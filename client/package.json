@@ -37,6 +37,6 @@
 		"vscode": "0.10.x"
 	},
 	"dependencies": {
-		"vscode-languageclient": "0.10.x"
+		"vscode-languageclient": "^1.1.0"
 	}
 }

@@ -7,7 +7,7 @@
 import * as path from 'path';
 
 import { workspace, Disposable, ExtensionContext } from 'vscode';
-import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions, TransportKind } from 'vscode-languageclient';
 
 export function activate(context: ExtensionContext) {
 
@@ -19,8 +19,8 @@ export function activate(context: ExtensionContext) {
 	// If the extension is launch in debug mode the debug server options are use
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
-		run : { module: serverModule },
-		debug: { module: serverModule, options: debugOptions }
+		run : { module: serverModule, transport: TransportKind.ipc },
+		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
 	
 	// Options to control the language client

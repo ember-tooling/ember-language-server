@@ -5,6 +5,7 @@
 'use strict';
 
 import {
+	IPCMessageReader, IPCMessageWriter,
 	createConnection, IConnection, TextDocumentSyncKind,
 	TextDocuments, ITextDocument, Diagnostic, DiagnosticSeverity,
 	InitializeParams, InitializeResult, TextDocumentIdentifier,
@@ -13,7 +14,7 @@ import {
 
 // Create a connection for the server. The connection uses 
 // stdin / stdout for message passing
-let connection: IConnection = createConnection(process.stdin, process.stdout);
+let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 
 // Create a simple text document manager. The text document manager
 // supports full document sync only
