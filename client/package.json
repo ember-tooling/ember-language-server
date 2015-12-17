@@ -9,7 +9,7 @@
 		"vscode": "0.10.x"
 	},
 	"categories": [
-		"Others"
+		"Other"
 	],
 	"activationEvents": [
 		"onLanguage:plaintext"
