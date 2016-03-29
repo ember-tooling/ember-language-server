@@ -8,10 +8,10 @@
 		"node": "*"
 	},
 	"dependencies": {
-		"vscode-languageserver": "^1.1.0"
+		"vscode-languageserver": "^1.4.1"
 	},
 	"devDependencies": {
-		"typescript": "^1.6.2"
+		"typescript": "^1.8.9"
 	},
 	"scripts": {
 		"compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",

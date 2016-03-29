@@ -83,7 +83,8 @@ function validateTextDocument(textDocument: ITextDocument): void {
 					start: { line: i, character: index},
 					end: { line: i, character: index + 10 }
 				},
-				message: `${line.substr(index, 10)} should be spelled TypeScript`
+				message: `${line.substr(index, 10)} should be spelled TypeScript`,
+				source: 'ex'
 			});
 		}
 	}
