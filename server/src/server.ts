@@ -12,8 +12,7 @@ import {
 	CompletionItem, CompletionItemKind
 } from 'vscode-languageserver';
 
-// Create a connection for the server. The connection uses 
-// stdin / stdout for message passing
+// Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 
 // Create a simple text document manager. The text document manager
