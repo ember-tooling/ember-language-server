@@ -8,7 +8,7 @@
 		"node": "*"
 	},
 	"dependencies": {
-		"vscode-languageserver": "^1.4.1"
+		"vscode-languageserver": "^2.2.0"
 	},
 	"devDependencies": {
 		"typescript": "^1.8.9"
