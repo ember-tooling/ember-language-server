@@ -1,5 +1,5 @@
 {
-	"name": "langauge-server-example",
+	"name": "language-server-example",
 	"description": "Example implementation of a language server in node.",
 	"version": "0.0.1",
 	"author": "Microsoft Corporation",
