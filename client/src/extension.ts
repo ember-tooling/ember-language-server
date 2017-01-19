@@ -28,9 +28,11 @@ export function activate(context: ExtensionContext) {
 		// Register the server for plain text documents
 		documentSelector: ['handlebars', 'javascript'],
 		synchronize: {
-			// Notify the server about file changes to '.clientrc files contain in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
-		}
+			fileEvents: [
+				workspace.createFileSystemWatcher('**/*.hbs'),
+				workspace.createFileSystemWatcher('**/*.js'),
+			],
+		},
 	}
 	
 	// Create the language client and start the client.
