@@ -52,7 +52,9 @@ export default class Server {
 	private onInitialize(params: InitializeParams): InitializeResult {
 		this.workspaceRoot = params.rootPath;
 
-		findProjectRoots(this.workspaceRoot);
+		findProjectRoots(this.workspaceRoot).then(projectRoots => {
+			console.log(`Ember CLI projects found at:${projectRoots.map(it => `\n- ${it}`)}`);
+		});
 
 		return {
 			capabilities: {
@@ -71,12 +73,17 @@ export default class Server {
 	}
 }
 
-function findProjectRoots(workspaceRoot: string) {
-	let filter = it => ignoredFolders.indexOf(basename(it)) === -1;
+export function findProjectRoots(workspaceRoot: string): Promise<string[]> {
+	return new Promise(resolve => {
+		let filter = it => ignoredFolders.indexOf(basename(it)) === -1;
 
-	klaw(workspaceRoot, { filter }).on('data', item => {
-		if (basename(item.path) === 'ember-cli-build.js') {
-			console.log(`Ember CLI project found at ${dirname(item.path)}`);
-		}
+		let projectRoots = [];
+		klaw(workspaceRoot, { filter })
+			.on('data', item => {
+				if (basename(item.path) === 'ember-cli-build.js') {
+					projectRoots.push(dirname(item.path));
+				}
+			})
+			.on('end', () => resolve(projectRoots));
 	});
 }
