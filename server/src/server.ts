@@ -4,11 +4,15 @@
  * ------------------------------------------------------------------------------------------ */
 'use strict';
 
+import { basename, dirname } from 'path';
+
 import {
 	IPCMessageReader, IPCMessageWriter,
 	createConnection, IConnection,
 	TextDocuments, InitializeResult,
 } from 'vscode-languageserver';
+
+const klaw = require('klaw');
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -25,6 +29,9 @@ documents.listen(connection);
 let workspaceRoot: string;
 connection.onInitialize((params): InitializeResult => {
 	workspaceRoot = params.rootPath;
+
+	findProjectRoots(workspaceRoot);
+
 	return {
 		capabilities: {
 			// Tell the client that the server works in FULL text document sync mode
@@ -32,6 +39,23 @@ connection.onInitialize((params): InitializeResult => {
 		}
 	}
 });
+
+const ignoredFolders: string[] = [
+	'.git',
+	'bower_components',
+	'node_modules',
+	'tmp',
+];
+
+function findProjectRoots(workspaceRoot: string) {
+	let filter = it => ignoredFolders.indexOf(basename(it)) === -1;
+
+	klaw(workspaceRoot, { filter }).on('data', item => {
+		if (basename(item.path) === 'ember-cli-build.js') {
+			console.log(`Ember CLI project found at ${dirname(item.path)}`);
+		}
+	});
+}
 
 documents.onDidChangeContent((change) => {
 	// here be dragons
