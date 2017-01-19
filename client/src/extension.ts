@@ -27,6 +27,7 @@ export function activate(context: ExtensionContext) {
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
 		documentSelector: ['handlebars', 'javascript'],
+		outputChannelName: 'Ember Language Server',
 		synchronize: {
 			fileEvents: [
 				workspace.createFileSystemWatcher('**/*.hbs'),
