@@ -52,6 +52,8 @@ export default class Server {
 	private onInitialize(params: InitializeParams): InitializeResult {
 		this.workspaceRoot = params.rootPath;
 
+		console.log(`Initializing Ember Language Server in ${this.workspaceRoot}`);
+
 		findProjectRoots(this.workspaceRoot).then(projectRoots => {
 			console.log(`Ember CLI projects found at:${projectRoots.map(it => `\n- ${it}`)}`);
 		});
