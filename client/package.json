@@ -12,7 +12,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:plaintext"
+    "onLanguage:handlebars",
+    "onLanguage:javascript"
   ],
   "main": "./out/src/extension",
   "scripts": {
