@@ -28,8 +28,6 @@ export function activate(context: ExtensionContext) {
 		// Register the server for plain text documents
 		documentSelector: ['plaintext'],
 		synchronize: {
-			// Synchronize the setting section 'languageServerExample' to the server
-			configurationSection: 'languageServerExample',
 			// Notify the server about file changes to '.clientrc files contain in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}

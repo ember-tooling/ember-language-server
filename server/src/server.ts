@@ -45,37 +45,13 @@ documents.onDidChangeContent((change) => {
 	validateTextDocument(change.document);
 });
 
-// The settings interface describe the server relevant settings part
-interface Settings {
-	languageServerExample: ExampleSettings;
-}
-
-// These are the example settings we defined in the client's package.json
-// file
-interface ExampleSettings {
-	maxNumberOfProblems: number;
-}
-
-// hold the maxNumberOfProblems setting
-let maxNumberOfProblems: number;
-// The settings have changed. Is send on server activation
-// as well.
-connection.onDidChangeConfiguration((change) => {
-	let settings = <Settings>change.settings;
-	maxNumberOfProblems = settings.languageServerExample.maxNumberOfProblems || 100;
-	// Revalidate any open text documents
-	documents.all().forEach(validateTextDocument);
-});
-
 function validateTextDocument(textDocument: TextDocument): void {
 	let diagnostics: Diagnostic[] = [];
 	let lines = textDocument.getText().split(/\r?\n/g);
-	let problems = 0;
-	for (var i = 0; i < lines.length && problems < maxNumberOfProblems; i++) {
+	for (var i = 0; i < lines.length; i++) {
 		let line = lines[i];
 		let index = line.indexOf('typescript');
 		if (index >= 0) {
-			problems++;
 			diagnostics.push({
 				severity: DiagnosticSeverity.Warning,
 				range: {
