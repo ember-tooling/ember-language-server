@@ -15,15 +15,12 @@ import {
 
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
-import { SymbolInformation, SymbolKind, Range, Position } from 'vscode-languageserver-types';
-
-import { preprocess, traverse } from '@glimmer/syntax';
-import { parse } from 'esprima'
-
-const types = require("ast-types");
-const klaw = require('klaw');
+import { SymbolInformation } from 'vscode-languageserver-types';
 
 import ProjectRoots from './project-roots';
+import DocumentSymbolProvider from "./symbols/document-symbol-provider";
+import JSDocumentSymbolProvider from "./symbols/js-document-symbol-provider";
+import HBSDocumentSymbolProvider from "./symbols/hbs-document-symbol-provider";
 
 export default class Server {
 
@@ -35,6 +32,11 @@ export default class Server {
 	documents: TextDocuments = new TextDocuments();
 
 	projectRoots: ProjectRoots = new ProjectRoots(this);
+
+	documentSymbolProviders: DocumentSymbolProvider[] = [
+		new JSDocumentSymbolProvider(),
+		new HBSDocumentSymbolProvider(),
+	];
 
 	constructor() {
 		// Make the text document manager listen on the connection
@@ -81,53 +83,16 @@ export default class Server {
 		let uri = params.textDocument.uri;
 		let filePath = uriToFilePath(uri);
 		let extension = extname(filePath);
-		if (extension === '.hbs') {
-			let ast = preprocess(readFileSync(filePath, 'utf-8'));
 
-			let symbols: SymbolInformation[] = [];
+		let providers = this.documentSymbolProviders
+			.filter(provider => provider.extensions.indexOf(extension) !== -1);
 
-			traverse(ast, {
-				BlockStatement(node) {
-					if (node.program.blockParams.length === 0) return;
+		if (providers.length === 0) return [];
 
-					node.program.blockParams.forEach(blockParam => {
-						let symbol = SymbolInformation.create(blockParam, SymbolKind.Variable, locToRange(node.loc));
-						symbols.push(symbol);
-					});
-				}
-			});
+		let content = readFileSync(filePath, 'utf-8');
 
-			return symbols;
-		}
-
-		if (extension === '.js') {
-			let ast = parse(readFileSync(filePath, 'utf-8'), {
-				loc: true,
-				sourceType: 'module',
-			});
-
-			let symbols: SymbolInformation[] = [];
-
-			types.visit(ast, {
-				visitProperty(path) {
-					let node = path.node;
-
-					let symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, locToRange(node.key.loc));
-					symbols.push(symbol);
-
-					this.traverse(path);
-				},
-			});
-
-			return symbols;
-		}
-
-		return [];
+		return providers
+			.map(providers => providers.process(content))
+			.reduce((a, b) => a.concat(b), []);
 	}
-}
-
-function locToRange(loc): Range {
-	let start = Position.create(loc.start.line - 1, loc.start.column);
-	let end = Position.create(loc.end.line - 1, loc.end.column);
-	return Range.create(start, end);
 }
