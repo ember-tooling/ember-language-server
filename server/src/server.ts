@@ -23,12 +23,7 @@ const esprima = require('esprima');
 const types = require("ast-types");
 const klaw = require('klaw');
 
-const ignoredFolders: string[] = [
-	'.git',
-	'bower_components',
-	'node_modules',
-	'tmp',
-];
+import ProjectRoots from './project-roots';
 
 export default class Server {
 
@@ -39,7 +34,7 @@ export default class Server {
 	// supports full document sync only
 	documents: TextDocuments = new TextDocuments();
 
-	workspaceRoot: string;
+	projectRoots: ProjectRoots = new ProjectRoots(this);
 
 	constructor() {
 		// Make the text document manager listen on the connection
@@ -60,13 +55,9 @@ export default class Server {
 	// After the server has started the client sends an initilize request. The server receives
 	// in the passed params the rootPath of the workspace plus the client capabilites.
 	private onInitialize(params: InitializeParams): InitializeResult {
-		this.workspaceRoot = params.rootPath;
+		console.log('Initializing Ember Language Server');
 
-		console.log(`Initializing Ember Language Server in ${this.workspaceRoot}`);
-
-		findProjectRoots(this.workspaceRoot).then(projectRoots => {
-			console.log(`Ember CLI projects found at:${projectRoots.map(it => `\n- ${it}`)}`);
-		});
+		this.projectRoots.initialize(params);
 
 		return {
 			capabilities: {
@@ -139,19 +130,4 @@ function locToRange(loc): Range {
 	let start = Position.create(loc.start.line - 1, loc.start.column);
 	let end = Position.create(loc.end.line - 1, loc.end.column);
 	return Range.create(start, end);
-}
-
-export function findProjectRoots(workspaceRoot: string): Promise<string[]> {
-	return new Promise(resolve => {
-		let filter = it => ignoredFolders.indexOf(basename(it)) === -1;
-
-		let projectRoots = [];
-		klaw(workspaceRoot, { filter })
-			.on('data', item => {
-				if (basename(item.path) === 'ember-cli-build.js') {
-					projectRoots.push(dirname(item.path));
-				}
-			})
-			.on('end', () => resolve(projectRoots));
-	});
 }
