@@ -1,4 +1,4 @@
-import { findProjectRoots } from "../src/server";
+import { findProjectRoots } from "../src/project-roots";
 
 const expect = require('chai').expect;
 
