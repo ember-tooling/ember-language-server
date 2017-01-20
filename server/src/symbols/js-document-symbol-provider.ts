@@ -7,27 +7,27 @@ import DocumentSymbolProvider from "./document-symbol-provider";
 import { locToRange } from "../ast";
 
 export default class JSDocumentSymbolProvider implements DocumentSymbolProvider {
-    extensions: string[] = ['.js'];
+  extensions: string[] = ['.js'];
 
-    process(content: string): SymbolInformation[] {
-        let ast = parse(content, {
-            loc: true,
-            sourceType: 'module',
-        });
+  process(content: string): SymbolInformation[] {
+    let ast = parse(content, {
+      loc: true,
+      sourceType: 'module',
+    });
 
-        let symbols: SymbolInformation[] = [];
+    let symbols: SymbolInformation[] = [];
 
-        types.visit(ast, {
-            visitProperty(path) {
-                let node = path.node;
+    types.visit(ast, {
+      visitProperty(path) {
+        let node = path.node;
 
-                let symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, locToRange(node.key.loc));
-                symbols.push(symbol);
+        let symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, locToRange(node.key.loc));
+        symbols.push(symbol);
 
-                this.traverse(path);
-            },
-        });
+        this.traverse(path);
+      },
+    });
 
-        return symbols;
-    }
+    return symbols;
+  }
 }
