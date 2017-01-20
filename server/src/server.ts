@@ -19,6 +19,8 @@ import { SymbolInformation, SymbolKind, Range, Position } from 'vscode-languages
 
 import { preprocess, traverse } from '@glimmer/syntax';
 
+const esprima = require('esprima');
+const types = require("ast-types");
 const klaw = require('klaw');
 
 const ignoredFolders: string[] = [
@@ -106,6 +108,29 @@ export default class Server {
 
 			return symbols;
 		}
+
+		if (extension === '.js') {
+			let ast = esprima.parse(readFileSync(filePath, 'utf-8'), {
+				loc: true,
+				sourceType: 'module',
+			});
+
+			let symbols: SymbolInformation[] = [];
+
+			types.visit(ast, {
+				visitProperty(path) {
+					let node = path.node;
+
+					let symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, locToRange(node.key.loc));
+					symbols.push(symbol);
+
+					this.traverse(path);
+				},
+			});
+
+			return symbols;
+		}
+
 		return [];
 	}
 }
