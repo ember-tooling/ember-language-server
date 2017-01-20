@@ -18,8 +18,8 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { SymbolInformation, SymbolKind, Range, Position } from 'vscode-languageserver-types';
 
 import { preprocess, traverse } from '@glimmer/syntax';
+import { parse } from 'esprima'
 
-const esprima = require('esprima');
 const types = require("ast-types");
 const klaw = require('klaw');
 
@@ -101,7 +101,7 @@ export default class Server {
 		}
 
 		if (extension === '.js') {
-			let ast = esprima.parse(readFileSync(filePath, 'utf-8'), {
+			let ast = parse(readFileSync(filePath, 'utf-8'), {
 				loc: true,
 				sourceType: 'module',
 			});
