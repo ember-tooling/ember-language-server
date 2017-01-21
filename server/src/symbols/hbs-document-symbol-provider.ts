@@ -1,8 +1,8 @@
 import { SymbolInformation, SymbolKind } from 'vscode-languageserver-types';
 import { preprocess, traverse } from '@glimmer/syntax';
 
-import DocumentSymbolProvider from "./document-symbol-provider";
-import { locToRange } from "../ast";
+import DocumentSymbolProvider from './document-symbol-provider';
+import { locToRange } from '../ast';
 
 export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.hbs'];

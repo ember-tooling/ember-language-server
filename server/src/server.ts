@@ -18,9 +18,9 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { SymbolInformation } from 'vscode-languageserver-types';
 
 import ProjectRoots from './project-roots';
-import DocumentSymbolProvider from "./symbols/document-symbol-provider";
-import JSDocumentSymbolProvider from "./symbols/js-document-symbol-provider";
-import HBSDocumentSymbolProvider from "./symbols/hbs-document-symbol-provider";
+import DocumentSymbolProvider from './symbols/document-symbol-provider';
+import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
+import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 
 export default class Server {
 
@@ -68,7 +68,7 @@ export default class Server {
 
         documentSymbolProvider: true,
       }
-    }
+    };
   }
 
   private onDidChangeContent(change) {

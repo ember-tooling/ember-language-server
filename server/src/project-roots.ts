@@ -4,7 +4,7 @@ import { basename, dirname } from 'path';
 
 import { InitializeParams } from 'vscode-languageserver';
 
-import Server from "./server";
+import Server from './server';
 
 const klaw = require('klaw');
 
