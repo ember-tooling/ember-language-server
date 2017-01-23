@@ -1,4 +1,4 @@
-import { Position } from 'vscode-languageserver-types';
+import { Position } from 'vscode-languageserver';
 
 export function compare(a: Position, b: Position): number {
   if (a.line < b.line) return -1;

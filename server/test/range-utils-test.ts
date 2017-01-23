@@ -1,10 +1,10 @@
-import { Range, Position } from 'vscode-languageserver-types';
+import { Range, Position } from 'vscode-languageserver';
 
 import { contains } from '../src/range-utils';
 
 const expect = require('chai').expect;
 
-describe.only('range-utils', function() {
+describe('range-utils', function() {
   describe('contains()', function() {
     it('checks if range contains a position', function() {
       expect(contains(Range.create(42, 1, 42, 3), Position.create(42, 0))).to.be.false;

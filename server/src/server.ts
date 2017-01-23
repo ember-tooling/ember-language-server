@@ -11,11 +11,10 @@ import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
+  SymbolInformation,
 } from 'vscode-languageserver';
 
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
-
-import { SymbolInformation } from 'vscode-languageserver-types';
 
 import ProjectRoots from './project-roots';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
