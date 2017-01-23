@@ -1,4 +1,4 @@
-import { SymbolInformation, SymbolKind } from 'vscode-languageserver-types';
+import { SymbolInformation, SymbolKind } from 'vscode-languageserver';
 import { preprocess, traverse } from '@glimmer/syntax';
 
 import DocumentSymbolProvider from './document-symbol-provider';

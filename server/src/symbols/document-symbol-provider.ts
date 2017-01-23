@@ -1,4 +1,4 @@
-import { SymbolInformation } from 'vscode-languageserver-types';
+import { SymbolInformation } from 'vscode-languageserver';
 
 interface DocumentSymbolProvider {
   /**

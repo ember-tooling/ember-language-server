@@ -1,4 +1,4 @@
-import { Range, Position } from 'vscode-languageserver-types';
+import { Range, Position } from 'vscode-languageserver';
 
 export function locToRange(loc): Range {
   let start = Position.create(loc.start.line - 1, loc.start.column);

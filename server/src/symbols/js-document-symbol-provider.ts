@@ -1,4 +1,4 @@
-import { SymbolInformation, SymbolKind } from 'vscode-languageserver-types';
+import { SymbolInformation, SymbolKind } from 'vscode-languageserver';
 import { parse } from 'esprima';
 import * as types from 'ast-types';
 import DocumentSymbolProvider from './document-symbol-provider';
