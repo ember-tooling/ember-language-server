@@ -17,6 +17,7 @@ import {
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import ProjectRoots from './project-roots';
+import DefinitionProvider from './definition-provider';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
@@ -37,6 +38,8 @@ export default class Server {
     new HBSDocumentSymbolProvider(),
   ];
 
+  definitionProvider: DefinitionProvider = new DefinitionProvider();
+
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
@@ -47,6 +50,7 @@ export default class Server {
     this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
+    this.connection.onDefinition(this.definitionProvider.handler);
   }
 
   listen() {
@@ -65,6 +69,7 @@ export default class Server {
         // Tell the client that the server works in FULL text document sync mode
         textDocumentSync: this.documents.syncKind,
 
+        definitionProvider: true,
         documentSymbolProvider: true,
       }
     };
