@@ -20,11 +20,14 @@
     "@types/node": "^6.0.52",
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
+    "mocha-tslint": "^0.2.0",
     "ts-node": "^2.0.0",
+    "tslint": "^4.3.1",
     "typescript": "^2.1.4"
   },
   "scripts": {
     "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+    "lint": "tslint --project ./tsconfig.json",
     "test": "mocha --require ts-node/register test/*.ts",
     "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
   }

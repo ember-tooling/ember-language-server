@@ -1,9 +1,9 @@
-import { findProjectRoots } from "../src/project-roots";
+import { findProjectRoots } from '../src/project-roots';
 
 const expect = require('chai').expect;
 
-describe('findProjectRoots()', function () {
-  it('finds nested projects', function () {
+describe('findProjectRoots()', function() {
+  it('finds nested projects', function() {
     let workspaceRoot = `${__dirname}/fixtures/nested-projects`;
     return findProjectRoots(workspaceRoot).then(projectRoots => {
       expect(projectRoots).to.deep.equal([

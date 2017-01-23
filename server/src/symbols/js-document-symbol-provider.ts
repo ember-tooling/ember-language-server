@@ -1,10 +1,8 @@
 import { SymbolInformation, SymbolKind } from 'vscode-languageserver-types';
-import { parse } from 'esprima'
-
-const types = require("ast-types");
-
-import DocumentSymbolProvider from "./document-symbol-provider";
-import { locToRange } from "../ast";
+import { parse } from 'esprima';
+import * as types from 'ast-types';
+import DocumentSymbolProvider from './document-symbol-provider';
+import { locToRange } from '../ast';
 
 export default class JSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.js'];
