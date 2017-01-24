@@ -30,6 +30,12 @@ export default class ProjectRoots {
 
     console.log(`Ember CLI projects found at:${this.projectRoots.map(it => `\n- ${it}`)}`);
   }
+
+  rootForPath(path: string) {
+    return this.projectRoots
+      .filter(root => path.indexOf(root) === 0)
+      .reduce((a, b) => a.length > b.length ? a : b);
+  }
 }
 
 export function findProjectRoots(workspaceRoot: string): Promise<string[]> {

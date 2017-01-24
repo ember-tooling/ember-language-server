@@ -1,17 +1,21 @@
-import { extname } from 'path';
-import { readFileSync } from 'fs';
+import { extname, join } from 'path';
+import { readFileSync, existsSync } from 'fs';
 
-import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-languageserver';
+import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { Position, SourceLocation } from 'estree';
 
 import { preprocess, traverse } from '@glimmer/syntax';
 import { toPosition, containsPosition } from './estree-utils';
+import Server from './server';
 
 export default class DefinitionProvider {
+  constructor(private server: Server) {}
+
   handle(params: TextDocumentPositionParams): Definition {
     let uri = params.textDocument.uri;
     let filePath = uriToFilePath(uri);
+    let root = this.server.projectRoots.rootForPath(filePath);
     let extension = extname(filePath);
 
     if (extension === '.hbs') {
@@ -19,7 +23,24 @@ export default class DefinitionProvider {
       let ast = preprocess(content);
       let focusPath = findFocusPath(ast, toPosition(params.position));
       if (this.isComponentName(focusPath)) {
-        console.log('looking up component: ' + focusPath[focusPath.length - 1].original);
+        let componentPath = focusPath[focusPath.length - 1].original;
+        console.log(`looking up component: ${componentPath}`);
+
+        let definition: Location[] = [];
+
+        let jsPath = join(root, 'app', 'components', `${componentPath}.js`);
+        if (existsSync(jsPath)) {
+          console.log(`found ${jsPath}`);
+          definition.push(Location.create(`file:${jsPath}`, Range.create(0, 0, 0, 0)));
+        }
+
+        let hbsPath = join(root, 'app', 'templates', 'components', `${componentPath}.hbs`);
+        if (existsSync(hbsPath)) {
+          console.log(`found ${hbsPath}`);
+          definition.push(Location.create(`file:${hbsPath}`, Range.create(0, 0, 0, 0)));
+        }
+
+        return definition;
       }
     }
 

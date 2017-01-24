@@ -38,7 +38,7 @@ export default class Server {
     new HBSDocumentSymbolProvider(),
   ];
 
-  definitionProvider: DefinitionProvider = new DefinitionProvider();
+  definitionProvider: DefinitionProvider = new DefinitionProvider(this);
 
   constructor() {
     // Make the text document manager listen on the connection
