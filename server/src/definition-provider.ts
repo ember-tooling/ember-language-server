@@ -18,7 +18,9 @@ export default class DefinitionProvider {
       let content = readFileSync(filePath, 'utf-8');
       let ast = preprocess(content);
       let focusPath = findFocusPath(ast, toPosition(params.position));
-      console.log(focusPath);
+      if (this.isComponentName(focusPath)) {
+        console.log('looking up component: ' + focusPath[focusPath.length - 1].original);
+      }
     }
 
     return null;
@@ -26,6 +28,20 @@ export default class DefinitionProvider {
 
   get handler(): RequestHandler<TextDocumentPositionParams, Definition, void> {
     return this.handle.bind(this);
+  }
+
+  isComponentName(path: any[]) {
+    let node = path[path.length - 1];
+    if (!node || node.type !== 'PathExpression') {
+      return false;
+    }
+
+    let parent = path[path.length - 2];
+    if (!parent || parent.path !== node || (parent.type !== 'MustacheStatement' && parent.type !== 'BlockStatement')) {
+      return false;
+    }
+
+    return true;
   }
 }
 
