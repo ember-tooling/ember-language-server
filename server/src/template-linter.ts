@@ -49,6 +49,11 @@ export default class TemplateLinter {
   private getLinterConfig(uri: string): { configPath: string } | undefined {
     const filePath = uriToFilePath(uri);
     const rootPath = this.server.projectRoots.rootForPath(filePath);
+
+    if (!rootPath) {
+      return;
+    }
+
     const configPath = path.join(rootPath, '.template-lintrc.js');
 
     if (!fs.existsSync(configPath)) {
@@ -63,6 +68,10 @@ export default class TemplateLinter {
   private async getLinter(uri: string) {
     const filePath = uriToFilePath(uri);
     const rootPath = this.server.projectRoots.rootForPath(filePath);
+
+    if (!rootPath) {
+      return;
+    }
 
     if (this._linter[rootPath]) {
       return this._linter;
