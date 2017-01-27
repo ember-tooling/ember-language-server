@@ -16,6 +16,7 @@ import {
 
 import ProjectRoots from './project-roots';
 import DefinitionProvider from './definition-provider';
+import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
@@ -38,6 +39,8 @@ export default class Server {
 
   definitionProvider: DefinitionProvider = new DefinitionProvider(this);
 
+  templateLinter: TemplateLinter = new TemplateLinter(this);
+
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
@@ -46,6 +49,7 @@ export default class Server {
     // Bind event handlers
     this.connection.onInitialize(this.onInitialize.bind(this));
     this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
+    this.connection.onDidOpenTextDocument(this.onDidOpenTextDocument.bind(this));
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
     this.connection.onDefinition(this.definitionProvider.handler);
@@ -82,8 +86,12 @@ export default class Server {
     };
   }
 
-  private onDidChangeContent() {
-    // here be dragons
+  private onDidChangeContent(change: any) {
+    this.templateLinter.lint(change.document);
+  }
+
+  private onDidOpenTextDocument({ textDocument }: any) {
+    this.templateLinter.lint(textDocument);
   }
 
   private onDidChangeWatchedFiles() {
