@@ -12,7 +12,7 @@ import Server from './server';
 export default class DefinitionProvider {
   constructor(private server: Server) {}
 
-  handle(params: TextDocumentPositionParams): Definition {
+  handle(params: TextDocumentPositionParams): Definition | null {
     let uri = params.textDocument.uri;
     let filePath = uriToFilePath(uri);
     let root = this.server.projectRoots.rootForPath(filePath);
@@ -69,7 +69,7 @@ export default class DefinitionProvider {
 function findFocusPath(node: any, position: Position, seen = new Set()): any {
   seen.add(node);
 
-  let path = [];
+  let path: any[] = [];
   let range: SourceLocation = node.loc;
   if (range) {
     if (containsPosition(range, position)) {

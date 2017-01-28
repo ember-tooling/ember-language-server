@@ -42,7 +42,7 @@ export function findProjectRoots(workspaceRoot: string): Promise<string[]> {
   return new Promise(resolve => {
     let filter = it => ignoredFolders.indexOf(basename(it)) === -1;
 
-    let projectRoots = [];
+    let projectRoots: string[] = [];
     klaw(workspaceRoot, { filter })
       .on('data', item => {
         if (basename(item.path) === 'ember-cli-build.js') {
