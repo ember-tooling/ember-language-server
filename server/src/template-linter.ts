@@ -8,7 +8,7 @@ import Server from './server';
 
 export default class TemplateLinter {
 
-  private _linter: any = {};
+  private _linterCache = new Map();
 
   constructor(private server: Server) {}
 
@@ -73,13 +73,13 @@ export default class TemplateLinter {
       return;
     }
 
-    if (this._linter[rootPath]) {
-      return this._linter;
+    if (this._linterCache.has(rootPath)) {
+      return this._linterCache.get(rootPath);
     }
 
     return Files.resolveModule(rootPath, 'ember-template-lint')
       .then(resolvedLinter => {
-        this._linter[rootPath] = resolvedLinter;
+        this._linterCache.set(rootPath, resolvedLinter);
 
         return resolvedLinter;
       }, () => {
