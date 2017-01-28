@@ -2,7 +2,7 @@ import { Position } from 'vscode-languageserver';
 
 import { compare } from '../src/position-utils';
 
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 describe('position-utils', function() {
   describe('compare()', function() {

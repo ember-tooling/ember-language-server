@@ -15,6 +15,7 @@
     "vscode-languageserver": "^2.6.2"
   },
   "devDependencies": {
+    "@types/chai": "^3.4.34",
     "@types/esprima": "^2.1.33",
     "@types/estree": "*",
     "@types/mocha": "^2.2.38",
