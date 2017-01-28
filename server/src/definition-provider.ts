@@ -5,9 +5,10 @@ import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { Position, SourceLocation } from 'estree';
 
-import { preprocess, traverse } from '@glimmer/syntax';
 import { toPosition, containsPosition } from './estree-utils';
 import Server from './server';
+
+const { preprocess } = require('@glimmer/syntax');
 
 export default class DefinitionProvider {
   constructor(private server: Server) {}

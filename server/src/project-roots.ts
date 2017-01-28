@@ -40,11 +40,11 @@ export default class ProjectRoots {
 
 export function findProjectRoots(workspaceRoot: string): Promise<string[]> {
   return new Promise(resolve => {
-    let filter = it => ignoredFolders.indexOf(basename(it)) === -1;
+    let filter = (it: string) => ignoredFolders.indexOf(basename(it)) === -1;
 
     let projectRoots: string[] = [];
     klaw(workspaceRoot, { filter })
-      .on('data', item => {
+      .on('data', (item: any) => {
         if (basename(item.path) === 'ember-cli-build.js') {
           projectRoots.push(dirname(item.path));
         }

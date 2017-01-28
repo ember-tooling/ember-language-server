@@ -11,7 +11,7 @@ import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
-  SymbolInformation,
+  SymbolInformation, DidChangeWatchedFilesParams
 } from 'vscode-languageserver';
 
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -75,11 +75,11 @@ export default class Server {
     };
   }
 
-  private onDidChangeContent(change) {
+  private onDidChangeContent(change: any) {
     // here be dragons
   }
 
-  private onDidChangeWatchedFiles(change) {
+  private onDidChangeWatchedFiles(change: DidChangeWatchedFilesParams) {
     // here be dragons
   }
 
