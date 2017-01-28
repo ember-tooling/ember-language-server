@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { tmpdir } from 'os';
+import { EventEmitter } from 'events';
 
 import { expect } from 'chai';
 
@@ -32,7 +33,10 @@ describe('chokidar', function() {
 
   it('watches an empty folder', function() {
     return withWatcher(async (watcher: any) => {
-      await readyEvent(watcher);
+      let events = await listEventsUntilReady(watcher);
+
+      expect(events).to.have.lengthOf(1);
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
 
       let watched = watcher.getWatched();
       expect(watched).to.deep.equal({
@@ -47,7 +51,15 @@ describe('chokidar', function() {
     fs.outputFileSync(path.join(workDir, 'b', 'c', 'ember-cli-build.js'));
 
     return withWatcher(async (watcher: any) => {
-      await readyEvent(watcher);
+      let events = await listEventsUntilReady(watcher);
+
+      expect(events).to.have.lengthOf(6);
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}/a` });
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}/b` });
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}/b/c` });
+      expect(events).to.deep.include({ event: 'add', path: `${workDir}/a/ember-cli-build.js` });
+      expect(events).to.deep.include({ event: 'add', path: `${workDir}/b/c/ember-cli-build.js` });
 
       let watched = watcher.getWatched();
       expect(watched).to.deep.equal({
@@ -61,7 +73,20 @@ describe('chokidar', function() {
   });
 });
 
-function readyEvent(watcher: any) {
+async function listEventsUntilReady(watcher: EventEmitter) {
+  let events: any[] = [];
+  let listener = (event: any, path: string) => {
+    events.push({ event, path });
+  };
+
+  watcher.on('all', listener);
+  await readyEvent(watcher);
+  watcher.removeListener('all', listener);
+
+  return events;
+}
+
+function readyEvent(watcher: EventEmitter) {
   return new Promise(resolve => {
     watcher.once('ready', resolve);
   });
