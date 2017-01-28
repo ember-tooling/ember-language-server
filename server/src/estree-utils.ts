@@ -1,5 +1,5 @@
 import { Position, SourceLocation } from 'estree';
-import { Position as LSPosition } from 'vscode-languageserver';
+import { Position as LSPosition, Range as LSRange } from 'vscode-languageserver';
 
 export function newPosition(line: number, column: number): Position {
   return { line, column };
@@ -17,6 +17,14 @@ export function comparePositions(a: Position, b: Position): number {
 
 export function toPosition(lsp: LSPosition): Position {
   return newPosition(lsp.line + 1, lsp.character);
+}
+
+export function toLSPosition(pos: Position): LSPosition {
+  return LSPosition.create(pos.line - 1, pos.column);
+}
+
+export function toLSRange(loc: SourceLocation): LSRange {
+  return LSRange.create(toLSPosition(loc.start), toLSPosition(loc.end));
 }
 
 export function newLocation(startLine: number, startColumn: number, endLine: number, endColumn: number): SourceLocation {

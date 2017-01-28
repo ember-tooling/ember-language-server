@@ -2,7 +2,15 @@ const { expect } = require('chai');
 
 import { Position as LSPosition } from 'vscode-languageserver';
 
-import { newPosition, comparePositions, newLocation, containsPosition, toPosition } from '../src/estree-utils';
+import {
+  newPosition,
+  comparePositions,
+  newLocation,
+  containsPosition,
+  toPosition,
+  toLSPosition,
+  toLSRange,
+} from '../src/estree-utils';
 
 describe('estree-utils', function() {
   describe('newPosition()', function() {
@@ -28,6 +36,24 @@ describe('estree-utils', function() {
       let position = toPosition(LSPosition.create(41, 17));
       expect(position).to.have.property('line', 42);
       expect(position).to.have.property('column', 17);
+    });
+  });
+
+  describe('toLSPosition()', function() {
+    it('converts estree Position to languageserver Position', function() {
+      let position = toLSPosition(newPosition(42, 17));
+      expect(position).to.have.property('line', 41);
+      expect(position).to.have.property('character', 17);
+    });
+  });
+
+  describe('toLSRange()', function() {
+    it('converts estree SourceLocation to languageserver Range', function() {
+      let { start, end } = toLSRange(newLocation(42, 17, 43, 10));
+      expect(start).to.have.property('line', 41);
+      expect(start).to.have.property('character', 17);
+      expect(end).to.have.property('line', 42);
+      expect(end).to.have.property('character', 10);
     });
   });
 

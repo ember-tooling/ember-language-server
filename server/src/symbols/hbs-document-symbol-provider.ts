@@ -2,7 +2,7 @@ import { SymbolInformation, SymbolKind } from 'vscode-languageserver';
 const { preprocess, traverse } = require('@glimmer/syntax');
 
 import DocumentSymbolProvider from './document-symbol-provider';
-import { locToRange } from '../ast';
+import { toLSRange } from '../estree-utils';
 
 export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.hbs'];
@@ -17,7 +17,7 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
         if (node.program.blockParams.length === 0) return;
 
         node.program.blockParams.forEach((blockParam: string) => {
-          let symbol = SymbolInformation.create(blockParam, SymbolKind.Variable, locToRange(node.loc));
+          let symbol = SymbolInformation.create(blockParam, SymbolKind.Variable, toLSRange(node.loc));
           symbols.push(symbol);
         });
       }
