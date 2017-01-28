@@ -2,8 +2,6 @@
 
 import { basename, dirname } from 'path';
 
-import { InitializeParams, Files } from 'vscode-languageserver';
-
 const klaw = require('klaw');
 
 const ignoredFolders: string[] = [
@@ -14,23 +12,19 @@ const ignoredFolders: string[] = [
 ];
 
 export default class ProjectRoots {
-  workspaceRoot: string | undefined;
+  workspaceRoot: string;
   projectRoots: string[];
 
   constructor() {}
 
-  async initialize(params: InitializeParams) {
-    if (params.rootUri) {
-      this.workspaceRoot = Files.uriToFilePath(params.rootUri);
+  async initialize(workspaceRoot: string) {
+    this.workspaceRoot = workspaceRoot;
 
-      console.log(`Searching for Ember projects in ${this.workspaceRoot}`);
-    }
+    console.log(`Searching for Ember projects in ${this.workspaceRoot}`);
 
-    if (this.workspaceRoot) {
-      this.projectRoots = await findProjectRoots(this.workspaceRoot);
+    this.projectRoots = await findProjectRoots(this.workspaceRoot);
 
-      console.log(`Ember CLI projects found at:${this.projectRoots.map(it => `\n- ${it}`)}`);
-    }
+    console.log(`Ember CLI projects found at:${this.projectRoots.map(it => `\n- ${it}`)}`);
   }
 
   rootForPath(path: string) {

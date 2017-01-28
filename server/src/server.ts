@@ -11,10 +11,8 @@ import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
-  SymbolInformation
+  SymbolInformation, Files
 } from 'vscode-languageserver';
-
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import ProjectRoots from './project-roots';
 import DefinitionProvider from './definition-provider';
@@ -59,10 +57,19 @@ export default class Server {
 
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
-  private onInitialize(params: InitializeParams): InitializeResult {
-    console.log('Initializing Ember Language Server');
+  private async onInitialize({ rootUri }: InitializeParams): Promise<InitializeResult> {
+    if (!rootUri) {
+      return { capabilities: {} };
+    }
 
-    this.projectRoots.initialize(params);
+    let rootPath = Files.uriToFilePath(rootUri);
+    if (!rootPath) {
+      return { capabilities: {} };
+    }
+
+    console.log(`Initializing Ember Language Server at ${rootPath}`);
+
+    await this.projectRoots.initialize(rootPath);
 
     return {
       capabilities: {
@@ -85,7 +92,7 @@ export default class Server {
 
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
     let uri = params.textDocument.uri;
-    let filePath = uriToFilePath(uri);
+    let filePath = Files.uriToFilePath(uri);
     if (!filePath) {
       return [];
     }
