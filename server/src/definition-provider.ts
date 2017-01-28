@@ -5,14 +5,15 @@ import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { Position, SourceLocation } from 'estree';
 
-import { preprocess, traverse } from '@glimmer/syntax';
 import { toPosition, containsPosition } from './estree-utils';
 import Server from './server';
+
+const { preprocess } = require('@glimmer/syntax');
 
 export default class DefinitionProvider {
   constructor(private server: Server) {}
 
-  handle(params: TextDocumentPositionParams): Definition {
+  handle(params: TextDocumentPositionParams): Definition | null {
     let uri = params.textDocument.uri;
     let filePath = uriToFilePath(uri);
     let root = this.server.projectRoots.rootForPath(filePath);
@@ -69,7 +70,7 @@ export default class DefinitionProvider {
 function findFocusPath(node: any, position: Position, seen = new Set()): any {
   seen.add(node);
 
-  let path = [];
+  let path: any[] = [];
   let range: SourceLocation = node.loc;
   if (range) {
     if (containsPosition(range, position)) {

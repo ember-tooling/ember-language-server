@@ -4,14 +4,14 @@
  * ------------------------------------------------------------------------------------------ */
 'use strict';
 
-import { basename, dirname, extname } from 'path';
+import { extname } from 'path';
 import { readFileSync } from 'fs';
 
 import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
-  SymbolInformation,
+  SymbolInformation
 } from 'vscode-languageserver';
 
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -31,7 +31,7 @@ export default class Server {
   // supports full document sync only
   documents: TextDocuments = new TextDocuments();
 
-  projectRoots: ProjectRoots = new ProjectRoots(this);
+  projectRoots: ProjectRoots = new ProjectRoots();
 
   documentSymbolProviders: DocumentSymbolProvider[] = [
     new JSDocumentSymbolProvider(),
@@ -75,11 +75,11 @@ export default class Server {
     };
   }
 
-  private onDidChangeContent(change) {
+  private onDidChangeContent() {
     // here be dragons
   }
 
-  private onDidChangeWatchedFiles(change) {
+  private onDidChangeWatchedFiles() {
     // here be dragons
   }
 

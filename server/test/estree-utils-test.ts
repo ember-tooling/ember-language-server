@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+const { expect } = require('chai');
 
 import { Position as LSPosition } from 'vscode-languageserver';
 

@@ -1,8 +1,9 @@
 import { SymbolInformation, SymbolKind } from 'vscode-languageserver';
 import { parse } from 'esprima';
-import * as types from 'ast-types';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { locToRange } from '../ast';
+
+const types = require('ast-types');
 
 export default class JSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.js'];
@@ -16,7 +17,7 @@ export default class JSDocumentSymbolProvider implements DocumentSymbolProvider 
     let symbols: SymbolInformation[] = [];
 
     types.visit(ast, {
-      visitProperty(path) {
+      visitProperty(path: any) {
         let node = path.node;
 
         let symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, locToRange(node.key.loc));

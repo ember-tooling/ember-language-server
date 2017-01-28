@@ -2,7 +2,7 @@ import { Range, Position } from 'vscode-languageserver';
 
 import { contains } from '../src/range-utils';
 
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 describe('range-utils', function() {
   describe('contains()', function() {

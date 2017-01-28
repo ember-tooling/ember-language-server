@@ -1,6 +1,6 @@
 import { findProjectRoots } from '../src/project-roots';
 
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 describe('findProjectRoots()', function() {
   it('finds nested projects', async function() {

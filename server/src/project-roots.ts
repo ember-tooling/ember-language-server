@@ -4,8 +4,6 @@ import { basename, dirname } from 'path';
 
 import { InitializeParams } from 'vscode-languageserver';
 
-import Server from './server';
-
 const klaw = require('klaw');
 
 const ignoredFolders: string[] = [
@@ -19,7 +17,7 @@ export default class ProjectRoots {
   workspaceRoot: string;
   projectRoots: string[];
 
-  constructor(private server: Server) {}
+  constructor() {}
 
   async initialize(params: InitializeParams) {
     this.workspaceRoot = params.rootPath;
@@ -40,11 +38,11 @@ export default class ProjectRoots {
 
 export function findProjectRoots(workspaceRoot: string): Promise<string[]> {
   return new Promise(resolve => {
-    let filter = it => ignoredFolders.indexOf(basename(it)) === -1;
+    let filter = (it: string) => ignoredFolders.indexOf(basename(it)) === -1;
 
-    let projectRoots = [];
+    let projectRoots: string[] = [];
     klaw(workspaceRoot, { filter })
-      .on('data', item => {
+      .on('data', (item: any) => {
         if (basename(item.path) === 'ember-cli-build.js') {
           projectRoots.push(dirname(item.path));
         }
