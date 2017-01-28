@@ -9,6 +9,7 @@
     "strictNullChecks": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
+    "noFallthroughCasesInSwitch": true,
     "newLine": "LF"
   },
   "exclude": [
