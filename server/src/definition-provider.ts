@@ -16,6 +16,10 @@ export default class DefinitionProvider {
   handle(params: TextDocumentPositionParams): Definition | null {
     let uri = params.textDocument.uri;
     let filePath = uriToFilePath(uri);
+    if (!filePath) {
+      return null;
+    }
+
     let root = this.server.projectRoots.rootForPath(filePath);
     let extension = extname(filePath);
 
