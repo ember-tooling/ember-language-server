@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@types/esprima": "^2.1.33",
+    "@types/estree": "*",
     "@types/mocha": "^2.2.38",
     "@types/node": "^6.0.52",
     "chai": "^3.5.0",
