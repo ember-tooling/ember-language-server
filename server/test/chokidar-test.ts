@@ -128,7 +128,7 @@ describe('chokidar', function() {
   });
 });
 
-async function listEventsUntilReady(watcher: EventEmitter) {
+async function listEventsUntilReady(watcher: EventEmitter): Promise<{ event: string, path: string }[]> {
   let events: any[] = [];
   let listener = (event: any, path: string) => {
     events.push({ event, path });
@@ -141,8 +141,8 @@ async function listEventsUntilReady(watcher: EventEmitter) {
   return events;
 }
 
-function event(watcher: EventEmitter, event: string, path: string) {
-  return new Promise(resolve => {
+function event(watcher: EventEmitter, event: string, path: string): Promise<undefined> {
+  return new Promise<undefined>(resolve => {
     let listener = (_event: string, _path: string) => {
       if (_event === event && _path === path) {
         resolve();
@@ -154,8 +154,8 @@ function event(watcher: EventEmitter, event: string, path: string) {
   });
 }
 
-function readyEvent(watcher: EventEmitter) {
-  return new Promise(resolve => {
+function readyEvent(watcher: EventEmitter): Promise<undefined> {
+  return new Promise<undefined>(resolve => {
     watcher.once('ready', resolve);
   });
 }
