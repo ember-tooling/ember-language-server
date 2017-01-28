@@ -71,6 +71,43 @@ describe('chokidar', function() {
       });
     });
   });
+
+  it('ignores npm and bower folders', function() {
+    fs.outputFileSync(path.join(workDir, 'a', 'ember-cli-build.js'));
+    fs.outputFileSync(path.join(workDir, 'a', 'app', 'app.js'));
+    fs.outputFileSync(path.join(workDir, 'a', 'bower_components', 'foo', 'bower.json'));
+    fs.outputFileSync(path.join(workDir, 'a', 'node_modules', 'bar', 'package.json'));
+
+    let options = {
+      ignored: [
+        '**/bower_components/**',
+        '**/node_modules/**',
+      ],
+    };
+
+    return withCustomWatcher(options, async (watcher: any) => {
+      let events = await listEventsUntilReady(watcher);
+
+      expect(events).to.have.lengthOf(7);
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}/a` });
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}/a/app` });
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}/a/bower_components` });
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}/a/node_modules` });
+      expect(events).to.deep.include({ event: 'add', path: `${workDir}/a/ember-cli-build.js` });
+      expect(events).to.deep.include({ event: 'add', path: `${workDir}/a/app/app.js` });
+
+      let watched = watcher.getWatched();
+      expect(watched).to.deep.equal({
+        [tmpdir()]: ['chokidar-test'],
+        [workDir]: ['a'],
+        [path.join(workDir, 'a')]: ['app', 'bower_components', 'ember-cli-build.js', 'node_modules'],
+        [path.join(workDir, 'a', 'app')]: ['app.js'],
+        [path.join(workDir, 'a', 'bower_components')]: [],
+        [path.join(workDir, 'a', 'node_modules')]: [],
+      });
+    });
+  });
 });
 
 async function listEventsUntilReady(watcher: EventEmitter) {
