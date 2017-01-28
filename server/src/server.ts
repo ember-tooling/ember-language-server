@@ -86,6 +86,10 @@ export default class Server {
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
     let uri = params.textDocument.uri;
     let filePath = uriToFilePath(uri);
+    if (!filePath) {
+      return [];
+    }
+
     let extension = extname(filePath);
 
     let providers = this.documentSymbolProviders
