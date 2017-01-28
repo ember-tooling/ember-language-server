@@ -30,6 +30,6 @@
     "vscode": "^1.0.3"
   },
   "dependencies": {
-    "vscode-languageclient": "^2.6.3"
+    "vscode-languageclient": "^3.0.3"
   }
 }
