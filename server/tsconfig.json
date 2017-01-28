@@ -10,7 +10,8 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true,
-    "newLine": "LF"
+    "newLine": "LF",
+    "pretty": true
   },
   "exclude": [
     "node_modules"
