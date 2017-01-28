@@ -15,7 +15,7 @@ export function comparePositions(a: Position, b: Position): number {
   return 0;
 }
 
-export function toPosition(lsp: LSPosition) {
+export function toPosition(lsp: LSPosition): Position {
   return newPosition(lsp.line + 1, lsp.character);
 }
 
