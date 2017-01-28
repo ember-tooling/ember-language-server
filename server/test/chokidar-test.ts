@@ -108,6 +108,24 @@ describe('chokidar', function() {
       });
     });
   });
+
+  it('notifies about file changes', function() {
+    return withWatcher(async (watcher: any) => {
+      let events = await listEventsUntilReady(watcher);
+
+      expect(events).to.have.lengthOf(1);
+      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
+
+      fs.outputFile(path.join(workDir, 'a', 'ember-cli-build.js'));
+      await event(watcher, 'add', `${workDir}/a/ember-cli-build.js`);
+
+      fs.outputFile(path.join(workDir, 'b', 'c', 'ember-cli-build.js'));
+      await event(watcher, 'add', `${workDir}/b/c/ember-cli-build.js`);
+
+      fs.remove(path.join(workDir, 'a', 'ember-cli-build.js'));
+      await event(watcher, 'unlink', `${workDir}/a/ember-cli-build.js`);
+    });
+  });
 });
 
 async function listEventsUntilReady(watcher: EventEmitter) {
@@ -121,6 +139,19 @@ async function listEventsUntilReady(watcher: EventEmitter) {
   watcher.removeListener('all', listener);
 
   return events;
+}
+
+function event(watcher: EventEmitter, event: string, path: string) {
+  return new Promise(resolve => {
+    let listener = (_event: string, _path: string) => {
+      if (_event === event && _path === path) {
+        resolve();
+        watcher.removeListener('all', listener);
+      }
+    };
+
+    watcher.on('all', listener);
+  });
 }
 
 function readyEvent(watcher: EventEmitter) {
