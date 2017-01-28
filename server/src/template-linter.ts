@@ -77,13 +77,12 @@ export default class TemplateLinter {
       return this._linterCache.get(rootPath);
     }
 
-    return Files.resolveModule(rootPath, 'ember-template-lint')
-      .then(resolvedLinter => {
-        this._linterCache.set(rootPath, resolvedLinter);
-
-        return resolvedLinter;
-      }, () => {
-        console.log('Module ember-template-lint not found.');
-      });
+    try {
+      const linter = await Files.resolveModule(rootPath, 'ember-template-lint');
+      this._linterCache.set(rootPath, linter);
+      return linter;
+    } catch (error) {
+      console.log('Module ember-template-lint not found.');
+    }
   }
 }
