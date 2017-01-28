@@ -57,10 +57,10 @@ export default class Server {
 
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
-  private onInitialize(params: InitializeParams): InitializeResult {
+  private async onInitialize(params: InitializeParams): Promise<InitializeResult> {
     console.log('Initializing Ember Language Server');
 
-    this.projectRoots.initialize(params);
+    await this.projectRoots.initialize(params);
 
     return {
       capabilities: {
