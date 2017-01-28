@@ -13,14 +13,14 @@ const { preprocess } = require('@glimmer/syntax');
 export default class DefinitionProvider {
   constructor(private server: Server) {}
 
-  handle(params: TextDocumentPositionParams): Definition | null {
+  async handle(params: TextDocumentPositionParams): Promise<Definition | null> {
     let uri = params.textDocument.uri;
     let filePath = uriToFilePath(uri);
     if (!filePath) {
       return null;
     }
 
-    let root = this.server.projectRoots.rootForPath(filePath);
+    let root = await this.server.projectRoots.rootForPath(filePath);
     let extension = extname(filePath);
 
     if (extension === '.hbs') {
