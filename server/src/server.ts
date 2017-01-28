@@ -11,10 +11,8 @@ import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
-  SymbolInformation
+  SymbolInformation, Files
 } from 'vscode-languageserver';
-
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import ProjectRoots from './project-roots';
 import DefinitionProvider from './definition-provider';
@@ -85,7 +83,7 @@ export default class Server {
 
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
     let uri = params.textDocument.uri;
-    let filePath = uriToFilePath(uri);
+    let filePath = Files.uriToFilePath(uri);
     if (!filePath) {
       return [];
     }
