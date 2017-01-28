@@ -4,8 +4,6 @@ import { basename, dirname } from 'path';
 
 import { InitializeParams } from 'vscode-languageserver';
 
-import Server from './server';
-
 const klaw = require('klaw');
 
 const ignoredFolders: string[] = [
@@ -19,7 +17,7 @@ export default class ProjectRoots {
   workspaceRoot: string;
   projectRoots: string[];
 
-  constructor(private server: Server) {}
+  constructor() {}
 
   async initialize(params: InitializeParams) {
     this.workspaceRoot = params.rootPath;

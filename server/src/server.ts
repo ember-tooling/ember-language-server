@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 'use strict';
 
-import { basename, dirname, extname } from 'path';
+import { extname } from 'path';
 import { readFileSync } from 'fs';
 
 import {
@@ -31,7 +31,7 @@ export default class Server {
   // supports full document sync only
   documents: TextDocuments = new TextDocuments();
 
-  projectRoots: ProjectRoots = new ProjectRoots(this);
+  projectRoots: ProjectRoots = new ProjectRoots();
 
   documentSymbolProviders: DocumentSymbolProvider[] = [
     new JSDocumentSymbolProvider(),
