@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 const RSVP = require('rsvp');
+const i = require('i')();
 
 const readdir = RSVP.denodeify(fs.readdir);
 const lstat = RSVP.denodeify(fs.lstat);
@@ -15,6 +16,7 @@ export enum ModuleType {
   Service,
   Serializer,
   Initializer,
+  InstanceInitializer,
   Mixin,
   Model,
   Transform
@@ -90,7 +92,8 @@ export default class ModuleIndex {
 
   private async indexModulesOfType(baseDirectory: string, type: number): Promise<Module[]> {
     const typeName = ModuleType[type];
-    const typeDirectory = path.join(baseDirectory, `${typeName.toLowerCase()}s`);
+    const typeSegment = i.pluralize(i.dasherize(i.underscore(typeName)));
+    const typeDirectory = path.join(baseDirectory, typeSegment);
     const validFile = new RegExp('(js|hbs)$');
 
     try {
