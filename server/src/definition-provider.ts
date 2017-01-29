@@ -25,7 +25,7 @@ export default class DefinitionProvider {
     let extension = extname(filePath);
 
     if (extension === '.hbs') {
-      let content = readFileSync(filePath, 'utf-8');
+      let content = this.server.documents.get(uri).getText();
       let ast = preprocess(content);
       let focusPath = findFocusPath(ast, toPosition(params.position));
 
