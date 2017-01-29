@@ -5,3 +5,7 @@ node_js:
 
 before_install:
   - cd server
+
+branches:
+  except:
+    - staging.tmp
