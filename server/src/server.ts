@@ -89,6 +89,11 @@ export default class Server {
       ],
     });
 
+    this.projectRoots.projects.then(projects => {
+      console.log('Ember CLI projects found at:');
+      projects.forEach(project => console.log(`- ${project}`));
+    });
+
     await this.projectRoots.initialize(rootPath, watcher);
 
     return {

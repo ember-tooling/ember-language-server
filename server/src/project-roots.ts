@@ -4,6 +4,7 @@ import { basename, dirname } from 'path';
 import { EventEmitter } from 'events';
 
 import FileIndex from './file-index';
+import Deferred from './utils/deferred';
 
 const klaw = require('klaw');
 
@@ -18,15 +19,17 @@ export default class ProjectRoots {
   workspaceRoot: string;
   projectRoots: string[];
 
+  private deferredProjects = new Deferred<Set<string>>();
+  private _projects = new Set<string>();
+
   private indexes: Map<string, FileIndex> = new Map();
-  private watcherReady = false;
 
   constructor() {}
 
   async initialize(workspaceRoot: string, watcher: EventEmitter) {
     this.workspaceRoot = workspaceRoot;
 
-    watcher.once('ready', () => this.watcherReady = true);
+    watcher.once('ready', () => this.deferredProjects.resolve(this._projects));
 
     watcher.on('add', (path: string) => {
       if (basename(path) === 'ember-cli-build.js') {
@@ -50,12 +53,18 @@ export default class ProjectRoots {
     }));
   }
 
+  get projects(): Promise<Set<string>> {
+    return this.deferredProjects.promise;
+  }
+
   onProjectAdd(path: string) {
-    console.log(`Ember CLI project found at ${path}`);
+    console.log(`Ember CLI project added at ${path}`);
+    this._projects.add(path);
   }
 
   onProjectDelete(path: string) {
     console.log(`Ember CLI project deleted at ${path}`);
+    this._projects.delete(path);
   }
 
   rootForPath(path: string) {
