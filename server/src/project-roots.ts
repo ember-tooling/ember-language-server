@@ -1,6 +1,7 @@
 'use strict';
 
 import { basename, dirname } from 'path';
+import { EventEmitter } from 'events';
 
 import FileIndex from './file-index';
 
@@ -18,13 +19,26 @@ export default class ProjectRoots {
   projectRoots: string[];
 
   private indexes: Map<string, FileIndex> = new Map();
+  private watcherReady = false;
 
   constructor() {}
 
-  async initialize(workspaceRoot: string) {
+  async initialize(workspaceRoot: string, watcher: EventEmitter) {
     this.workspaceRoot = workspaceRoot;
 
-    console.log(`Searching for Ember projects in ${this.workspaceRoot}`);
+    watcher.once('ready', () => this.watcherReady = true);
+
+    watcher.on('add', (path: string) => {
+      if (basename(path) === 'ember-cli-build.js') {
+        this.onProjectAdd(dirname(path));
+      }
+    });
+
+    watcher.on('unlink', (path: string) => {
+      if (basename(path) === 'ember-cli-build.js') {
+        this.onProjectDelete(dirname(path));
+      }
+    });
 
     this.projectRoots = await findProjectRoots(this.workspaceRoot);
 
@@ -34,8 +48,14 @@ export default class ProjectRoots {
 
       await index.invalidate();
     }));
+  }
 
-    console.log(`Ember CLI projects found at:${this.projectRoots.map(it => `\n- ${it}`)}`);
+  onProjectAdd(path: string) {
+    console.log(`Ember CLI project found at ${path}`);
+  }
+
+  onProjectDelete(path: string) {
+    console.log(`Ember CLI project deleted at ${path}`);
   }
 
   rootForPath(path: string) {

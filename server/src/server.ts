@@ -89,11 +89,7 @@ export default class Server {
       ],
     });
 
-    watcher.on('all', (event: string, path: string) => {
-      console.log(event, path);
-    });
-
-    await this.projectRoots.initialize(rootPath);
+    await this.projectRoots.initialize(rootPath, watcher);
 
     return {
       capabilities: {
