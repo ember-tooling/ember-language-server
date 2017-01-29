@@ -13,7 +13,7 @@ const ignoredFolders: string[] = [
 
 export default class ProjectRoots {
   workspaceRoot: string;
-  projectRoots: string[];
+  projectRoots: Promise<string[]>;
 
   constructor() {}
 
@@ -22,13 +22,13 @@ export default class ProjectRoots {
 
     console.log(`Searching for Ember projects in ${this.workspaceRoot}`);
 
-    this.projectRoots = await findProjectRoots(this.workspaceRoot);
+    this.projectRoots = findProjectRoots(this.workspaceRoot);
 
-    console.log(`Ember CLI projects found at:${this.projectRoots.map(it => `\n- ${it}`)}`);
+    console.log(`Ember CLI projects found at:${(await this.projectRoots).map(it => `\n- ${it}`)}`);
   }
 
-  rootForPath(path: string) {
-    return this.projectRoots
+  async rootForPath(path: string) {
+    return (await this.projectRoots)
       .filter(root => path.indexOf(root) === 0)
       .reduce((a, b) => a.length > b.length ? a : b);
   }
