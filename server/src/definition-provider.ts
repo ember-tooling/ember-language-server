@@ -29,8 +29,8 @@ export default class DefinitionProvider {
       let ast = preprocess(content);
       let focusPath = findFocusPath(ast, toPosition(params.position));
 
-      if (this.isComponentName(focusPath)) {
-        const componentName = focusPath[focusPath.length - 1].original;
+      if (this.isComponentOrHelperName(focusPath)) {
+        const componentOrHelperName = focusPath[focusPath.length - 1].original;
         const moduleIndex = this.server.projectRoots.modulesForPath(filePath);
 
         if (!moduleIndex) {
@@ -38,11 +38,13 @@ export default class DefinitionProvider {
         }
 
         const templates = moduleIndex.getModules(ModuleType.ComponentTemplate);
-        const template = templates.find(module => module.name === componentName);
+        const template = templates.find(module => module.name === componentOrHelperName);
         const components = moduleIndex.getModules(ModuleType.Component);
-        const component = components.find(module => module.name === componentName);
+        const component = components.find(module => module.name === componentOrHelperName);
+        const helpers = moduleIndex.getModules(ModuleType.Helper);
+        const helper = helpers.find(module => module.name === componentOrHelperName);
 
-        return [template, component]
+        return [template, component, helper]
           .filter(module => module)
           .map((module: Module) => Location.create(`file:${module.path}`, Range.create(0, 0, 0, 0)));
       }
@@ -55,7 +57,7 @@ export default class DefinitionProvider {
     return this.handle.bind(this);
   }
 
-  isComponentName(path: any[]) {
+  isComponentOrHelperName(path: any[]) {
     let node = path[path.length - 1];
     if (!node || node.type !== 'PathExpression') {
       return false;
