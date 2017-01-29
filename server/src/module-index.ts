@@ -1,11 +1,11 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-const RSVP = require('rsvp');
+const pify = require('pify');
 const i = require('i')();
 
-const readdir = RSVP.denodeify(fs.readdir);
-const lstat = RSVP.denodeify(fs.lstat);
+const readdir = pify(fs.readdir);
+const lstat = pify(fs.lstat);
 
 export enum ModuleType {
   Adapter,
