@@ -71,7 +71,7 @@ export default class DefinitionProvider {
   }
 }
 
-function findFocusPath(node: any, position: Position, seen = new Set()): any {
+export function findFocusPath(node: any, position: Position, seen = new Set()): any {
   seen.add(node);
 
   let path: any[] = [];

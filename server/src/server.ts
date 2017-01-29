@@ -11,7 +11,7 @@ import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
-  SymbolInformation, Files
+  SymbolInformation, Files, TextDocumentPositionParams, CompletionItem
 } from 'vscode-languageserver';
 
 import ProjectRoots from './project-roots';
@@ -19,6 +19,8 @@ import DefinitionProvider from './definition-provider';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
+
+import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 
 export default class Server {
 
@@ -36,6 +38,8 @@ export default class Server {
     new HBSDocumentSymbolProvider(),
   ];
 
+  templateCompletionProvider: TemplateCompletionProvider = new TemplateCompletionProvider(this);
+
   definitionProvider: DefinitionProvider = new DefinitionProvider(this);
 
   constructor() {
@@ -49,6 +53,7 @@ export default class Server {
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
     this.connection.onDefinition(this.definitionProvider.handler);
+    this.connection.onCompletion(this.onCompletion.bind(this));
   }
 
   listen() {
@@ -78,6 +83,7 @@ export default class Server {
 
         definitionProvider: true,
         documentSymbolProvider: true,
+        completionProvider: true
       }
     };
   }
@@ -88,6 +94,15 @@ export default class Server {
 
   private onDidChangeWatchedFiles() {
     // here be dragons
+  }
+
+  private onCompletion(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] {
+    const completionItems = [];
+
+    const templateCompletions = this.templateCompletionProvider.provideCompletions(textDocumentPosition);
+    completionItems.push(...templateCompletions);
+
+    return completionItems;
   }
 
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
