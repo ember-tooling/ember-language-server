@@ -1,6 +1,11 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
+const RSVP = require('rsvp');
+
+const readdir = RSVP.denodeify(fs.readdir);
+const lstat = RSVP.denodeify(fs.lstat);
+
 export enum ModuleType {
   Adapter,
   Component,
@@ -114,51 +119,39 @@ export default class ModuleIndex {
 
     const validFile = new RegExp('(js|hbs)$');
 
-    return new Promise((resolve, reject) => {
-      fs.readdir(dir, async (err, list) => {
-        if (err) {
-          return reject(err);
-        }
+    const list = await readdir(dir);
 
-        const filesPromises = list.map(entry => {
-          const fullPath = path.join(dir, entry);
-          return this.filesForPath(fullPath);
-        });
-
-        const files = await Promise.all(filesPromises);
-        const flattenedPaths: string[] = [];
-
-        files.forEach((modulePaths: string | string[]) => {
-          if (typeof modulePaths === 'string') {
-            return flattenedPaths.push(modulePaths);
-          }
-
-          flattenedPaths.push(...modulePaths);
-        });
-
-        const filtered: string[] = flattenedPaths.filter((modulePath: string) => {
-          return validFile.test(modulePath);
-        });
-        resolve(filtered);
-      });
+    const filesPromises = list.map((entry: string) => {
+      const fullPath = path.join(dir, entry);
+      return this.filesForPath(fullPath);
     });
+
+    const files = await Promise.all(filesPromises);
+    const flattenedPaths: string[] = [];
+
+    files.forEach((modulePaths: string | string[]) => {
+      if (typeof modulePaths === 'string') {
+        return flattenedPaths.push(modulePaths);
+      }
+
+      flattenedPaths.push(...modulePaths);
+    });
+
+    const filtered: string[] = flattenedPaths.filter((modulePath: string) => {
+      return validFile.test(modulePath);
+    });
+
+    return filtered;
   }
 
   // TODO: Make this better
   private async filesForPath(fullPath: string) {
-    return new Promise((resolve, reject) => {
-      fs.lstat(fullPath, async (err, stats) => {
-        if (err) {
-          return reject(err);
-        }
+    const stats = await lstat(fullPath);
 
-        if (stats.isFile()) {
-          resolve(fullPath);
-        } else {
-          const subPaths = await this.walk(fullPath);
-          resolve(subPaths);
-        }
-      });
-    });
+    if (stats.isFile()) {
+      return fullPath;
+    } else {
+      return await this.walk(fullPath);
+    }
   }
 }
