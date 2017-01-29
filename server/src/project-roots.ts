@@ -2,6 +2,8 @@
 
 import { basename, dirname } from 'path';
 
+import ModuleIndex from './module-index';
+
 const klaw = require('klaw');
 
 const ignoredFolders: string[] = [
@@ -15,6 +17,8 @@ export default class ProjectRoots {
   workspaceRoot: string;
   projectRoots: string[];
 
+  private moduleIndexes: Map<string, ModuleIndex> = new Map();
+
   constructor() {}
 
   async initialize(workspaceRoot: string) {
@@ -24,6 +28,13 @@ export default class ProjectRoots {
 
     this.projectRoots = await findProjectRoots(this.workspaceRoot);
 
+    await Promise.all(this.projectRoots.map(async projectRoot => {
+      const moduleIndex = new ModuleIndex(projectRoot);
+      this.moduleIndexes.set(projectRoot, moduleIndex);
+
+      await moduleIndex.indexModules();
+    }));
+
     console.log(`Ember CLI projects found at:${this.projectRoots.map(it => `\n- ${it}`)}`);
   }
 
@@ -31,6 +42,14 @@ export default class ProjectRoots {
     return this.projectRoots
       .filter(root => path.indexOf(root) === 0)
       .reduce((a, b) => a.length > b.length ? a : b);
+  }
+
+  modulesForProjectRoot(projectRoot: string): ModuleIndex | undefined {
+    return this.moduleIndexes.get(projectRoot);
+  }
+
+  modulesForPath(path: string): ModuleIndex | undefined {
+    return this.modulesForProjectRoot(this.rootForPath(path));
   }
 }
 
