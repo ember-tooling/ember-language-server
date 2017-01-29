@@ -13,13 +13,13 @@ export enum ModuleType {
   ComponentTemplate,
   Controller,
   Helper,
-  Route,
-  Service,
-  Serializer,
   Initializer,
   InstanceInitializer,
   Mixin,
   Model,
+  Route,
+  Serializer,
+  Service,
   Template,
   Transform
 }
@@ -57,8 +57,8 @@ export default class ModuleIndex {
     this.modules.splice(index, 1);
   }
 
-  public getModules(type: ModuleType | undefined) {
-    if (!type) {
+  public getModules(type?: ModuleType) {
+    if (type === undefined) {
       return this.modules;
     }
     return this.modules.filter(module => module.type === type);
@@ -123,7 +123,6 @@ export default class ModuleIndex {
           };
         });
 
-      console.log(modules);
       this.modules.push(...modules);
 
       return modules;

@@ -77,8 +77,7 @@ export default class Server {
       console.log(root);
       const moduleIndex = new ModuleIndex(root);
       console.time('Index modules');
-      moduleIndex.indexModules().then(mods => {
-        console.log('Found modules:', mods.length);
+      moduleIndex.indexModules().then(() => {
         console.timeEnd('Index modules');
       });
     });
