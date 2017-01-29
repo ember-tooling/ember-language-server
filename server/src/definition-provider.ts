@@ -1,5 +1,5 @@
-import { extname, join } from 'path';
-import { readFileSync, existsSync } from 'fs';
+import { extname } from 'path';
+import { readFileSync } from 'fs';
 
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -7,6 +7,8 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { toPosition } from './estree-utils';
 import Server from './server';
 import { findFocusPath } from './glimmer-utils';
+
+import { ModuleType, Module } from './module-index';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -20,32 +22,31 @@ export default class DefinitionProvider {
       return null;
     }
 
-    let root = this.server.projectRoots.rootForPath(filePath);
     let extension = extname(filePath);
 
     if (extension === '.hbs') {
-      let content = readFileSync(filePath, 'utf-8');
+      let content = this.server.documents.get(uri).getText();
       let ast = preprocess(content);
       let focusPath = findFocusPath(ast, toPosition(params.position));
-      if (this.isComponentName(focusPath)) {
-        let componentPath = focusPath[focusPath.length - 1].original;
-        console.log(`looking up component: ${componentPath}`);
 
-        let definition: Location[] = [];
+      if (this.isComponentOrHelperName(focusPath)) {
+        const componentOrHelperName = focusPath[focusPath.length - 1].original;
+        const moduleIndex = this.server.projectRoots.modulesForPath(filePath);
 
-        let jsPath = join(root, 'app', 'components', `${componentPath}.js`);
-        if (existsSync(jsPath)) {
-          console.log(`found ${jsPath}`);
-          definition.push(Location.create(`file:${jsPath}`, Range.create(0, 0, 0, 0)));
+        if (!moduleIndex) {
+          return null;
         }
 
-        let hbsPath = join(root, 'app', 'templates', 'components', `${componentPath}.hbs`);
-        if (existsSync(hbsPath)) {
-          console.log(`found ${hbsPath}`);
-          definition.push(Location.create(`file:${hbsPath}`, Range.create(0, 0, 0, 0)));
-        }
+        const templates = moduleIndex.getModules(ModuleType.ComponentTemplate);
+        const template = templates.find(module => module.name === componentOrHelperName);
+        const components = moduleIndex.getModules(ModuleType.Component);
+        const component = components.find(module => module.name === componentOrHelperName);
+        const helpers = moduleIndex.getModules(ModuleType.Helper);
+        const helper = helpers.find(module => module.name === componentOrHelperName);
 
-        return definition;
+        return [template, component, helper]
+          .filter(module => module)
+          .map((module: Module) => Location.create(`file:${module.path}`, Range.create(0, 0, 0, 0)));
       }
     }
 
@@ -56,7 +57,7 @@ export default class DefinitionProvider {
     return this.handle.bind(this);
   }
 
-  isComponentName(path: any[]) {
+  isComponentOrHelperName(path: any[]) {
     let node = path[path.length - 1];
     if (!node || node.type !== 'PathExpression') {
       return false;
