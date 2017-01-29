@@ -24,7 +24,7 @@ export enum ModuleType {
   Transform
 }
 
-interface Module {
+export interface Module {
   type: ModuleType;
   name: string;
   path: string;
