@@ -10,7 +10,7 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import Server from '../server';
 import ModuleIndex, { ModuleType } from '../module-index';
-import { findFocusPath } from '../definition-provider';
+import { findFocusPath } from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 
 const { preprocess } = require('@glimmer/syntax');

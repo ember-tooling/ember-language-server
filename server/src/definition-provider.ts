@@ -3,10 +3,10 @@ import { readFileSync, existsSync } from 'fs';
 
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
-import { Position, SourceLocation } from 'estree';
 
-import { toPosition, containsPosition } from './estree-utils';
+import { toPosition } from './estree-utils';
 import Server from './server';
+import { findFocusPath } from './glimmer-utils';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -69,37 +69,4 @@ export default class DefinitionProvider {
 
     return true;
   }
-}
-
-export function findFocusPath(node: any, position: Position, seen = new Set()): any {
-  seen.add(node);
-
-  let path: any[] = [];
-  let range: SourceLocation = node.loc;
-  if (range) {
-    if (containsPosition(range, position)) {
-      path.push(node);
-    } else {
-      return [];
-    }
-  }
-
-  for (let key in node) {
-    if (!node.hasOwnProperty(key)) {
-      continue;
-    }
-
-    let value = node[key];
-    if (!value || typeof value !== 'object' || seen.has(value)) {
-      continue;
-    }
-
-    let childPath = findFocusPath(value, position, seen);
-    if (childPath.length > 0) {
-      path = path.concat(childPath);
-      break;
-    }
-  }
-
-  return path;
 }
