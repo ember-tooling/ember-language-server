@@ -10,6 +10,7 @@ const lstat = RSVP.denodeify(fs.lstat);
 export enum ModuleType {
   Adapter,
   Component,
+  ComponentTemplate,
   Controller,
   Helper,
   Route,
@@ -19,6 +20,7 @@ export enum ModuleType {
   InstanceInitializer,
   Mixin,
   Model,
+  Template,
   Transform
 }
 
@@ -90,14 +92,25 @@ export default class ModuleIndex {
     return this.modules;
   }
 
-  private async indexModulesOfType(baseDirectory: string, type: number): Promise<Module[]> {
+  private async indexModulesOfType(baseDirectory: string, type: ModuleType): Promise<Module[]> {
+    const exclude = [];
     const typeName = ModuleType[type];
-    const typeSegment = i.pluralize(i.dasherize(i.underscore(typeName)));
+    let typeSegment = i.pluralize(i.dasherize(i.underscore(typeName)));
+
+    if (type === ModuleType.ComponentTemplate) {
+      typeSegment = 'templates/components';
+    }
+
+    if (type === ModuleType.Template) {
+      exclude.push('components');
+    }
+
     const typeDirectory = path.join(baseDirectory, typeSegment);
+
     const validFile = new RegExp('(js|hbs)$');
 
     try {
-      const allPaths = await this.walk(typeDirectory);
+      const allPaths = await this.walk(typeDirectory, exclude);
 
       const modules: Module[] = allPaths
         .filter((modulePath: string): boolean => validFile.test(modulePath))
@@ -120,17 +133,16 @@ export default class ModuleIndex {
     }
   }
 
-  private async walk(dir: string): Promise<any> {
+  private async walk(dir: string, exclude: string[] = []): Promise<any> {
     if (!fs.existsSync(dir)) {
       return [];
     }
 
     const list = await readdir(dir);
 
-    const filesPromises = list.map((entry: string) => {
-      const fullPath = path.join(dir, entry);
-      return this.filesForPath(fullPath);
-    });
+    const filesPromises = list
+      .filter((entry: string) => !exclude.includes(entry))
+      .map((entry: string) => this.filesForPath(path.join(dir, entry)));
 
     const files = await Promise.all(filesPromises);
     const flattenedPaths: string[] = [];
