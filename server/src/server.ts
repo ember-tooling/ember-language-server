@@ -20,8 +20,6 @@ import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 
-import ModuleIndex from './module-index';
-
 export default class Server {
 
   // Create a connection for the server. The connection uses Node's IPC as a transport
@@ -73,14 +71,6 @@ export default class Server {
 
     await this.projectRoots.initialize(rootPath);
 
-    this.projectRoots.projectRoots.forEach(root => {
-      console.log(root);
-      const moduleIndex = new ModuleIndex(root);
-      console.time('Index modules');
-      moduleIndex.indexModules().then(() => {
-        console.timeEnd('Index modules');
-      });
-    });
     return {
       capabilities: {
         // Tell the client that the server works in FULL text document sync mode
