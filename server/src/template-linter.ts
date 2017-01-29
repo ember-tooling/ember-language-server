@@ -48,6 +48,10 @@ export default class TemplateLinter {
 
   private getLinterConfig(uri: string): { configPath: string } | undefined {
     const filePath = uriToFilePath(uri);
+    if (!filePath) {
+      return;
+    }
+
     const rootPath = this.server.projectRoots.rootForPath(filePath);
 
     if (!rootPath) {
@@ -67,6 +71,10 @@ export default class TemplateLinter {
 
   private async getLinter(uri: string) {
     const filePath = uriToFilePath(uri);
+    if (!filePath) {
+      return;
+    }
+
     const rootPath = this.server.projectRoots.rootForPath(filePath);
 
     if (!rootPath) {
