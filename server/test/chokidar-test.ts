@@ -7,6 +7,8 @@ import { expect } from 'chai';
 const fs = require('fs-extra');
 const chokidar = require('chokidar');
 
+import { readyEvent } from '../src/utils/chokidar';
+
 describe('chokidar', function() {
   let workDir = path.join(tmpdir(), 'chokidar-test');
 
@@ -151,11 +153,5 @@ function event(watcher: EventEmitter, event: string, path: string): Promise<unde
     };
 
     watcher.on('all', listener);
-  });
-}
-
-function readyEvent(watcher: EventEmitter): Promise<undefined> {
-  return new Promise<undefined>(resolve => {
-    watcher.once('ready', resolve);
   });
 }
