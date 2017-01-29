@@ -1,10 +1,11 @@
 'use strict';
 
-import { basename, dirname } from 'path';
+import { basename, dirname, relative } from 'path';
 import { EventEmitter } from 'events';
 
 import FileIndex from './file-index';
 import Deferred from './utils/deferred';
+import { FileInfo } from './file-info';
 
 const klaw = require('klaw');
 
@@ -35,6 +36,19 @@ export default class ProjectRoots {
       if (basename(path) === 'ember-cli-build.js') {
         this.onProjectAdd(dirname(path));
       }
+
+      this.projectForPath(path).then(project => {
+        let relativePath = relative(project, path);
+        let fileInfo = FileInfo.from(relativePath);
+        if (fileInfo) {
+          let containerName = fileInfo.containerName;
+          if (containerName) {
+            console.log(project, '->', relativePath, '->', containerName);
+          } else {
+            console.log(project, '->', relativePath);
+          }
+        }
+      });
     });
 
     watcher.on('unlink', (path: string) => {
@@ -71,6 +85,14 @@ export default class ProjectRoots {
     return (this.projectRoots || [])
       .filter(root => path.indexOf(root) === 0)
       .reduce((a, b) => a.length > b.length ? a : b, '');
+  }
+
+  async projectForPath(path: string) {
+    let projects = await this.projects;
+
+    return Array.from(projects.values())
+      .filter(root => path.indexOf(root) === 0)
+      .reduce((a, b) => a.length > b.length ? a : b);
   }
 
   indexForProjectRoot(projectRoot: string): FileIndex | undefined {
