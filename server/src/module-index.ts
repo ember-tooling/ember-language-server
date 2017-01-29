@@ -13,6 +13,7 @@ export enum ModuleType {
   Helper,
   Route,
   Service,
+  Serializer,
   Initializer,
   Mixin,
   Model,
@@ -77,8 +78,8 @@ export default class ModuleIndex {
     const promises: Promise<Module[]>[] = [];
 
     for (let type in ModuleType) {
-      if (!isNaN(Number(type))) {
-        promises.push(this.indexModulesOfType(baseDirectory, Number(type)));
+      if (typeof ModuleType[type] === 'number') {
+        promises.push(this.indexModulesOfType(baseDirectory, Number(ModuleType[type])));
       }
     }
 
@@ -87,21 +88,26 @@ export default class ModuleIndex {
     return this.modules;
   }
 
-  private async indexModulesOfType(baseDirectory: string, type: ModuleType): Promise<Module[]> {
+  private async indexModulesOfType(baseDirectory: string, type: number): Promise<Module[]> {
     const typeName = ModuleType[type];
     const typeDirectory = path.join(baseDirectory, `${typeName.toLowerCase()}s`);
+    const validFile = new RegExp('(js|hbs)$');
 
     try {
       const allPaths = await this.walk(typeDirectory);
 
-      const modules: Module[] = allPaths.map((modulePath: string): Module => {
-        return {
-          type,
-          path: modulePath,
-          name: modulePath.substring(typeDirectory.length + 1)
-        };
-      });
+      const modules: Module[] = allPaths
+        .filter((modulePath: string): boolean => validFile.test(modulePath))
+        .map((modulePath: string): Module => {
+          const fileEndingBeginning = modulePath.lastIndexOf('.');
+          return {
+            type,
+            path: modulePath,
+            name: modulePath.substring(typeDirectory.length + 1, fileEndingBeginning)
+          };
+        });
 
+      console.log(modules);
       this.modules.push(...modules);
 
       return modules;
@@ -111,13 +117,10 @@ export default class ModuleIndex {
     }
   }
 
-  // TODO: Make this better
   private async walk(dir: string): Promise<any> {
     if (!fs.existsSync(dir)) {
       return [];
     }
-
-    const validFile = new RegExp('(js|hbs)$');
 
     const list = await readdir(dir);
 
@@ -137,14 +140,9 @@ export default class ModuleIndex {
       flattenedPaths.push(...modulePaths);
     });
 
-    const filtered: string[] = flattenedPaths.filter((modulePath: string) => {
-      return validFile.test(modulePath);
-    });
-
-    return filtered;
+    return flattenedPaths;
   }
 
-  // TODO: Make this better
   private async filesForPath(fullPath: string) {
     const stats = await lstat(fullPath);
 

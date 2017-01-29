@@ -76,11 +76,10 @@ export default class Server {
     this.projectRoots.projectRoots.forEach(root => {
       console.log(root);
       const moduleIndex = new ModuleIndex(root);
-      console.time();
-      moduleIndex.indexModules().then(allModules => {
-        // console.log(allModules);
-        console.log(allModules.length);
-        console.timeEnd();
+      console.time('Index modules');
+      moduleIndex.indexModules().then(mods => {
+        console.log('Found modules:', mods.length);
+        console.timeEnd('Index modules');
       });
     });
     return {
