@@ -38,9 +38,12 @@ export default class TemplateCompletionProvider {
     let text = originalText.slice(0, offset) + 'ELSCompletionDummy' + originalText.slice(offset);
     let ast = preprocess(text);
     let focusPath = findFocusPath(ast, toPosition(params.position));
+    if (!focusPath) {
+      return [];
+    }
 
-    let node = focusPath[focusPath.length - 1];
-    if (!node || node.type !== 'PathExpression') {
+    let node = focusPath.node;
+    if (node.type !== 'PathExpression') {
       return [];
     }
 
