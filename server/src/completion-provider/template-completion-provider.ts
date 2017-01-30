@@ -42,19 +42,51 @@ export default class TemplateCompletionProvider {
       return [];
     }
 
-    let node = focusPath.node;
-    if (node.type !== 'PathExpression') {
-      return [];
+    let completions: CompletionItem[] = [];
+
+    if (isMustachePath(focusPath)) {
+      completions.push(...listComponents(project.fileIndex));
+      completions.push(...listHelpers(project.fileIndex));
+    } else if (isBlockPath(focusPath)) {
+      completions.push(...listComponents(project.fileIndex));
+    } else if (isSubExpressionPath(focusPath)) {
+      completions.push(...listHelpers(project.fileIndex));
     }
 
-    return getComponentAndHelperCompletions(project.fileIndex);
+    return completions;
   }
 }
 
-function getComponentAndHelperCompletions(index: FileIndex): CompletionItem[] {
-  return index.files
-    .filter(fileInfo => isComponent(fileInfo) || isHelper(fileInfo))
-    .map(toCompletionItem);
+function listComponents(index: FileIndex): CompletionItem[] {
+  return index.files.filter(isComponent).map(toCompletionItem);
+}
+
+function listHelpers(index: FileIndex): CompletionItem[] {
+  return index.files.filter(isHelper).map(toCompletionItem);
+}
+
+function isMustachePath(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'PathExpression') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'MustacheStatement') { return false; }
+  return parent.path === node;
+}
+
+function isBlockPath(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'PathExpression') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'BlockStatement') { return false; }
+  return parent.path === node;
+}
+
+function isSubExpressionPath(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'PathExpression') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'SubExpression') { return false; }
+  return parent.path === node;
 }
 
 function isComponent(fileInfo: FileInfo) {
