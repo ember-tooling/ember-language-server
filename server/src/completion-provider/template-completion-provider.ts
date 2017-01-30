@@ -59,6 +59,7 @@ function getComponentAndHelperCompletions(index: FileIndex): CompletionItem[] {
     return {
       kind,
       label: fileInfo.slashName,
+      detail: fileInfo.type,
       data: {
         name: fileInfo.slashName,
         type: fileInfo.type,
