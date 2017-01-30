@@ -20,18 +20,16 @@ export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
 
   provideCompletions(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] {
-
-    let items: CompletionItem[] = [];
     const uri = textDocumentPosition.textDocument.uri;
     const filePath = uriToFilePath(uri);
 
     if (!filePath || extname(filePath) !== '.hbs') {
-      return items;
+      return [];
     }
 
     const project = this.server.projectRoots.projectForPath(filePath);
     if (!project) {
-      return items;
+      return [];
     }
 
     let document = this.server.documents.get(uri);
@@ -42,16 +40,11 @@ export default class TemplateCompletionProvider {
     let focusPath = findFocusPath(ast, toPosition(textDocumentPosition.position));
 
     let node = focusPath[focusPath.length - 1];
-
     if (!node || node.type !== 'PathExpression') {
-      return items;
+      return [];
     }
 
-    if (node.type === 'PathExpression') {
-      items.push(...getComponentAndHelperCompletions(project.fileIndex));
-    }
-
-    return items;
+    return getComponentAndHelperCompletions(project.fileIndex);
   }
 }
 
