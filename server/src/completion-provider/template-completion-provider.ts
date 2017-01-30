@@ -49,23 +49,9 @@ export default class TemplateCompletionProvider {
 }
 
 function getComponentAndHelperCompletions(index: FileIndex): CompletionItem[] {
-  return index.files.filter(fileInfo => isComponent(fileInfo) || isHelper(fileInfo)).map((fileInfo: ModuleFileInfo) => {
-    let kind: CompletionItemKind = CompletionItemKind.Class;
-
-    if (fileInfo.type === 'helper') {
-      kind = CompletionItemKind.Function;
-    }
-
-    return {
-      kind,
-      label: fileInfo.slashName,
-      detail: fileInfo.type,
-      data: {
-        name: fileInfo.slashName,
-        type: fileInfo.type,
-      }
-    };
-  });
+  return index.files
+    .filter(fileInfo => isComponent(fileInfo) || isHelper(fileInfo))
+    .map(toCompletionItem);
 }
 
 function isComponent(fileInfo: FileInfo) {
@@ -74,4 +60,22 @@ function isComponent(fileInfo: FileInfo) {
 
 function isHelper(fileInfo: FileInfo) {
   return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'helper';
+}
+
+function toCompletionItem(fileInfo: ModuleFileInfo) {
+  let kind = toCompletionItemKind(fileInfo.type);
+
+  return {
+    kind,
+    label: fileInfo.slashName,
+    detail: fileInfo.type,
+    data: {
+      name: fileInfo.slashName,
+      type: fileInfo.type,
+    }
+  };
+}
+
+function toCompletionItemKind(type: string): CompletionItemKind {
+  return (type === 'helper') ? CompletionItemKind.Function : CompletionItemKind.Class;
 }
