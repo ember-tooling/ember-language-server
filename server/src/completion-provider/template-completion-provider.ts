@@ -34,9 +34,11 @@ export default class TemplateCompletionProvider {
       return items;
     }
 
-    let content = this.server.documents.get(uri).getText();
-    content = content.replace('{{}}', '{{am-i-doing-this-right}}'); // Prevent the parser from throwing errors
-    let ast = preprocess(content);
+    let document = this.server.documents.get(uri);
+    let offset = document.offsetAt(textDocumentPosition.position);
+    let originalText = document.getText();
+    let text = originalText.slice(0, offset) + 'ELSCompletionDummy' + originalText.slice(offset);
+    let ast = preprocess(text);
     let focusPath = findFocusPath(ast, toPosition(textDocumentPosition.position));
 
     let node = focusPath[focusPath.length - 1];
