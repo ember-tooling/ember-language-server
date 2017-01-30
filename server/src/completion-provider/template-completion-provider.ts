@@ -51,6 +51,8 @@ export default class TemplateCompletionProvider {
       completions.push(...listComponents(project.fileIndex));
     } else if (isSubExpressionPath(focusPath)) {
       completions.push(...listHelpers(project.fileIndex));
+    } else if (isLinkToTarget(focusPath)) {
+      completions.push(...listRoutes(project.fileIndex));
     }
 
     return completions;
@@ -63,6 +65,10 @@ function listComponents(index: FileIndex): CompletionItem[] {
 
 function listHelpers(index: FileIndex): CompletionItem[] {
   return index.files.filter(isHelper).map(toCompletionItem);
+}
+
+function listRoutes(index: FileIndex): CompletionItem[] {
+  return index.files.filter(isRoute).map(toRouteCompletionItem);
 }
 
 function isMustachePath(path: ASTPath): boolean {
@@ -89,12 +95,36 @@ function isSubExpressionPath(path: ASTPath): boolean {
   return parent.path === node;
 }
 
+function isLinkToTarget(path: ASTPath): boolean {
+  return isInlineLinkToTarget(path) || isBlockLinkToTarget(path);
+}
+
+function isInlineLinkToTarget(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'StringLiteral') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'MustacheStatement') { return false; }
+  return parent.params[1] === node && parent.path.original === 'link-to';
+}
+
+function isBlockLinkToTarget(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'StringLiteral') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'BlockStatement') { return false; }
+  return parent.params[0] === node && parent.path.original === 'link-to';
+}
+
 function isComponent(fileInfo: FileInfo) {
   return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'component';
 }
 
 function isHelper(fileInfo: FileInfo) {
   return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'helper';
+}
+
+function isRoute(fileInfo: FileInfo) {
+  return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'route';
 }
 
 function toCompletionItem(fileInfo: ModuleFileInfo) {
@@ -107,6 +137,22 @@ function toCompletionItem(fileInfo: ModuleFileInfo) {
   };
 }
 
+function toRouteCompletionItem(fileInfo: ModuleFileInfo) {
+  let kind = toCompletionItemKind(fileInfo.type);
+
+  return {
+    kind,
+    label: fileInfo.name,
+    detail: fileInfo.type,
+  };
+}
+
 function toCompletionItemKind(type: string): CompletionItemKind {
-  return (type === 'helper') ? CompletionItemKind.Function : CompletionItemKind.Class;
+  if (type === 'helper') {
+    return CompletionItemKind.Function;
+  } else if (type === 'route') {
+    return CompletionItemKind.File;
+  } else {
+    return CompletionItemKind.Class;
+  }
 }
