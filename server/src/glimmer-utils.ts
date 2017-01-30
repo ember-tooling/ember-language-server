@@ -24,10 +24,6 @@ export default class ASTPath {
   }
 }
 
-export function findFocusPath(node: any, position: Position): ASTPath | undefined {
-  return ASTPath.toPosition(node, position);
-}
-
 function _findFocusPath(node: any, position: Position, seen = new Set()): any {
   seen.add(node);
 

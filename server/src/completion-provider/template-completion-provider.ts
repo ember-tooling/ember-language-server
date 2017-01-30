@@ -9,7 +9,7 @@ import {
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import Server from '../server';
-import { findFocusPath } from '../glimmer-utils';
+import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import FileIndex from '../file-index';
 import { FileInfo, ModuleFileInfo } from '../file-info';
@@ -37,7 +37,7 @@ export default class TemplateCompletionProvider {
     let originalText = document.getText();
     let text = originalText.slice(0, offset) + 'ELSCompletionDummy' + originalText.slice(offset);
     let ast = preprocess(text);
-    let focusPath = findFocusPath(ast, toPosition(params.position));
+    let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
     if (!focusPath) {
       return [];
     }
