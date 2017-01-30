@@ -19,8 +19,8 @@ const { preprocess } = require('@glimmer/syntax');
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
 
-  provideCompletions(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] {
-    const uri = textDocumentPosition.textDocument.uri;
+  provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
+    const uri = params.textDocument.uri;
     const filePath = uriToFilePath(uri);
 
     if (!filePath || extname(filePath) !== '.hbs') {
@@ -33,11 +33,11 @@ export default class TemplateCompletionProvider {
     }
 
     let document = this.server.documents.get(uri);
-    let offset = document.offsetAt(textDocumentPosition.position);
+    let offset = document.offsetAt(params.position);
     let originalText = document.getText();
     let text = originalText.slice(0, offset) + 'ELSCompletionDummy' + originalText.slice(offset);
     let ast = preprocess(text);
-    let focusPath = findFocusPath(ast, toPosition(textDocumentPosition.position));
+    let focusPath = findFocusPath(ast, toPosition(params.position));
 
     let node = focusPath[focusPath.length - 1];
     if (!node || node.type !== 'PathExpression') {
