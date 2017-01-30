@@ -69,10 +69,6 @@ function toCompletionItem(fileInfo: ModuleFileInfo) {
     kind,
     label: fileInfo.slashName,
     detail: fileInfo.type,
-    data: {
-      name: fileInfo.slashName,
-      type: fileInfo.type,
-    }
   };
 }
 
