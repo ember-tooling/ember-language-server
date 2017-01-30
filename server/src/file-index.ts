@@ -28,16 +28,30 @@ export default class FileIndex {
     let deferred = new Deferred<void>();
 
     klaw(this.root, { filter })
-      .on('data', (item: any) => {
-        let relativePath = path.relative(this.root, item.path);
-        let fileInfo = FileInfo.from(relativePath);
-        if (fileInfo) {
-          this.files.push(fileInfo);
-        }
-      })
+      .on('data', (item: any) => this.add(item.path))
       .on('end', () => deferred.resolve());
 
     return deferred.promise;
+  }
+
+  public add(absolutePath: string): FileInfo | undefined {
+    let relativePath = path.relative(this.root, absolutePath);
+    let fileInfo = FileInfo.from(relativePath);
+    if (fileInfo) {
+      console.log(`add ${relativePath} -> ${fileInfo.containerName}`);
+      this.files.push(fileInfo);
+    }
+    return fileInfo;
+  }
+
+  public remove(absolutePath: string): FileInfo | undefined {
+    let relativePath = path.relative(this.root, absolutePath);
+    let index = this.files.findIndex(fileInfo => fileInfo.relativePath === relativePath);
+    if (index !== -1) {
+      let fileInfo = this.files.splice(index, 1)[0];
+      console.log(`remove ${relativePath} -> ${fileInfo.containerName}`);
+      return fileInfo;
+    }
   }
 
   public byModuleType(type: string) {
