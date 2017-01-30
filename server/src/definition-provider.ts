@@ -1,5 +1,4 @@
-import { extname } from 'path';
-import { readFileSync } from 'fs';
+import * as path from 'path';
 
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -7,8 +6,7 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { toPosition } from './estree-utils';
 import Server from './server';
 import { findFocusPath } from './glimmer-utils';
-
-import { ModuleType, Module } from './module-index';
+import { ModuleFileInfo, TemplateFileInfo } from './file-info';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -22,7 +20,7 @@ export default class DefinitionProvider {
       return null;
     }
 
-    let extension = extname(filePath);
+    let extension = path.extname(filePath);
 
     if (extension === '.hbs') {
       let content = this.server.documents.get(uri).getText();
@@ -31,22 +29,26 @@ export default class DefinitionProvider {
 
       if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName = focusPath[focusPath.length - 1].original;
-        const moduleIndex = this.server.projectRoots.modulesForPath(filePath);
-
-        if (!moduleIndex) {
+        const index = this.server.projectRoots.indexForPath(filePath);
+        if (!index) {
           return null;
         }
 
-        const templates = moduleIndex.getModules(ModuleType.ComponentTemplate);
-        const template = templates.find(module => module.name === componentOrHelperName);
-        const components = moduleIndex.getModules(ModuleType.Component);
-        const component = components.find(module => module.name === componentOrHelperName);
-        const helpers = moduleIndex.getModules(ModuleType.Helper);
-        const helper = helpers.find(module => module.name === componentOrHelperName);
+        return index.files
+          .filter(fileInfo => {
+            if (fileInfo instanceof ModuleFileInfo) {
+              return (fileInfo.type === 'component' || fileInfo.type === 'helper') &&
+                fileInfo.slashName === componentOrHelperName;
 
-        return [template, component, helper]
-          .filter(module => module)
-          .map((module: Module) => Location.create(`file:${module.path}`, Range.create(0, 0, 0, 0)));
+            } else if (fileInfo instanceof TemplateFileInfo) {
+              return fileInfo.forComponent && fileInfo.slashName === componentOrHelperName;
+            }
+          })
+          .map(fileInfo => {
+            let uri = `file:${path.join(index.root, fileInfo.relativePath)}`;
+            let range = Range.create(0, 0, 0, 0);
+            return Location.create(uri, range);
+          });
       }
     }
 

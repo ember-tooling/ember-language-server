@@ -9,9 +9,10 @@ import {
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import Server from '../server';
-import ModuleIndex, { ModuleType } from '../module-index';
 import { findFocusPath } from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
+import FileIndex from '../file-index';
+import { FileInfo, ModuleFileInfo } from '../file-info';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -28,9 +29,8 @@ export default class TemplateCompletionProvider {
       return items;
     }
 
-    const moduleIndex = this.server.projectRoots.modulesForPath(filePath);
-
-    if (!moduleIndex) {
+    const index = this.server.projectRoots.indexForPath(filePath);
+    if (!index) {
       return items;
     }
 
@@ -46,30 +46,36 @@ export default class TemplateCompletionProvider {
     }
 
     if (node.type === 'PathExpression') {
-      items.push(...getComponentAndHelperCompletions(moduleIndex));
-    };
+      items.push(...getComponentAndHelperCompletions(index));
+    }
 
     return items;
   }
 }
 
-function getComponentAndHelperCompletions(moduleIndex: ModuleIndex): CompletionItem[] {
-    const components = moduleIndex.getModules(ModuleType.Component);
-    const helpers = moduleIndex.getModules(ModuleType.Helper);
+function getComponentAndHelperCompletions(index: FileIndex): CompletionItem[] {
+  return index.files.filter(fileInfo => isComponent(fileInfo) || isHelper(fileInfo)).map((fileInfo: ModuleFileInfo) => {
+    let kind: CompletionItemKind = CompletionItemKind.Class;
 
-    return [...components, ...helpers].map(module => {
-      let kind: CompletionItemKind = CompletionItemKind.Class;
+    if (fileInfo.type === 'helper') {
+      kind = CompletionItemKind.Function;
+    }
 
-      if (module.type === ModuleType.Helper) {
-        kind = CompletionItemKind.Function;
+    return {
+      kind,
+      label: fileInfo.slashName,
+      data: {
+        name: fileInfo.slashName,
+        type: fileInfo.type,
       }
+    };
+  });
+}
 
-      return {
-        kind,
-        label: module.name,
-        data: {
-          name: module.name, type: module.type
-        }
-      };
-    });
-  }
+function isComponent(fileInfo: FileInfo) {
+  return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'component';
+}
+
+function isHelper(fileInfo: FileInfo) {
+  return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'helper';
+}

@@ -2,7 +2,7 @@
 
 import { basename, dirname } from 'path';
 
-import ModuleIndex from './module-index';
+import FileIndex from './file-index';
 
 const klaw = require('klaw');
 
@@ -17,7 +17,7 @@ export default class ProjectRoots {
   workspaceRoot: string;
   projectRoots: string[];
 
-  private moduleIndexes: Map<string, ModuleIndex> = new Map();
+  private indexes: Map<string, FileIndex> = new Map();
 
   constructor() {}
 
@@ -29,10 +29,10 @@ export default class ProjectRoots {
     this.projectRoots = await findProjectRoots(this.workspaceRoot);
 
     await Promise.all(this.projectRoots.map(async projectRoot => {
-      const moduleIndex = new ModuleIndex(projectRoot);
-      this.moduleIndexes.set(projectRoot, moduleIndex);
+      const index = new FileIndex(projectRoot);
+      this.indexes.set(projectRoot, index);
 
-      await moduleIndex.indexModules();
+      await index.invalidate();
     }));
 
     console.log(`Ember CLI projects found at:${this.projectRoots.map(it => `\n- ${it}`)}`);
@@ -44,12 +44,12 @@ export default class ProjectRoots {
       .reduce((a, b) => a.length > b.length ? a : b);
   }
 
-  modulesForProjectRoot(projectRoot: string): ModuleIndex | undefined {
-    return this.moduleIndexes.get(projectRoot);
+  indexForProjectRoot(projectRoot: string): FileIndex | undefined {
+    return this.indexes.get(projectRoot);
   }
 
-  modulesForPath(path: string): ModuleIndex | undefined {
-    return this.modulesForProjectRoot(this.rootForPath(path));
+  indexForPath(path: string): FileIndex | undefined {
+    return this.indexForProjectRoot(this.rootForPath(path));
   }
 }
 
