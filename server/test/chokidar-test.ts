@@ -111,7 +111,7 @@ describe('chokidar', function() {
     });
   });
 
-  it('notifies about file changes', function() {
+  it('notifies about file changes', async function() {
     return withWatcher(async (watcher: any) => {
       let events = await listEventsUntilReady(watcher);
 
