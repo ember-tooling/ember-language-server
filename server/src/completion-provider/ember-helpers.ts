@@ -3,77 +3,48 @@ import {
   CompletionItemKind
 } from 'vscode-languageserver';
 
-const EmberHelpers: CompletionItem[] = [
-  {
-    kind: CompletionItemKind.Function,
-    label: 'action'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'component'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'concat'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'debugger'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'each'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'each-in'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'get'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'hash'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'if'
-  }, {
-    kind: CompletionItemKind.Class,
-    label: 'input'
-  }, {
-    kind: CompletionItemKind.Class,
-    label: 'link-to'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'loc'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'log'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'mount'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'mut'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'outlet'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'partial'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'query-params'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'render'
-  }, {
-    kind: CompletionItemKind.Class,
-    label: 'textarea'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'unbound'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'unless'
-  }, {
-    kind: CompletionItemKind.Function,
-    label: 'with'
-  }
+type UsableIn = 'BlockPath' | 'MustachePath' | 'SubExpressionPath';
+type EmberHelperConfig = [string, CompletionItemKind, UsableIn[]];
+
+const {
+  Function: HelperItem,
+  Class: ComponentItem
+} = CompletionItemKind;
+
+const emberHelperConfigs: EmberHelperConfig[] = [
+  ['action',       HelperItem,    ['MustachePath', 'SubExpressionPath']],
+  ['component',    HelperItem,    ['BlockPath', 'MustachePath', 'SubExpressionPath']],
+  ['concat',       HelperItem,    ['MustachePath', 'SubExpressionPath']],
+  ['debugger',     HelperItem,    ['MustachePath']],
+  ['each',         HelperItem,    ['BlockPath']],
+  ['each-in',      HelperItem,    ['BlockPath']],
+  ['get',          HelperItem,    ['MustachePath', 'SubExpressionPath']],
+  ['hash',         HelperItem,    ['SubExpressionPath']],
+  ['if',           HelperItem,    ['BlockPath', 'MustachePath', 'SubExpressionPath']],
+  ['input',        ComponentItem, ['MustachePath']],
+  ['link-to',      ComponentItem, ['MustachePath']],
+  ['loc',          HelperItem,    ['MustachePath', 'SubExpressionPath']],
+  ['log',          HelperItem,    ['MustachePath']],
+  ['mount',        HelperItem,    ['MustachePath']],
+  ['mut',          HelperItem,    ['SubExpressionPath']],
+  ['outlet',       HelperItem,    ['MustachePath']],
+  ['partial',      HelperItem,    ['MustachePath']],
+  ['query-params', HelperItem,    ['SubExpressionPath']],
+  ['render',       HelperItem,    ['MustachePath']],
+  ['textarea',     ComponentItem, ['MustachePath']],
+  ['unbound',      HelperItem,    ['MustachePath', 'SubExpressionPath']],
+  ['unless',       HelperItem,    ['BlockPath', 'MustachePath', 'SubExpressionPath']],
+  ['with',         HelperItem,    ['BlockPath']]
 ];
 
-export default EmberHelpers;
+function filterConfigs(type: UsableIn): EmberHelperConfig[] {
+  return emberHelperConfigs.filter(([, , types]) => types.includes(type));
+}
+
+function createCompletionItem([label, kind]: EmberHelperConfig): CompletionItem {
+  return { label, kind };
+}
+
+export const emberBlockItems: CompletionItem[] = filterConfigs('BlockPath').map(createCompletionItem);
+export const emberMustacheItems: CompletionItem[] = filterConfigs('MustachePath').map(createCompletionItem);
+export const emberSubExpressionItems: CompletionItem[] = filterConfigs('SubExpressionPath').map(createCompletionItem);

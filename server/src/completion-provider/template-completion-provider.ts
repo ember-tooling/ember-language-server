@@ -16,7 +16,11 @@ import { FileInfo, ModuleFileInfo } from '../file-info';
 
 const { preprocess } = require('@glimmer/syntax');
 
-import EmberHelpers from './ember-helpers';
+import {
+  emberBlockItems,
+  emberMustacheItems,
+  emberSubExpressionItems
+} from './ember-helpers';
 
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
@@ -49,11 +53,13 @@ export default class TemplateCompletionProvider {
     if (isMustachePath(focusPath)) {
       completions.push(...listComponents(project.fileIndex));
       completions.push(...listHelpers(project.fileIndex));
-      completions.push(...EmberHelpers);
+      completions.push(...emberMustacheItems);
     } else if (isBlockPath(focusPath)) {
       completions.push(...listComponents(project.fileIndex));
+      completions.push(...emberBlockItems);
     } else if (isSubExpressionPath(focusPath)) {
       completions.push(...listHelpers(project.fileIndex));
+      completions.push(...emberSubExpressionItems);
     } else if (isLinkToTarget(focusPath)) {
       completions.push(...listRoutes(project.fileIndex));
     }
