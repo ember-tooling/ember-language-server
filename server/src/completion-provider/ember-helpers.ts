@@ -15,19 +15,25 @@ class EmberCompletionItem implements CompletionItem {
   constructor(
     public label: string,
     public kind: CompletionItemKind,
-    public usableIn: UsableIn[]
+    public usableIn: UsableIn[],
+    private version?: string
   ) {
+    this.detail = 'Ember';
+
+    if (version) {
+      this.detail = `Ember ${this.version}`;
+    };
   }
 }
 
 const emberHelperConfigs: EmberCompletionItem[] = [
   new EmberCompletionItem('action',       HelperItem,    ['MustachePath', 'SubExpressionPath']),
-  new EmberCompletionItem('component',    HelperItem,    ['BlockPath', 'MustachePath', 'SubExpressionPath']),
-  new EmberCompletionItem('concat',       HelperItem,    ['MustachePath', 'SubExpressionPath']),
+  new EmberCompletionItem('component',    HelperItem,    ['BlockPath', 'MustachePath', 'SubExpressionPath'], '1.11.0'),
+  new EmberCompletionItem('concat',       HelperItem,    ['MustachePath', 'SubExpressionPath'], '1.13.0'),
   new EmberCompletionItem('debugger',     HelperItem,    ['MustachePath']),
   new EmberCompletionItem('each',         HelperItem,    ['BlockPath']),
-  new EmberCompletionItem('each-in',      HelperItem,    ['BlockPath']),
-  new EmberCompletionItem('get',          HelperItem,    ['MustachePath', 'SubExpressionPath']),
+  new EmberCompletionItem('each-in',      HelperItem,    ['BlockPath'], '2.1.0'),
+  new EmberCompletionItem('get',          HelperItem,    ['MustachePath', 'SubExpressionPath'], '2.1.0'),
   new EmberCompletionItem('hash',         HelperItem,    ['SubExpressionPath']),
   new EmberCompletionItem('if',           HelperItem,    ['BlockPath', 'MustachePath', 'SubExpressionPath']),
   new EmberCompletionItem('input',        ComponentItem, ['MustachePath']),
