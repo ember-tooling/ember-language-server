@@ -1,69 +1,74 @@
 'use strict';
 
 import { basename, dirname } from 'path';
+import { EventEmitter } from 'events';
 
 import FileIndex from './file-index';
 
-const klaw = require('klaw');
+class Project {
+  readonly fileIndex: FileIndex;
 
-const ignoredFolders: string[] = [
-  '.git',
-  'bower_components',
-  'node_modules',
-  'tmp',
-];
-
-export default class ProjectRoots {
-  workspaceRoot: string;
-  projectRoots: string[];
-
-  private indexes: Map<string, FileIndex> = new Map();
-
-  constructor() {}
-
-  async initialize(workspaceRoot: string) {
-    this.workspaceRoot = workspaceRoot;
-
-    console.log(`Searching for Ember projects in ${this.workspaceRoot}`);
-
-    this.projectRoots = await findProjectRoots(this.workspaceRoot);
-
-    await Promise.all(this.projectRoots.map(async projectRoot => {
-      const index = new FileIndex(projectRoot);
-      this.indexes.set(projectRoot, index);
-
-      await index.invalidate();
-    }));
-
-    console.log(`Ember CLI projects found at:${this.projectRoots.map(it => `\n- ${it}`)}`);
-  }
-
-  rootForPath(path: string) {
-    return (this.projectRoots || [])
-      .filter(root => path.indexOf(root) === 0)
-      .reduce((a, b) => a.length > b.length ? a : b, '');
-  }
-
-  indexForProjectRoot(projectRoot: string): FileIndex | undefined {
-    return this.indexes.get(projectRoot);
-  }
-
-  indexForPath(path: string): FileIndex | undefined {
-    return this.indexForProjectRoot(this.rootForPath(path));
+  constructor(public readonly root: string) {
+    this.fileIndex = new FileIndex(root);
   }
 }
 
-export function findProjectRoots(workspaceRoot: string): Promise<string[]> {
-  return new Promise(resolve => {
-    let filter = (it: string) => ignoredFolders.indexOf(basename(it)) === -1;
+export default class ProjectRoots {
+  workspaceRoot: string;
 
-    let projectRoots: string[] = [];
-    klaw(workspaceRoot, { filter })
-      .on('data', (item: any) => {
-        if (basename(item.path) === 'ember-cli-build.js') {
-          projectRoots.push(dirname(item.path));
+  projects = new Map<string, Project>();
+
+  async initialize(workspaceRoot: string, watcher: EventEmitter) {
+    this.workspaceRoot = workspaceRoot;
+
+    let promise = new Promise(resolve => {
+      watcher.once('ready', resolve);
+    });
+
+    watcher.on('add', (path: string) => {
+      if (basename(path) === 'ember-cli-build.js') {
+        this.onProjectAdd(dirname(path));
+      }
+
+      promise.then(() => {
+        let project = this.projectForPath(path);
+        if (project) {
+          project.fileIndex.add(path);
         }
-      })
-      .on('end', () => resolve(projectRoots));
-  });
+      });
+    });
+
+    watcher.on('unlink', (path: string) => {
+      if (basename(path) === 'ember-cli-build.js') {
+        this.onProjectDelete(dirname(path));
+      }
+
+      promise.then(() => {
+        let project = this.projectForPath(path);
+        if (project) {
+          project.fileIndex.remove(path);
+        }
+      });
+    });
+
+    await promise;
+  }
+
+  onProjectAdd(path: string) {
+    console.log(`Ember CLI project added at ${path}`);
+    this.projects.set(path, new Project(path));
+  }
+
+  onProjectDelete(path: string) {
+    console.log(`Ember CLI project deleted at ${path}`);
+    this.projects.delete(path);
+  }
+
+  projectForPath(path: string): Project | undefined {
+    let root = (Array.from(this.projects.keys()) || [])
+      .filter(root => path.indexOf(root) === 0)
+      .reduce((a, b) => a.length > b.length ? a : b, '');
+
+    return this.projects.get(root);
+  }
 }

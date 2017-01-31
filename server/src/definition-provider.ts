@@ -29,12 +29,12 @@ export default class DefinitionProvider {
 
       if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName = focusPath[focusPath.length - 1].original;
-        const index = this.server.projectRoots.indexForPath(filePath);
-        if (!index) {
+        const project = this.server.projectRoots.projectForPath(filePath);
+        if (!project) {
           return null;
         }
 
-        return index.files
+        return project.fileIndex.files
           .filter(fileInfo => {
             if (fileInfo instanceof ModuleFileInfo) {
               return (fileInfo.type === 'component' || fileInfo.type === 'helper') &&
@@ -45,7 +45,7 @@ export default class DefinitionProvider {
             }
           })
           .map(fileInfo => {
-            let uri = `file:${path.join(index.root, fileInfo.relativePath)}`;
+            let uri = `file:${path.join(project.root, fileInfo.relativePath)}`;
             let range = Range.create(0, 0, 0, 0);
             return Location.create(uri, range);
           });

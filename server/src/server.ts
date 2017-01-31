@@ -14,6 +14,8 @@ import {
   SymbolInformation, Files, TextDocumentPositionParams, CompletionItem
 } from 'vscode-languageserver';
 
+const { watch } = require('chokidar');
+
 import ProjectRoots from './project-roots';
 import DefinitionProvider from './definition-provider';
 import TemplateLinter from './template-linter';
@@ -77,7 +79,17 @@ export default class Server {
 
     console.log(`Initializing Ember Language Server at ${rootPath}`);
 
-    await this.projectRoots.initialize(rootPath);
+    let watcher = watch(rootPath, {
+      ignored: [
+        '**/.git/**',
+        '**/bower_components/**',
+        '**/dist/**',
+        '**/node_modules/**',
+        '**/tmp/**',
+      ],
+    });
+
+    await this.projectRoots.initialize(rootPath, watcher);
 
     return {
       capabilities: {

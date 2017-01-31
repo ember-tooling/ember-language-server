@@ -29,8 +29,8 @@ export default class TemplateCompletionProvider {
       return items;
     }
 
-    const index = this.server.projectRoots.indexForPath(filePath);
-    if (!index) {
+    const project = this.server.projectRoots.projectForPath(filePath);
+    if (!project) {
       return items;
     }
 
@@ -46,7 +46,7 @@ export default class TemplateCompletionProvider {
     }
 
     if (node.type === 'PathExpression') {
-      items.push(...getComponentAndHelperCompletions(index));
+      items.push(...getComponentAndHelperCompletions(project.fileIndex));
     }
 
     return items;
