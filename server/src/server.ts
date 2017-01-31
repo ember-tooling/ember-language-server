@@ -16,6 +16,7 @@ import {
 
 import ProjectRoots from './project-roots';
 import DefinitionProvider from './definition-provider';
+import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
@@ -41,6 +42,8 @@ export default class Server {
   templateCompletionProvider: TemplateCompletionProvider = new TemplateCompletionProvider(this);
 
   definitionProvider: DefinitionProvider = new DefinitionProvider(this);
+
+  templateLinter: TemplateLinter = new TemplateLinter(this);
 
   constructor() {
     // Make the text document manager listen on the connection
@@ -88,8 +91,8 @@ export default class Server {
     };
   }
 
-  private onDidChangeContent() {
-    // here be dragons
+  private onDidChangeContent(change: any) {
+    this.templateLinter.lint(change.document);
   }
 
   private onDidChangeWatchedFiles() {

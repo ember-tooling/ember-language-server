@@ -39,9 +39,9 @@ export default class ProjectRoots {
   }
 
   rootForPath(path: string) {
-    return this.projectRoots
+    return (this.projectRoots || [])
       .filter(root => path.indexOf(root) === 0)
-      .reduce((a, b) => a.length > b.length ? a : b);
+      .reduce((a, b) => a.length > b.length ? a : b, '');
   }
 
   indexForProjectRoot(projectRoot: string): FileIndex | undefined {
