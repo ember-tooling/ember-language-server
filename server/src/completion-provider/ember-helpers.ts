@@ -26,7 +26,7 @@ class EmberCompletionItem implements CompletionItem {
   }
 }
 
-const emberHelperConfigs: EmberCompletionItem[] = [
+const emberCompletionItems: EmberCompletionItem[] = [
   new EmberCompletionItem('action',       HelperItem,    ['MustachePath', 'SubExpressionPath']),
   new EmberCompletionItem('component',    HelperItem,    ['BlockPath', 'MustachePath', 'SubExpressionPath'], '1.11.0'),
   new EmberCompletionItem('concat',       HelperItem,    ['MustachePath', 'SubExpressionPath'], '1.13.0'),
@@ -53,7 +53,7 @@ const emberHelperConfigs: EmberCompletionItem[] = [
 ];
 
 function filterConfigs(type: UsableIn): EmberCompletionItem[] {
-  return emberHelperConfigs.filter(({ usableIn }) => usableIn.includes(type));
+  return emberCompletionItems.filter(({ usableIn }) => usableIn.includes(type));
 }
 
 export const emberBlockItems: CompletionItem[] = filterConfigs('BlockPath');
