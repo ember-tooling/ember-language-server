@@ -1,7 +1,30 @@
 import { Position, SourceLocation } from 'estree';
 import { containsPosition } from './estree-utils';
 
-export function findFocusPath(node: any, position: Position, seen = new Set()): any {
+export default class ASTPath {
+  static toPosition(ast: any, position: Position): ASTPath | undefined {
+    let path = _findFocusPath(ast, position);
+    if (path) {
+      return new ASTPath(path);
+    }
+  }
+
+  private constructor(private readonly path: any[], private readonly index: number = path.length - 1) {}
+
+  get node(): any {
+    return this.path[this.index];
+  }
+
+  get parent(): any | undefined {
+    return this.path[this.index - 1];
+  }
+
+  get parentPath(): ASTPath | undefined {
+    return new ASTPath(this.path, this.index - 1);
+  }
+}
+
+function _findFocusPath(node: any, position: Position, seen = new Set()): any {
   seen.add(node);
 
   let path: any[] = [];
@@ -24,7 +47,7 @@ export function findFocusPath(node: any, position: Position, seen = new Set()): 
       continue;
     }
 
-    let childPath = findFocusPath(value, position, seen);
+    let childPath = _findFocusPath(value, position, seen);
     if (childPath.length > 0) {
       path = path.concat(childPath);
       break;

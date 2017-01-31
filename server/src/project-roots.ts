@@ -5,7 +5,7 @@ import { EventEmitter } from 'events';
 
 import FileIndex from './file-index';
 
-class Project {
+export class Project {
   readonly fileIndex: FileIndex;
 
   constructor(public readonly root: string) {

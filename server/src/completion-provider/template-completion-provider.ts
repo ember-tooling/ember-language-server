@@ -9,7 +9,7 @@ import {
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import Server from '../server';
-import { findFocusPath } from '../glimmer-utils';
+import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import FileIndex from '../file-index';
 import { FileInfo, ModuleFileInfo } from '../file-info';
@@ -19,57 +19,100 @@ const { preprocess } = require('@glimmer/syntax');
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
 
-  provideCompletions(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] {
-
-    let items: CompletionItem[] = [];
-    const uri = textDocumentPosition.textDocument.uri;
+  provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
+    const uri = params.textDocument.uri;
     const filePath = uriToFilePath(uri);
 
     if (!filePath || extname(filePath) !== '.hbs') {
-      return items;
+      return [];
     }
 
     const project = this.server.projectRoots.projectForPath(filePath);
     if (!project) {
-      return items;
+      return [];
     }
 
-    let content = this.server.documents.get(uri).getText();
-    content = content.replace('{{}}', '{{am-i-doing-this-right}}'); // Prevent the parser from throwing errors
-    let ast = preprocess(content);
-    let focusPath = findFocusPath(ast, toPosition(textDocumentPosition.position));
-
-    let node = focusPath[focusPath.length - 1];
-
-    if (!node || node.type !== 'PathExpression') {
-      return items;
+    let document = this.server.documents.get(uri);
+    let offset = document.offsetAt(params.position);
+    let originalText = document.getText();
+    let text = originalText.slice(0, offset) + 'ELSCompletionDummy' + originalText.slice(offset);
+    let ast = preprocess(text);
+    let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
+    if (!focusPath) {
+      return [];
     }
 
-    if (node.type === 'PathExpression') {
-      items.push(...getComponentAndHelperCompletions(project.fileIndex));
+    let completions: CompletionItem[] = [];
+
+    if (isMustachePath(focusPath)) {
+      completions.push(...listComponents(project.fileIndex));
+      completions.push(...listHelpers(project.fileIndex));
+    } else if (isBlockPath(focusPath)) {
+      completions.push(...listComponents(project.fileIndex));
+    } else if (isSubExpressionPath(focusPath)) {
+      completions.push(...listHelpers(project.fileIndex));
+    } else if (isLinkToTarget(focusPath)) {
+      completions.push(...listRoutes(project.fileIndex));
     }
 
-    return items;
+    return completions;
   }
 }
 
-function getComponentAndHelperCompletions(index: FileIndex): CompletionItem[] {
-  return index.files.filter(fileInfo => isComponent(fileInfo) || isHelper(fileInfo)).map((fileInfo: ModuleFileInfo) => {
-    let kind: CompletionItemKind = CompletionItemKind.Class;
+function listComponents(index: FileIndex): CompletionItem[] {
+  return index.files.filter(isComponent).map(toCompletionItem);
+}
 
-    if (fileInfo.type === 'helper') {
-      kind = CompletionItemKind.Function;
-    }
+function listHelpers(index: FileIndex): CompletionItem[] {
+  return index.files.filter(isHelper).map(toCompletionItem);
+}
 
-    return {
-      kind,
-      label: fileInfo.slashName,
-      data: {
-        name: fileInfo.slashName,
-        type: fileInfo.type,
-      }
-    };
-  });
+function listRoutes(index: FileIndex): CompletionItem[] {
+  return index.files.filter(isRoute).map(toRouteCompletionItem);
+}
+
+function isMustachePath(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'PathExpression') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'MustacheStatement') { return false; }
+  return parent.path === node;
+}
+
+function isBlockPath(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'PathExpression') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'BlockStatement') { return false; }
+  return parent.path === node;
+}
+
+function isSubExpressionPath(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'PathExpression') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'SubExpression') { return false; }
+  return parent.path === node;
+}
+
+function isLinkToTarget(path: ASTPath): boolean {
+  return isInlineLinkToTarget(path) || isBlockLinkToTarget(path);
+}
+
+function isInlineLinkToTarget(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'StringLiteral') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'MustacheStatement') { return false; }
+  return parent.params[1] === node && parent.path.original === 'link-to';
+}
+
+function isBlockLinkToTarget(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'StringLiteral') { return false; }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'BlockStatement') { return false; }
+  return parent.params[0] === node && parent.path.original === 'link-to';
 }
 
 function isComponent(fileInfo: FileInfo) {
@@ -78,4 +121,38 @@ function isComponent(fileInfo: FileInfo) {
 
 function isHelper(fileInfo: FileInfo) {
   return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'helper';
+}
+
+function isRoute(fileInfo: FileInfo) {
+  return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'route';
+}
+
+function toCompletionItem(fileInfo: ModuleFileInfo) {
+  let kind = toCompletionItemKind(fileInfo.type);
+
+  return {
+    kind,
+    label: fileInfo.slashName,
+    detail: fileInfo.type,
+  };
+}
+
+function toRouteCompletionItem(fileInfo: ModuleFileInfo) {
+  let kind = toCompletionItemKind(fileInfo.type);
+
+  return {
+    kind,
+    label: fileInfo.name,
+    detail: fileInfo.type,
+  };
+}
+
+function toCompletionItemKind(type: string): CompletionItemKind {
+  if (type === 'helper') {
+    return CompletionItemKind.Function;
+  } else if (type === 'route') {
+    return CompletionItemKind.File;
+  } else {
+    return CompletionItemKind.Class;
+  }
 }

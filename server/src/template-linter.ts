@@ -5,10 +5,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import Server from './server';
+import { Project } from './project-roots';
 
 export default class TemplateLinter {
 
-  private _linterCache = new Map();
+  private _linterCache = new Map<Project, any>();
 
   constructor(private server: Server) {}
 
@@ -52,21 +53,17 @@ export default class TemplateLinter {
       return;
     }
 
-    const rootPath = this.server.projectRoots.rootForPath(filePath);
-
-    if (!rootPath) {
+    const project = this.server.projectRoots.projectForPath(filePath);
+    if (!project) {
       return;
     }
 
-    const configPath = path.join(rootPath, '.template-lintrc.js');
-
+    const configPath = path.join(project.root, '.template-lintrc.js');
     if (!fs.existsSync(configPath)) {
       return;
     }
 
-    return {
-      configPath
-    };
+    return { configPath };
   }
 
   private async getLinter(uri: string) {
@@ -75,19 +72,18 @@ export default class TemplateLinter {
       return;
     }
 
-    const rootPath = this.server.projectRoots.rootForPath(filePath);
-
-    if (!rootPath) {
+    const project = this.server.projectRoots.projectForPath(filePath);
+    if (!project) {
       return;
     }
 
-    if (this._linterCache.has(rootPath)) {
-      return this._linterCache.get(rootPath);
+    if (this._linterCache.has(project)) {
+      return this._linterCache.get(project);
     }
 
     try {
-      const linter = await Files.resolveModule(rootPath, 'ember-template-lint');
-      this._linterCache.set(rootPath, linter);
+      const linter = await (Files.resolveModule(project.root, 'ember-template-lint') as Promise<any>);
+      this._linterCache.set(project, linter);
       return linter;
     } catch (error) {
       console.log('Module ember-template-lint not found.');
