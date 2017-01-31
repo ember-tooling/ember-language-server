@@ -6,10 +6,8 @@ import {
 type UsableIn = 'BlockPath' | 'MustachePath' | 'SubExpressionPath';
 type EmberHelperConfig = [string, CompletionItemKind, UsableIn[]];
 
-const {
-  Function: HelperItem,
-  Class: ComponentItem
-} = CompletionItemKind;
+const HelperItem = CompletionItemKind.Function;
+const ComponentItem = CompletionItemKind.Class;
 
 const emberHelperConfigs: EmberHelperConfig[] = [
   ['action',       HelperItem,    ['MustachePath', 'SubExpressionPath']],
