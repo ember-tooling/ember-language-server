@@ -13,10 +13,10 @@ class EmberCompletionItem implements CompletionItem {
   public detail: string;
 
   constructor(
-    public label: string,
-    public kind: CompletionItemKind,
-    public usableIn: UsableIn[],
-    private version?: string
+    readonly label: string,
+    readonly kind: CompletionItemKind,
+    readonly usableIn: UsableIn[],
+    readonly version?: string
   ) {
     this.detail = 'Ember';
 
