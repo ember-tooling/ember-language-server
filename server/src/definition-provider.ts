@@ -3,6 +3,8 @@ import * as path from 'path';
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
+import { parse } from 'esprima';
+
 import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
@@ -20,6 +22,11 @@ export default class DefinitionProvider {
       return null;
     }
 
+    const project = this.server.projectRoots.projectForPath(filePath);
+    if (!project) {
+      return null;
+    }
+
     let extension = path.extname(filePath);
 
     if (extension === '.hbs') {
@@ -32,10 +39,6 @@ export default class DefinitionProvider {
 
       if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName = focusPath.node.original;
-        const project = this.server.projectRoots.projectForPath(filePath);
-        if (!project) {
-          return null;
-        }
 
         return project.fileIndex.files
           .filter(fileInfo => {
@@ -47,6 +50,26 @@ export default class DefinitionProvider {
               return fileInfo.forComponent && fileInfo.slashName === componentOrHelperName;
             }
           })
+          .map(fileInfo => toLocation(fileInfo, project.root));
+      }
+    } else if (extension === '.js') {
+      let content = this.server.documents.get(uri).getText();
+      let ast = parse(content, {
+        loc: true,
+        sourceType: 'module',
+      });
+      let astPath = ASTPath.toPosition(ast, toPosition(params.position));
+      if (!astPath) {
+        return null;
+      }
+
+      if (isModelReference(astPath)) {
+        let modelName = astPath.node.value;
+
+        return project.fileIndex.files
+          .filter(fileInfo => fileInfo instanceof ModuleFileInfo &&
+            fileInfo.type === 'model' &&
+            fileInfo.name === modelName)
           .map(fileInfo => toLocation(fileInfo, project.root));
       }
     }
@@ -71,6 +94,15 @@ export default class DefinitionProvider {
 
     return true;
   }
+}
+
+function isModelReference(astPath: ASTPath): boolean {
+  let node = astPath.node;
+  if (node.type !== 'Literal') { return false; }
+  let parent = astPath.parent;
+  if (!parent || parent.type !== 'CallExpression' || parent.arguments[0] !== node) { return false; }
+  let identifier = (parent.callee.type === 'Identifier') ? parent.callee : parent.callee.property;
+  return identifier.name === 'belongsTo' || identifier.name === 'hasMany';
 }
 
 function toLocation(fileInfo: FileInfo, root: string) {
