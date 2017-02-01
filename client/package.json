@@ -13,7 +13,8 @@
   ],
   "activationEvents": [
     "onLanguage:handlebars",
-    "onLanguage:javascript"
+    "onLanguage:javascript",
+    "workspaceContains:ember-cli-build.js"
   ],
   "main": "./out/src/extension",
   "scripts": {
