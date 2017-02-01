@@ -71,6 +71,15 @@ export default class DefinitionProvider {
             fileInfo.type === 'model' &&
             fileInfo.name === modelName)
           .map(fileInfo => toLocation(fileInfo, project.root));
+
+      } else if (isTransformReference(astPath)) {
+        let transformName = astPath.node.value;
+
+        return project.fileIndex.files
+          .filter(fileInfo => fileInfo instanceof ModuleFileInfo &&
+            fileInfo.type === 'transform' &&
+            fileInfo.name === transformName)
+          .map(fileInfo => toLocation(fileInfo, project.root));
       }
     }
 
@@ -103,6 +112,15 @@ function isModelReference(astPath: ASTPath): boolean {
   if (!parent || parent.type !== 'CallExpression' || parent.arguments[0] !== node) { return false; }
   let identifier = (parent.callee.type === 'Identifier') ? parent.callee : parent.callee.property;
   return identifier.name === 'belongsTo' || identifier.name === 'hasMany';
+}
+
+function isTransformReference(astPath: ASTPath): boolean {
+  let node = astPath.node;
+  if (node.type !== 'Literal') { return false; }
+  let parent = astPath.parent;
+  if (!parent || parent.type !== 'CallExpression' || parent.arguments[0] !== node) { return false; }
+  let identifier = (parent.callee.type === 'Identifier') ? parent.callee : parent.callee.property;
+  return identifier.name === 'attr';
 }
 
 function toLocation(fileInfo: FileInfo, root: string) {
