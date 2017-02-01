@@ -6,7 +6,7 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
-import { ModuleFileInfo, TemplateFileInfo } from './file-info';
+import { FileInfo, ModuleFileInfo, TemplateFileInfo } from './file-info';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -47,11 +47,7 @@ export default class DefinitionProvider {
               return fileInfo.forComponent && fileInfo.slashName === componentOrHelperName;
             }
           })
-          .map(fileInfo => {
-            let uri = `file:${path.join(project.root, fileInfo.relativePath)}`;
-            let range = Range.create(0, 0, 0, 0);
-            return Location.create(uri, range);
-          });
+          .map(fileInfo => toLocation(fileInfo, project.root));
       }
     }
 
@@ -75,4 +71,10 @@ export default class DefinitionProvider {
 
     return true;
   }
+}
+
+function toLocation(fileInfo: FileInfo, root: string) {
+  let uri = `file:${path.join(root, fileInfo.relativePath)}`;
+  let range = Range.create(0, 0, 0, 0);
+  return Location.create(uri, range);
 }
