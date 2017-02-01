@@ -111,7 +111,7 @@ describe('chokidar', function() {
     });
   });
 
-  it('notifies about file changes', async function() {
+  it('notifies about file changes', function() {
     return withWatcher(async (watcher: any) => {
       let events = await listEventsUntilReady(watcher);
 
@@ -119,13 +119,13 @@ describe('chokidar', function() {
       expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
 
       fs.outputFile(path.join(workDir, 'a', 'ember-cli-build.js'));
-      await event(watcher, 'add', `${workDir}/a/ember-cli-build.js`);
+      await event(watcher, 'add', path.join(workDir, '/a/ember-cli-build.js'));
 
       fs.outputFile(path.join(workDir, 'b', 'c', 'ember-cli-build.js'));
-      await event(watcher, 'add', `${workDir}/b/c/ember-cli-build.js`);
+      await event(watcher, 'add', path.join(workDir, '/b/c/ember-cli-build.js'));
 
       fs.remove(path.join(workDir, 'a', 'ember-cli-build.js'));
-      await event(watcher, 'unlink', `${workDir}/a/ember-cli-build.js`);
+      await event(watcher, 'unlink', path.join(workDir, '/a/ember-cli-build.js'));
     });
   });
 });

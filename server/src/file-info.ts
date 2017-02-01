@@ -11,7 +11,7 @@ export abstract class FileInfo {
       return;
     }
 
-    let pathParts = relativePath.split('/');
+    let pathParts = relativePath.split(path.sep);
     let sourceRoot = pathParts[0];
 
     if (sourceRoot === 'app') {
