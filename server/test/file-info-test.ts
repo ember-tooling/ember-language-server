@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import {
   AcceptanceTestFileInfo, FileInfo, MainFileInfo, ModuleFileInfo, ModuleTestFileInfo,
   TemplateFileInfo
@@ -88,6 +90,7 @@ describe('FileInfo', function() {
 
     function test(relativePath: string, type: any, expected: any) {
       let description: string;
+      relativePath = path.normalize(relativePath);
       if (!expected.name) {
         description = `${relativePath} -> ${type.name}`;
       } else if (!expected.type) {

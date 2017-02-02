@@ -1,11 +1,11 @@
+import * as path from 'path';
 import FileIndex from '../src/file-index';
-
 import { expect } from 'chai';
 import {TemplateFileInfo} from '../src/file-info';
 
 describe('FileIndex', function() {
   it('indexes all module types', async function() {
-    let workspaceRoot = `${__dirname}/fixtures/modules/all-modules`;
+    let workspaceRoot = path.join(__dirname, '/fixtures/modules/all-modules');
 
     const index = new FileIndex(workspaceRoot);
     await index.invalidate();
@@ -14,7 +14,7 @@ describe('FileIndex', function() {
   });
 
   it('indexes nothing in empty project', async function() {
-    let workspaceRoot = `${__dirname}/fixtures/modules/no-modules`;
+    let workspaceRoot = path.join(__dirname, '/fixtures/modules/no-modules');
 
     const index = new FileIndex(workspaceRoot);
     await index.invalidate();
@@ -23,7 +23,7 @@ describe('FileIndex', function() {
   });
 
   it('returns the correct modules for each type', async function() {
-    let workspaceRoot = `${__dirname}/fixtures/modules/all-modules`;
+    let workspaceRoot = path.join(__dirname, 'fixtures/modules/all-modules');
 
     const index = new FileIndex(workspaceRoot);
     await index.invalidate();
@@ -45,7 +45,7 @@ describe('FileIndex', function() {
   });
 
   it('indexes modules in subdirectories', async function() {
-    let workspaceRoot = `${__dirname}/fixtures/modules/nested-modules`;
+    let workspaceRoot = path.join(__dirname, '/fixtures/modules/nested-modules');
 
     const index = new FileIndex(workspaceRoot);
     await index.invalidate();
@@ -54,7 +54,7 @@ describe('FileIndex', function() {
   });
 
   it('indexes component templates separated from other templates', async function() {
-    let workspaceRoot = `${__dirname}/fixtures/modules/templates`;
+    let workspaceRoot = path.join(__dirname, '/fixtures/modules/templates');
 
     const index = new FileIndex(workspaceRoot);
     await index.invalidate();
