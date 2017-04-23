@@ -9,7 +9,7 @@ import * as path from 'path';
 import { workspace, Disposable, ExtensionContext } from 'vscode';
 import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions, TransportKind } from 'vscode-languageclient';
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
 
   // The server is implemented in node
   let serverModule = context.asAbsolutePath(path.join('node_modules', '@emberwatch', 'ember-language-server', 'lib', 'start-server.js'));
@@ -22,6 +22,10 @@ export function activate(context: ExtensionContext) {
     run : { module: serverModule, transport: TransportKind.ipc },
     debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
   };
+
+  if (!await isEmberCliProject()) {
+    return;
+  }
 
   // Options to control the language client
   let clientOptions: LanguageClientOptions = {
@@ -36,4 +40,14 @@ export function activate(context: ExtensionContext) {
   // Push the disposable to the context's subscriptions so that the
   // client can be deactivated on extension deactivation
   context.subscriptions.push(disposable);
+}
+
+async function isEmberCliProject(): Promise<boolean> {
+  const emberCliBuildFile = await workspace.findFiles('ember-cli-build.js')
+
+  if (emberCliBuildFile.length < 1) {
+    return false;
+  }
+
+  return true;
 }
