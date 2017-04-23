@@ -12,7 +12,7 @@ import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions, T
 export function activate(context: ExtensionContext) {
 
   // The server is implemented in node
-  let serverModule = context.asAbsolutePath(path.join('server', 'src', 'start-server.js'));
+  let serverModule = context.asAbsolutePath(path.join('node_modules', '@emberwatch', 'ember-language-server', 'lib', 'start-server.js'));
   // The debug options for the server
   let debugOptions = { execArgv: ["--nolazy", "--debug=6004"] };
 
@@ -27,13 +27,7 @@ export function activate(context: ExtensionContext) {
   let clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
     documentSelector: ['handlebars', 'javascript'],
-    outputChannelName: 'Ember Language Server',
-    synchronize: {
-      fileEvents: [
-        workspace.createFileSystemWatcher('**/*.hbs'),
-        workspace.createFileSystemWatcher('**/*.js'),
-      ],
-    },
+    outputChannelName: 'Ember Language Server'
   };
 
   // Create the language client and start the client.

@@ -94,7 +94,7 @@ export class ModuleFileInfo extends FileInfo {
   }
 }
 
-abstract class TestFileInfo extends FileInfo {}
+export abstract class TestFileInfo extends FileInfo {}
 
 export class ModuleTestFileInfo extends TestFileInfo {
   readonly subjectType: string;
