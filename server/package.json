@@ -1,12 +1,17 @@
 {
-  "name": "language-server-example",
-  "description": "Example implementation of a language server in node.",
+  "name": "@emberwatch/ember-language-server",
+  "description": "A language server implementation for Ember.js projects.",
   "version": "0.0.1",
-  "author": "Microsoft Corporation",
+  "contributors": [
+    "Tobias Bieniek <tobias.bieniek@gmail.com>",
+    "Thomas Sauer <t-sauer@outlook.de>"
+  ],
   "license": "MIT",
   "engines": {
     "node": "*"
   },
+  "main": "lib/start-server.js",
+  "typings": "lib/start-server.d.ts",
   "dependencies": {
     "@glimmer/syntax": "^0.21.2",
     "ast-types": "^0.9.4",
@@ -32,9 +37,11 @@
     "typescript": "^2.1.5"
   },
   "scripts": {
-    "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+    "clean": "rm -rf lib/",
+    "compile": "tsc -p .",
     "lint": "tslint --project ./tsconfig.json",
+    "prepublish": "npm run clean && npm run compile",
     "test": "mocha --require ts-node/register test/*.ts",
-    "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
+    "watch": "tsc --watch -p ."
   }
 }

@@ -31,6 +31,7 @@
     "vscode": "^1.0.3"
   },
   "dependencies": {
+    "@emberwatch/ember-language-server": "*",
     "vscode-languageclient": "^3.0.3"
   }
 }
