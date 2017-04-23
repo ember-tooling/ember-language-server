@@ -9,7 +9,6 @@ branches:
 
 # Install scripts. (runs after repo cloning)
 install:
-  - cd server
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   # install modules
