@@ -1,4 +1,5 @@
 {
+  "defaultSeverity": "error",
   "rules": {
     "arrow-parens": [
       true,
@@ -13,7 +14,7 @@
       true,
       "spaces"
     ],
-    "no-consecutive-blank-lines": true,
+    "no-consecutive-blank-lines": [true],
     "no-duplicate-variable": true,
     "no-eval": true,
     "no-internal-module": true,
