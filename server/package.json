@@ -37,7 +37,7 @@
     "typescript": "^2.1.5"
   },
   "scripts": {
-    "clean": "mkdir -p lib/ && rm -rf lib/",
+    "clean": "rm -rf lib/",
     "compile": "tsc -p .",
     "lint": "tslint --project ./tsconfig.json",
     "prepublish": "npm run clean && npm run compile",
