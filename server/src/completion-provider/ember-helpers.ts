@@ -22,7 +22,7 @@ class EmberCompletionItem implements CompletionItem {
 
     if (version) {
       this.detail = `Ember ${this.version}`;
-    };
+    }
   }
 }
 
