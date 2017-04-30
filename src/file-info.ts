@@ -3,11 +3,13 @@ import * as path from 'path';
 const i = require('i')();
 
 const extensions = ['.js', '.hbs', '.handlebars'];
+const ignoredFiles = ['.eslintrc.js'];
 
 export abstract class FileInfo {
   static from(relativePath: string): FileInfo | undefined {
     let ext = path.extname(relativePath);
-    if (!extensions.includes(ext)) {
+    let filename = path.basename(relativePath);
+    if (!extensions.includes(ext) || ignoredFiles.includes(filename)) {
       return;
     }
 
