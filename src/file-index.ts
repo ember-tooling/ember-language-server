@@ -2,6 +2,7 @@ import * as path from 'path';
 
 import {FileInfo, ModuleFileInfo} from './file-info';
 import Deferred from './utils/deferred';
+import Server from './server';
 
 const klaw = require('klaw');
 
@@ -18,7 +19,7 @@ export default class FileIndex {
   readonly root: string;
   readonly files: FileInfo[] = [];
 
-  constructor(root: string) {
+  constructor(root: string, private readonly server: Server | null = null) {
     this.root = root;
   }
 
@@ -38,7 +39,7 @@ export default class FileIndex {
     let relativePath = path.relative(this.root, absolutePath);
     let fileInfo = FileInfo.from(relativePath);
     if (fileInfo) {
-      console.log(`add ${relativePath} -> ${fileInfo.containerName}`);
+      this.server && this.server.connection.console.log(`add ${relativePath} -> ${fileInfo.containerName}`);
       this.files.push(fileInfo);
     }
     return fileInfo;
@@ -49,7 +50,7 @@ export default class FileIndex {
     let index = this.files.findIndex(fileInfo => fileInfo.relativePath === relativePath);
     if (index !== -1) {
       let fileInfo = this.files.splice(index, 1)[0];
-      console.log(`remove ${relativePath} -> ${fileInfo.containerName}`);
+      this.server && this.server.connection.console.log(`remove ${relativePath} -> ${fileInfo.containerName}`);
       return fileInfo;
     }
   }

@@ -4,12 +4,13 @@ import { basename, dirname } from 'path';
 import { EventEmitter } from 'events';
 
 import FileIndex from './file-index';
+import Server from './server';
 
 export class Project {
   readonly fileIndex: FileIndex;
 
-  constructor(public readonly root: string) {
-    this.fileIndex = new FileIndex(root);
+  constructor(public readonly root: string, server: Server) {
+    this.fileIndex = new FileIndex(root, server);
   }
 }
 
@@ -17,6 +18,8 @@ export default class ProjectRoots {
   workspaceRoot: string;
 
   projects = new Map<string, Project>();
+
+  constructor(private readonly server: Server) {}
 
   async initialize(workspaceRoot: string, watcher: EventEmitter) {
     this.workspaceRoot = workspaceRoot;
@@ -55,12 +58,12 @@ export default class ProjectRoots {
   }
 
   onProjectAdd(path: string) {
-    console.log(`Ember CLI project added at ${path}`);
-    this.projects.set(path, new Project(path));
+    this.server.connection.console.log(`Ember CLI project added at ${path}`);
+    this.projects.set(path, new Project(path, this.server));
   }
 
   onProjectDelete(path: string) {
-    console.log(`Ember CLI project deleted at ${path}`);
+    this.server.connection.console.log(`Ember CLI project deleted at ${path}`);
     this.projects.delete(path);
   }
 

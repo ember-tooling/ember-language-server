@@ -8,7 +8,7 @@ import { extname } from 'path';
 import { readFileSync } from 'fs';
 
 import {
-  IPCMessageReader, IPCMessageWriter,
+  StreamMessageWriter, StreamMessageReader,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
   SymbolInformation, Files, TextDocumentPositionParams, CompletionItem
@@ -28,13 +28,13 @@ import TemplateCompletionProvider from './completion-provider/template-completio
 export default class Server {
 
   // Create a connection for the server. The connection uses Node's IPC as a transport
-  connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+  connection: IConnection = createConnection(new StreamMessageReader(process.stdin), new StreamMessageWriter(process.stdout));
 
   // Create a simple text document manager. The text document manager
   // supports full document sync only
   documents: TextDocuments = new TextDocuments();
 
-  projectRoots: ProjectRoots = new ProjectRoots();
+  projectRoots: ProjectRoots = new ProjectRoots(this);
 
   documentSymbolProviders: DocumentSymbolProvider[] = [
     new JSDocumentSymbolProvider(),
@@ -67,17 +67,17 @@ export default class Server {
 
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
-  private async onInitialize({ rootUri }: InitializeParams): Promise<InitializeResult> {
-    if (!rootUri) {
+  private async onInitialize({ rootUri, rootPath }: InitializeParams): Promise<InitializeResult> {
+    if (!rootUri && !rootPath) {
       return { capabilities: {} };
     }
 
-    let rootPath = Files.uriToFilePath(rootUri);
+    rootPath = rootPath || Files.uriToFilePath(<string>rootUri);
     if (!rootPath) {
       return { capabilities: {} };
     }
 
-    console.log(`Initializing Ember Language Server at ${rootPath}`);
+    this.connection.console.log(`Initializing Ember Language Server at ${rootPath}`);
 
     let watcher = watch(rootPath, {
       ignored: [
