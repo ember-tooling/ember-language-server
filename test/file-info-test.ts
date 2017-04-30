@@ -28,6 +28,10 @@ describe('FileInfo', function() {
       expect(FileInfo.from('foo/bar.txt')).to.be.undefined;
     });
 
+    it('returns undefined for ignored files', function() {
+      expect(FileInfo.from('foo/.eslintrc.js')).to.be.undefined;
+    });
+
     test('app/app.js', MainFileInfo, { name: 'app' });
     test('app/resolver.js', MainFileInfo, { name: 'resolver' });
     test('app/router.js', MainFileInfo, { name: 'router' });
