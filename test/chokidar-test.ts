@@ -144,7 +144,7 @@ async function listEventsUntilReady(watcher: EventEmitter): Promise<{ event: str
 }
 
 function event(watcher: EventEmitter, event: string, path: string): Promise<undefined> {
-  return new Promise<undefined>(resolve => {
+  return new Promise<undefined>((resolve) => {
     let listener = (_event: string, _path: string) => {
       if (_event === event && _path === path) {
         resolve();

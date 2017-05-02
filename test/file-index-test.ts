@@ -41,7 +41,7 @@ describe('FileIndex', function() {
     expect(index.byModuleType('service'), 'Service').to.have.lengthOf(1);
     expect(index.byModuleType('transform'), 'Transform').to.have.lengthOf(1);
 
-    expect(index.files.filter(it => it instanceof TemplateFileInfo)).to.have.lengthOf(2);
+    expect(index.files.filter((it) => it instanceof TemplateFileInfo)).to.have.lengthOf(2);
   });
 
   it('indexes modules in subdirectories', async function() {
@@ -60,7 +60,7 @@ describe('FileIndex', function() {
     await index.invalidate();
 
     expect(index.files).to.have.lengthOf(2);
-    expect(index.files.filter(it => it instanceof TemplateFileInfo && it.forComponent)).to.have.lengthOf(1);
-    expect(index.files.filter(it => it instanceof TemplateFileInfo && !it.forComponent)).to.have.lengthOf(1);
+    expect(index.files.filter((it) => it instanceof TemplateFileInfo && it.forComponent)).to.have.lengthOf(1);
+    expect(index.files.filter((it) => it instanceof TemplateFileInfo && !it.forComponent)).to.have.lengthOf(1);
   });
 });
