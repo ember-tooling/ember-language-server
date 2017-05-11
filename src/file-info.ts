@@ -38,6 +38,8 @@ export abstract class FileInfo {
     }
   }
 
+  readonly name: string;
+
   constructor(public readonly relativePath: string) {}
 
   get containerName(): string | undefined {
