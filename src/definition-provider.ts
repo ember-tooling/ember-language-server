@@ -9,6 +9,7 @@ import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
 import { FileInfo, ModuleFileInfo, TemplateFileInfo } from './file-info';
+import { getExtension } from './utils/file-extension';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -27,7 +28,7 @@ export default class DefinitionProvider {
       return null;
     }
 
-    let extension = path.extname(filePath);
+    let extension = getExtension(params.textDocument);
 
     if (extension === '.hbs') {
       let content = this.server.documents.get(uri).getText();
