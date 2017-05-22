@@ -86,7 +86,7 @@ export default class TemplateLinter {
       this._linterCache.set(project, linter);
       return linter;
     } catch (error) {
-      console.log('Module ember-template-lint not found.');
+      this.server.connection.console.log('Module ember-template-lint not found.');
     }
   }
 }

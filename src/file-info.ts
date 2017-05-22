@@ -132,6 +132,9 @@ export class AcceptanceTestFileInfo extends TestFileInfo {
 
 function removeExtension(nameParts: string[]) {
   let baseName = nameParts.pop() as string;
+  if (!baseName) {
+    return [];
+  }
   let extension = path.extname(baseName);
   nameParts.push(baseName.substr(0, baseName.length - extension.length));
   return nameParts;
