@@ -124,7 +124,7 @@ function isTransformReference(astPath: ASTPath): boolean {
 }
 
 function toLocation(fileInfo: FileInfo, root: string) {
-  let uri = `file:${path.join(root, fileInfo.relativePath)}`;
+  let uri = `file://${path.join(root, fileInfo.relativePath)}`;
   let range = Range.create(0, 0, 0, 0);
   return Location.create(uri, range);
 }
