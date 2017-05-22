@@ -67,12 +67,9 @@ export default class Server {
 
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
-  private async onInitialize({ rootUri }: InitializeParams): Promise<InitializeResult> {
-    if (!rootUri) {
-      return { capabilities: {} };
-    }
+  private async onInitialize({ rootUri, rootPath }: InitializeParams): Promise<InitializeResult> {
 
-    let rootPath = Files.uriToFilePath(rootUri);
+    rootPath = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
     if (!rootPath) {
       return { capabilities: {} };
     }
