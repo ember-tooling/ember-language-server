@@ -1,5 +1,6 @@
 import { Diagnostic, DiagnosticSeverity, Files, TextDocument } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
+import { hasExtension } from './utils/file-extension';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -14,7 +15,7 @@ export default class TemplateLinter {
   constructor(private server: Server) {}
 
   async lint(textDocument: TextDocument) {
-    if (textDocument.languageId !== 'handlebars') {
+    if (!hasExtension(textDocument, '.hbs')) {
       return;
     }
 
