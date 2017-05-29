@@ -13,6 +13,7 @@ import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import FileIndex from '../file-index';
 import { FileInfo, ModuleFileInfo, TemplateFileInfo } from '../file-info';
+import { filter } from 'fuzzaldrin';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -65,7 +66,7 @@ export default class TemplateCompletionProvider {
       completions.push(...listRoutes(project.fileIndex));
     }
 
-    return completions;
+    return filter(completions, getTextPrefix(focusPath), { key: 'label' });
   }
 }
 
@@ -172,4 +173,8 @@ function toCompletionItemKind(type: string): CompletionItemKind {
   } else {
     return CompletionItemKind.Class;
   }
+}
+
+function getTextPrefix({ node }: ASTPath): string {
+  return node && node.original.replace('ELSCompletionDummy', '');
 }
