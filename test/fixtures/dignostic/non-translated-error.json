@@ -1,0 +1,12 @@
+{
+  "source": "\n<span>Test</span>",
+  "error":  {
+    "moduleId": "file:///path/to/project/template.hbs",
+    "rule": "bare-strings",
+    "severity": 2,
+    "message": "Non-translated string used",
+    "line": 2,
+    "column": 6,
+    "source": "Test"
+  }
+}

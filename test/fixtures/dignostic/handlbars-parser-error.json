@@ -1,0 +1,10 @@
+{
+  "source": "\n  {{}}  ",
+  "error": {
+    "fatal": true,
+    "moduleId": "file:///path/to/project/template.hbs",
+    "message": "Parse error on line 2:\n{{}}\n--^\nExpecting 'ID', 'STRING', 'NUMBER', 'BOOLEAN', 'UNDEFINED', 'NULL', 'DATA', got 'CLOSE'",
+    "source": "Error: Parse error on line 2:\n{{}}\n--^\nExpecting 'ID', 'STRING', 'NUMBER', 'BOOLEAN', 'UNDEFINED', 'NULL', 'DATA', got 'CLOSE'\n    at Parser.parseError (/path/to/project/node_modules/glimmer-engine/dist/node_modules/handlebars/compiler/parser.js:218:19)\n    at Parser.parse (/path/to/project/node_modules/glimmer-engine/dist/node_modules/handlebars/compiler/parser.js:287:30)\n    at HandlebarsEnvironment.parse (/path/to/project/node_modules/glimmer-engine/dist/node_modules/handlebars/compiler/base.js:45:43)\n    at Object.preprocess (/path/to/project/node_modules/glimmer-engine/dist/node_modules/@glimmer/syntax/lib/parser.js:18:64)\n    at precompile (/path/to/project/node_modules/glimmer-engine/dist/node_modules/@glimmer/compiler/lib/compiler.js:37:24)\n    at Linter.verify (/path/to/project/node_modules/ember-template-lint/lib/index.js:94:7)\n    at TemplateLinter.<anonymous> (/path/to/ember-language-server/lib/template-linter.js:33:35)\n    at Generator.next (<anonymous>)\n    at fulfilled (/path/to/ember-language-server/lib/template-linter.js:4:58)\n    at process._tickCallback (internal/process/next_tick.js:109:7)",
+    "severity": 2
+  }
+}
