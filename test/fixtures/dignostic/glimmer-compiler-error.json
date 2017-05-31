@@ -1,0 +1,10 @@
+{
+  "source": "\n  <div></di  ",
+  "error":  {
+    "fatal": true,
+    "moduleId": "file:///path/to/project/template.hbs",
+    "message": "Unclosed element `div` (on line 2).",
+    "source": "Error: Unclosed element `div` (on line 2).\n    at Parser.Program (/path/to/project/node_modules/glimmer-engine/dist/node_modules/@glimmer/syntax/lib/parser/handlebars-node-visitors.js:20:19)\n    at Parser.acceptNode (/path/to/project/node_modules/glimmer-engine/dist/node_modules/@glimmer/syntax/lib/parser.js:44:31)\n    at Object.preprocess (/path/to/project/node_modules/glimmer-engine/dist/node_modules/@glimmer/syntax/lib/parser.js:19:46)\n    at precompile (/path/to/project/node_modules/glimmer-engine/dist/node_modules/@glimmer/compiler/lib/compiler.js:37:24)\n    at Linter.verify (/path/to/project/node_modules/ember-template-lint/lib/index.js:94:7)\n    at TemplateLinter.<anonymous> (/Users/josa/github/ember-language-server/lib/template-linter.js:34:35)\n    at Generator.next (<anonymous>)\n    at fulfilled (/Users/josa/github/ember-language-server/lib/template-linter.js:4:58)\n    at process._tickCallback (internal/process/next_tick.js:109:7)",
+    "severity": 2
+  }
+}

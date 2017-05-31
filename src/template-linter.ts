@@ -1,12 +1,24 @@
-import { Diagnostic, DiagnosticSeverity, Files, TextDocument } from 'vscode-languageserver';
+import { Diagnostic, Files, TextDocument } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { hasExtension } from './utils/file-extension';
+import { toDiagnostic } from './utils/diagnostic';
 
 import * as path from 'path';
 import * as fs from 'fs';
 
 import Server from './server';
 import { Project } from './project-roots';
+
+export interface TemplateLinterError {
+  fatal?: boolean;
+  moduleId: string;
+  rule?: string;
+  severity: number;
+  message: string;
+  line?: number;
+  column?: number;
+  source?: string;
+}
 
 export default class TemplateLinter {
 
@@ -28,22 +40,16 @@ export default class TemplateLinter {
     const TemplateLinter = await this.getLinter(textDocument.uri);
     const linter = new TemplateLinter(config);
 
+    const source = textDocument.getText();
+
     const errors = linter.verify({
-      source: textDocument.getText(),
+      source,
       moduleId: textDocument.uri
     });
 
-    const diagnostics: Diagnostic[] = errors.map((error: any) => {
-      return {
-        severity: DiagnosticSeverity.Error,
-        range: {
-          start: { line: error.line - 1, character: error.column },
-          end: { line: error.line - 1, character: error.column + 1 }
-        },
-        message: error.message,
-        source: 'ember-template-lint'
-      };
-    });
+    const diagnostics: Diagnostic[] = errors.map((error: TemplateLinterError) =>
+      toDiagnostic(source, error)
+    );
 
     this.server.connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
   }
