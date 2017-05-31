@@ -36,7 +36,7 @@ describe('FileInfo', function() {
     test('app/resolver.js', MainFileInfo, { name: 'resolver' });
     test('app/router.js', MainFileInfo, { name: 'router' });
 
-    moduleTypes.forEach(type => {
+    moduleTypes.forEach((type) => {
       test(`app/${type}s/foo.js`, ModuleFileInfo, {
         type,
         name: 'foo',
@@ -44,7 +44,7 @@ describe('FileInfo', function() {
       });
     });
 
-    moduleTypes.forEach(type => {
+    moduleTypes.forEach((type) => {
       test(`tests/integration/${type}s/foo.js`, ModuleTestFileInfo, {
         type: 'integration',
         subjectType: type,
@@ -53,7 +53,7 @@ describe('FileInfo', function() {
       });
     });
 
-    moduleTypes.forEach(type => {
+    moduleTypes.forEach((type) => {
       test(`tests/unit/${type}s/foo.js`, ModuleTestFileInfo, {
         type: 'unit',
         subjectType: type,

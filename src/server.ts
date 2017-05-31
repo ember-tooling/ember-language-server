@@ -127,14 +127,14 @@ export default class Server {
     let extension = extname(filePath);
 
     let providers = this.documentSymbolProviders
-      .filter(provider => provider.extensions.indexOf(extension) !== -1);
+      .filter((provider) => provider.extensions.indexOf(extension) !== -1);
 
     if (providers.length === 0) return [];
 
     let content = readFileSync(filePath, 'utf-8');
 
     return providers
-      .map(providers => providers.process(content))
+      .map((providers) => providers.process(content))
       .reduce((a, b) => a.concat(b), []);
   }
 }

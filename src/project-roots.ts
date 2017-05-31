@@ -21,7 +21,7 @@ export default class ProjectRoots {
   async initialize(workspaceRoot: string, watcher: EventEmitter) {
     this.workspaceRoot = workspaceRoot;
 
-    let promise = new Promise(resolve => {
+    let promise = new Promise((resolve) => {
       watcher.once('ready', resolve);
     });
 
@@ -66,7 +66,7 @@ export default class ProjectRoots {
 
   projectForPath(path: string): Project | undefined {
     let root = (Array.from(this.projects.keys()) || [])
-      .filter(root => path.indexOf(root) === 0)
+      .filter((root) => path.indexOf(root) === 0)
       .reduce((a, b) => a.length > b.length ? a : b, '');
 
     return this.projects.get(root);

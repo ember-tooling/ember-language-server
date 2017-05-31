@@ -42,7 +42,7 @@ export default class DefinitionProvider {
         const componentOrHelperName = focusPath.node.original;
 
         return project.fileIndex.files
-          .filter(fileInfo => {
+          .filter((fileInfo) => {
             if (fileInfo instanceof ModuleFileInfo) {
               return (fileInfo.type === 'component' || fileInfo.type === 'helper') &&
                 fileInfo.slashName === componentOrHelperName;
@@ -51,7 +51,7 @@ export default class DefinitionProvider {
               return fileInfo.forComponent && fileInfo.slashName === componentOrHelperName;
             }
           })
-          .map(fileInfo => toLocation(fileInfo, project.root));
+          .map((fileInfo) => toLocation(fileInfo, project.root));
       }
     } else if (extension === '.js') {
       let content = this.server.documents.get(uri).getText();
@@ -68,19 +68,19 @@ export default class DefinitionProvider {
         let modelName = astPath.node.value;
 
         return project.fileIndex.files
-          .filter(fileInfo => fileInfo instanceof ModuleFileInfo &&
+          .filter((fileInfo) => fileInfo instanceof ModuleFileInfo &&
             fileInfo.type === 'model' &&
             fileInfo.name === modelName)
-          .map(fileInfo => toLocation(fileInfo, project.root));
+          .map((fileInfo) => toLocation(fileInfo, project.root));
 
       } else if (isTransformReference(astPath)) {
         let transformName = astPath.node.value;
 
         return project.fileIndex.files
-          .filter(fileInfo => fileInfo instanceof ModuleFileInfo &&
+          .filter((fileInfo) => fileInfo instanceof ModuleFileInfo &&
             fileInfo.type === 'transform' &&
             fileInfo.name === transformName)
-          .map(fileInfo => toLocation(fileInfo, project.root));
+          .map((fileInfo) => toLocation(fileInfo, project.root));
       }
     }
 

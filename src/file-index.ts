@@ -46,7 +46,7 @@ export default class FileIndex {
 
   public remove(absolutePath: string): FileInfo | undefined {
     let relativePath = path.relative(this.root, absolutePath);
-    let index = this.files.findIndex(fileInfo => fileInfo.relativePath === relativePath);
+    let index = this.files.findIndex((fileInfo) => fileInfo.relativePath === relativePath);
     if (index !== -1) {
       let fileInfo = this.files.splice(index, 1)[0];
       console.log(`remove ${relativePath} -> ${fileInfo.containerName}`);
@@ -55,6 +55,6 @@ export default class FileIndex {
   }
 
   public byModuleType(type: string) {
-    return this.files.filter(it => it instanceof ModuleFileInfo && it.type === type);
+    return this.files.filter((it) => it instanceof ModuleFileInfo && it.type === type);
   }
 }
