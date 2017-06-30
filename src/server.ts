@@ -95,7 +95,9 @@ export default class Server {
 
         definitionProvider: true,
         documentSymbolProvider: true,
-        completionProvider: true
+        completionProvider: {
+          resolveProvider: true
+        }
       }
     };
   }
