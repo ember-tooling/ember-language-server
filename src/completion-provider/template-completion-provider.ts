@@ -175,6 +175,6 @@ function toCompletionItemKind(type: string): CompletionItemKind {
   }
 }
 
-function getTextPrefix({ node }: ASTPath): string {
-  return node && node.original.replace('ELSCompletionDummy', '');
+function getTextPrefix({ node: { original = '' } }: ASTPath): string {
+  return original.replace('ELSCompletionDummy', '');
 }
