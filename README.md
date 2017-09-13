@@ -22,3 +22,4 @@ All features currently only work in Ember CLI application that use the default c
 ## Editor Plugins
 
 * VSCode: [vscode-ember](https://github.com/emberwatch/vscode-ember)
+* Atom: [atom-languageserver-ember](https://github.com/josa42/atom-languageserver-ember)
