@@ -23,11 +23,15 @@ export default class FileIndex {
   }
 
   public async invalidate() {
+    return this.addDirectory(this.root);
+  }
+
+  public async addDirectory(dirPath: string) {
     let filter = (it: string) => ignoredFolders.indexOf(path.basename(it)) === -1;
 
     let deferred = new Deferred<void>();
 
-    klaw(this.root, { filter })
+    klaw(dirPath, { filter })
       .on('data', (item: any) => this.add(item.path))
       .on('end', () => deferred.resolve());
 

@@ -2,6 +2,10 @@
 
 import { basename, dirname } from 'path';
 import { EventEmitter } from 'events';
+import * as path from 'path';
+
+import Deferred from './utils/deferred';
+const glob = require('glob');
 
 import FileIndex from './file-index';
 
@@ -19,6 +23,7 @@ export default class ProjectRoots {
   projects = new Map<string, Project>();
 
   async initialize(workspaceRoot: string, watcher: EventEmitter) {
+
     this.workspaceRoot = workspaceRoot;
 
     let promise = new Promise(resolve => {
@@ -54,9 +59,29 @@ export default class ProjectRoots {
     await promise;
   }
 
-  onProjectAdd(path: string) {
-    console.log(`Ember CLI project added at ${path}`);
-    this.projects.set(path, new Project(path));
+  private async findAddonDirectories(projectPath: string) {
+    const pattern = path.join(projectPath, 'node_modules', '*', 'ember-cli-build.js');
+
+    let deferred = new Deferred<string[]>();
+
+    glob(pattern, (err: Error, files: string[]) => {
+      if (err) { return deferred.reject(err); }
+
+      deferred.resolve(files.map(file => path.dirname(file)));
+    });
+
+    return deferred.promise;
+  }
+
+  async onProjectAdd(path: string) {
+    let project = new Project(path);
+
+    const addonsPaths = await this.findAddonDirectories(path);
+    await Promise.all(addonsPaths.map((dirPath: string) =>
+      project.fileIndex.addDirectory(dirPath))
+    );
+
+    this.projects.set(path, project);
   }
 
   onProjectDelete(path: string) {
