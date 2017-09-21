@@ -2,12 +2,9 @@
 
 import { basename, dirname } from 'path';
 import { EventEmitter } from 'events';
-import * as path from 'path';
-
-import Deferred from './utils/deferred';
-const glob = require('glob');
 
 import FileIndex from './file-index';
+import emberAddons from './utils/ember-addons';
 
 export class Project {
   readonly fileIndex: FileIndex;
@@ -59,24 +56,10 @@ export default class ProjectRoots {
     await promise;
   }
 
-  private async findAddonDirectories(projectPath: string) {
-    const pattern = path.join(projectPath, 'node_modules', '*', 'ember-cli-build.js');
-
-    let deferred = new Deferred<string[]>();
-
-    glob(pattern, (err: Error, files: string[]) => {
-      if (err) { return deferred.reject(err); }
-
-      deferred.resolve(files.map(file => path.dirname(file)));
-    });
-
-    return deferred.promise;
-  }
-
   async onProjectAdd(path: string) {
     let project = new Project(path);
 
-    const addonsPaths = await this.findAddonDirectories(path);
+    const addonsPaths = await emberAddons(path);
     await Promise.all(addonsPaths.map((dirPath: string) =>
       project.fileIndex.addDirectory(dirPath))
     );
