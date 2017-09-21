@@ -1,6 +1,5 @@
-import * as path from 'path';
-
-import {FileInfo, ModuleFileInfo} from './file-info';
+import  { basename, join, relative } from 'path';
+import { FileInfo, ModuleFileInfo } from './file-info';
 import Deferred from './utils/deferred';
 
 const klaw = require('klaw');
@@ -27,19 +26,26 @@ export default class FileIndex {
   }
 
   public async addDirectory(dirPath: string) {
-    let filter = (it: string) => ignoredFolders.indexOf(path.basename(it)) === -1;
+    let filter = (it: string) => ignoredFolders.indexOf(basename(it)) === -1;
 
-    let deferred = new Deferred<void>();
+    let { promise, resolve } = new Deferred<void>();
 
     klaw(dirPath, { filter })
       .on('data', (item: any) => this.add(item.path))
-      .on('end', () => deferred.resolve());
+      .on('end', () => resolve());
 
-    return deferred.promise;
+    return promise;
+  }
+
+  public removeDirectory(dirPath: string) {
+    let relativePath = relative(this.root, dirPath);
+    this.files
+      .filter(it => it.relativePath.indexOf(relativePath) === 0)
+      .forEach(it => this.remove(join(this.root, it.relativePath)));
   }
 
   public add(absolutePath: string): FileInfo | undefined {
-    let relativePath = path.relative(this.root, absolutePath);
+    let relativePath = relative(this.root, absolutePath);
     let fileInfo = FileInfo.from(relativePath);
     if (fileInfo) {
       console.log(`add ${relativePath} -> ${fileInfo.containerName}`);
@@ -49,7 +55,7 @@ export default class FileIndex {
   }
 
   public remove(absolutePath: string): FileInfo | undefined {
-    let relativePath = path.relative(this.root, absolutePath);
+    let relativePath = relative(this.root, absolutePath);
     let index = this.files.findIndex(fileInfo => fileInfo.relativePath === relativePath);
     if (index !== -1) {
       let fileInfo = this.files.splice(index, 1)[0];
