@@ -14,7 +14,7 @@
   "typings": "lib/start-server.d.ts",
   "dependencies": {
     "@glimmer/syntax": "^0.27.0",
-    "ast-types": "^0.9.4",
+    "ast-types": "^0.10.0",
     "chokidar": "^1.6.1",
     "esprima": "^4.0.0",
     "fs-extra": "^4.0.0",
