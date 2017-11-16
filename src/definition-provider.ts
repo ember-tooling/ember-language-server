@@ -3,7 +3,7 @@ import * as path from 'path';
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
-import { parse } from 'esprima';
+import { parseModule } from 'esprima';
 
 import { toPosition } from './estree-utils';
 import Server from './server';
@@ -55,9 +55,8 @@ export default class DefinitionProvider {
       }
     } else if (extension === '.js') {
       let content = this.server.documents.get(uri).getText();
-      let ast = parse(content, {
-        loc: true,
-        sourceType: 'module',
+      let ast = parseModule(content, {
+        loc: true
       });
       let astPath = ASTPath.toPosition(ast, toPosition(params.position));
       if (!astPath) {
