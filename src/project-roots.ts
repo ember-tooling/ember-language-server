@@ -78,7 +78,6 @@ export default class ProjectRoots {
   }
 
   async onProjectAdd(projectPath: string) {
-    // TODO cobine onProjectAdd() with onPackageChange()
     let project = new Project(projectPath);
 
     const addonsPaths = await emberAddons(projectPath);

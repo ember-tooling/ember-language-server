@@ -1,9 +1,7 @@
 import * as path from 'path';
-import * as fs from 'fs';
-import Deferred from './deferred';
+import { exists, readJSON } from './file';
 
 async function npmDependencies(projectPath: string): Promise<string[]> {
-
   try {
     const pgk = await readJSON(path.join(projectPath, 'package.json'));
     return Object.keys(pgk.dependencies || {}).concat(Object.keys(pgk.devDependencies || {}));
@@ -13,47 +11,12 @@ async function npmDependencies(projectPath: string): Promise<string[]> {
   return [];
 }
 
-// TODO move into file util
-async function readJSON(filePath: string) {
-  let { resolve, reject, promise } = new Deferred<any>();
-
-  fs.readFile(filePath, 'utf8', function (err, data) {
-    if (err) {
-      reject(err);
-
-    } else try {
-      resolve(JSON.parse(data));
-
-    } catch (err) {
-      reject(err);
-    }
-  });
-
-  return promise;
-}
-
 async function isEmberProject(dependencyPath: string) {
-  // FIXME handle addons having `ember-cli-build.js` on theire .npmignore
-  return exists(path.join(dependencyPath, 'ember-cli-build.js'));
-}
-
-// TODO move into file util
-async function exists(filePath: string): Promise<boolean> {
-  let { resolve, reject, promise } = new Deferred<boolean>();
-
-  fs.stat(filePath, err => {
-    if (err == null) {
-      resolve(true);
-
-    } else if (err.code === 'ENOENT') {
-      resolve(false);
-
-    } else {
-      reject(err.code);
-    }
-  });
-
-  return promise;
+  // Some ember addons exclude ember-cli-build.js in their .npmignore
+  return (
+    await exists(path.join(dependencyPath, 'ember-cli-build.js'))
+    || (await npmDependencies(dependencyPath)).includes('ember-cli')
+  );
 }
 
 export default async function emberAddons(projectPath: string): Promise<string[]> {
