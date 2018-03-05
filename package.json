@@ -21,7 +21,7 @@
     "fuzzaldrin": "^2.1.0",
     "i": "^0.3.5",
     "klaw": "^2.0.0",
-    "vscode-languageserver": "^3.0.4"
+    "vscode-languageserver": "^4.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.0.1",
