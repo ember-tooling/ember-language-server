@@ -28,7 +28,7 @@
     "@types/esprima": "^4.0.1",
     "@types/estree": "*",
     "@types/fuzzaldrin": "^2.1.0",
-    "@types/mocha": "^2.2.38",
+    "@types/mocha": "^5.0.0",
     "@types/node": "^9.3.0",
     "chai": "^4.0.2",
     "mocha": "^5.0.1",
