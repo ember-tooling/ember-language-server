@@ -2,30 +2,30 @@
 # yarn lockfile v1
 
 
-"@glimmer/interfaces@^0.32.3":
-  version "0.32.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.32.3.tgz#a328344d88490c1ae765ebe18ee357ed9a66f0fb"
+"@glimmer/interfaces@^0.33.4":
+  version "0.33.4"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.33.4.tgz#80783552d4d8b567f78ddbc3273e751fe263006b"
   dependencies:
-    "@glimmer/wire-format" "^0.32.3"
+    "@glimmer/wire-format" "^0.33.4"
 
-"@glimmer/syntax@^0.32.0":
-  version "0.32.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.32.3.tgz#f6b035948013728e646731d774ccd8c49f7d10d1"
+"@glimmer/syntax@^0.33.4":
+  version "0.33.4"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.33.4.tgz#ac824e0ccad3fd4cb9bf05d7cf6b5a9fbd8b195e"
   dependencies:
-    "@glimmer/interfaces" "^0.32.3"
-    "@glimmer/util" "^0.32.3"
+    "@glimmer/interfaces" "^0.33.4"
+    "@glimmer/util" "^0.33.4"
     handlebars "^4.0.6"
-    simple-html-tokenizer "^0.4.1"
+    simple-html-tokenizer "^0.5.0"
 
-"@glimmer/util@^0.32.3":
-  version "0.32.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.32.3.tgz#b73ccc1b73097ba6ec1e250954a1a2e1eb83eb48"
+"@glimmer/util@^0.33.4":
+  version "0.33.4"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.33.4.tgz#3aaabcad5cf04195917553510d2128fdce3208eb"
 
-"@glimmer/wire-format@^0.32.3":
-  version "0.32.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/wire-format/-/wire-format-0.32.3.tgz#2f684a6d88ba7162d32cd5f01bd0b83151cdb73d"
+"@glimmer/wire-format@^0.33.4":
+  version "0.33.4"
+  resolved "https://registry.yarnpkg.com/@glimmer/wire-format/-/wire-format-0.33.4.tgz#782d8bc02cb0f6261b5711cef007d907831f15d5"
   dependencies:
-    "@glimmer/util" "^0.32.3"
+    "@glimmer/util" "^0.33.4"
 
 "@types/chai@^4.1.2":
   version "4.1.2"
@@ -154,9 +154,9 @@ assign-symbols@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
 
-ast-types@^0.10.1:
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/ast-types/-/ast-types-0.10.1.tgz#f52fca9715579a14f841d67d7f8d25432ab6a3dd"
+ast-types@^0.11.3:
+  version "0.11.3"
+  resolved "https://registry.yarnpkg.com/ast-types/-/ast-types-0.11.3.tgz#c20757fe72ee71278ea0ff3d87e5c2ca30d9edf8"
 
 async-each@^1.0.0:
   version "1.0.1"
@@ -991,9 +991,9 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
 
-klaw@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/klaw/-/klaw-2.1.0.tgz#694a269019f4321d9233fb1b9abdae21e38259fb"
+klaw@^2.0.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/klaw/-/klaw-2.1.1.tgz#42b76894701169cc910fd0d19ce677b5fb378af1"
   dependencies:
     graceful-fs "^4.1.9"
 
@@ -1409,9 +1409,9 @@ signal-exit@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
 
-simple-html-tokenizer@^0.4.1:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/simple-html-tokenizer/-/simple-html-tokenizer-0.4.3.tgz#9b00b766e30058b4bb377c0d4f97566a13ab1be1"
+simple-html-tokenizer@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/simple-html-tokenizer/-/simple-html-tokenizer-0.5.0.tgz#014523a6eeb4b923859c1b31f5f4f933d6b0ddf6"
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
@@ -1733,26 +1733,26 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vscode-jsonrpc@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-3.5.0.tgz#87239d9e166b2d7352245b8a813597804c1d63aa"
+vscode-jsonrpc@^3.6.0:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-3.6.1.tgz#3f9b8f902077da27f1ffd37c7317a77bd4696a49"
 
-vscode-languageserver-protocol@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.5.0.tgz#067c5cbe27709795398d119692c97ebba1452209"
+vscode-languageserver-protocol@^3.7.0:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.7.1.tgz#bb15ece97bc73bf8f0a02e9f358c4c61a7df4846"
   dependencies:
-    vscode-jsonrpc "^3.5.0"
-    vscode-languageserver-types "^3.5.0"
+    vscode-jsonrpc "^3.6.0"
+    vscode-languageserver-types "^3.7.0"
 
-vscode-languageserver-types@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/vscode-languageserver-types/-/vscode-languageserver-types-3.5.0.tgz#e48d79962f0b8e02de955e3f524908e2b19c0374"
+vscode-languageserver-types@^3.7.0:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/vscode-languageserver-types/-/vscode-languageserver-types-3.7.1.tgz#4835d1c1811f91dd5c92e9446e5b29edd2216969"
 
-vscode-languageserver@^3.0.4:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/vscode-languageserver/-/vscode-languageserver-3.5.0.tgz#d28099bc6ddda8c1dd16b707e454e1b1ddae0dba"
+vscode-languageserver@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/vscode-languageserver/-/vscode-languageserver-4.1.2.tgz#ccff3499c85a1445d00b11b2efa1770c6143ddab"
   dependencies:
-    vscode-languageserver-protocol "^3.5.0"
+    vscode-languageserver-protocol "^3.7.0"
     vscode-uri "^1.0.1"
 
 vscode-uri@^1.0.1:
