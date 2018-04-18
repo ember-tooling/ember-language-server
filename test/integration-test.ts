@@ -31,7 +31,7 @@ describe('integration', function() {
   let connection: MessageConnection;
   let serverProcess: cp.ChildProcess;
 
-  before(() => {
+  beforeAll(() => {
     serverProcess = startServer();
     connection = createMessageConnection(
       new IPCMessageReader(serverProcess),
@@ -47,7 +47,7 @@ describe('integration', function() {
     connection.listen();
   });
 
-  after(() => {
+  afterAll(() => {
     connection.dispose();
     serverProcess.kill();
   });
