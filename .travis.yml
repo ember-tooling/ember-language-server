@@ -10,5 +10,5 @@ node_js:
 
 script:
   - npm run compile
-  - npm lint
-  - npm test
+  - yarn lint
+  - yarn test

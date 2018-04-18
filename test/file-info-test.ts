@@ -5,8 +5,6 @@ import {
   TemplateFileInfo
 } from '../src/file-info';
 
-const { expect } = require('chai');
-
 const moduleTypes = [
   'adapter',
   'component',
@@ -25,11 +23,11 @@ const moduleTypes = [
 describe('FileInfo', function() {
   describe('from()', function() {
     it('returns undefined for unknown files', function() {
-      expect(FileInfo.from('foo/bar.txt')).to.be.undefined;
+      expect(FileInfo.from('foo/bar.txt')).toBeUndefined();
     });
 
     it('returns undefined for ignored files', function() {
-      expect(FileInfo.from('foo/.eslintrc.js')).to.be.undefined;
+      expect(FileInfo.from('foo/.eslintrc.js')).toBeUndefined();
     });
 
     test('app/app.js', MainFileInfo, { name: 'app' });
@@ -109,8 +107,8 @@ describe('FileInfo', function() {
         expected.relativePath = relativePath;
 
         let result = FileInfo.from(relativePath);
-        expect(result).to.be.an.instanceof(type);
-        expect(result).to.deep.equal(expected);
+        expect(result).toBeInstanceOf(type);
+        expect(result).toEqual(expected);
       });
     }
   });

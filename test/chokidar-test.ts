@@ -2,7 +2,7 @@ import * as path from 'path';
 import { tmpdir } from 'os';
 import { EventEmitter } from 'events';
 
-import { expect } from 'chai';
+// import { expect } from 'chai';
 
 const fs = require('fs-extra');
 const chokidar = require('chokidar');
@@ -37,11 +37,11 @@ describe('chokidar', function() {
     return withWatcher(async (watcher: any) => {
       let events = await listEventsUntilReady(watcher);
 
-      expect(events).to.have.lengthOf(1);
-      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
+      expect(events).toHaveLength(1);
+      expect(events).toContainEqual({ event: 'addDir', path: `${workDir}` });
 
       let watched = watcher.getWatched();
-      expect(watched).to.deep.equal({
+      expect(watched).toEqual({
         [tmpdir()]: ['chokidar-test'],
         [workDir]: [],
       });
@@ -55,16 +55,16 @@ describe('chokidar', function() {
     return withWatcher(async (watcher: any) => {
       let events = await listEventsUntilReady(watcher);
 
-      expect(events).to.have.lengthOf(6);
-      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
-      expect(events).to.deep.include({ event: 'addDir', path: path.join(workDir, '/a') });
-      expect(events).to.deep.include({ event: 'addDir', path: path.join(workDir, '/b') });
-      expect(events).to.deep.include({ event: 'addDir', path: path.join(workDir, '/b/c') });
-      expect(events).to.deep.include({ event: 'add', path: path.join(workDir, '/a/ember-cli-build.js') });
-      expect(events).to.deep.include({ event: 'add', path: path.join(workDir, '/b/c/ember-cli-build.js') });
+      expect(events).toHaveLength(6);
+      expect(events).toContainEqual({ event: 'addDir', path: `${workDir}` });
+      expect(events).toContainEqual({ event: 'addDir', path: path.join(workDir, '/a') });
+      expect(events).toContainEqual({ event: 'addDir', path: path.join(workDir, '/b') });
+      expect(events).toContainEqual({ event: 'addDir', path: path.join(workDir, '/b/c') });
+      expect(events).toContainEqual({ event: 'add', path: path.join(workDir, '/a/ember-cli-build.js') });
+      expect(events).toContainEqual({ event: 'add', path: path.join(workDir, '/b/c/ember-cli-build.js') });
 
       let watched = watcher.getWatched();
-      expect(watched).to.deep.equal({
+      expect(watched).toEqual({
         [tmpdir()]: ['chokidar-test'],
         [workDir]: ['a', 'b'],
         [path.join(workDir, 'a')]: ['ember-cli-build.js'],
@@ -90,17 +90,17 @@ describe('chokidar', function() {
     return withCustomWatcher(options, async (watcher: any) => {
       let events = await listEventsUntilReady(watcher);
 
-      expect(events).to.have.lengthOf(7);
-      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
-      expect(events).to.deep.include({ event: 'addDir', path: path.join(workDir, '/a') });
-      expect(events).to.deep.include({ event: 'addDir', path: path.join(workDir, '/a/app') });
-      expect(events).to.deep.include({ event: 'addDir', path: path.join(workDir, '/a/bower_components') });
-      expect(events).to.deep.include({ event: 'addDir', path: path.join(workDir, '/a/node_modules') });
-      expect(events).to.deep.include({ event: 'add', path: path.join(workDir, '/a/ember-cli-build.js') });
-      expect(events).to.deep.include({ event: 'add', path: path.join(workDir, '/a/app/app.js') });
+      expect(events).toHaveLength(7);
+      expect(events).toContainEqual({ event: 'addDir', path: `${workDir}` });
+      expect(events).toContainEqual({ event: 'addDir', path: path.join(workDir, '/a') });
+      expect(events).toContainEqual({ event: 'addDir', path: path.join(workDir, '/a/app') });
+      expect(events).toContainEqual({ event: 'addDir', path: path.join(workDir, '/a/bower_components') });
+      expect(events).toContainEqual({ event: 'addDir', path: path.join(workDir, '/a/node_modules') });
+      expect(events).toContainEqual({ event: 'add', path: path.join(workDir, '/a/ember-cli-build.js') });
+      expect(events).toContainEqual({ event: 'add', path: path.join(workDir, '/a/app/app.js') });
 
       let watched = watcher.getWatched();
-      expect(watched).to.deep.equal({
+      expect(watched).toEqual({
         [tmpdir()]: ['chokidar-test'],
         [workDir]: ['a'],
         [path.join(workDir, 'a')]: ['app', 'bower_components', 'ember-cli-build.js', 'node_modules'],
@@ -115,8 +115,8 @@ describe('chokidar', function() {
     return withWatcher(async (watcher: any) => {
       let events = await listEventsUntilReady(watcher);
 
-      expect(events).to.have.lengthOf(1);
-      expect(events).to.deep.include({ event: 'addDir', path: `${workDir}` });
+      expect(events).toHaveLength(1);
+      expect(events).toContainEqual({ event: 'addDir', path: `${workDir}` });
 
       fs.outputFile(path.join(workDir, 'a', 'ember-cli-build.js'));
       await event(watcher, 'add', path.join(workDir, '/a/ember-cli-build.js'));

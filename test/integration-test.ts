@@ -1,7 +1,6 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
-import { expect } from 'chai';
 
 import { createMessageConnection, MessageConnection, Logger, IPCMessageReader, IPCMessageWriter } from 'vscode-jsonrpc';
 import {
@@ -61,21 +60,12 @@ describe('integration', function() {
 
       const response = await connection.sendRequest(InitializeRequest.type, params);
 
-      expect(response).to.deep.equal({
-        capabilities: {
-          textDocumentSync: 1,
-          definitionProvider: true,
-          documentSymbolProvider: true,
-          completionProvider: {
-            resolveProvider: true
-          }
-        }
-      });
+      expect(response).toMatchSnapshot();
     });
   });
 
   describe('Completion request', () => {
-    it('returns all components and helpers when requesting completion items in a handlebars expression', () => {
+    it('returns all components and helpers when requesting completion items in a handlebars expression', async () => {
       const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'application.hbs');
       const params = {
         textDocument: {
@@ -89,9 +79,10 @@ describe('integration', function() {
 
       openFile(connection, applicationTemplatePath);
 
-      return connection
-        .sendRequest(CompletionRequest.type, params)
-        .then(resp => expect(resp).to.have.lengthOf(19));
+      const response = await connection
+        .sendRequest(CompletionRequest.type, params);
+
+      expect(response).toMatchSnapshot();
     });
   });
 });
