@@ -1,5 +1,3 @@
-import { expect } from 'chai';
-
 import {
   emberBlockItems,
   emberMustacheItems,
@@ -8,14 +6,14 @@ import {
 
 describe('ember-helpers', function() {
   it('should provide all block helper', function() {
-    expect(emberBlockItems).to.have.lengthOf(6);
+    expect(emberBlockItems).toHaveLength(6);
   });
 
   it('should provide all non-block helper', function() {
-    expect(emberMustacheItems).to.have.lengthOf(17);
+    expect(emberMustacheItems).toHaveLength(17);
   });
 
   it('should provide all subexpression helper', function() {
-    expect(emberSubExpressionItems).to.have.lengthOf(11);
+    expect(emberSubExpressionItems).toHaveLength(11);
   });
 });
