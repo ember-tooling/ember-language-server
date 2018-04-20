@@ -40,7 +40,7 @@
     "clean": "rm -rf lib/",
     "compile": "tsc -p .",
     "lint": "tslint --project ./tsconfig.json",
-    "prepublish": "npm run clean && npm run compile",
+    "prepublish": "yarn clean && yarn compile",
     "test": "jest",
     "watch": "tsc --watch -p ."
   }

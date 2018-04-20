@@ -6,7 +6,9 @@ import { createMessageConnection, MessageConnection, Logger, IPCMessageReader, I
 import {
   DidOpenTextDocumentNotification,
   InitializeRequest,
-  CompletionRequest
+  CompletionRequest,
+  DefinitionRequest,
+  Definition
 } from 'vscode-languageserver-protocol';
 
 function startServer() {
@@ -23,6 +25,33 @@ function openFile(connection: MessageConnection, filePath: string) {
       uri: `file://${filePath}`,
       text: fs.readFileSync(filePath, 'utf8')
     }
+  });
+}
+
+function replaceDynamicUriPart(uri: string) {
+  let dirname = __dirname;
+  if (dirname.indexOf(':') === 1) {
+    dirname = dirname.substr(2);
+  }
+
+  return uri
+    .replace(dirname, '/path-to-tests')
+    .replace(/\\/g, '/');
+}
+
+function normalizeUri(objects: Definition) {
+  if (!Array.isArray(objects)) {
+    objects.uri = replaceDynamicUriPart(objects.uri);
+    return objects;
+  }
+
+  return objects.map(object => {
+    if (object.uri) {
+      const { uri } = object;
+      object.uri = replaceDynamicUriPart(object.uri);
+    }
+
+    return object;
   });
 }
 
@@ -82,6 +111,153 @@ describe('integration', function() {
       const response = await connection
         .sendRequest(CompletionRequest.type, params);
 
+      expect(response).toMatchSnapshot();
+    });
+
+    it('returns all routes when requesting completion items in an inline link-to', async () => {
+      const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      const params = {
+        textDocument: {
+          uri: `file://${templatePath}`
+        },
+        position: {
+          line: 2,
+          character: 23
+        }
+      };
+
+      openFile(connection, templatePath);
+
+      const response = await connection
+        .sendRequest(CompletionRequest.type, params);
+
+      expect(response).toMatchSnapshot();
+    });
+
+    it('returns all routes when requesting completion items in a block link-to', async () => {
+      const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      const params = {
+        textDocument: {
+          uri: `file://${templatePath}`
+        },
+        position: {
+          line: 3,
+          character: 12
+        }
+      };
+
+      openFile(connection, templatePath);
+
+      const response = await connection
+        .sendRequest(CompletionRequest.type, params);
+
+      expect(response).toMatchSnapshot();
+    });
+  });
+
+  describe('Definition request', () => {
+    it('returns the definition information for a component in a template', async () => {
+      const definitionTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      const params = {
+        textDocument: {
+          uri: `file://${definitionTemplatePath}`
+        },
+        position: {
+          line: 0,
+          character: 4
+        }
+      };
+
+      openFile(connection, definitionTemplatePath);
+
+      let response = await connection
+        .sendRequest(DefinitionRequest.type, params);
+
+      response = normalizeUri(response);
+      expect(response).toMatchSnapshot();
+    });
+
+    it('returns the definition information for a component in a template', async () => {
+      const definitionTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      const params = {
+        textDocument: {
+          uri: `file://${definitionTemplatePath}`
+        },
+        position: {
+          line: 1,
+          character: 4
+        }
+      };
+
+      openFile(connection, definitionTemplatePath);
+
+      let response = await connection
+        .sendRequest(DefinitionRequest.type, params);
+
+      response = normalizeUri(response);
+      expect(response).toMatchSnapshot();
+    });
+
+    it('returns the definition information for a hasMany relationship', async () => {
+      const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-a.js');
+      const params = {
+        textDocument: {
+          uri: `file://${modelPath}`
+        },
+        position: {
+          line: 4,
+          character: 27
+        }
+      };
+
+      openFile(connection, modelPath);
+
+      let response = await connection
+        .sendRequest(DefinitionRequest.type, params);
+
+      response = normalizeUri(response);
+      expect(response).toMatchSnapshot();
+    });
+
+    it('returns the definition information for a belongsTo relationship', async () => {
+      const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-b.js');
+      const params = {
+        textDocument: {
+          uri: `file://${modelPath}`
+        },
+        position: {
+          line: 4,
+          character: 27
+        }
+      };
+
+      openFile(connection, modelPath);
+
+      let response = await connection
+        .sendRequest(DefinitionRequest.type, params);
+
+      response = normalizeUri(response);
+      expect(response).toMatchSnapshot();
+    });
+
+    it('returns the definition information for a transform', async () => {
+      const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-a.js');
+      const params = {
+        textDocument: {
+          uri: `file://${modelPath}`
+        },
+        position: {
+          line: 6,
+          character: 27
+        }
+      };
+
+      openFile(connection, modelPath);
+
+      let response = await connection
+        .sendRequest(DefinitionRequest.type, params);
+
+      response = normalizeUri(response);
       expect(response).toMatchSnapshot();
     });
   });

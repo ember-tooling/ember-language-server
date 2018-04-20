@@ -12,6 +12,11 @@ Array [
     "label": "another-awesome-component",
   },
   Object {
+    "detail": "helper",
+    "kind": 3,
+    "label": "some-helper",
+  },
+  Object {
     "detail": "Ember",
     "kind": 3,
     "label": "action",
@@ -160,6 +165,116 @@ Array [
       "MustachePath",
       "SubExpressionPath",
     ],
+  },
+]
+`;
+
+exports[`integration Completion request returns all routes when requesting completion items in a block link-to 1`] = `
+Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "test-route",
+  },
+]
+`;
+
+exports[`integration Completion request returns all routes when requesting completion items in an inline link-to 1`] = `
+Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "test-route",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a belongsTo relationship 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/models/model-a.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a component in a template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/components/my-awesome-component.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a component in a template 2`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/helpers/some-helper.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a hasMany relationship 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/models/model-b.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a transform 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/transforms/custom-transform.js",
   },
 ]
 `;
