@@ -1,13 +1,8 @@
 # Test against the latest version of this Node.js version
 environment:
   matrix:
-    - nodejs_version: "6"
     - nodejs_version: "7"
-
-# Make bors happy
-branches:
-  except:
-    - staging.tmp
+    - nodejs_version: "8"
 
 # Install scripts. (runs after repo cloning)
 install:
