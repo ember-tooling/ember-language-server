@@ -7,7 +7,8 @@ import {
   DidOpenTextDocumentNotification,
   InitializeRequest,
   CompletionRequest,
-  DefinitionRequest
+  DefinitionRequest,
+  Definition
 } from 'vscode-languageserver-protocol';
 
 function startServer() {
@@ -24,6 +25,33 @@ function openFile(connection: MessageConnection, filePath: string) {
       uri: `file://${filePath}`,
       text: fs.readFileSync(filePath, 'utf8')
     }
+  });
+}
+
+function replaceDynamicUriPart(uri: string) {
+  let dirname = __dirname;
+  if (dirname.indexOf(':') === 1) {
+    dirname = dirname.substr(2);
+  }
+
+  return uri
+    .replace(dirname, '/path-to-tests')
+    .replace(/\\/g, '/');
+}
+
+function normalizeUri(objects: Definition) {
+  if (!Array.isArray(objects)) {
+    objects.uri = replaceDynamicUriPart(objects.uri);
+    return objects;
+  }
+
+  return objects.map(object => {
+    if (object.uri) {
+      const { uri } = object;
+      object.uri = replaceDynamicUriPart(object.uri);
+    }
+
+    return object;
   });
 }
 
@@ -142,9 +170,10 @@ describe('integration', function() {
 
       openFile(connection, definitionTemplatePath);
 
-      const response = await connection
+      let response = await connection
         .sendRequest(DefinitionRequest.type, params);
 
+      response = normalizeUri(response);
       expect(response).toMatchSnapshot();
     });
 
@@ -162,9 +191,10 @@ describe('integration', function() {
 
       openFile(connection, definitionTemplatePath);
 
-      const response = await connection
+      let response = await connection
         .sendRequest(DefinitionRequest.type, params);
 
+      response = normalizeUri(response);
       expect(response).toMatchSnapshot();
     });
 
@@ -182,9 +212,10 @@ describe('integration', function() {
 
       openFile(connection, modelPath);
 
-      const response = await connection
+      let response = await connection
         .sendRequest(DefinitionRequest.type, params);
 
+      response = normalizeUri(response);
       expect(response).toMatchSnapshot();
     });
 
@@ -202,9 +233,10 @@ describe('integration', function() {
 
       openFile(connection, modelPath);
 
-      const response = await connection
+      let response = await connection
         .sendRequest(DefinitionRequest.type, params);
 
+      response = normalizeUri(response);
       expect(response).toMatchSnapshot();
     });
 
@@ -222,9 +254,10 @@ describe('integration', function() {
 
       openFile(connection, modelPath);
 
-      const response = await connection
+      let response = await connection
         .sendRequest(DefinitionRequest.type, params);
 
+      response = normalizeUri(response);
       expect(response).toMatchSnapshot();
     });
   });
