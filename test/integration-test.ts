@@ -55,7 +55,7 @@ function normalizeUri(objects: Definition) {
   });
 }
 
-describe.only('integration', function() {
+describe('integration', function() {
   let connection: MessageConnection;
   let serverProcess: cp.ChildProcess;
 

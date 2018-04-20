@@ -180,6 +180,11 @@ Array [
   Object {
     "detail": "route",
     "kind": 17,
+    "label": "nested.nested-route",
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
     "label": "test-route",
   },
 ]
@@ -187,6 +192,11 @@ Array [
 
 exports[`integration Completion request returns all routes when requesting completion items in an inline link-to 1`] = `
 Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "nested.nested-route",
+  },
   Object {
     "detail": "route",
     "kind": 17,

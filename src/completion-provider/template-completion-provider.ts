@@ -11,8 +11,6 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
-import FileIndex from '../file-index';
-import { FileInfo, ModuleFileInfo } from '../file-info';
 import { filter } from 'fuzzaldrin';
 
 const { preprocess } = require('@glimmer/syntax');
@@ -66,7 +64,7 @@ export default class TemplateCompletionProvider {
       completions.push(...listHelpers(project));
       completions.push(...emberSubExpressionItems);
     } else if (isLinkToTarget(focusPath)) {
-      completions.push(...listRoutes(project.fileIndex));
+      completions.push(...listRoutes(project));
     }
 
     return filter(completions, getTextPrefix(focusPath), { key: 'label' });
@@ -110,8 +108,25 @@ function listHelpers(project: Project): CompletionItem[] {
   return uniqueBy(items, 'label');
 }
 
-function listRoutes(index: FileIndex): CompletionItem[] {
-  return index.files.filter(isRoute).map(toRouteCompletionItem);
+function listRoutes(project: Project): CompletionItem[] {
+  const { root } = project;
+  const jsPaths = walkSync(join(root, 'app', 'routes'));
+  const paths = [...jsPaths];
+
+  const items = paths
+    .filter((filePath: string) => filePath.endsWith('.js'))
+    .map((filePath: string) => {
+      const label = filePath
+        .replace(extname(filePath), '')
+        .replace(/\//g, '.');
+      return {
+        kind: CompletionItemKind.File,
+        label,
+        detail: 'route',
+      };
+    });
+
+  return uniqueBy(items, 'label');
 }
 
 function isMustachePath(path: ASTPath): boolean {
@@ -156,30 +171,6 @@ function isBlockLinkToTarget(path: ASTPath): boolean {
   let parent = path.parent;
   if (!parent || parent.type !== 'BlockStatement') { return false; }
   return parent.params[0] === node && parent.path.original === 'link-to';
-}
-
-function isRoute(fileInfo: FileInfo) {
-  return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'route';
-}
-
-function toRouteCompletionItem(fileInfo: ModuleFileInfo) {
-  let kind = toCompletionItemKind(fileInfo.type);
-
-  return {
-    kind,
-    label: fileInfo.name,
-    detail: fileInfo.type,
-  };
-}
-
-function toCompletionItemKind(type: string): CompletionItemKind {
-  if (type === 'helper') {
-    return CompletionItemKind.Function;
-  } else if (type === 'route') {
-    return CompletionItemKind.File;
-  } else {
-    return CompletionItemKind.Class;
-  }
 }
 
 function getTextPrefix({ node: { original = '' } }: ASTPath): string {
