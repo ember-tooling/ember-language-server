@@ -21,7 +21,6 @@ import {
   emberSubExpressionItems
 } from './ember-helpers';
 import uniqueBy from '../utils/unique-by';
-import { Project } from '../project-roots';
 
 const walkSync = require('walk-sync');
 
@@ -51,34 +50,39 @@ export default class TemplateCompletionProvider {
       return [];
     }
 
+    const { root } = project;
     let completions: CompletionItem[] = [];
 
     if (isMustachePath(focusPath)) {
-      completions.push(...listComponents(project));
-      completions.push(...listHelpers(project));
+      completions.push(...listComponents(root));
+      completions.push(...listHelpers(root));
       completions.push(...emberMustacheItems);
     } else if (isBlockPath(focusPath)) {
-      completions.push(...listComponents(project));
+      completions.push(...listComponents(root));
       completions.push(...emberBlockItems);
     } else if (isSubExpressionPath(focusPath)) {
-      completions.push(...listHelpers(project));
+      completions.push(...listHelpers(root));
       completions.push(...emberSubExpressionItems);
     } else if (isLinkToTarget(focusPath)) {
-      completions.push(...listRoutes(project));
+      completions.push(...listRoutes(root));
     }
 
     return filter(completions, getTextPrefix(focusPath), { key: 'label' });
   }
 }
 
-function listComponents(project: Project): CompletionItem[] {
-  const { root } = project;
-  const jsPaths = walkSync(join(root, 'app', 'components'));
-  const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'));
+function listComponents(root: string): CompletionItem[] {
+  const jsPaths = walkSync(join(root, 'app', 'components'), {
+    directors: false,
+    globs: ['**/*.js']
+  });
+  const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'), {
+    directors: false,
+    globs: ['**/*.hbs']
+  });
   const paths = [...jsPaths, ...hbsPaths];
 
   const items = paths
-    .filter((filePath: string) => filePath.endsWith('.js') || filePath.endsWith('.hbs'))
     .map((filePath: string) => {
       return {
         kind: CompletionItemKind.Class,
@@ -90,13 +94,13 @@ function listComponents(project: Project): CompletionItem[] {
   return uniqueBy(items, 'label');
 }
 
-function listHelpers(project: Project): CompletionItem[] {
-  const { root } = project;
-  const jsPaths = walkSync(join(root, 'app', 'helpers'));
-  const paths = [...jsPaths];
+function listHelpers(root: string): CompletionItem[] {
+  const paths = walkSync(join(root, 'app', 'helpers'), {
+    directors: false,
+    globs: ['**/*.js']
+  });
 
   const items = paths
-    .filter((filePath: string) => filePath.endsWith('.js'))
     .map((filePath: string) => {
       return {
         kind: CompletionItemKind.Function,
@@ -108,13 +112,13 @@ function listHelpers(project: Project): CompletionItem[] {
   return uniqueBy(items, 'label');
 }
 
-function listRoutes(project: Project): CompletionItem[] {
-  const { root } = project;
-  const jsPaths = walkSync(join(root, 'app', 'routes'));
-  const paths = [...jsPaths];
+function listRoutes(root: string): CompletionItem[] {
+  const paths = walkSync(join(root, 'app', 'routes'), {
+    directors: false,
+    globs: ['**/*.js']
+  });
 
   const items = paths
-    .filter((filePath: string) => filePath.endsWith('.js'))
     .map((filePath: string) => {
       const label = filePath
         .replace(extname(filePath), '')
