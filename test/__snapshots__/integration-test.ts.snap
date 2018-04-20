@@ -5,11 +5,17 @@ Array [
   Object {
     "detail": "component",
     "kind": 7,
+    "label": "another-awesome-component",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
     "label": "my-awesome-component",
   },
   Object {
+    "detail": "component",
     "kind": 7,
-    "label": "another-awesome-component",
+    "label": "nested/nested-component",
   },
   Object {
     "detail": "helper",

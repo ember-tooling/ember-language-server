@@ -1,4 +1,4 @@
-import { extname } from 'path';
+import { extname, join } from 'path';
 
 import {
   CompletionItem,
@@ -12,7 +12,7 @@ import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import FileIndex from '../file-index';
-import { FileInfo, ModuleFileInfo, TemplateFileInfo } from '../file-info';
+import { FileInfo, ModuleFileInfo } from '../file-info';
 import { filter } from 'fuzzaldrin';
 
 const { preprocess } = require('@glimmer/syntax');
@@ -23,6 +23,9 @@ import {
   emberSubExpressionItems
 } from './ember-helpers';
 import uniqueBy from '../utils/unique-by';
+import { Project } from '../project-roots';
+
+const walkSync = require('walk-sync');
 
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
@@ -53,14 +56,14 @@ export default class TemplateCompletionProvider {
     let completions: CompletionItem[] = [];
 
     if (isMustachePath(focusPath)) {
-      completions.push(...listComponents(project.fileIndex));
-      completions.push(...listHelpers(project.fileIndex));
+      completions.push(...listComponents(project));
+      completions.push(...listHelpers(project));
       completions.push(...emberMustacheItems);
     } else if (isBlockPath(focusPath)) {
-      completions.push(...listComponents(project.fileIndex));
+      completions.push(...listComponents(project));
       completions.push(...emberBlockItems);
     } else if (isSubExpressionPath(focusPath)) {
-      completions.push(...listHelpers(project.fileIndex));
+      completions.push(...listHelpers(project));
       completions.push(...emberSubExpressionItems);
     } else if (isLinkToTarget(focusPath)) {
       completions.push(...listRoutes(project.fileIndex));
@@ -70,12 +73,41 @@ export default class TemplateCompletionProvider {
   }
 }
 
-function listComponents(index: FileIndex): CompletionItem[] {
-  return uniqueBy(index.files.filter(isComponent), 'name').map(toCompletionItem);
+function listComponents(project: Project): CompletionItem[] {
+  const { root } = project;
+  const jsPaths = walkSync(join(root, 'app', 'components'));
+  const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'));
+  const paths = [...jsPaths, ...hbsPaths];
+
+  const items = paths
+    .filter((filePath: string) => filePath.endsWith('.js') || filePath.endsWith('.hbs'))
+    .map((filePath: string) => {
+      return {
+        kind: CompletionItemKind.Class,
+        label: filePath.replace(extname(filePath), ''),
+        detail: 'component',
+      };
+    });
+
+  return uniqueBy(items, 'label');
 }
 
-function listHelpers(index: FileIndex): CompletionItem[] {
-  return index.files.filter(isHelper).map(toCompletionItem);
+function listHelpers(project: Project): CompletionItem[] {
+  const { root } = project;
+  const jsPaths = walkSync(join(root, 'app', 'helpers'));
+  const paths = [...jsPaths];
+
+  const items = paths
+    .filter((filePath: string) => filePath.endsWith('.js'))
+    .map((filePath: string) => {
+      return {
+        kind: CompletionItemKind.Function,
+        label: filePath.replace(extname(filePath), ''),
+        detail: 'helper',
+      };
+    });
+
+  return uniqueBy(items, 'label');
 }
 
 function listRoutes(index: FileIndex): CompletionItem[] {
@@ -126,33 +158,8 @@ function isBlockLinkToTarget(path: ASTPath): boolean {
   return parent.params[0] === node && parent.path.original === 'link-to';
 }
 
-function isComponent(fileInfo: FileInfo): boolean {
-  if (fileInfo instanceof ModuleFileInfo) {
-    return fileInfo.type === 'component';
-  }
-  if (fileInfo instanceof TemplateFileInfo) {
-    return fileInfo.forComponent;
-  }
-
-  return false;
-}
-
-function isHelper(fileInfo: FileInfo) {
-  return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'helper';
-}
-
 function isRoute(fileInfo: FileInfo) {
   return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'route';
-}
-
-function toCompletionItem(fileInfo: ModuleFileInfo) {
-  let kind = toCompletionItemKind(fileInfo.type);
-
-  return {
-    kind,
-    label: fileInfo.slashName,
-    detail: fileInfo.type,
-  };
 }
 
 function toRouteCompletionItem(fileInfo: ModuleFileInfo) {
