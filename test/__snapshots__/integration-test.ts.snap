@@ -241,24 +241,6 @@ Array [
 ]
 `;
 
-exports[`integration Definition request returns the definition information for a component in a template 2`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
-    },
-    "uri": "file:///path-to-tests/fixtures/full-project/app/helpers/some-helper.js",
-  },
-]
-`;
-
 exports[`integration Definition request returns the definition information for a hasMany relationship 1`] = `
 Array [
   Object {
@@ -273,6 +255,24 @@ Array [
       },
     },
     "uri": "file:///path-to-tests/fixtures/full-project/app/models/model-b.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a helper in a template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/helpers/some-helper.js",
   },
 ]
 `;
