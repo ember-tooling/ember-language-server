@@ -1,4 +1,4 @@
-import { extname } from 'path';
+import { extname, join } from 'path';
 
 import {
   CompletionItem,
@@ -11,8 +11,6 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
-import FileIndex from '../file-index';
-import { FileInfo, ModuleFileInfo, TemplateFileInfo } from '../file-info';
 import { filter } from 'fuzzaldrin';
 
 const { preprocess } = require('@glimmer/syntax');
@@ -23,6 +21,8 @@ import {
   emberSubExpressionItems
 } from './ember-helpers';
 import uniqueBy from '../utils/unique-by';
+
+const walkSync = require('walk-sync');
 
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
@@ -50,36 +50,87 @@ export default class TemplateCompletionProvider {
       return [];
     }
 
+    const { root } = project;
     let completions: CompletionItem[] = [];
 
     if (isMustachePath(focusPath)) {
-      completions.push(...listComponents(project.fileIndex));
-      completions.push(...listHelpers(project.fileIndex));
+      completions.push(...listComponents(root));
+      completions.push(...listHelpers(root));
       completions.push(...emberMustacheItems);
     } else if (isBlockPath(focusPath)) {
-      completions.push(...listComponents(project.fileIndex));
+      completions.push(...listComponents(root));
       completions.push(...emberBlockItems);
     } else if (isSubExpressionPath(focusPath)) {
-      completions.push(...listHelpers(project.fileIndex));
+      completions.push(...listHelpers(root));
       completions.push(...emberSubExpressionItems);
     } else if (isLinkToTarget(focusPath)) {
-      completions.push(...listRoutes(project.fileIndex));
+      completions.push(...listRoutes(root));
     }
 
     return filter(completions, getTextPrefix(focusPath), { key: 'label' });
   }
 }
 
-function listComponents(index: FileIndex): CompletionItem[] {
-  return uniqueBy(index.files.filter(isComponent), 'name').map(toCompletionItem);
+function listComponents(root: string): CompletionItem[] {
+  const jsPaths = walkSync(join(root, 'app', 'components'), {
+    directors: false,
+    globs: ['**/*.js']
+  });
+  const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'), {
+    directors: false,
+    globs: ['**/*.hbs']
+  });
+  const paths = [...jsPaths, ...hbsPaths];
+
+  const items = paths
+    .map((filePath: string) => {
+      return {
+        kind: CompletionItemKind.Class,
+        label: filePath.replace(extname(filePath), ''),
+        detail: 'component',
+      };
+    });
+
+  return uniqueBy(items, 'label');
 }
 
-function listHelpers(index: FileIndex): CompletionItem[] {
-  return index.files.filter(isHelper).map(toCompletionItem);
+function listHelpers(root: string): CompletionItem[] {
+  const paths = walkSync(join(root, 'app', 'helpers'), {
+    directors: false,
+    globs: ['**/*.js']
+  });
+
+  const items = paths
+    .map((filePath: string) => {
+      return {
+        kind: CompletionItemKind.Function,
+        label: filePath.replace(extname(filePath), ''),
+        detail: 'helper',
+      };
+    });
+
+  return uniqueBy(items, 'label');
 }
 
-function listRoutes(index: FileIndex): CompletionItem[] {
-  return index.files.filter(isRoute).map(toRouteCompletionItem);
+function listRoutes(root: string): CompletionItem[] {
+  const paths = walkSync(join(root, 'app', 'routes'), {
+    directors: false,
+    globs: ['**/*.js']
+  });
+
+  const items = paths
+    .map((filePath: string) => {
+      const label = filePath
+        .replace(extname(filePath), '')
+        .replace(/\//g, '.');
+      return {
+        kind: CompletionItemKind.File,
+        label,
+        detail: 'route',
+      };
+    });
+
+  return uniqueBy(items, 'label');
 }
 
 function isMustachePath(path: ASTPath): boolean {
@@ -124,55 +175,6 @@ function isBlockLinkToTarget(path: ASTPath): boolean {
   let parent = path.parent;
   if (!parent || parent.type !== 'BlockStatement') { return false; }
   return parent.params[0] === node && parent.path.original === 'link-to';
-}
-
-function isComponent(fileInfo: FileInfo): boolean {
-  if (fileInfo instanceof ModuleFileInfo) {
-    return fileInfo.type === 'component';
-  }
-  if (fileInfo instanceof TemplateFileInfo) {
-    return fileInfo.forComponent;
-  }
-
-  return false;
-}
-
-function isHelper(fileInfo: FileInfo) {
-  return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'helper';
-}
-
-function isRoute(fileInfo: FileInfo) {
-  return fileInfo instanceof ModuleFileInfo && fileInfo.type === 'route';
-}
-
-function toCompletionItem(fileInfo: ModuleFileInfo) {
-  let kind = toCompletionItemKind(fileInfo.type);
-
-  return {
-    kind,
-    label: fileInfo.slashName,
-    detail: fileInfo.type,
-  };
-}
-
-function toRouteCompletionItem(fileInfo: ModuleFileInfo) {
-  let kind = toCompletionItemKind(fileInfo.type);
-
-  return {
-    kind,
-    label: fileInfo.name,
-    detail: fileInfo.type,
-  };
-}
-
-function toCompletionItemKind(type: string): CompletionItemKind {
-  if (type === 'helper') {
-    return CompletionItemKind.Function;
-  } else if (type === 'route') {
-    return CompletionItemKind.File;
-  } else {
-    return CompletionItemKind.Class;
-  }
 }
 
 function getTextPrefix({ node: { original = '' } }: ASTPath): string {

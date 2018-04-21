@@ -21,7 +21,8 @@
     "fuzzaldrin": "^2.1.0",
     "i": "^0.3.5",
     "klaw": "^2.0.1",
-    "vscode-languageserver": "^4.1.2"
+    "vscode-languageserver": "^4.1.2",
+    "walk-sync": "^0.3.2"
   },
   "devDependencies": {
     "@types/esprima": "^4.0.1",
