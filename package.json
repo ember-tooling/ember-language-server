@@ -13,7 +13,7 @@
   "main": "lib/start-server.js",
   "typings": "lib/start-server.d.ts",
   "dependencies": {
-    "@glimmer/syntax": "^0.33.4",
+    "@glimmer/syntax": "^0.34.0",
     "ast-types": "^0.11.3",
     "chokidar": "^2.0.0",
     "esprima": "^4.0.0",
