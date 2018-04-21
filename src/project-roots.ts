@@ -1,15 +1,12 @@
 'use strict';
 
-import { basename, dirname } from 'path';
-import { EventEmitter } from 'events';
+import { dirname, join } from 'path';
 
-import FileIndex from './file-index';
+const walkSync = require('walk-sync');
 
 export class Project {
-  readonly fileIndex: FileIndex;
 
   constructor(public readonly root: string) {
-    this.fileIndex = new FileIndex(root);
   }
 }
 
@@ -18,50 +15,30 @@ export default class ProjectRoots {
 
   projects = new Map<string, Project>();
 
-  async initialize(workspaceRoot: string, watcher: EventEmitter) {
+  async initialize(workspaceRoot: string) {
     this.workspaceRoot = workspaceRoot;
 
-    let promise = new Promise(resolve => {
-      watcher.once('ready', resolve);
+    const roots = walkSync(workspaceRoot, {
+      directories: false,
+      globs: ['**/ember-cli-build.js'],
+      ignore: [
+        '**/.git/**',
+        '**/bower_components/**',
+        '**/dist/**',
+        '**/node_modules/**',
+        '**/tmp/**',
+      ]
     });
 
-    watcher.on('add', (path: string) => {
-      if (basename(path) === 'ember-cli-build.js') {
-        this.onProjectAdd(dirname(path));
-      }
-
-      promise.then(() => {
-        let project = this.projectForPath(path);
-        if (project) {
-          project.fileIndex.add(path);
-        }
-      });
+    roots.forEach((rootPath: string) => {
+      const fullPath = dirname(join(workspaceRoot, rootPath));
+      this.onProjectAdd(fullPath);
     });
-
-    watcher.on('unlink', (path: string) => {
-      if (basename(path) === 'ember-cli-build.js') {
-        this.onProjectDelete(dirname(path));
-      }
-
-      promise.then(() => {
-        let project = this.projectForPath(path);
-        if (project) {
-          project.fileIndex.remove(path);
-        }
-      });
-    });
-
-    await promise;
   }
 
   onProjectAdd(path: string) {
     console.log(`Ember CLI project added at ${path}`);
     this.projects.set(path, new Project(path));
-  }
-
-  onProjectDelete(path: string) {
-    console.log(`Ember CLI project deleted at ${path}`);
-    this.projects.delete(path);
   }
 
   projectForPath(path: string): Project | undefined {

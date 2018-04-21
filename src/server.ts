@@ -14,8 +14,6 @@ import {
   SymbolInformation, Files, TextDocumentPositionParams, CompletionItem
 } from 'vscode-languageserver';
 
-const { watch } = require('chokidar');
-
 import ProjectRoots from './project-roots';
 import DefinitionProvider from './definition-provider';
 import TemplateLinter from './template-linter';
@@ -67,7 +65,7 @@ export default class Server {
 
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
-  private async onInitialize({ rootUri, rootPath }: InitializeParams): Promise<InitializeResult> {
+  private onInitialize({ rootUri, rootPath }: InitializeParams): InitializeResult {
 
     rootPath = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
     if (!rootPath) {
@@ -76,17 +74,7 @@ export default class Server {
 
     console.log(`Initializing Ember Language Server at ${rootPath}`);
 
-    let watcher = watch(rootPath, {
-      ignored: [
-        '**/.git/**',
-        '**/bower_components/**',
-        '**/dist/**',
-        '**/node_modules/**',
-        '**/tmp/**',
-      ],
-    });
-
-    await this.projectRoots.initialize(rootPath, watcher);
+    this.projectRoots.initialize(rootPath);
 
     return {
       capabilities: {
