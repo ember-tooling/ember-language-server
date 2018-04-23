@@ -177,7 +177,7 @@ describe('integration', function() {
       expect(response).toMatchSnapshot();
     });
 
-    it('returns the definition information for a component in a template', async () => {
+    it('returns the definition information for a helper in a template', async () => {
       const definitionTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
       const params = {
         textDocument: {

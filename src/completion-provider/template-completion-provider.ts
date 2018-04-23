@@ -73,11 +73,11 @@ export default class TemplateCompletionProvider {
 
 function listComponents(root: string): CompletionItem[] {
   const jsPaths = walkSync(join(root, 'app', 'components'), {
-    directors: false,
+    directories: false,
     globs: ['**/*.js']
   });
   const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'), {
-    directors: false,
+    directories: false,
     globs: ['**/*.hbs']
   });
   const paths = [...jsPaths, ...hbsPaths];
@@ -96,7 +96,7 @@ function listComponents(root: string): CompletionItem[] {
 
 function listHelpers(root: string): CompletionItem[] {
   const paths = walkSync(join(root, 'app', 'helpers'), {
-    directors: false,
+    directories: false,
     globs: ['**/*.js']
   });
 
@@ -114,7 +114,7 @@ function listHelpers(root: string): CompletionItem[] {
 
 function listRoutes(root: string): CompletionItem[] {
   const paths = walkSync(join(root, 'app', 'routes'), {
-    directors: false,
+    directories: false,
     globs: ['**/*.js']
   });
 

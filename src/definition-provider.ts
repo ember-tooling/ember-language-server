@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fs from 'fs';
 
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -8,7 +9,6 @@ import { parseModule } from 'esprima';
 import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
-import { FileInfo, ModuleFileInfo, TemplateFileInfo } from './file-info';
 import { getExtension } from './utils/file-extension';
 
 const { preprocess } = require('@glimmer/syntax');
@@ -41,17 +41,11 @@ export default class DefinitionProvider {
       if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName = focusPath.node.original;
 
-        return project.fileIndex.files
-          .filter(fileInfo => {
-            if (fileInfo instanceof ModuleFileInfo) {
-              return (fileInfo.type === 'component' || fileInfo.type === 'helper') &&
-                fileInfo.slashName === componentOrHelperName;
+        const templatePath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.js`);
+        const componentPath = path.join(project.root, 'app', 'templates', 'components', `${componentOrHelperName}.hbs`);
+        const helperPath = path.join(project.root, 'app', 'helpers', `${componentOrHelperName}.js`);
 
-            } else if (fileInfo instanceof TemplateFileInfo) {
-              return fileInfo.forComponent && fileInfo.slashName === componentOrHelperName;
-            }
-          })
-          .map(fileInfo => toLocation(fileInfo, project.root));
+        return pathsToLocations(templatePath, componentPath, helperPath);
       }
     } else if (extension === '.js') {
       let content = this.server.documents.get(uri).getText();
@@ -66,20 +60,15 @@ export default class DefinitionProvider {
       if (isModelReference(astPath)) {
         let modelName = astPath.node.value;
 
-        return project.fileIndex.files
-          .filter(fileInfo => fileInfo instanceof ModuleFileInfo &&
-            fileInfo.type === 'model' &&
-            fileInfo.name === modelName)
-          .map(fileInfo => toLocation(fileInfo, project.root));
+        const modelPath = path.join(project.root, 'app', 'models', `${modelName}.js`);
 
+        return pathsToLocations(modelPath);
       } else if (isTransformReference(astPath)) {
         let transformName = astPath.node.value;
 
-        return project.fileIndex.files
-          .filter(fileInfo => fileInfo instanceof ModuleFileInfo &&
-            fileInfo.type === 'transform' &&
-            fileInfo.name === transformName)
-          .map(fileInfo => toLocation(fileInfo, project.root));
+        const transformPath = path.join(project.root, 'app', 'transforms', `${transformName}.js`);
+
+        return pathsToLocations(transformPath);
       }
     }
 
@@ -123,8 +112,10 @@ function isTransformReference(astPath: ASTPath): boolean {
   return identifier.name === 'attr';
 }
 
-function toLocation(fileInfo: FileInfo, root: string) {
-  let uri = `file://${path.join(root, fileInfo.relativePath)}`;
-  let range = Range.create(0, 0, 0, 0);
-  return Location.create(uri, range);
+function pathsToLocations(...paths: string[]): Location[] {
+  return paths
+    .filter(fs.existsSync)
+    .map(modulePath => {
+      return Location.create(`file://${modulePath}`, Range.create(0, 0, 0, 0));
+    });
 }
