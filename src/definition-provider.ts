@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
-import { parseModule } from 'esprima';
+import { parse } from 'babylon';
 
 import { toPosition } from './estree-utils';
 import Server from './server';
@@ -49,8 +49,8 @@ export default class DefinitionProvider {
       }
     } else if (extension === '.js') {
       let content = this.server.documents.get(uri).getText();
-      let ast = parseModule(content, {
-        loc: true
+      let ast = parse(content, {
+        sourceType: 'module'
       });
       let astPath = ASTPath.toPosition(ast, toPosition(params.position));
       if (!astPath) {
@@ -96,7 +96,7 @@ export default class DefinitionProvider {
 
 function isModelReference(astPath: ASTPath): boolean {
   let node = astPath.node;
-  if (node.type !== 'Literal') { return false; }
+  if (node.type !== 'StringLiteral') { return false; }
   let parent = astPath.parent;
   if (!parent || parent.type !== 'CallExpression' || parent.arguments[0] !== node) { return false; }
   let identifier = (parent.callee.type === 'Identifier') ? parent.callee : parent.callee.property;
@@ -105,7 +105,7 @@ function isModelReference(astPath: ASTPath): boolean {
 
 function isTransformReference(astPath: ASTPath): boolean {
   let node = astPath.node;
-  if (node.type !== 'Literal') { return false; }
+  if (node.type !== 'StringLiteral') { return false; }
   let parent = astPath.parent;
   if (!parent || parent.type !== 'CallExpression' || parent.arguments[0] !== node) { return false; }
   let identifier = (parent.callee.type === 'Identifier') ? parent.callee : parent.callee.property;
