@@ -1,5 +1,5 @@
 import { SymbolInformation, SymbolKind } from 'vscode-languageserver';
-import { parseModule } from 'esprima';
+import { parse } from 'babylon';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';
 
@@ -9,8 +9,8 @@ export default class JSDocumentSymbolProvider implements DocumentSymbolProvider 
   extensions: string[] = ['.js'];
 
   process(content: string): SymbolInformation[] {
-    let ast = parseModule(content, {
-      loc: true
+    const ast = parse(content, {
+      sourceType: 'module'
     });
 
     let symbols: SymbolInformation[] = [];

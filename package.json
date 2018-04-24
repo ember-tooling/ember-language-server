@@ -15,7 +15,7 @@
   "dependencies": {
     "@glimmer/syntax": "^0.33.4",
     "ast-types": "^0.11.3",
-    "esprima": "^4.0.0",
+    "babylon": "^6.18.0",
     "fs-extra": "^5.0.0",
     "fuzzaldrin": "^2.1.0",
     "i": "^0.3.5",
@@ -23,7 +23,7 @@
     "walk-sync": "^0.3.2"
   },
   "devDependencies": {
-    "@types/esprima": "^4.0.1",
+    "@types/babylon": "^6.16.2",
     "@types/estree": "*",
     "@types/fuzzaldrin": "^2.1.1",
     "@types/jest": "^22.2.3",
