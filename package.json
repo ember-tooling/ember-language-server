@@ -26,7 +26,7 @@
     "@types/babylon": "^6.16.2",
     "@types/estree": "*",
     "@types/fuzzaldrin": "^2.1.1",
-    "@types/jest": "^22.2.3",
+    "@types/jest": "^23.0.0",
     "@types/node": "^9.3.0",
     "jest": "^22.4.3",
     "ts-jest": "^22.4.3",
