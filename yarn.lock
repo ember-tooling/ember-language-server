@@ -16,30 +16,30 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@glimmer/interfaces@^0.33.4":
-  version "0.33.4"
-  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.33.4.tgz#80783552d4d8b567f78ddbc3273e751fe263006b"
+"@glimmer/interfaces@^0.34.8":
+  version "0.34.8"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.34.8.tgz#421ff213a69120d42ffacf6edc184f8e78e558f5"
   dependencies:
-    "@glimmer/wire-format" "^0.33.4"
+    "@glimmer/wire-format" "^0.34.8"
 
-"@glimmer/syntax@^0.33.4":
-  version "0.33.4"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.33.4.tgz#ac824e0ccad3fd4cb9bf05d7cf6b5a9fbd8b195e"
+"@glimmer/syntax@^0.34.0":
+  version "0.34.8"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.34.8.tgz#fc7c54faa450111a4c97200100f7510294217156"
   dependencies:
-    "@glimmer/interfaces" "^0.33.4"
-    "@glimmer/util" "^0.33.4"
+    "@glimmer/interfaces" "^0.34.8"
+    "@glimmer/util" "^0.34.8"
     handlebars "^4.0.6"
-    simple-html-tokenizer "^0.5.0"
+    simple-html-tokenizer "^0.5.3"
 
-"@glimmer/util@^0.33.4":
-  version "0.33.4"
-  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.33.4.tgz#3aaabcad5cf04195917553510d2128fdce3208eb"
+"@glimmer/util@^0.34.8":
+  version "0.34.8"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.34.8.tgz#0f1349b3134bb55d4887da73919863401647525b"
 
-"@glimmer/wire-format@^0.33.4":
-  version "0.33.4"
-  resolved "https://registry.yarnpkg.com/@glimmer/wire-format/-/wire-format-0.33.4.tgz#782d8bc02cb0f6261b5711cef007d907831f15d5"
+"@glimmer/wire-format@^0.34.8":
+  version "0.34.8"
+  resolved "https://registry.yarnpkg.com/@glimmer/wire-format/-/wire-format-0.34.8.tgz#5f792d4c8789d77a801e7d4c742ea42f55d24816"
   dependencies:
-    "@glimmer/util" "^0.33.4"
+    "@glimmer/util" "^0.34.8"
 
 "@types/babel-types@*":
   version "7.0.1"
@@ -2975,9 +2975,9 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
 
-simple-html-tokenizer@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/simple-html-tokenizer/-/simple-html-tokenizer-0.5.0.tgz#014523a6eeb4b923859c1b31f5f4f933d6b0ddf6"
+simple-html-tokenizer@^0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/simple-html-tokenizer/-/simple-html-tokenizer-0.5.3.tgz#c1c246a53ccf1cd65fb2fa970967145b47602ce4"
 
 slash@^1.0.0:
   version "1.0.0"
