@@ -8,7 +8,9 @@
 			"request": "attach",
 			"port": 6004,
 			"sourceMaps": true,
-			"outDir": "${workspaceRoot}/../client/server"
+      "outFiles": [
+        "${workspaceRoot}/lib/**/*.js"
+      ]
 		}
 	]
 }
