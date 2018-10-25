@@ -1,4 +1,5 @@
 import { extname, join } from 'path';
+import { existsSync } from 'fs';
 
 import {
   CompletionItem,
@@ -48,37 +49,60 @@ export default class TemplateCompletionProvider {
       return [];
     }
 
-    const { root } = project;
+    const { root, podRoot } = project;
     let completions: CompletionItem[] = [];
 
     if (isMustachePath(focusPath)) {
-      completions.push(...listComponents(root));
+      completions.push(...listComponents(root, podRoot));
       completions.push(...listHelpers(root));
       completions.push(...emberMustacheItems);
     } else if (isBlockPath(focusPath)) {
-      completions.push(...listComponents(root));
+      completions.push(...listComponents(root, podRoot));
       completions.push(...emberBlockItems);
     } else if (isSubExpressionPath(focusPath)) {
       completions.push(...listHelpers(root));
       completions.push(...emberSubExpressionItems);
     } else if (isLinkToTarget(focusPath)) {
-      completions.push(...listRoutes(root));
+      completions.push(...listRoutes(root, podRoot));
     }
 
     return filter(completions, getTextPrefix(focusPath), { key: 'label' });
   }
 }
 
-function listComponents(root: string): CompletionItem[] {
-  const jsPaths = walkSync(join(root, 'app', 'components'), {
-    directories: false,
-    globs: ['**/*.js']
-  });
-  const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'), {
-    directories: false,
-    globs: ['**/*.hbs']
-  });
-  const paths = [...jsPaths, ...hbsPaths];
+function listComponents(root: string, podRoot: string): CompletionItem[] {
+  const traditionalJsDirectory = join(root, 'app', 'components');
+  const traditionalHbsDirectory = join(root, 'app', 'templates', 'components');
+
+  let jsPaths = [], hbsPaths = [], podsHbsPaths = [], podsJsPaths = [];
+
+  if (existsSync(traditionalJsDirectory)) {
+    jsPaths = walkSync(traditionalJsDirectory, {
+      directories: false,
+      globs: ['**/*.js']
+    });
+  }
+  if (existsSync(traditionalHbsDirectory)) {
+    hbsPaths = walkSync(traditionalHbsDirectory, {
+      directories: false,
+      globs: ['**/*.hbs']
+    });
+  }
+
+  const podComponentsDirectory = join(root, 'app', podRoot, 'components');
+
+  if (existsSync(podComponentsDirectory)) {
+    podsHbsPaths = walkSync(podComponentsDirectory, {
+      directories: false,
+      globs: ['**/template.hbs']
+    }).map((path: string) => path.replace('/template.hbs', ''));
+    podsJsPaths = walkSync(podComponentsDirectory, {
+      directories: false,
+      globs: ['**/component.js']
+    }).map((path: string) => path.replace('/component.js', ''));
+  }
+
+  const paths = [...jsPaths, ...hbsPaths, ...podsHbsPaths, ...podsJsPaths];
 
   const items = paths
     .map((filePath: string) => {
@@ -110,13 +134,23 @@ function listHelpers(root: string): CompletionItem[] {
   return uniqueBy(items, 'label');
 }
 
-function listRoutes(root: string): CompletionItem[] {
+function listRoutes(root: string, podRoot: string): CompletionItem[] {
   const paths = walkSync(join(root, 'app', 'routes'), {
     directories: false,
     globs: ['**/*.js']
   });
 
-  const items = paths
+  let podPaths = [];
+
+  const podDirectory = join(root, 'app', podRoot);
+  if (existsSync(podDirectory)) {
+    podPaths = walkSync(podDirectory, {
+      directories: false,
+      globs: ['**/route.js']
+    }).map((path: string) => path.replace('/route.js', ''));
+  }
+
+  const items = [...paths, ...podPaths]
     .map((filePath: string) => {
       const label = filePath
         .replace(extname(filePath), '')
