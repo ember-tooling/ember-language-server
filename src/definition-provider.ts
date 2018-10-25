@@ -37,8 +37,8 @@ export default class DefinitionProvider {
       if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName = focusPath.node.original;
 
-        const templatePath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.js`);
-        const componentPath = path.join(project.root, 'app', 'templates', 'components', `${componentOrHelperName}.hbs`);
+        const componentPath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.js`);
+        const templatePath = path.join(project.root, 'app', 'templates', 'components', `${componentOrHelperName}.hbs`);
         const helperPath = path.join(project.root, 'app', 'helpers', `${componentOrHelperName}.js`);
 
         return pathsToLocations(templatePath, componentPath, helperPath);
