@@ -3,7 +3,7 @@ import { SymbolInformation } from 'vscode-languageserver';
 interface DocumentSymbolProvider {
   /**
    * Supported file extensions.
-   * @example ['.html', '.js']
+   * @example ['.html', '.js', '.ts']
    */
   extensions: string[];
 

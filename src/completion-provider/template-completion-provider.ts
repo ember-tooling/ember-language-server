@@ -76,11 +76,19 @@ function listComponents(root: string): CompletionItem[] {
     directories: false,
     globs: ['**/*.js']
   });
+  const tsPaths = walkSync(join(root, 'app', 'components'), {
+    directories: false,
+    globs: ['**/*.ts']
+  });
+  const hbsDefaultPodPaths = walkSync(join(root, 'app', 'templates', 'components'), {
+    directories: false,
+    globs: ['**/*.hbs']
+  });
   const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'), {
     directories: false,
     globs: ['**/*.hbs']
   });
-  const paths = [...jsPaths, ...hbsPaths];
+  const paths = [...jsPaths, ...hbsPaths, ...tsPaths, ...hbsDefaultPodPaths];
 
   const items = paths
     .map((filePath: string) => {
@@ -97,7 +105,7 @@ function listComponents(root: string): CompletionItem[] {
 function listHelpers(root: string): CompletionItem[] {
   const paths = walkSync(join(root, 'app', 'helpers'), {
     directories: false,
-    globs: ['**/*.js']
+    globs: ['**/*.js', '**/*.ts']
   });
 
   const items = paths
@@ -115,7 +123,7 @@ function listHelpers(root: string): CompletionItem[] {
 function listRoutes(root: string): CompletionItem[] {
   const paths = walkSync(join(root, 'app', 'routes'), {
     directories: false,
-    globs: ['**/*.js']
+    globs: ['**/*.js', '**/*.ts']
   });
 
   const items = paths

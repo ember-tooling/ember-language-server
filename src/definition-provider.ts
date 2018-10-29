@@ -40,17 +40,19 @@ export default class DefinitionProvider {
 
       if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName = focusPath.node.original;
-
-        const templatePath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.js`);
-        const componentPath = path.join(project.root, 'app', 'templates', 'components', `${componentOrHelperName}.hbs`);
-        const helperPath = path.join(project.root, 'app', 'helpers', `${componentOrHelperName}.js`);
-
-        return pathsToLocations(templatePath, componentPath, helperPath);
+        const jsComponentPath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.js`);
+        const tsComponentPath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.ts`);
+        const templatePath = path.join(project.root, 'app', 'templates', 'components', `${componentOrHelperName}.hbs`);
+        const basicPodTemplatePath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.hbs`);
+        const tsHelerPath = path.join(project.root, 'app', 'helpers', `${componentOrHelperName}.ts`);
+        const jsHelperPath = path.join(project.root, 'app', 'helpers', `${componentOrHelperName}.js`);
+        return pathsToLocations(templatePath, basicPodTemplatePath, jsComponentPath, tsComponentPath, jsHelperPath, tsHelerPath);
       }
-    } else if (extension === '.js') {
+    } else if (extension === '.js' || extension === '.ts') {
       let content = this.server.documents.get(uri).getText();
       let ast = parse(content, {
-        sourceType: 'module'
+		sourceType: 'module',
+		plugins: extension === '.ts' ? ['@babel/plugin-syntax-typescript'] : []
       });
       let astPath = ASTPath.toPosition(ast, toPosition(params.position));
       if (!astPath) {
@@ -60,15 +62,16 @@ export default class DefinitionProvider {
       if (isModelReference(astPath)) {
         let modelName = astPath.node.value;
 
-        const modelPath = path.join(project.root, 'app', 'models', `${modelName}.js`);
+        const jsModelPath = path.join(project.root, 'app', 'models', `${modelName}.js`);
+        const tsModelPath = path.join(project.root, 'app', 'models', `${modelName}.ts`);
 
-        return pathsToLocations(modelPath);
+        return pathsToLocations(jsModelPath, tsModelPath);
       } else if (isTransformReference(astPath)) {
         let transformName = astPath.node.value;
 
-        const transformPath = path.join(project.root, 'app', 'transforms', `${transformName}.js`);
-
-        return pathsToLocations(transformPath);
+        const jsTransformPath = path.join(project.root, 'app', 'transforms', `${transformName}.js`);
+        const tsTransformPath = path.join(project.root, 'app', 'transforms', `${transformName}.ts`);
+        return pathsToLocations(jsTransformPath, tsTransformPath);
       }
     }
 
