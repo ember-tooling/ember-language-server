@@ -29,6 +29,10 @@ export default class DefinitionProvider {
     }
 
     let extension = getExtension(params.textDocument);
+    const projectFilePath = function(folderInsideApp: string, fileName: string) {
+      const args = [path, project.root, 'app'].concat(folderInsideApp.split('/').filter(path => path.length), [fileName]);
+      return path.join.apply(args);
+    };
 
     if (extension === '.hbs') {
       let content = this.server.documents.get(uri).getText();
@@ -40,19 +44,20 @@ export default class DefinitionProvider {
 
       if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName = focusPath.node.original;
-        const jsComponentPath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.js`);
-        const tsComponentPath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.ts`);
-        const templatePath = path.join(project.root, 'app', 'templates', 'components', `${componentOrHelperName}.hbs`);
-        const basicPodTemplatePath = path.join(project.root, 'app', 'components', `${componentOrHelperName}.hbs`);
-        const tsHelerPath = path.join(project.root, 'app', 'helpers', `${componentOrHelperName}.ts`);
-        const jsHelperPath = path.join(project.root, 'app', 'helpers', `${componentOrHelperName}.js`);
+        const jsComponentPath = projectFilePath('components', `${componentOrHelperName}.js`);
+        const tsComponentPath = projectFilePath('components', `${componentOrHelperName}.ts`);
+        const templatePath = projectFilePath('templates/components', `${componentOrHelperName}.hbs`);
+        const basicPodTemplatePath = projectFilePath('components', `${componentOrHelperName}.hbs`);
+        const tsHelerPath = projectFilePath('helpers', `${componentOrHelperName}.ts`);
+        const jsHelperPath = projectFilePath('helpers', `${componentOrHelperName}.js`);
         return pathsToLocations(templatePath, basicPodTemplatePath, jsComponentPath, tsComponentPath, jsHelperPath, tsHelerPath);
       }
     } else if (extension === '.js' || extension === '.ts') {
       let content = this.server.documents.get(uri).getText();
+      let plugins = extension === '.ts' ? ['@babel/plugin-syntax-typescript'] : [];
       let ast = parse(content, {
 		sourceType: 'module',
-		plugins: extension === '.ts' ? ['@babel/plugin-syntax-typescript'] : []
+        plugins
       });
       let astPath = ASTPath.toPosition(ast, toPosition(params.position));
       if (!astPath) {
@@ -62,15 +67,15 @@ export default class DefinitionProvider {
       if (isModelReference(astPath)) {
         let modelName = astPath.node.value;
 
-        const jsModelPath = path.join(project.root, 'app', 'models', `${modelName}.js`);
-        const tsModelPath = path.join(project.root, 'app', 'models', `${modelName}.ts`);
+        const jsModelPath = projectFilePath('models', `${modelName}.js`);
+        const tsModelPath = projectFilePath('models', `${modelName}.ts`);
 
         return pathsToLocations(jsModelPath, tsModelPath);
       } else if (isTransformReference(astPath)) {
         let transformName = astPath.node.value;
 
-        const jsTransformPath = path.join(project.root, 'app', 'transforms', `${transformName}.js`);
-        const tsTransformPath = path.join(project.root, 'app', 'transforms', `${transformName}.ts`);
+        const jsTransformPath = projectFilePath('transforms', `${transformName}.js`);
+        const tsTransformPath = projectFilePath('transforms', `${transformName}.ts`);
         return pathsToLocations(jsTransformPath, tsTransformPath);
       }
     }
