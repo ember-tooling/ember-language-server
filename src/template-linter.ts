@@ -1,5 +1,4 @@
 import { Diagnostic, Files, TextDocument } from 'vscode-languageserver';
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { hasExtension } from './utils/file-extension';
 import { toDiagnostic } from './utils/diagnostic';
 
@@ -55,12 +54,7 @@ export default class TemplateLinter {
   }
 
   private getLinterConfig(uri: string): { configPath: string } | undefined {
-    const filePath = uriToFilePath(uri);
-    if (!filePath) {
-      return;
-    }
-
-    const project = this.server.projectRoots.projectForPath(filePath);
+    const project = this.server.projectRoots.projectForUri(uri);
     if (!project) {
       return;
     }
@@ -74,12 +68,7 @@ export default class TemplateLinter {
   }
 
   private async getLinter(uri: string) {
-    const filePath = uriToFilePath(uri);
-    if (!filePath) {
-      return;
-    }
-
-    const project = this.server.projectRoots.projectForPath(filePath);
+    const project = this.server.projectRoots.projectForUri(uri);
     if (!project) {
       return;
     }

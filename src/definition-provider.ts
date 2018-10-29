@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import { parse } from 'babylon';
 
@@ -18,12 +17,8 @@ export default class DefinitionProvider {
 
   handle(params: TextDocumentPositionParams): Definition | null {
     let uri = params.textDocument.uri;
-    let filePath = uriToFilePath(uri);
-    if (!filePath) {
-      return null;
-    }
 
-    const project = this.server.projectRoots.projectForPath(filePath);
+    const project = this.server.projectRoots.projectForUri(uri);
     if (!project) {
       return null;
     }

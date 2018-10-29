@@ -11,7 +11,7 @@ import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
-  SymbolInformation, Files, TextDocumentPositionParams, CompletionItem
+  SymbolInformation, TextDocumentPositionParams, CompletionItem
 } from 'vscode-languageserver';
 
 import ProjectRoots from './project-roots';
@@ -22,6 +22,7 @@ import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
+import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 export default class Server {
 
@@ -67,7 +68,7 @@ export default class Server {
   // in the passed params the rootPath of the workspace plus the client capabilites.
   private onInitialize({ rootUri, rootPath }: InitializeParams): InitializeResult {
 
-    rootPath = rootUri ? Files.uriToFilePath(rootUri) : rootPath;
+    rootPath = rootUri ? uriToFilePath(rootUri) : rootPath;
     if (!rootPath) {
       return { capabilities: {} };
     }
@@ -109,7 +110,7 @@ export default class Server {
 
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
     let uri = params.textDocument.uri;
-    let filePath = Files.uriToFilePath(uri);
+    let filePath = uriToFilePath(uri);
     if (!filePath) {
       return [];
     }
