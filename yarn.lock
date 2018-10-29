@@ -3921,6 +3921,11 @@ vscode-uri@^1.0.1:
   resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-1.0.1.tgz#11a86befeac3c4aa3ec08623651a3c81a6d0bbc8"
   integrity sha1-Eahr7+rDxKo+wIYjZRo8gabQu8g=
 
+vscode-uri@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-1.0.6.tgz#6b8f141b0bbc44ad7b07e94f82f168ac7608ad4d"
+  integrity sha512-sLI2L0uGov3wKVb9EB+vIQBl9tVP90nqRvxSoJ35vI3NjxE8jfsE5DSOhWgSunHSZmKS4OCi2jrtfxK7uyp2ww==
+
 w3c-hr-time@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/w3c-hr-time/-/w3c-hr-time-1.0.1.tgz#82ac2bff63d950ea9e3189a58a65625fedf19045"

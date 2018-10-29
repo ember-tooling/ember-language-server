@@ -35,6 +35,7 @@ function replaceDynamicUriPart(uri: string) {
   }
 
   return uri
+    .replace(dirname.replace(/\\/g, '/'), '/path-to-tests')
     .replace(dirname, '/path-to-tests')
     .replace(/\\/g, '/');
 }

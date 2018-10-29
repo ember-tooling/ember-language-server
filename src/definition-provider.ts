@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import { parse } from 'babylon';
 
@@ -10,6 +9,7 @@ import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
 import { getExtension } from './utils/file-extension';
+import URI from 'vscode-uri';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -18,12 +18,8 @@ export default class DefinitionProvider {
 
   handle(params: TextDocumentPositionParams): Definition | null {
     let uri = params.textDocument.uri;
-    let filePath = uriToFilePath(uri);
-    if (!filePath) {
-      return null;
-    }
 
-    const project = this.server.projectRoots.projectForPath(filePath);
+    const project = this.server.projectRoots.projectForUri(uri);
     if (!project) {
       return null;
     }
@@ -116,6 +112,6 @@ function pathsToLocations(...paths: string[]): Location[] {
   return paths
     .filter(fs.existsSync)
     .map(modulePath => {
-      return Location.create(`file://${modulePath}`, Range.create(0, 0, 0, 0));
+      return Location.create(URI.file(modulePath).toString(), Range.create(0, 0, 0, 0));
     });
 }
