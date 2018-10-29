@@ -9,6 +9,7 @@ import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
 import { getExtension } from './utils/file-extension';
+import URI from 'vscode-uri';
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -111,6 +112,6 @@ function pathsToLocations(...paths: string[]): Location[] {
   return paths
     .filter(fs.existsSync)
     .map(modulePath => {
-      return Location.create(`file://${modulePath}`, Range.create(0, 0, 0, 0));
+      return Location.create(URI.file(modulePath).toString(), Range.create(0, 0, 0, 0));
     });
 }
