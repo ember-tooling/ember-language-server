@@ -22,7 +22,14 @@ import {
 import uniqueBy from '../utils/unique-by';
 import { getExtension } from '../utils/file-extension';
 
-const walkSync = require('walk-sync');
+import walkSync = require('walk-sync');
+
+const safeWalkSync = (path: string, options?: walkSync.WalkSyncOptions | undefined) => {
+  if (existsSync(path)) {
+    return walkSync(path, options);
+  }
+  return [];
+};
 
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
@@ -71,36 +78,27 @@ export default class TemplateCompletionProvider {
 }
 
 function listComponents(root: string, podRoot: string): CompletionItem[] {
-  const traditionalJsDirectory = join(root, 'app', 'components');
-  const traditionalHbsDirectory = join(root, 'app', 'templates', 'components');
 
-  let jsPaths = [], hbsPaths = [], podsHbsPaths = [], podsJsPaths = [];
-
-  if (existsSync(traditionalJsDirectory)) {
-    jsPaths = walkSync(traditionalJsDirectory, {
-      directories: false,
-      globs: ['**/*.js']
-    });
-  }
-  if (existsSync(traditionalHbsDirectory)) {
-    hbsPaths = walkSync(traditionalHbsDirectory, {
-      directories: false,
-      globs: ['**/*.hbs']
-    });
-  }
+  const jsPaths = safeWalkSync(join(root, 'app', 'components'), {
+    directories: false,
+    globs: ['**/*.js']
+  });
+  const hbsPaths = safeWalkSync(join(root, 'app', 'templates', 'components'), {
+    directories: false,
+    globs: ['**/*.hbs']
+  });
 
   const podComponentsDirectory = join(root, 'app', podRoot, 'components');
 
-  if (existsSync(podComponentsDirectory)) {
-    podsHbsPaths = walkSync(podComponentsDirectory, {
-      directories: false,
-      globs: ['**/template.hbs']
-    }).map((path: string) => path.replace('/template.hbs', ''));
-    podsJsPaths = walkSync(podComponentsDirectory, {
-      directories: false,
-      globs: ['**/component.js']
-    }).map((path: string) => path.replace('/component.js', ''));
-  }
+  const podsHbsPaths = safeWalkSync(podComponentsDirectory, {
+    directories: false,
+    globs: ['**/template.hbs']
+  }).map(path => path.replace('/template.hbs', ''));
+
+  const podsJsPaths = safeWalkSync(podComponentsDirectory, {
+    directories: false,
+    globs: ['**/component.js']
+  }).map(path => path.replace('/component.js', ''));
 
   const paths = [...jsPaths, ...hbsPaths, ...podsHbsPaths, ...podsJsPaths];
 
@@ -117,7 +115,7 @@ function listComponents(root: string, podRoot: string): CompletionItem[] {
 }
 
 function listHelpers(root: string): CompletionItem[] {
-  const paths = walkSync(join(root, 'app', 'helpers'), {
+  const paths = safeWalkSync(join(root, 'app', 'helpers'), {
     directories: false,
     globs: ['**/*.js']
   });
@@ -135,20 +133,15 @@ function listHelpers(root: string): CompletionItem[] {
 }
 
 function listRoutes(root: string, podRoot: string): CompletionItem[] {
-  const paths = walkSync(join(root, 'app', 'routes'), {
+  const paths = safeWalkSync(join(root, 'app', 'routes'), {
     directories: false,
     globs: ['**/*.js']
   });
 
-  let podPaths = [];
-
-  const podDirectory = join(root, 'app', podRoot);
-  if (existsSync(podDirectory)) {
-    podPaths = walkSync(podDirectory, {
-      directories: false,
-      globs: ['**/route.js']
-    }).map((path: string) => path.replace('/route.js', ''));
-  }
+  const podPaths = safeWalkSync(join(root, 'app', podRoot), {
+    directories: false,
+    globs: ['**/route.js']
+  }).map((path: string) => path.replace('/route.js', ''));
 
   const items = [...paths, ...podPaths]
     .map((filePath: string) => {
