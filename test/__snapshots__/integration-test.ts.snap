@@ -308,6 +308,211 @@ Object {
 }
 `;
 
+exports[`integration Pods App Structure Completion request returns all components and helpers when requesting completion items in a handlebars expression 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "test-component/nested-component",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "test-component",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "action",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember 1.13.0",
+    "kind": 3,
+    "label": "concat",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.13.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "debugger",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "get",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "input",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "link-to",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "loc",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "log",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "mount",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "outlet",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "partial",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "render",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "textarea",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unbound",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+]
+`;
+
+exports[`integration Pods App Structure Completion request returns all routes when requesting completion items in a block link-to 1`] = `
+Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "bar",
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "foo.foo-nest",
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "foo",
+  },
+]
+`;
+
+exports[`integration Pods App Structure Completion request returns all routes when requesting completion items in an inline link-to 1`] = `
+Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "bar",
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "foo.foo-nest",
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "foo",
+  },
+]
+`;
+
 exports[`integration Pods App Structure Definition request returns the definition information for a belongsTo relationship 1`] = `
 Array [
   Object {

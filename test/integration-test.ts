@@ -213,6 +213,32 @@ describe('integration', function() {
       });
     });
 
+    describe('Completion request', () => {
+      it('returns all components and helpers when requesting completion items in a handlebars expression', async () => {
+        const templatePath = path.join(...podRoot, 'foo', 'template.hbs');
+
+        let response = await getCompletion(templatePath, 1, 2);
+
+        expect(response).toMatchSnapshot();
+      });
+
+      it('returns all routes when requesting completion items in an inline link-to', async () => {
+        const templatePath = path.join(...podRoot, 'components', 'test-component', 'template.hbs');
+
+        let response = await getCompletion(templatePath, 2, 23);
+
+        expect(response).toMatchSnapshot();
+      });
+
+      it('returns all routes when requesting completion items in a block link-to', async () => {
+        const templatePath = path.join(...podRoot, 'components', 'test-component', 'template.hbs');
+
+        let response = await getCompletion(templatePath, 3, 13);
+
+        expect(response).toMatchSnapshot();
+      });
+    });
+
     describe('Definition request', () => {
       it('returns the definition information for a component in a template', async () => {
         const definitionTemplatePath = path.join(...podRoot, 'components', 'test-component', 'template.hbs');
