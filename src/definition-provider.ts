@@ -60,8 +60,9 @@ export default class DefinitionProvider {
         let modelName = astPath.node.value;
 
         const modelPath = path.join(project.root, 'app', 'models', `${modelName}.js`);
+        const podModelPath = path.join(project.root, 'app', project.podRoot, modelName, 'model.js');
 
-        return pathsToLocations(modelPath);
+        return pathsToLocations(modelPath, podModelPath);
       } else if (isTransformReference(astPath)) {
         let transformName = astPath.node.value;
 
