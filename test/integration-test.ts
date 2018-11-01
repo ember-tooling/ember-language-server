@@ -111,84 +111,140 @@ describe('integration', function() {
     serverProcess.kill();
   });
 
-  describe('Initialize request', () => {
-    it('returns an initialize request', async () => {
-      const params = {
-        rootUri: `file://${path.join(__dirname, 'fixtures', 'full-project')}`,
-        capabilities: {}
-      };
+  describe('Classic App Structure', () => {
+    // This test actually needs to be run first,
+    // otherwise the project won't have been initialized and the following tests will fail.
+    describe('Initialize request', () => {
+      it('returns an initialize request', async () => {
+        const params = {
+          rootUri: `file://${path.join(__dirname, 'fixtures', 'full-project')}`,
+          capabilities: {}
+        };
 
-      const response = await connection.sendRequest(InitializeRequest.type, params);
+        const response = await connection.sendRequest(InitializeRequest.type, params);
 
-      expect(response).toMatchSnapshot();
+        expect(response).toMatchSnapshot();
+      });
+    });
+
+    describe('Completion request', () => {
+      it('returns all components and helpers when requesting completion items in a handlebars expression', async () => {
+        const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'application.hbs');
+
+        let response = await getCompletion(applicationTemplatePath, 1, 2);
+
+        expect(response).toMatchSnapshot();
+      });
+
+      it('returns all routes when requesting completion items in an inline link-to', async () => {
+        const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+
+        let response = await getCompletion(templatePath, 2, 23);
+
+        expect(response).toMatchSnapshot();
+      });
+
+      it('returns all routes when requesting completion items in a block link-to', async () => {
+        const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+
+        let response = await getCompletion(templatePath, 3, 12);
+
+        expect(response).toMatchSnapshot();
+      });
+    });
+
+    describe('Definition request', () => {
+      it('returns the definition information for a component in a template', async () => {
+        const definitionTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+
+        let response = await getDefinition(definitionTemplatePath, 0, 4);
+
+        expect(response).toMatchSnapshot();
+      });
+
+      it('returns the definition information for a helper in a template', async () => {
+        const definitionTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+
+        let response = await getDefinition(definitionTemplatePath, 1, 4);
+
+        expect(response).toMatchSnapshot();
+      });
+
+      it('returns the definition information for a hasMany relationship', async () => {
+        const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-a.js');
+
+        let response = await getDefinition(modelPath, 4, 27);
+
+        expect(response).toMatchSnapshot();
+      });
+
+      it('returns the definition information for a belongsTo relationship', async () => {
+        const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-b.js');
+
+        let response = await getDefinition(modelPath, 4, 27);
+
+        expect(response).toMatchSnapshot();
+      });
+
+      it('returns the definition information for a transform', async () => {
+        const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-a.js');
+
+        let response = await getDefinition(modelPath, 6, 27);
+
+        expect(response).toMatchSnapshot();
+      });
     });
   });
 
-  describe('Completion request', () => {
-    it('returns all components and helpers when requesting completion items in a handlebars expression', async () => {
-      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'application.hbs');
+  describe('Pods App Structure', () => {
+    let projectRoot = [__dirname, 'fixtures', 'pod-project'];
+    let podRoot = [...projectRoot, 'app', 'pod-dir'];
 
-      let response = await getCompletion(applicationTemplatePath, 1, 2);
+    describe('Pods Initialize request', () => {
+      it('returns an initialize request', async () => {
+        const params = {
+          rootUri: `file://${path.join(...projectRoot)}`,
+          capabilities: {}
+        };
 
-      expect(response).toMatchSnapshot();
+        const response = await connection.sendRequest(InitializeRequest.type, params);
+
+        expect(response).toMatchSnapshot();
+      });
     });
 
-    it('returns all routes when requesting completion items in an inline link-to', async () => {
-      const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+    describe('Definition request', () => {
+      it('returns the definition information for a component in a template', async () => {
+        const definitionTemplatePath = path.join(...podRoot, 'components', 'test-component', 'template.hbs');
 
-      let response = await getCompletion(templatePath, 2, 23);
+        let response = await getDefinition(definitionTemplatePath, 0, 4);
 
-      expect(response).toMatchSnapshot();
-    });
+        expect(response).toMatchSnapshot();
+      });
 
-    it('returns all routes when requesting completion items in a block link-to', async () => {
-      const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      it('returns the definition information for a nested component in a template', async () => {
+        const definitionTemplatePath = path.join(...podRoot, 'components', 'test-component', 'template.hbs');
 
-      let response = await getCompletion(templatePath, 3, 12);
+        let response = await getDefinition(definitionTemplatePath, 1, 4);
 
-      expect(response).toMatchSnapshot();
-    });
-  });
+        expect(response).toMatchSnapshot();
+      });
 
-  describe('Definition request', () => {
-    it('returns the definition information for a component in a template', async () => {
-      const definitionTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      it('returns the definition information for a hasMany relationship', async () => {
+        const modelPath = path.join(...podRoot, 'foo', 'model.js');
 
-      let response = await getDefinition(definitionTemplatePath, 0, 4);
+        let response = await getDefinition(modelPath, 4, 22);
 
-      expect(response).toMatchSnapshot();
-    });
+        expect(response).toMatchSnapshot();
+      });
 
-    it('returns the definition information for a helper in a template', async () => {
-      const definitionTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      it('returns the definition information for a belongsTo relationship', async () => {
+        const modelPath = path.join(...podRoot, 'bar', 'model.js');
 
-      let response = await getDefinition(definitionTemplatePath, 1, 4);
+        let response = await getDefinition(modelPath, 4, 24);
 
-      expect(response).toMatchSnapshot();
-    });
-
-    it('returns the definition information for a hasMany relationship', async () => {
-      const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-a.js');
-
-      let response = await getDefinition(modelPath, 4, 27);
-
-      expect(response).toMatchSnapshot();
-    });
-
-    it('returns the definition information for a belongsTo relationship', async () => {
-      const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-b.js');
-
-      let response = await getDefinition(modelPath, 4, 27);
-
-      expect(response).toMatchSnapshot();
-    });
-
-    it('returns the definition information for a transform', async () => {
-      const modelPath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'models', 'model-a.js');
-
-      let response = await getDefinition(modelPath, 6, 27);
-
-      expect(response).toMatchSnapshot();
+        expect(response).toMatchSnapshot();
+      });
     });
   });
 });

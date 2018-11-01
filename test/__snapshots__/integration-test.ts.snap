@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`integration Completion request returns all components and helpers when requesting completion items in a handlebars expression 1`] = `
+exports[`integration Classic App Structure Completion request returns all components and helpers when requesting completion items in a handlebars expression 1`] = `
 Array [
   Object {
     "detail": "component",
@@ -175,7 +175,7 @@ Array [
 ]
 `;
 
-exports[`integration Completion request returns all routes when requesting completion items in a block link-to 1`] = `
+exports[`integration Classic App Structure Completion request returns all routes when requesting completion items in a block link-to 1`] = `
 Array [
   Object {
     "detail": "route",
@@ -190,7 +190,7 @@ Array [
 ]
 `;
 
-exports[`integration Completion request returns all routes when requesting completion items in an inline link-to 1`] = `
+exports[`integration Classic App Structure Completion request returns all routes when requesting completion items in an inline link-to 1`] = `
 Array [
   Object {
     "detail": "route",
@@ -205,7 +205,7 @@ Array [
 ]
 `;
 
-exports[`integration Definition request returns the definition information for a belongsTo relationship 1`] = `
+exports[`integration Classic App Structure Definition request returns the definition information for a belongsTo relationship 1`] = `
 Array [
   Object {
     "range": Object {
@@ -223,7 +223,7 @@ Array [
 ]
 `;
 
-exports[`integration Definition request returns the definition information for a component in a template 1`] = `
+exports[`integration Classic App Structure Definition request returns the definition information for a component in a template 1`] = `
 Array [
   Object {
     "range": Object {
@@ -241,7 +241,7 @@ Array [
 ]
 `;
 
-exports[`integration Definition request returns the definition information for a hasMany relationship 1`] = `
+exports[`integration Classic App Structure Definition request returns the definition information for a hasMany relationship 1`] = `
 Array [
   Object {
     "range": Object {
@@ -259,7 +259,7 @@ Array [
 ]
 `;
 
-exports[`integration Definition request returns the definition information for a helper in a template 1`] = `
+exports[`integration Classic App Structure Definition request returns the definition information for a helper in a template 1`] = `
 Array [
   Object {
     "range": Object {
@@ -277,7 +277,7 @@ Array [
 ]
 `;
 
-exports[`integration Definition request returns the definition information for a transform 1`] = `
+exports[`integration Classic App Structure Definition request returns the definition information for a transform 1`] = `
 Array [
   Object {
     "range": Object {
@@ -295,7 +295,118 @@ Array [
 ]
 `;
 
-exports[`integration Initialize request returns an initialize request 1`] = `
+exports[`integration Classic App Structure Initialize request returns an initialize request 1`] = `
+Object {
+  "capabilities": Object {
+    "completionProvider": Object {
+      "resolveProvider": true,
+    },
+    "definitionProvider": true,
+    "documentSymbolProvider": true,
+    "textDocumentSync": 1,
+  },
+}
+`;
+
+exports[`integration Pods App Structure Definition request returns the definition information for a belongsTo relationship 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/pod-project/app/pod-dir/foo/model.js",
+  },
+]
+`;
+
+exports[`integration Pods App Structure Definition request returns the definition information for a component in a template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/pod-project/app/pod-dir/components/test-component/component.js",
+  },
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/pod-project/app/pod-dir/components/test-component/template.hbs",
+  },
+]
+`;
+
+exports[`integration Pods App Structure Definition request returns the definition information for a hasMany relationship 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/pod-project/app/pod-dir/bar/model.js",
+  },
+]
+`;
+
+exports[`integration Pods App Structure Definition request returns the definition information for a nested component in a template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/pod-project/app/pod-dir/components/test-component/nested-component/component.js",
+  },
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/pod-project/app/pod-dir/components/test-component/nested-component/template.hbs",
+  },
+]
+`;
+
+exports[`integration Pods App Structure Pods Initialize request returns an initialize request 1`] = `
 Object {
   "capabilities": Object {
     "completionProvider": Object {
