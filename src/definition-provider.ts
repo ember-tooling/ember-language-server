@@ -54,9 +54,9 @@ export default class DefinitionProvider {
       }
     } else if (extension === '.js' || extension === '.ts') {
       let content = this.server.documents.get(uri).getText();
-      let plugins = extension === '.ts' ? ['@babel/plugin-syntax-typescript'] : [];
+      let plugins = extension === '.ts' ? ['typescript'] : [];
       let ast = parse(content, {
-		sourceType: 'module',
+        sourceType: 'module',
         plugins
       });
       let astPath = ASTPath.toPosition(ast, toPosition(params.position));
