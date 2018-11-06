@@ -10,8 +10,8 @@ export default class TSDocumentSymbolProvider implements DocumentSymbolProvider 
 
   process(content: string): SymbolInformation[] {
     const ast = parse(content, {
-	    sourceType: 'module',
-	    plugins: ['typescript']
+      sourceType: 'module',
+      plugins: ['typescript']
     });
 
     let symbols: SymbolInformation[] = [];
