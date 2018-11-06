@@ -10,8 +10,8 @@ export default class TSDocumentSymbolProvider implements DocumentSymbolProvider 
 
   process(content: string): SymbolInformation[] {
     const ast = parse(content, {
-	  sourceType: 'module',
-	  plugins: ['@babel/plugin-syntax-typescript']
+	    sourceType: 'module',
+	    plugins: ['typescript']
     });
 
     let symbols: SymbolInformation[] = [];
