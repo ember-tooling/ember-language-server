@@ -6,8 +6,6 @@ import {
   TextDocumentPositionParams
 } from 'vscode-languageserver';
 
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
-
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
@@ -21,6 +19,7 @@ import {
   emberSubExpressionItems
 } from './ember-helpers';
 import uniqueBy from '../utils/unique-by';
+import { getExtension } from '../utils/file-extension';
 
 const walkSync = require('walk-sync');
 
@@ -29,13 +28,12 @@ export default class TemplateCompletionProvider {
 
   provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
     const uri = params.textDocument.uri;
-    const filePath = uriToFilePath(uri);
 
-    if (!filePath || extname(filePath) !== '.hbs') {
+    if (getExtension(params.textDocument) !== '.hbs') {
       return [];
     }
 
-    const project = this.server.projectRoots.projectForPath(filePath);
+    const project = this.server.projectRoots.projectForUri(uri);
     if (!project) {
       return [];
     }

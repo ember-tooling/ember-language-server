@@ -1,6 +1,7 @@
 'use strict';
 
 import { dirname, join } from 'path';
+import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 const walkSync = require('walk-sync');
 
@@ -41,9 +42,14 @@ export default class ProjectRoots {
     this.projects.set(path, new Project(path));
   }
 
-  projectForPath(path: string): Project | undefined {
+  projectForUri(uri: string): Project | undefined {
+    let path = uriToFilePath(uri);
+
+    if (!path)
+      return;
+
     let root = (Array.from(this.projects.keys()) || [])
-      .filter(root => path.indexOf(root) === 0)
+      .filter(root => path!.indexOf(root) === 0)
       .reduce((a, b) => a.length > b.length ? a : b, '');
 
     return this.projects.get(root);
