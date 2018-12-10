@@ -5,6 +5,9 @@
 #### :bug: Bug Fix
 * [#129](https://github.com/emberwatch/ember-language-server/pull/129) Fix "Go to Definition" for windows ([@HodofHod](https://github.com/HodofHod))
 
+#### :memo: Documentation
+* [#140](https://github.com/emberwatch/ember-language-server/pull/140) Add Changelog ([@Turbo87](https://github.com/Turbo87))
+
 #### :house: Internal
 * [#126](https://github.com/emberwatch/ember-language-server/pull/126) Update `fsevents` subdependency to v1.2.4 ([@Turbo87](https://github.com/Turbo87))
 * [#125](https://github.com/emberwatch/ember-language-server/pull/125) yarn: Add `integrity` hashes ([@Turbo87](https://github.com/Turbo87))
