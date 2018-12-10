@@ -7,6 +7,10 @@
     "Thomas Sauer <t-sauer@outlook.de>"
   ],
   "license": "MIT",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/emberwatch/ember-language-server.git"
+  },
   "engines": {
     "node": "*"
   },
