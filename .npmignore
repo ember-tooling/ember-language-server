@@ -1,5 +1,11 @@
-/tests
 /.vscode
 /src
+/test
+/.editorconfig
+/.travis.yml
+/appveyor.yml
+/jest.config.js
 /tsconfig.json
-/tsling.json
+/tslint.json
+/yarn.lock
+/*.tgz
