@@ -11,7 +11,8 @@ import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection,
   TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
-  SymbolInformation, TextDocumentPositionParams, CompletionItem
+  SymbolInformation, TextDocumentPositionParams, CompletionItem,
+  StreamMessageReader, StreamMessageWriter
 } from 'vscode-languageserver';
 
 import ProjectRoots from './project-roots';
@@ -26,8 +27,9 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 export default class Server {
 
-  // Create a connection for the server. The connection uses Node's IPC as a transport
-  connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+  // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
+  // also supports stdio via command line flag
+  connection: IConnection = (process.argv.includes('--stdio')) ? createConnection(new StreamMessageReader(process.stdin), new StreamMessageWriter(process.stdout)) : createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 
   // Create a simple text document manager. The text document manager
   // supports full document sync only
