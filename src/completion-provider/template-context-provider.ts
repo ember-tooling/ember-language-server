@@ -5,6 +5,7 @@ import {
     CompletionItem,
     CompletionItemKind
 } from 'vscode-languageserver';
+
 import { processJSFile } from 'ember-component-info/utils/js-utils';
 import { processTemplate } from 'ember-component-info/utils/hbs-utils';
 import { extractComponentInformationFromMeta }  from 'ember-component-info/utils/informator';
@@ -49,31 +50,40 @@ function componentsContextData(root: string, postfix: string, templateContent: s
     });
 
     const infoItems = [].concat.apply([], jsPaths.map((filePath: string) => {
-      const fileContent = readFileSync(filePath, { encoding: 'utf8' });
+      const fileContent = readFileSync(join(root, 'app', 'components', filePath), { encoding: 'utf8' });
       const jsMeta = processJSFile(fileContent, filePath);
       return jsMeta;
     }));
 
     infoItems.push(processTemplate(templateContent));
-
     const meta: any = infoItems.reduce((result: any, it: any) => {
-      Object.keys(it.meta).forEach(name => {
+      Object.keys(it).forEach(name => {
         if (name in result) {
-          result[name] = result[name].concat(it.meta[name]);
+          result[name] = result[name].concat(it[name]);
         } else {
-          result[name] = it.meta[name];
+          result[name] = it[name].slice(0);
         }
       });
       return result;
     }, {});
-
     const items: any = [];
     const contextInfo: IComponentMetaInformation = extractComponentInformationFromMeta(meta);
+
+    function localizeName(name: string) {
+      if (name.startsWith('this.')) {
+        return name;
+      } else if (name.startsWith('@')) {
+        return name;
+      } else {
+        return 'this.' + name;
+      }
+    }
+
     contextInfo.jsProps.forEach((propName: string) => {
       const [name]: any = propName.split(' ');
       items.push({
         kind: CompletionItemKind.Property,
-        label: 'this.' + name,
+        label: localizeName(name),
         detail: propName,
       });
     });
@@ -81,7 +91,7 @@ function componentsContextData(root: string, postfix: string, templateContent: s
       const [name]: any = propName.split(' ');
       items.push({
         kind: CompletionItemKind.Property,
-        label: 'this.' + name,
+        label: localizeName(name),
         detail: 'ComputedProperty: ' + propName,
       });
     });
@@ -89,7 +99,7 @@ function componentsContextData(root: string, postfix: string, templateContent: s
       const [name]: any = propName.split(' ');
       items.push({
         kind: CompletionItemKind.Function,
-        label: 'this.' + name,
+        label: localizeName(name),
         detail: 'Function: ' + propName,
       });
     });
