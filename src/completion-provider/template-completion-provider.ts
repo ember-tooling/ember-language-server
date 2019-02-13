@@ -53,16 +53,16 @@ export default class TemplateCompletionProvider {
     let completions: CompletionItem[] = [];
 
     if (isMustachePath(focusPath)) {
-      completions.push(...templateContextLookup(root, uri));
+      completions.push(...templateContextLookup(root, uri, originalText));
       completions.push(...listComponents(root));
       completions.push(...listHelpers(root));
       completions.push(...emberMustacheItems);
     } else if (isBlockPath(focusPath)) {
-      completions.push(...templateContextLookup(root, uri));
+      completions.push(...templateContextLookup(root, uri, originalText));
       completions.push(...listComponents(root));
       completions.push(...emberBlockItems);
     } else if (isSubExpressionPath(focusPath)) {
-      completions.push(...templateContextLookup(root, uri));
+      completions.push(...templateContextLookup(root, uri, originalText));
       completions.push(...listHelpers(root));
       completions.push(...emberSubExpressionItems);
     } else if (isLinkToTarget(focusPath)) {
