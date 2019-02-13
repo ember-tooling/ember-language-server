@@ -18,6 +18,7 @@ import {
   emberMustacheItems,
   emberSubExpressionItems
 } from './ember-helpers';
+import { templateContextLookup } from './template-context-provider';
 import uniqueBy from '../utils/unique-by';
 import { getExtension } from '../utils/file-extension';
 
@@ -52,13 +53,16 @@ export default class TemplateCompletionProvider {
     let completions: CompletionItem[] = [];
 
     if (isMustachePath(focusPath)) {
+      completions.push(...templateContextLookup(root, uri));
       completions.push(...listComponents(root));
       completions.push(...listHelpers(root));
       completions.push(...emberMustacheItems);
     } else if (isBlockPath(focusPath)) {
+      completions.push(...templateContextLookup(root, uri));
       completions.push(...listComponents(root));
       completions.push(...emberBlockItems);
     } else if (isSubExpressionPath(focusPath)) {
+      completions.push(...templateContextLookup(root, uri));
       completions.push(...listHelpers(root));
       completions.push(...emberSubExpressionItems);
     } else if (isLinkToTarget(focusPath)) {
