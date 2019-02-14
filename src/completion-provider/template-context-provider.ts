@@ -43,7 +43,7 @@ function componentsContextData(root: string, postfix: string, templateContent: s
       return result;
     }, {});
     const items: any = [];
-    const contextInfo: any = extractComponentInformationFromMeta(meta);
+    const contextInfo = extractComponentInformationFromMeta(meta);
 
     function localizeName(name: string) {
       if (name.startsWith('this.')) {
