@@ -20,10 +20,11 @@
     "@glimmer/syntax": "^0.38.1",
     "ast-types": "^0.11.3",
     "babylon": "^6.18.0",
-    "ember-meta-explorer": "^0.0.4",
+    "ember-meta-explorer": "^0.0.5",
     "fs-extra": "^5.0.0",
     "fuzzaldrin": "^2.1.0",
     "i": "^0.3.5",
+    "util": "^0.11.1",
     "vscode-languageserver": "^4.1.2",
     "vscode-uri": "^1.0.6",
     "walk-sync": "^1.0.1"
