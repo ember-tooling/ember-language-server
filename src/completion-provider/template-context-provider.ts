@@ -6,31 +6,7 @@ import {
     CompletionItemKind
 } from 'vscode-languageserver';
 
-import { processJSFile } from 'ember-component-info/utils/js-utils';
-import { processTemplate } from 'ember-component-info/utils/hbs-utils';
-import { extractComponentInformationFromMeta }  from 'ember-component-info/utils/informator';
-
-interface IComponentMetaInformationAPI {
-  actions: string[];
-  tagName: string;
-  attributeBindings: string[];
-  mergedProperties: string[];
-  classNameBindings: string[];
-  concatenatedProperties: string[];
-  positionalParams: string[];
-  classNames: string[];
-}
-interface IComponentMetaInformation {
-  name: string;
-  jsProps: string[];
-  jsComputeds: string[];
-  jsFunc: string[];
-  jsImports: string[];
-  hbsComponents: string[];
-  hbsProps: string[];
-  hbsHelpers: string[];
-  api: IComponentMetaInformationAPI;
-}
+import { extractComponentInformationFromMeta, processJSFile, processTemplate }  from 'ember-meta-explorer';
 
 const walkSync = require('walk-sync');
 
@@ -67,7 +43,7 @@ function componentsContextData(root: string, postfix: string, templateContent: s
       return result;
     }, {});
     const items: any = [];
-    const contextInfo: IComponentMetaInformation = extractComponentInformationFromMeta(meta);
+    const contextInfo: any = extractComponentInformationFromMeta(meta);
 
     function localizeName(name: string) {
       if (name.startsWith('this.')) {
