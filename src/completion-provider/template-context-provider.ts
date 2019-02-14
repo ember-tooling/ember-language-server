@@ -6,11 +6,26 @@ import {
     CompletionItemKind
 } from 'vscode-languageserver';
 
+const debug = false;
+const fs = require('fs');
+const util = require('util');
+const log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'w'});
+
+console.log = debug ? function(...args: any[]) {
+  const output = args.map((a: any) => {
+    return JSON.stringify(a);
+  }).join(' ');
+  log_file.write('----------------------------------------' + '\r\n');
+  log_file.write(util.format(output) + '\r\n');
+  log_file.write('----------------------------------------' + '\r\n');
+} : function() {};
+
 import { extractComponentInformationFromMeta, processJSFile, processTemplate }  from 'ember-meta-explorer';
 
 const walkSync = require('walk-sync');
 
 export function templateContextLookup(root: string, currentFilePath: string, templateContent: string) {
+    console.log('templateContextLookup', root, currentFilePath, templateContent);
     const nameParts = currentFilePath.split('/components/');
     if (nameParts.length !== 2) {
         return [];
@@ -20,6 +35,7 @@ export function templateContextLookup(root: string, currentFilePath: string, tem
 }
 
 function componentsContextData(root: string, postfix: string, templateContent: string): CompletionItem[] {
+    console.log('templateContextLookup', root, postfix, templateContent);
   const jsPaths = walkSync(join(root, 'app', 'components'), {
     directories: false,
     globs: [
@@ -29,15 +45,33 @@ function componentsContextData(root: string, postfix: string, templateContent: s
       `**/**/${postfix}/component.ts`
     ]
   });
-
+  console.log('jsPaths', jsPaths);
   const infoItems = [].concat.apply([], jsPaths.map((filePath: string) => {
-    const fileContent = readFileSync(join(root, 'app', 'components', filePath), { encoding: 'utf8' });
-    const jsMeta = processJSFile(fileContent, filePath);
-    return jsMeta;
+    const fileLocation = join(root, 'app', 'components', filePath);
+    console.log('fileLocation', fileLocation);
+    const fileContent = readFileSync(fileLocation, { encoding: 'utf8' });
+    console.log('fileContent', fileContent);
+    try {
+        const jsMeta = processJSFile(fileContent, filePath);
+        console.log('jsMeta', jsMeta);
+        return jsMeta;
+    } catch (e) {
+        console.log('error', e);
+        return null;
+    }
   }));
 
-  infoItems.push(processTemplate(templateContent));
-  const meta: any = infoItems.reduce((result: any, it: any) => {
+  let templateInfo: any = null;
+  try {
+    templateInfo = processTemplate(templateContent);
+  } catch (e) {
+    console.log('templateError', e);
+  }
+  infoItems.push(templateInfo);
+  console.log('infoItems', infoItems);
+
+  const meta: any = infoItems.filter((item: any) => item !== null).reduce((result: any, it: any) => {
+    console.log('it', it);
     Object.keys(it).forEach(name => {
       if (name in result) {
         result[name] = result[name].concat(it[name]);
@@ -48,8 +82,14 @@ function componentsContextData(root: string, postfix: string, templateContent: s
     return result;
   }, {});
   const items: any = [];
-  const contextInfo = extractComponentInformationFromMeta(meta);
-
+  console.log('meta', meta);
+  let contextInfo: any = {};
+  try {
+   contextInfo = extractComponentInformationFromMeta(meta);
+  } catch (e) {
+    console.log('contextInforError', e);
+  }
+  console.log('contextInfo', contextInfo);
   function localizeName(name: string) {
     if (name.startsWith('this.')) {
       return name;
