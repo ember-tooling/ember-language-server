@@ -20,73 +20,81 @@ export function templateContextLookup(root: string, currentFilePath: string, tem
 }
 
 function componentsContextData(root: string, postfix: string, templateContent: string): CompletionItem[] {
-    const jsPaths = walkSync(join(root, 'app', 'components'), {
-      directories: false,
-      globs: [`**/${postfix}.js`, `**/**/${postfix}/component.js`]
-    });
+  const jsPaths = walkSync(join(root, 'app', 'components'), {
+    directories: false,
+    globs: [`**/${postfix}.js`, `**/**/${postfix}/component.js`]
+  });
 
-    const infoItems = [].concat.apply([], jsPaths.map((filePath: string) => {
-      const fileContent = readFileSync(join(root, 'app', 'components', filePath), { encoding: 'utf8' });
-      const jsMeta = processJSFile(fileContent, filePath);
-      return jsMeta;
-    }));
+  const infoItems = [].concat.apply([], jsPaths.map((filePath: string) => {
+    const fileContent = readFileSync(join(root, 'app', 'components', filePath), { encoding: 'utf8' });
+    const jsMeta = processJSFile(fileContent, filePath);
+    return jsMeta;
+  }));
 
-    infoItems.push(processTemplate(templateContent));
-    const meta: any = infoItems.reduce((result: any, it: any) => {
-      Object.keys(it).forEach(name => {
-        if (name in result) {
-          result[name] = result[name].concat(it[name]);
-        } else {
-          result[name] = it[name].slice(0);
-        }
-      });
-      return result;
-    }, {});
-    const items: any = [];
-    const contextInfo = extractComponentInformationFromMeta(meta);
-
-    function localizeName(name: string) {
-      if (name.startsWith('this.')) {
-        return name;
-      } else if (name.startsWith('@')) {
-        return name;
+  infoItems.push(processTemplate(templateContent));
+  const meta: any = infoItems.reduce((result: any, it: any) => {
+    Object.keys(it).forEach(name => {
+      if (name in result) {
+        result[name] = result[name].concat(it[name]);
       } else {
-        return 'this.' + name;
+        result[name] = it[name].slice(0);
       }
-    }
+    });
+    return result;
+  }, {});
+  const items: any = [];
+  const contextInfo = extractComponentInformationFromMeta(meta);
 
-    contextInfo.jsProps.forEach((propName: string) => {
-      const [name]: any = propName.split(' ');
-      items.push({
-        kind: CompletionItemKind.Property,
-        label: localizeName(name),
-        detail: propName,
-      });
-    });
-    contextInfo.jsComputeds.forEach((propName: string) => {
-      const [name]: any = propName.split(' ');
-      items.push({
-        kind: CompletionItemKind.Property,
-        label: localizeName(name),
-        detail: 'ComputedProperty: ' + propName,
-      });
-    });
-    contextInfo.jsFunc.forEach((propName: string) => {
-      const [name]: any = propName.split(' ');
-      items.push({
-        kind: CompletionItemKind.Function,
-        label: localizeName(name),
-        detail: 'Function: ' + propName,
-      });
-    });
-    contextInfo.hbsProps.forEach((propName: string) => {
-      const [name]: any = propName.split(' ');
-      items.push({
-        kind: CompletionItemKind.Function,
-        label: name,
-        detail: 'Template Property: ' + propName,
-      });
-    });
-    // @todo actions
-    return uniqueBy(items, 'label');
+  function localizeName(name: string) {
+    if (name.startsWith('this.')) {
+      return name;
+    } else if (name.startsWith('@')) {
+      return name;
+    } else {
+      return 'this.' + name;
+    }
   }
+
+  contextInfo.jsProps.forEach((propName: string) => {
+    const [name]: any = propName.split(' ');
+    items.push({
+      kind: CompletionItemKind.Property,
+      label: localizeName(name),
+      detail: propName,
+    });
+  });
+  contextInfo.jsComputeds.forEach((propName: string) => {
+    const [name]: any = propName.split(' ');
+    items.push({
+      kind: CompletionItemKind.Property,
+      label: localizeName(name),
+      detail: 'ComputedProperty: ' + propName,
+    });
+  });
+  contextInfo.jsFunc.forEach((propName: string) => {
+    const [name]: any = propName.split(' ');
+    items.push({
+      kind: CompletionItemKind.Function,
+      label: localizeName(name),
+      detail: 'Function: ' + propName,
+    });
+  });
+  contextInfo.hbsProps.forEach((propName: string) => {
+    const [name]: any = propName.split(' ');
+    items.push({
+      kind: CompletionItemKind.Function,
+      label: name,
+      detail: 'Template Property: ' + propName,
+    });
+  });
+  // contextInfo.api.actions.forEach((propName: string) => {
+  //   const [name]: any = propName.split(' ');
+  //   items.push({
+  //     kind: CompletionItemKind.Event,
+  //     label: name,
+  //     detail: 'Component Action: ' + propName,
+  //   });
+  // });
+  // @todo actions
+  return uniqueBy(items, 'label');
+}
