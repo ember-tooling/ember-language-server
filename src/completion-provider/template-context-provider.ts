@@ -22,7 +22,12 @@ export function templateContextLookup(root: string, currentFilePath: string, tem
 function componentsContextData(root: string, postfix: string, templateContent: string): CompletionItem[] {
   const jsPaths = walkSync(join(root, 'app', 'components'), {
     directories: false,
-    globs: [`**/${postfix}.js`, `**/**/${postfix}/component.js`]
+    globs: [
+      `**/${postfix}.js`,
+      `**/**/${postfix}/component.js`,
+      `**/${postfix}.ts`,
+      `**/**/${postfix}/component.ts`
+    ]
   });
 
   const infoItems = [].concat.apply([], jsPaths.map((filePath: string) => {
