@@ -6,19 +6,19 @@ import {
     CompletionItemKind
 } from 'vscode-languageserver';
 
-const debug = false;
-const fs = require('fs');
-const util = require('util');
-const log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'w'});
+// const debug = false;
+// const fs = require('fs');
+// const util = require('util');
+// const log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'w'});
 
-console.log = debug ? function(...args: any[]) {
-  const output = args.map((a: any) => {
-    return JSON.stringify(a);
-  }).join(' ');
-  log_file.write('----------------------------------------' + '\r\n');
-  log_file.write(util.format(output) + '\r\n');
-  log_file.write('----------------------------------------' + '\r\n');
-} : function() {};
+// console.log = debug ? function(...args: any[]) {
+//   const output = args.map((a: any) => {
+//     return JSON.stringify(a);
+//   }).join(' ');
+//   log_file.write('----------------------------------------' + '\r\n');
+//   log_file.write(util.format(output) + '\r\n');
+//   log_file.write('----------------------------------------' + '\r\n');
+// } : function() {};
 
 import { extractComponentInformationFromMeta, processJSFile, processTemplate }  from 'ember-meta-explorer';
 
