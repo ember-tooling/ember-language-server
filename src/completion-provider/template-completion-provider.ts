@@ -20,12 +20,11 @@ import {
 } from './ember-helpers';
 import { templateContextLookup } from './template-context-provider';
 import { getExtension } from '../utils/file-extension';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, createWriteStream } from 'fs';
 
 const debug = false;
-const fs = require('fs');
 const util = require('util');
-const log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'w'});
+const log_file = createWriteStream(__dirname + '/debug.log', {flags : 'w'});
 
 console.log = debug ? function(...args: any[]) {
   const output = args.map((a: any) => {
@@ -100,7 +99,7 @@ export default class TemplateCompletionProvider {
       } else if (isLinkToTarget(focusPath)) {
         completions.push(...mListRoutes(root));
       }
-    } catch(e) {
+    } catch (e) {
       console.log('e', e);
     }
 
@@ -130,7 +129,7 @@ function getPackageJSON(file: string) {
   try {
     const result =  JSON.parse(readFileSync(join(file, 'package.json'), 'utf8'));
     return result;
-  } catch(e) {
+  } catch (e) {
     return {};
   }
 }
