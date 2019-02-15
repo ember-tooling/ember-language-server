@@ -1,5 +1,4 @@
-import { extname, join } from 'path';
-
+import { extname, join, sep } from 'path';
 import {
   CompletionItem,
   CompletionItemKind,
@@ -12,17 +11,38 @@ import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
 
 const { preprocess } = require('@glimmer/syntax');
-
+const _ = require('lodash');
+const memoize = require('memoizee');
 import {
   emberBlockItems,
   emberMustacheItems,
   emberSubExpressionItems
 } from './ember-helpers';
 import { templateContextLookup } from './template-context-provider';
-import uniqueBy from '../utils/unique-by';
 import { getExtension } from '../utils/file-extension';
+import { readFileSync, existsSync } from 'fs';
+
+const debug = false;
+const fs = require('fs');
+const util = require('util');
+const log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'w'});
+
+console.log = debug ? function(...args: any[]) {
+  const output = args.map((a: any) => {
+    return JSON.stringify(a);
+  }).join(' ');
+  log_file.write('----------------------------------------' + '\r\n');
+  log_file.write(util.format(output) + '\r\n');
+  log_file.write('----------------------------------------' + '\r\n');
+} : function() {};
 
 const walkSync = require('walk-sync');
+
+const mTemplateContextLookup = memoize(templateContextLookup, { length: 3, maxAge: 60000 }); // 1 second
+const mListComponents = memoize(listComponents, {length: 1,  maxAge: 60000 }); // 1 second
+const mListHelpers = memoize(listHelpers, { length: 1, maxAge: 60000 }); // 1 second
+const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {length: 1,  maxAge: 600000 }); // 1 second
+const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
 
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
@@ -33,12 +53,10 @@ export default class TemplateCompletionProvider {
     if (getExtension(params.textDocument) !== '.hbs') {
       return [];
     }
-
     const project = this.server.projectRoots.projectForUri(uri);
     if (!project) {
       return [];
     }
-
     let document = this.server.documents.get(uri);
     let offset = document.offsetAt(params.position);
     let originalText = document.getText();
@@ -46,42 +64,141 @@ export default class TemplateCompletionProvider {
     let ast = preprocess(text);
     let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
     if (!focusPath) {
+      console.log('focusPath - exit');
       return [];
     }
 
     const { root } = project;
     let completions: CompletionItem[] = [];
 
-    if (isMustachePath(focusPath)) {
-      completions.push(...templateContextLookup(root, uri, originalText));
-      completions.push(...listComponents(root));
-      completions.push(...listHelpers(root));
-      completions.push(...emberMustacheItems);
-    } else if (isBlockPath(focusPath)) {
-      completions.push(...templateContextLookup(root, uri, originalText));
-      completions.push(...listComponents(root));
-      completions.push(...emberBlockItems);
-    } else if (isSubExpressionPath(focusPath)) {
-      completions.push(...templateContextLookup(root, uri, originalText));
-      completions.push(...listHelpers(root));
-      completions.push(...emberSubExpressionItems);
-    } else if (isLinkToTarget(focusPath)) {
-      completions.push(...listRoutes(root));
+    try {
+      if (isMustachePath(focusPath)) {
+        let candidates: any = [
+          ...mTemplateContextLookup(root, uri, originalText),
+          ...mListComponents(root),
+          ...mListHelpers(root),
+          ...mGetProjectAddonsInfo(root)
+        ];
+        completions.push(..._.uniqBy(candidates, 'label'));
+        completions.push(...emberMustacheItems);
+      } else if (isBlockPath(focusPath)) {
+        let candidates = [
+          ...mTemplateContextLookup(root, uri, originalText),
+          ...mListComponents(root),
+          ...mGetProjectAddonsInfo(root)
+        ];
+        completions.push(..._.uniqBy(candidates, 'label'));
+        completions.push(...emberBlockItems);
+      } else if (isSubExpressionPath(focusPath)) {
+        let candidates = [
+          ...mTemplateContextLookup(root, uri, originalText),
+          ...mListHelpers(root),
+          ...mGetProjectAddonsInfo(root)
+        ];
+        completions.push(..._.uniqBy(candidates, 'label'));
+        completions.push(...emberSubExpressionItems);
+      } else if (isLinkToTarget(focusPath)) {
+        completions.push(...mListRoutes(root));
+      }
+    } catch(e) {
+      console.log('e', e);
     }
 
-    return filter(completions, getTextPrefix(focusPath), { key: 'label' });
+    // const normalizedResults = _.uniqueBy(completions, 'label');
+    // console.log('normalizedResults', completions);
+    // console.log('getTextPrefix(focusPath)', getTextPrefix(focusPath));
+    return filter(completions, getTextPrefix(focusPath), { key: 'label', maxResults: 40 });
   }
 }
 
-function listComponents(root: string): CompletionItem[] {
-  const jsPaths = walkSync(join(root, 'app', 'components'), {
-    directories: false,
-    globs: ['**/*.js']
+function resolvePackageRoot(root: string, addonName: string) {
+  const roots = root.split(sep);
+  while (roots.length) {
+    const maybePath = join(roots.join(sep), 'node_modules', addonName);
+    const linkedPath = join(roots.join(sep), addonName);
+    if (existsSync(join(maybePath, 'package.json'))) {
+      return maybePath;
+    } else if (existsSync(join(linkedPath, 'package.json'))) {
+      return linkedPath;
+    }
+    roots.pop();
+  }
+  return false;
+}
+
+function getPackageJSON(file: string) {
+  try {
+    const result =  JSON.parse(readFileSync(join(file, 'package.json'), 'utf8'));
+    return result;
+  } catch(e) {
+    return {};
+  }
+}
+
+function getProjectAddonsInfo(root: string) {
+  // console.log('getProjectAddonsInfo', root);
+  const pack = getPackageJSON(root);
+  // console.log('getPackageJSON', pack);
+  const items = [...Object.keys(pack.dependencies), ...Object.keys(pack.devDependencies)];
+  // console.log('items', items);
+
+  const roots = items.map((item: string) => {
+    return resolvePackageRoot(root, item);
+  }).filter((p: string | boolean) => {
+    return p !== false;
   });
-  const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'), {
+  // console.log('roots', roots);
+  const meta: any = [];
+  roots.forEach((packagePath: string) => {
+    const info = getPackageJSON(packagePath);
+    // console.log('info', info);
+    if (info.keywords && info.keywords.includes('ember-addon')) {
+      // console.log('isEmberAddon', packagePath);
+      const extractedData = [...listComponents(packagePath), ...listRoutes(packagePath), ...listHelpers(packagePath)];
+      // console.log('extractedData', extractedData);
+      if (extractedData.length) {
+        meta.push(extractedData);
+      }
+    }
+  });
+  // console.log('meta', meta);
+  const normalizedResult: any[] = meta.reduce((arrs: any[], item: any[]) => {
+    if (!item.length) {
+      return arrs;
+    }
+    return arrs.concat(item);
+  }, []);
+
+  return normalizedResult;
+}
+
+function safeWalkSync(filePath: string, opts: any) {
+  if (!existsSync(filePath)) {
+    return [];
+  }
+  return walkSync(filePath, opts);
+}
+
+function listComponents(root: string): CompletionItem[] {
+
+  const jsPaths = safeWalkSync(join(root, 'app', 'components'), {
+    directories: false,
+    globs: ['**/*.{js,ts,hbs}']
+  }).map((name: string) => {
+    if (name.endsWith('.hbs')) {
+      return name.replace('/template', '');
+    } else if (name.includes('/component.')) {
+      return name.replace('/component', '');
+    } else {
+      return name;
+    }
+  });
+
+  const hbsPaths = safeWalkSync(join(root, 'app', 'templates', 'components'), {
     directories: false,
     globs: ['**/*.hbs']
   });
+
   const paths = [...jsPaths, ...hbsPaths];
 
   const items = paths
@@ -93,11 +210,11 @@ function listComponents(root: string): CompletionItem[] {
       };
     });
 
-  return uniqueBy(items, 'label');
+  return items;
 }
 
 function listHelpers(root: string): CompletionItem[] {
-  const paths = walkSync(join(root, 'app', 'helpers'), {
+  const paths = safeWalkSync(join(root, 'app', 'helpers'), {
     directories: false,
     globs: ['**/*.js']
   });
@@ -111,11 +228,11 @@ function listHelpers(root: string): CompletionItem[] {
       };
     });
 
-  return uniqueBy(items, 'label');
+  return items;
 }
 
 function listRoutes(root: string): CompletionItem[] {
-  const paths = walkSync(join(root, 'app', 'routes'), {
+  const paths = safeWalkSync(join(root, 'app', 'routes'), {
     directories: false,
     globs: ['**/*.js']
   });
@@ -132,7 +249,7 @@ function listRoutes(root: string): CompletionItem[] {
       };
     });
 
-  return uniqueBy(items, 'label');
+  return items;
 }
 
 function isMustachePath(path: ASTPath): boolean {
