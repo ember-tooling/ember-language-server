@@ -20,20 +20,20 @@ import {
 } from './ember-helpers';
 import { templateContextLookup } from './template-context-provider';
 import { getExtension } from '../utils/file-extension';
-import { readFileSync, existsSync, createWriteStream } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 
-const debug = false;
-const util = require('util');
-const log_file = createWriteStream(__dirname + '/debug.log', {flags : 'w'});
+// const debug = false;
+// const util = require('util');
+// const log_file = createWriteStream(__dirname + '/debug.log', {flags : 'w'});
 
-console.log = debug ? function(...args: any[]) {
-  const output = args.map((a: any) => {
-    return JSON.stringify(a);
-  }).join(' ');
-  log_file.write('----------------------------------------' + '\r\n');
-  log_file.write(util.format(output) + '\r\n');
-  log_file.write('----------------------------------------' + '\r\n');
-} : function() {};
+// console.log = debug ? function(...args: any[]) {
+//   const output = args.map((a: any) => {
+//     return JSON.stringify(a);
+//   }).join(' ');
+//   log_file.write('----------------------------------------' + '\r\n');
+//   log_file.write(util.format(output) + '\r\n');
+//   log_file.write('----------------------------------------' + '\r\n');
+// } : function() {};
 
 const walkSync = require('walk-sync');
 
@@ -59,17 +59,24 @@ export default class TemplateCompletionProvider {
     let document = this.server.documents.get(uri);
     let offset = document.offsetAt(params.position);
     let originalText = document.getText();
+    // console.log('originalText', originalText);
     let text = originalText.slice(0, offset) + 'ELSCompletionDummy' + originalText.slice(offset);
-    let ast = preprocess(text);
+    let ast: any = {};
+    try {
+      ast = preprocess(text);
+    } catch (e) {
+      // console.log('unable to get ast', test);
+    }
     let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
     if (!focusPath) {
+      // console.log(ast, params.position);
       // console.log('focusPath - exit');
       return [];
     }
     // console.log('go');
     const { root } = project;
     let completions: CompletionItem[] = [];
-
+    // console.log('focusPath', focusPath);
     try {
       if (isMustachePath(focusPath)) {
         // console.log('isMustachePath');
@@ -104,7 +111,7 @@ export default class TemplateCompletionProvider {
         completions.push(...mListRoutes(root));
       }
     } catch (e) {
-      console.log('e', e);
+      // console.log('e', e);
     }
 
     // const normalizedResults = _.uniqueBy(completions, 'label');
@@ -138,6 +145,10 @@ function getPackageJSON(file: string) {
   }
 }
 
+function isEmeberAddon(info: any) {
+  return info.keywords && info.keywords.includes('ember-addon');
+}
+
 function getProjectAddonsInfo(root: string) {
   // console.log('getProjectAddonsInfo', root);
   const pack = getPackageJSON(root);
@@ -155,7 +166,7 @@ function getProjectAddonsInfo(root: string) {
   roots.forEach((packagePath: string) => {
     const info = getPackageJSON(packagePath);
     // console.log('info', info);
-    if (info.keywords && info.keywords.includes('ember-addon')) {
+    if (isEmeberAddon(info)) {
       // console.log('isEmberAddon', packagePath);
       const extractedData = [...listComponents(packagePath), ...listRoutes(packagePath), ...listHelpers(packagePath)];
       // console.log('extractedData', extractedData);
@@ -188,7 +199,7 @@ function listComponents(root: string): CompletionItem[] {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   }).map((name: string) => {
-    if (name.endsWith('.hbs')) {
+    if (name.endsWith('/template.hbs')) {
       return name.replace('/template', '');
     } else if (name.includes('/component.')) {
       return name.replace('/component', '');
@@ -220,7 +231,7 @@ function listHelpers(root: string): CompletionItem[] {
   // console.log('listHelpers');
   const paths = safeWalkSync(join(root, 'app', 'helpers'), {
     directories: false,
-    globs: ['**/*.js']
+    globs: ['**/*.{js,ts}']
   });
 
   const items = paths
@@ -239,7 +250,7 @@ function listRoutes(root: string): CompletionItem[] {
   // console.log('listRoutes');
   const paths = safeWalkSync(join(root, 'app', 'routes'), {
     directories: false,
-    globs: ['**/*.js']
+    globs: ['**/*.{js,ts}']
   });
 
   const items = paths
