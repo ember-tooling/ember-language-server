@@ -63,15 +63,16 @@ export default class TemplateCompletionProvider {
     let ast = preprocess(text);
     let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
     if (!focusPath) {
-      console.log('focusPath - exit');
+      // console.log('focusPath - exit');
       return [];
     }
-
+    // console.log('go');
     const { root } = project;
     let completions: CompletionItem[] = [];
 
     try {
       if (isMustachePath(focusPath)) {
+        // console.log('isMustachePath');
         let candidates: any = [
           ...mTemplateContextLookup(root, uri, originalText),
           ...mListComponents(root),
@@ -81,6 +82,7 @@ export default class TemplateCompletionProvider {
         completions.push(..._.uniqBy(candidates, 'label'));
         completions.push(...emberMustacheItems);
       } else if (isBlockPath(focusPath)) {
+        // console.log('isBlockPath');
         let candidates = [
           ...mTemplateContextLookup(root, uri, originalText),
           ...mListComponents(root),
@@ -89,6 +91,7 @@ export default class TemplateCompletionProvider {
         completions.push(..._.uniqBy(candidates, 'label'));
         completions.push(...emberBlockItems);
       } else if (isSubExpressionPath(focusPath)) {
+        // console.log('isSubExpressionPath');
         let candidates = [
           ...mTemplateContextLookup(root, uri, originalText),
           ...mListHelpers(root),
@@ -97,6 +100,7 @@ export default class TemplateCompletionProvider {
         completions.push(..._.uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
       } else if (isLinkToTarget(focusPath)) {
+        // console.log('isLinkToTarget');
         completions.push(...mListRoutes(root));
       }
     } catch (e) {
@@ -138,7 +142,7 @@ function getProjectAddonsInfo(root: string) {
   // console.log('getProjectAddonsInfo', root);
   const pack = getPackageJSON(root);
   // console.log('getPackageJSON', pack);
-  const items = [...Object.keys(pack.dependencies), ...Object.keys(pack.devDependencies)];
+  const items = [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.devDependencies || {})];
   // console.log('items', items);
 
   const roots = items.map((item: string) => {
@@ -179,7 +183,7 @@ function safeWalkSync(filePath: string, opts: any) {
 }
 
 function listComponents(root: string): CompletionItem[] {
-
+  // console.log('listComponents');
   const jsPaths = safeWalkSync(join(root, 'app', 'components'), {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
@@ -213,6 +217,7 @@ function listComponents(root: string): CompletionItem[] {
 }
 
 function listHelpers(root: string): CompletionItem[] {
+  // console.log('listHelpers');
   const paths = safeWalkSync(join(root, 'app', 'helpers'), {
     directories: false,
     globs: ['**/*.js']
@@ -231,6 +236,7 @@ function listHelpers(root: string): CompletionItem[] {
 }
 
 function listRoutes(root: string): CompletionItem[] {
+  // console.log('listRoutes');
   const paths = safeWalkSync(join(root, 'app', 'routes'), {
     directories: false,
     globs: ['**/*.js']
