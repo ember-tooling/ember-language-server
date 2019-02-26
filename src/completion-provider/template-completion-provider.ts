@@ -20,33 +20,44 @@ import {
 } from './ember-helpers';
 import { templateContextLookup } from './template-context-provider';
 import { getExtension } from '../utils/file-extension';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, createWriteStream } from 'fs';
 
-// const debug = false;
-// const util = require('util');
-// const log_file = createWriteStream(__dirname + '/debug.log', {flags : 'w'});
+const debug = false;
+const util = require('util');
+const log_file = createWriteStream(__dirname + '/debug.log', { flags: 'w' });
 
-// console.log = debug ? function(...args: any[]) {
-//   const output = args.map((a: any) => {
-//     return JSON.stringify(a);
-//   }).join(' ');
-//   log_file.write('----------------------------------------' + '\r\n');
-//   log_file.write(util.format(output) + '\r\n');
-//   log_file.write('----------------------------------------' + '\r\n');
-// } : function() {};
+console.log = debug
+  ? function(...args: any[]) {
+      const output = args
+        .map((a: any) => {
+          return JSON.stringify(a);
+        })
+        .join(' ');
+      log_file.write('----------------------------------------' + '\r\n');
+      log_file.write(util.format(output) + '\r\n');
+      log_file.write('----------------------------------------' + '\r\n');
+    }
+  : function() {};
 
 const walkSync = require('walk-sync');
 
-const mTemplateContextLookup = memoize(templateContextLookup, { length: 3, maxAge: 60000 }); // 1 second
-const mListComponents = memoize(listComponents, {length: 1,  maxAge: 60000 }); // 1 second
+const mTemplateContextLookup = memoize(templateContextLookup, {
+  length: 3,
+  maxAge: 60000
+}); // 1 second
+const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
 const mListHelpers = memoize(listHelpers, { length: 1, maxAge: 60000 }); // 1 second
-const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {length: 1,  maxAge: 600000 }); // 1 second
+const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
+  length: 1,
+  maxAge: 600000
+}); // 1 second
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
 
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
 
   provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
+    console.log('provideCompletions');
     const uri = params.textDocument.uri;
 
     if (getExtension(params.textDocument) !== '.hbs') {
@@ -58,22 +69,60 @@ export default class TemplateCompletionProvider {
     }
     let document = this.server.documents.get(uri);
     let offset = document.offsetAt(params.position);
+    // console.log('offset', offset);
     let originalText = document.getText();
     // console.log('originalText', originalText);
-    let text = originalText.slice(0, offset) + 'ELSCompletionDummy' + originalText.slice(offset);
+    let text =
+      originalText.slice(0, offset) +
+      'ELSCompletionDummy' +
+      originalText.slice(offset);
     let ast: any = {};
+    // console.log('originalText', originalText);
+    const helpers = _.uniqBy(
+      mListComponents(project.root)
+        .filter((item: any) => {
+          return !item.label.includes('/');
+        })
+        .map((item: any) => {
+          item.label = item.label
+            .split('-')
+            .reduce((result: string, name: string) => {
+              return result + name.charAt(0).toUpperCase() + name.substr(1);
+            }, '');
+          return item;
+        }),
+      'label'
+    );
+
+    // looks like this is an angle-bracked component
+    if (
+      text.indexOf('<') !== -1 &&
+      text.lastIndexOf('>') < text.lastIndexOf('<')
+    ) {
+      let tmp: any = text
+        .replace('ELSCompletionDummy', '')
+        .split('<')
+        .pop();
+      return filter(helpers, tmp, {
+        key: 'label',
+        maxResults: 40
+      });
+    }
+
     try {
+    //   console.log('textFor AST', text);
       ast = preprocess(text);
     } catch (e) {
-      // console.log('unable to get ast', test);
+    //   console.log('unable to get ast', text);
+      return helpers;
     }
     let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
     if (!focusPath) {
       // console.log(ast, params.position);
-      // console.log('focusPath - exit');
+    //   console.log('focusPath - exit');
       return [];
     }
-    // console.log('go');
+    // console.log('go', focusPath);
     const { root } = project;
     let completions: CompletionItem[] = [];
     // console.log('focusPath', focusPath);
@@ -117,7 +166,10 @@ export default class TemplateCompletionProvider {
     // const normalizedResults = _.uniqueBy(completions, 'label');
     // console.log('normalizedResults', completions);
     // console.log('getTextPrefix(focusPath)', getTextPrefix(focusPath));
-    return filter(completions, getTextPrefix(focusPath), { key: 'label', maxResults: 40 });
+    return filter(completions, getTextPrefix(focusPath), {
+      key: 'label',
+      maxResults: 40
+    });
   }
 }
 
@@ -138,7 +190,7 @@ function resolvePackageRoot(root: string, addonName: string) {
 
 function getPackageJSON(file: string) {
   try {
-    const result =  JSON.parse(readFileSync(join(file, 'package.json'), 'utf8'));
+    const result = JSON.parse(readFileSync(join(file, 'package.json'), 'utf8'));
     return result;
   } catch (e) {
     return {};
@@ -153,14 +205,19 @@ function getProjectAddonsInfo(root: string) {
   // console.log('getProjectAddonsInfo', root);
   const pack = getPackageJSON(root);
   // console.log('getPackageJSON', pack);
-  const items = [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.devDependencies || {})];
+  const items = [
+    ...Object.keys(pack.dependencies || {}),
+    ...Object.keys(pack.devDependencies || {})
+  ];
   // console.log('items', items);
 
-  const roots = items.map((item: string) => {
-    return resolvePackageRoot(root, item);
-  }).filter((p: string | boolean) => {
-    return p !== false;
-  });
+  const roots = items
+    .map((item: string) => {
+      return resolvePackageRoot(root, item);
+    })
+    .filter((p: string | boolean) => {
+      return p !== false;
+    });
   // console.log('roots', roots);
   const meta: any = [];
   roots.forEach((packagePath: string) => {
@@ -168,7 +225,11 @@ function getProjectAddonsInfo(root: string) {
     // console.log('info', info);
     if (isEmeberAddon(info)) {
       // console.log('isEmberAddon', packagePath);
-      const extractedData = [...listComponents(packagePath), ...listRoutes(packagePath), ...listHelpers(packagePath)];
+      const extractedData = [
+        ...listComponents(packagePath),
+        ...listRoutes(packagePath),
+        ...listHelpers(packagePath)
+      ];
       // console.log('extractedData', extractedData);
       if (extractedData.length) {
         meta.push(extractedData);
@@ -215,14 +276,13 @@ function listComponents(root: string): CompletionItem[] {
 
   const paths = [...jsPaths, ...hbsPaths];
 
-  const items = paths
-    .map((filePath: string) => {
-      return {
-        kind: CompletionItemKind.Class,
-        label: filePath.replace(extname(filePath), ''),
-        detail: 'component',
-      };
-    });
+  const items = paths.map((filePath: string) => {
+    return {
+      kind: CompletionItemKind.Class,
+      label: filePath.replace(extname(filePath), ''),
+      detail: 'component'
+    };
+  });
 
   return items;
 }
@@ -234,14 +294,13 @@ function listHelpers(root: string): CompletionItem[] {
     globs: ['**/*.{js,ts}']
   });
 
-  const items = paths
-    .map((filePath: string) => {
-      return {
-        kind: CompletionItemKind.Function,
-        label: filePath.replace(extname(filePath), ''),
-        detail: 'helper',
-      };
-    });
+  const items = paths.map((filePath: string) => {
+    return {
+      kind: CompletionItemKind.Function,
+      label: filePath.replace(extname(filePath), ''),
+      detail: 'helper'
+    };
+  });
 
   return items;
 }
@@ -253,42 +312,51 @@ function listRoutes(root: string): CompletionItem[] {
     globs: ['**/*.{js,ts}']
   });
 
-  const items = paths
-    .map((filePath: string) => {
-      const label = filePath
-        .replace(extname(filePath), '')
-        .replace(/\//g, '.');
-      return {
-        kind: CompletionItemKind.File,
-        label,
-        detail: 'route',
-      };
-    });
+  const items = paths.map((filePath: string) => {
+    const label = filePath.replace(extname(filePath), '').replace(/\//g, '.');
+    return {
+      kind: CompletionItemKind.File,
+      label,
+      detail: 'route'
+    };
+  });
 
   return items;
 }
 
 function isMustachePath(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'PathExpression') { return false; }
+  if (node.type !== 'PathExpression') {
+    return false;
+  }
   let parent = path.parent;
-  if (!parent || parent.type !== 'MustacheStatement') { return false; }
+  if (!parent || parent.type !== 'MustacheStatement') {
+    return false;
+  }
   return parent.path === node;
 }
 
 function isBlockPath(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'PathExpression') { return false; }
+  if (node.type !== 'PathExpression') {
+    return false;
+  }
   let parent = path.parent;
-  if (!parent || parent.type !== 'BlockStatement') { return false; }
+  if (!parent || parent.type !== 'BlockStatement') {
+    return false;
+  }
   return parent.path === node;
 }
 
 function isSubExpressionPath(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'PathExpression') { return false; }
+  if (node.type !== 'PathExpression') {
+    return false;
+  }
   let parent = path.parent;
-  if (!parent || parent.type !== 'SubExpression') { return false; }
+  if (!parent || parent.type !== 'SubExpression') {
+    return false;
+  }
   return parent.path === node;
 }
 
@@ -298,17 +366,25 @@ function isLinkToTarget(path: ASTPath): boolean {
 
 function isInlineLinkToTarget(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'StringLiteral') { return false; }
+  if (node.type !== 'StringLiteral') {
+    return false;
+  }
   let parent = path.parent;
-  if (!parent || parent.type !== 'MustacheStatement') { return false; }
+  if (!parent || parent.type !== 'MustacheStatement') {
+    return false;
+  }
   return parent.params[1] === node && parent.path.original === 'link-to';
 }
 
 function isBlockLinkToTarget(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'StringLiteral') { return false; }
+  if (node.type !== 'StringLiteral') {
+    return false;
+  }
   let parent = path.parent;
-  if (!parent || parent.type !== 'BlockStatement') { return false; }
+  if (!parent || parent.type !== 'BlockStatement') {
+    return false;
+  }
   return parent.params[0] === node && parent.path.original === 'link-to';
 }
 
