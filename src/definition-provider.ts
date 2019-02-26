@@ -73,7 +73,7 @@ export default class DefinitionProvider {
           return path.join.apply(path, pathParts.filter((part: any) => !!part));
         });
 
-        return pathsToLocations.apply(null, paths);
+        return pathsToLocationsWithPosition(paths, focusPath.node.original.replace('this.', ''));
       } else if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName =
           focusPath.node.type === 'ElementNode'
@@ -200,14 +200,13 @@ export default class DefinitionProvider {
 
   isActionName(path: ASTPath) {
     let node = path.node;
+    if (!path.parent || path.parent.path.original !== 'action' ||  !path.parent.params[0] === node) {
+      return false;
+    }
     if (node.type === 'StringLiteral') {
-      if (
-        path.parent &&
-        path.parent.path.original === 'action' &&
-        path.parent.params[0] === node
-      ) {
-        return true;
-      }
+      return true;
+    } else if (node.type === 'PathExpression' && node.this) {
+      return true;
     }
     return false;
   }
@@ -297,6 +296,34 @@ function pathsToLocations(...paths: string[]): Location[] {
     return Location.create(
       URI.file(modulePath).toString(),
       Range.create(0, 0, 0, 0)
+    );
+  });
+}
+
+function getFirstTextPostion(filePath: string, content: string) {
+  const text = fs.readFileSync(filePath, 'utf8');
+  const arrayOfLines = text.match(/[^\r\n]+/g) || [];
+  let startLine = 0;
+  let startCharacter = 0;
+  arrayOfLines.forEach((line: string, index: number) => {
+    if (startLine || startCharacter) {
+      return;
+    }
+    let textPosition = line.indexOf(content);
+    if (textPosition > -1) {
+      startLine = index;
+      startCharacter = textPosition;
+    }
+  });
+  return [startLine, startCharacter];
+}
+
+function pathsToLocationsWithPosition(paths: string[], findMe: string) {
+  return paths.filter(fs.existsSync).map((fileName: string) => {
+    const [ startLine, startCharacter ] = getFirstTextPostion(fileName, findMe);
+    return Location.create(
+      URI.file(fileName).toString(),
+      Range.create(startLine, startCharacter, startLine, startCharacter + findMe.length)
     );
   });
 }
