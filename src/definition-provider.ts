@@ -166,9 +166,9 @@ export default class DefinitionProvider {
           [project.root, 'app', 'helpers', `${componentOrHelperName}.ts`]
         ].map((pathParts: any) => {
           return path.join.apply(path, pathParts.filter((part: any) => !!part));
-        });
+        }).filter(fs.existsSync);
 
-        return pathsToLocations.apply(null, paths);
+        return pathsToLocations.apply(null, paths.length > 1 ? paths.filter((postfix: string ) => postfix.endsWith('.hbs')) : paths);
       } else {
         // let { line, column } =  toPosition(params.position);
         // let textLine = getLineFromText(content, line);
