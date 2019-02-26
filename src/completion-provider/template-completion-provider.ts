@@ -96,12 +96,12 @@ export default class TemplateCompletionProvider {
     );
 
     // looks like this is an angle-bracked component
+    const firstTextPart = text.split('ELSCompletionDummy')[0] || '';
     if (
-      text.indexOf('<') !== -1 &&
-      text.lastIndexOf('>') < text.lastIndexOf('<')
+      firstTextPart.indexOf('<') !== -1 &&
+      firstTextPart.lastIndexOf('>') < firstTextPart.lastIndexOf('<')
     ) {
-      let tmp: any = text
-        .replace('ELSCompletionDummy', '')
+      let tmp: any = firstTextPart
         .split('<')
         .pop();
       return filter(helpers, tmp, {
