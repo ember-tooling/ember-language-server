@@ -46,6 +46,7 @@ const mTemplateContextLookup = memoize(templateContextLookup, {
   maxAge: 60000
 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
+const mListPodsComponents = memoize(listPodsComponents, { length: 1, maxAge: 60000 }); // 1 second
 const mListHelpers = memoize(listHelpers, { length: 1, maxAge: 60000 }); // 1 second
 const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
   length: 1,
@@ -79,7 +80,7 @@ export default class TemplateCompletionProvider {
     let ast: any = {};
     // console.log('originalText', originalText);
     const helpers = _.uniqBy(
-      mListComponents(project.root)
+      [].concat(mListComponents(project.root), mListPodsComponents(project.root))
         .filter((item: any) => {
           return !item.label.includes('/');
         })
@@ -110,16 +111,16 @@ export default class TemplateCompletionProvider {
     }
 
     try {
-    //   console.log('textFor AST', text);
+      //   console.log('textFor AST', text);
       ast = preprocess(text);
     } catch (e) {
-    //   console.log('unable to get ast', text);
+      //   console.log('unable to get ast', text);
       return helpers;
     }
     let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
     if (!focusPath) {
       // console.log(ast, params.position);
-    //   console.log('focusPath - exit');
+      //   console.log('focusPath - exit');
       return [];
     }
     // console.log('go', focusPath);
@@ -132,6 +133,7 @@ export default class TemplateCompletionProvider {
         let candidates: any = [
           ...mTemplateContextLookup(root, uri, originalText),
           ...mListComponents(root),
+          ...mListPodsComponents(root),
           ...mListHelpers(root),
           ...mGetProjectAddonsInfo(root)
         ];
@@ -142,6 +144,7 @@ export default class TemplateCompletionProvider {
         let candidates = [
           ...mTemplateContextLookup(root, uri, originalText),
           ...mListComponents(root),
+          ...mListPodsComponents(root),
           ...mGetProjectAddonsInfo(root)
         ];
         completions.push(..._.uniqBy(candidates, 'label'));
@@ -252,6 +255,53 @@ function safeWalkSync(filePath: string, opts: any) {
     return [];
   }
   return walkSync(filePath, opts);
+}
+
+function listPodsComponents(root: string): CompletionItem[] {
+  let podModulePrefix: any = '';
+  // console.log('listPodsComponents');
+  try {
+    const appConfig = require(join(root, 'config', 'environment.js'));
+    // console.log('appConfig', appConfig);
+    podModulePrefix = appConfig('development').podModulePrefix || '';
+    if (podModulePrefix.includes('/')) {
+      podModulePrefix = podModulePrefix.split('/').pop();
+    }
+  } catch (e) {
+    // console.log('catch', e);
+    return [];
+  }
+  if (!podModulePrefix) {
+    return [];
+  }
+
+  // console.log('listComponents');
+  const jsPaths = safeWalkSync(
+    join(root, 'app', podModulePrefix, 'components'),
+    {
+      directories: false,
+      globs: ['**/*.{js,ts,hbs}']
+    }
+  ).map((name: string) => {
+    if (name.endsWith('/template.hbs')) {
+      return name.replace('/template', '');
+    } else if (name.includes('/component.')) {
+      return name.replace('/component', '');
+    } else {
+      return name;
+    }
+  });
+
+  const items = jsPaths.map((filePath: string) => {
+    return {
+      kind: CompletionItemKind.Class,
+      label: filePath.replace(extname(filePath), ''),
+      detail: 'component'
+    };
+  });
+
+  // console.log('pods-items', items);
+  return items;
 }
 
 function listComponents(root: string): CompletionItem[] {
