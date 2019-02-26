@@ -58,14 +58,17 @@ export default class DefinitionProvider {
             'components',
             maybeComponentName,
             '.hbs'
-          ],
+          ]
         ].map((pathParts: any) => {
           return path.join.apply(path, pathParts.filter((part: any) => !!part));
         });
 
         return pathsToLocationsWithPosition(paths, '{{yield');
-
-      } else if (this.isActionName(focusPath) || this.isLocalProperty(focusPath)) {
+      } else if (
+        this.isActionName(focusPath) ||
+        this.isLocalProperty(focusPath) ||
+        this.isHahPairWithLocalValue(focusPath)
+      ) {
         let fileName = uri.replace('file://', '').replace(project.root, '');
         let maybeComponentName = fileName
           .split(path.sep)
@@ -97,7 +100,11 @@ export default class DefinitionProvider {
           return path.join.apply(path, pathParts.filter((part: any) => !!part));
         });
 
-        return pathsToLocationsWithPosition(paths, focusPath.node.original.replace('this.', '').split('.')[0]);
+        const text = focusPath.node.type !== 'HashPair' ? focusPath.node.original : focusPath.node.value.original;
+        return pathsToLocationsWithPosition(
+          paths,
+          text.replace('this.', '').split('.')[0]
+        );
       } else if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName =
           focusPath.node.type === 'ElementNode'
@@ -233,9 +240,18 @@ export default class DefinitionProvider {
     return false;
   }
 
+  isHahPairWithLocalValue(path: ASTPath) {
+    let node = path.node;
+    return node.type === 'HashPair' && node.value.type === 'PathExpression' && node.value.this;
+  }
+
   isActionName(path: ASTPath) {
     let node = path.node;
-    if (!path.parent || path.parent.path.original !== 'action' ||  !path.parent.params[0] === node) {
+    if (
+      !path.parent ||
+      path.parent.path.original !== 'action' ||
+      !path.parent.params[0] === node
+    ) {
       return false;
     }
     if (node.type === 'StringLiteral') {
@@ -248,7 +264,14 @@ export default class DefinitionProvider {
 
   isComponentWithBlock(path: ASTPath) {
     let node = path.node;
-    return node.type === 'BlockStatement' && node.path.type === 'PathExpression' && node.path.this === false;
+    return (
+      node.type === 'BlockStatement' &&
+      node.path.type === 'PathExpression' &&
+      node.path.this === false &&
+      node.path.original.includes('-') &&
+      node.path.original.charAt(0) !== '-' &&
+      !node.path.original.includes('.')
+    );
   }
 
   isComponentOrHelperName(path: ASTPath) {
@@ -357,9 +380,14 @@ function getFirstTextPostion(filePath: string, content: string) {
     let textPosition = line.indexOf(content);
     let bounds = line.split(content);
     if (textPosition > -1) {
-      if (/\s/.test(bounds[0].charAt(bounds[0].length - 1)) || bounds[0].trim().length === 0) {
-        startLine = index;
-        startCharacter = textPosition;
+      if (
+        /\s/.test(bounds[0].charAt(bounds[0].length - 1)) ||
+        bounds[0].trim().length === 0
+      ) {
+        if (/^[A-Za-z]+$/.test(bounds[1].charAt(0)) === false) {
+          startLine = index;
+          startCharacter = textPosition;
+        }
       }
     }
   });
@@ -368,10 +396,15 @@ function getFirstTextPostion(filePath: string, content: string) {
 
 function pathsToLocationsWithPosition(paths: string[], findMe: string) {
   return paths.filter(fs.existsSync).map((fileName: string) => {
-    const [ startLine, startCharacter ] = getFirstTextPostion(fileName, findMe);
+    const [startLine, startCharacter] = getFirstTextPostion(fileName, findMe);
     return Location.create(
       URI.file(fileName).toString(),
-      Range.create(startLine, startCharacter, startLine, startCharacter + findMe.length)
+      Range.create(
+        startLine,
+        startCharacter,
+        startLine,
+        startCharacter + findMe.length
+      )
     );
   });
 }
