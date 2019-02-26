@@ -1,7 +1,13 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { RequestHandler, TextDocumentPositionParams, Definition, Location, Range } from 'vscode-languageserver';
+import {
+  RequestHandler,
+  TextDocumentPositionParams,
+  Definition,
+  Location,
+  Range
+} from 'vscode-languageserver';
 
 import { parse } from 'babylon';
 
@@ -35,17 +41,96 @@ export default class DefinitionProvider {
         return null;
       }
 
-      if (this.isComponentOrHelperName(focusPath)) {
-        const componentOrHelperName = focusPath.node.type === 'ElementNode' ? _.kebabCase(focusPath.node.tag) : focusPath.node.original;
+      if (this.isActionName(focusPath) || this.isLocalProperty(focusPath)) {
+        let fileName = uri.replace('file://', '').replace(project.root, '');
+        let maybeComponentName = fileName
+          .split(path.sep)
+          .join('/')
+          .split('/components/')[1];
+        if (maybeComponentName.endsWith('/template.hbs')) {
+          maybeComponentName = maybeComponentName.replace('/template.hbs', '');
+        } else if (maybeComponentName.endsWith('.hbs')) {
+          maybeComponentName = maybeComponentName.replace('.hbs', '');
+        }
+        const paths = [
+          [project.root, 'app', 'components', maybeComponentName, '.js'],
+          [project.root, 'app', 'components', maybeComponentName, '.ts'],
+          [
+            project.root,
+            'app',
+            'components',
+            maybeComponentName,
+            'component.js'
+          ],
+          [
+            project.root,
+            'app',
+            'components',
+            maybeComponentName,
+            'component.ts'
+          ]
+        ].map((pathParts: any) => {
+          return path.join.apply(path, pathParts.filter((part: any) => !!part));
+        });
+
+        return pathsToLocations.apply(null, paths);
+      } else if (this.isComponentOrHelperName(focusPath)) {
+        const componentOrHelperName =
+          focusPath.node.type === 'ElementNode'
+            ? _.kebabCase(focusPath.node.tag)
+            : focusPath.node.original;
         const componentPathParts = componentOrHelperName.split('/');
         const maybeComponentName = componentPathParts.pop();
         const paths = [
-          [project.root, 'app', 'components', ...componentPathParts, maybeComponentName, '.js'],
-          [project.root, 'app', 'components', ...componentPathParts, maybeComponentName, '.ts'],
-          [project.root, 'app', 'components', ...componentPathParts, maybeComponentName, 'component.js'],
-          [project.root, 'app', 'components', ...componentPathParts, maybeComponentName, 'component.ts'],
-          [project.root, 'app', 'components', ...componentPathParts, maybeComponentName, 'template.hbs'],
-          [project.root, 'app', 'templates', 'components', ...componentPathParts, maybeComponentName, '.hbs'],
+          [
+            project.root,
+            'app',
+            'components',
+            ...componentPathParts,
+            maybeComponentName,
+            '.js'
+          ],
+          [
+            project.root,
+            'app',
+            'components',
+            ...componentPathParts,
+            maybeComponentName,
+            '.ts'
+          ],
+          [
+            project.root,
+            'app',
+            'components',
+            ...componentPathParts,
+            maybeComponentName,
+            'component.js'
+          ],
+          [
+            project.root,
+            'app',
+            'components',
+            ...componentPathParts,
+            maybeComponentName,
+            'component.ts'
+          ],
+          [
+            project.root,
+            'app',
+            'components',
+            ...componentPathParts,
+            maybeComponentName,
+            'template.hbs'
+          ],
+          [
+            project.root,
+            'app',
+            'templates',
+            'components',
+            ...componentPathParts,
+            maybeComponentName,
+            '.hbs'
+          ],
           [project.root, 'app', 'helpers', `${componentOrHelperName}.js`],
           [project.root, 'app', 'helpers', `${componentOrHelperName}.ts`]
         ].map((pathParts: any) => {
@@ -66,14 +151,34 @@ export default class DefinitionProvider {
 
       if (isModelReference(astPath)) {
         let modelName = astPath.node.value;
-        const modelPath = path.join(project.root, 'app', 'models', `${modelName}.js`);
-        const tsModelPath = path.join(project.root, 'app', 'models', `${modelName}.ts`);
+        const modelPath = path.join(
+          project.root,
+          'app',
+          'models',
+          `${modelName}.js`
+        );
+        const tsModelPath = path.join(
+          project.root,
+          'app',
+          'models',
+          `${modelName}.ts`
+        );
         return pathsToLocations(modelPath, tsModelPath);
       } else if (isTransformReference(astPath)) {
         let transformName = astPath.node.value;
 
-        const transformPath = path.join(project.root, 'app', 'transforms', `${transformName}.js`);
-        const tsTransformPath = path.join(project.root, 'app', 'transforms', `${transformName}.ts`);
+        const transformPath = path.join(
+          project.root,
+          'app',
+          'transforms',
+          `${transformName}.js`
+        );
+        const tsTransformPath = path.join(
+          project.root,
+          'app',
+          'transforms',
+          `${transformName}.ts`
+        );
         return pathsToLocations(transformPath, tsTransformPath);
       }
     }
@@ -85,8 +190,44 @@ export default class DefinitionProvider {
     return this.handle.bind(this);
   }
 
+  isLocalProperty(path: ASTPath) {
+    let node = path.node;
+    if (node.type === 'PathExpression') {
+      return node.this;
+    }
+    return false;
+  }
+
+  isActionName(path: ASTPath) {
+    let node = path.node;
+    if (node.type === 'StringLiteral') {
+      if (
+        path.parent &&
+        path.parent.path.original === 'action' &&
+        path.parent.params[0] === node
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   isComponentOrHelperName(path: ASTPath) {
     let node = path.node;
+    if (node.type === 'StringLiteral') {
+      // if (node.original.includes('/')) {
+      //   return true;
+      // } else if (!node.original.includes('.') && node.original.includes('-')) {
+      //   return true;
+      // }
+      if (
+        path.parent &&
+        path.parent.path.original === 'component' &&
+        path.parent.params[0] === node
+      ) {
+        return true;
+      }
+    }
     if (node.type === 'ElementNode') {
       if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
         return true;
@@ -97,7 +238,13 @@ export default class DefinitionProvider {
     }
 
     let parent = path.parent;
-    if (!parent || parent.path !== node || (parent.type !== 'MustacheStatement' && parent.type !== 'BlockStatement')) {
+    if (
+      !parent ||
+      parent.path !== node ||
+      (parent.type !== 'MustacheStatement' &&
+        parent.type !== 'BlockStatement' &&
+        parent.type !== 'SubExpression')
+    ) {
       return false;
     }
 
@@ -107,26 +254,49 @@ export default class DefinitionProvider {
 
 function isModelReference(astPath: ASTPath): boolean {
   let node = astPath.node;
-  if (node.type !== 'StringLiteral') { return false; }
+  if (node.type !== 'StringLiteral') {
+    return false;
+  }
   let parent = astPath.parent;
-  if (!parent || parent.type !== 'CallExpression' || parent.arguments[0] !== node) { return false; }
-  let identifier = (parent.callee.type === 'Identifier') ? parent.callee : parent.callee.property;
+  if (
+    !parent ||
+    parent.type !== 'CallExpression' ||
+    parent.arguments[0] !== node
+  ) {
+    return false;
+  }
+  let identifier =
+    parent.callee.type === 'Identifier'
+      ? parent.callee
+      : parent.callee.property;
   return identifier.name === 'belongsTo' || identifier.name === 'hasMany';
 }
 
 function isTransformReference(astPath: ASTPath): boolean {
   let node = astPath.node;
-  if (node.type !== 'StringLiteral') { return false; }
+  if (node.type !== 'StringLiteral') {
+    return false;
+  }
   let parent = astPath.parent;
-  if (!parent || parent.type !== 'CallExpression' || parent.arguments[0] !== node) { return false; }
-  let identifier = (parent.callee.type === 'Identifier') ? parent.callee : parent.callee.property;
+  if (
+    !parent ||
+    parent.type !== 'CallExpression' ||
+    parent.arguments[0] !== node
+  ) {
+    return false;
+  }
+  let identifier =
+    parent.callee.type === 'Identifier'
+      ? parent.callee
+      : parent.callee.property;
   return identifier.name === 'attr';
 }
 
 function pathsToLocations(...paths: string[]): Location[] {
-  return paths
-    .filter(fs.existsSync)
-    .map(modulePath => {
-      return Location.create(URI.file(modulePath).toString(), Range.create(0, 0, 0, 0));
-    });
+  return paths.filter(fs.existsSync).map(modulePath => {
+    return Location.create(
+      URI.file(modulePath).toString(),
+      Range.create(0, 0, 0, 0)
+    );
+  });
 }
