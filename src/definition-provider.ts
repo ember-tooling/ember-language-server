@@ -10,6 +10,7 @@ import Server from './server';
 import ASTPath from './glimmer-utils';
 import { getExtension } from './utils/file-extension';
 import URI from 'vscode-uri';
+const _ = require('lodash');
 
 const { preprocess } = require('@glimmer/syntax');
 
@@ -35,7 +36,7 @@ export default class DefinitionProvider {
       }
 
       if (this.isComponentOrHelperName(focusPath)) {
-        const componentOrHelperName = focusPath.node.original;
+        const componentOrHelperName = focusPath.node.type === 'ElementNode' ? _.kebabCase(focusPath.node.tag) : focusPath.node.original;
         const componentPathParts = componentOrHelperName.split('/');
         const maybeComponentName = componentPathParts.pop();
         const paths = [
@@ -86,6 +87,11 @@ export default class DefinitionProvider {
 
   isComponentOrHelperName(path: ASTPath) {
     let node = path.node;
+    if (node.type === 'ElementNode') {
+      if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
+        return true;
+      }
+    }
     if (node.type !== 'PathExpression') {
       return false;
     }
