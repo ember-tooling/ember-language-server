@@ -41,7 +41,31 @@ export default class DefinitionProvider {
         return null;
       }
 
-      if (this.isActionName(focusPath) || this.isLocalProperty(focusPath)) {
+      if (this.isComponentWithBlock(focusPath)) {
+        let maybeComponentName = focusPath.node.path.original;
+        const paths = [
+          [
+            project.root,
+            'app',
+            'components',
+            maybeComponentName,
+            'template.hbs'
+          ],
+          [
+            project.root,
+            'app',
+            'templates',
+            'components',
+            maybeComponentName,
+            '.hbs'
+          ],
+        ].map((pathParts: any) => {
+          return path.join.apply(path, pathParts.filter((part: any) => !!part));
+        });
+
+        return pathsToLocationsWithPosition(paths, '{{yield');
+
+      } else if (this.isActionName(focusPath) || this.isLocalProperty(focusPath)) {
         let fileName = uri.replace('file://', '').replace(project.root, '');
         let maybeComponentName = fileName
           .split(path.sep)
@@ -73,7 +97,7 @@ export default class DefinitionProvider {
           return path.join.apply(path, pathParts.filter((part: any) => !!part));
         });
 
-        return pathsToLocationsWithPosition(paths, focusPath.node.original.replace('this.', ''));
+        return pathsToLocationsWithPosition(paths, focusPath.node.original.replace('this.', '').split('.')[0]);
       } else if (this.isComponentOrHelperName(focusPath)) {
         const componentOrHelperName =
           focusPath.node.type === 'ElementNode'
@@ -138,6 +162,17 @@ export default class DefinitionProvider {
         });
 
         return pathsToLocations.apply(null, paths);
+      } else {
+        // let { line, column } =  toPosition(params.position);
+        // let textLine = getLineFromText(content, line);
+        // let leftLine = textLine.slice(0, column);
+        // let rightLine = textLine.slice(column);
+        // let leftEqual = leftLine.lastIndexOf('=');
+        // if (leftEqual > -1) {
+        //   let needle = leftLine.slice(leftEqual + 1).trim() + rightLine.slice(0, rightLine.indexOf(' ') || rightLine.length - 1).trim();
+        //   if (needle.indexOf('this.') > -1) {
+        //   }
+        // }
       }
     } else if (extension === '.js') {
       let content = this.server.documents.get(uri).getText();
@@ -209,6 +244,11 @@ export default class DefinitionProvider {
       return true;
     }
     return false;
+  }
+
+  isComponentWithBlock(path: ASTPath) {
+    let node = path.node;
+    return node.type === 'BlockStatement' && node.path.type === 'PathExpression' && node.path.this === false;
   }
 
   isComponentOrHelperName(path: ASTPath) {
@@ -300,9 +340,14 @@ function pathsToLocations(...paths: string[]): Location[] {
   });
 }
 
+// function getLineFromText(text: string, line: number) {
+//   const arrayOfLines = text.match(/[^\r\n]+/g) || [];
+//   return arrayOfLines[line - 1] || '';
+// }
+
 function getFirstTextPostion(filePath: string, content: string) {
   const text = fs.readFileSync(filePath, 'utf8');
-  const arrayOfLines = text.match(/[^\r\n]+/g) || [];
+  const arrayOfLines = text.match(/(.*?(?:\r\n?|\n|$))/gm) || [];
   let startLine = 0;
   let startCharacter = 0;
   arrayOfLines.forEach((line: string, index: number) => {
@@ -310,9 +355,12 @@ function getFirstTextPostion(filePath: string, content: string) {
       return;
     }
     let textPosition = line.indexOf(content);
+    let bounds = line.split(content);
     if (textPosition > -1) {
-      startLine = index;
-      startCharacter = textPosition;
+      if (/\s/.test(bounds[0].charAt(bounds[0].length - 1)) || bounds[0].trim().length === 0) {
+        startLine = index;
+        startCharacter = textPosition;
+      }
     }
   });
   return [startLine, startCharacter];
