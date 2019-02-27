@@ -71,9 +71,9 @@
   integrity sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
 
 "@types/fuzzaldrin@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@types/fuzzaldrin/-/fuzzaldrin-2.1.1.tgz#f2c18783d8404766f59e645e8168ff129d170cbe"
-  integrity sha512-KHKQApfuxY67bNVCvRYXEJA/8krvf27T4aA5dTQV8GBx19FKOhcvznbHBVqR7pFJhXZk/yYMWiPEPJ/JVdQ0jQ==
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@types/fuzzaldrin/-/fuzzaldrin-2.1.2.tgz#6dc592d12d1d48a65a7cc1636128b4da8f46f4b2"
+  integrity sha512-VtsthdzyI2DDMgU8BnrOGjN+hfEfRL1j10pUJ2JBkHCOQIcyWsTMJk0WOKnaY929ubCgznKx/b4MTxevHKDxqw==
 
 "@types/jest@^23.3.13":
   version "23.3.13"
