@@ -46,6 +46,7 @@ const mTemplateContextLookup = memoize(templateContextLookup, {
   maxAge: 60000
 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
+const mListMUComponents = memoize(listMUComponents, { length: 1, maxAge: 60000 }); // 1 second
 const mListPodsComponents = memoize(listPodsComponents, { length: 1, maxAge: 60000 }); // 1 second
 const mListHelpers = memoize(listHelpers, { length: 1, maxAge: 60000 }); // 1 second
 const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
@@ -53,7 +54,8 @@ const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
   maxAge: 600000
 }); // 1 second
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
-
+export const isModuleUnificationApp = memoize(isMuApp, { length: 1, maxAge: 60000 });
+export const podModulePrefixForRoot = memoize(getPodModulePrefix, { length: 1, maxAge: 60000 });
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
 
@@ -80,7 +82,10 @@ export default class TemplateCompletionProvider {
     let ast: any = {};
     // console.log('originalText', originalText);
     const helpers = _.uniqBy(
-      [].concat(mListComponents(project.root), mListPodsComponents(project.root))
+      [].concat(
+        mListMUComponents(project.root),
+        mListComponents(project.root),
+        mListPodsComponents(project.root))
         .filter((item: any) => {
           return !item.label.includes('/');
         })
@@ -133,6 +138,7 @@ export default class TemplateCompletionProvider {
         let candidates: any = [
           ...mTemplateContextLookup(root, uri, originalText),
           ...mListComponents(root),
+          ...mListMUComponents(root),
           ...mListPodsComponents(root),
           ...mListHelpers(root),
           ...mGetProjectAddonsInfo(root)
@@ -144,6 +150,7 @@ export default class TemplateCompletionProvider {
         let candidates = [
           ...mTemplateContextLookup(root, uri, originalText),
           ...mListComponents(root),
+          ...mListMUComponents(root),
           ...mListPodsComponents(root),
           ...mGetProjectAddonsInfo(root)
         ];
@@ -255,11 +262,18 @@ function getProjectAddonsInfo(root: string) {
   return normalizedResult;
 }
 
-function safeWalkSync(filePath: string, opts: any) {
+export function safeWalkSync(filePath: string | false, opts: any) {
+  if (!filePath) {
+    return [];
+  }
   if (!existsSync(filePath)) {
     return [];
   }
   return walkSync(filePath, opts);
+}
+
+export function isMuApp(root: string) {
+  return existsSync(join(root, 'src', 'ui'));
 }
 
 export function getPodModulePrefix(root: string): string | null {
@@ -283,7 +297,7 @@ export function getPodModulePrefix(root: string): string | null {
 }
 
 function listPodsComponents(root: string): CompletionItem[] {
-  let podModulePrefix = getPodModulePrefix(root);
+  let podModulePrefix = podModulePrefixForRoot(root);
   if (podModulePrefix === null) {
     return [];
   }
@@ -313,6 +327,31 @@ function listPodsComponents(root: string): CompletionItem[] {
   });
 
   // console.log('pods-items', items);
+  return items;
+}
+
+function listMUComponents(root: string): CompletionItem[] {
+  const jsPaths = safeWalkSync(join(root, 'src', 'ui', 'components'), {
+    directories: false,
+    globs: ['**/*.{js,ts,hbs}']
+  }).map((name: string) => {
+    if (name.endsWith('/template.hbs')) {
+      return name.replace('/template', '');
+    } else if (name.includes('/component.')) {
+      return name.replace('/component', '');
+    } else {
+      return name;
+    }
+  });
+
+  const items = jsPaths.map((filePath: string) => {
+    return {
+      kind: CompletionItemKind.Class,
+      label: filePath.replace(extname(filePath), ''),
+      detail: 'component'
+    };
+  });
+
   return items;
 }
 

@@ -15,7 +15,7 @@ import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
 import { getExtension } from './utils/file-extension';
-import { getProjectAddonsRoots, getPodModulePrefix } from './completion-provider/template-completion-provider';
+import { getProjectAddonsRoots, getPodModulePrefix, isModuleUnificationApp } from './completion-provider/template-completion-provider';
 import URI from 'vscode-uri';
 const _ = require('lodash');
 const memoize = require('memoizee');
@@ -88,10 +88,17 @@ function getPathsForComponentTemplates(
 ): string[] {
   const podModulePrefix = getPodModulePrefix(root);
   let podComponentsScriptsParts: string[][] = [];
+  let muComponentsScriptsParts: string[][] = [];
+  let classicComponentsScriptsParts: string[][] = [];
   if (podModulePrefix) {
-    podComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app' + path.sep + podModulePrefix, maybeComponentName);
+    podComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app' + path.sep + podModulePrefix, maybeComponentName);
   }
-  const paths = [...podComponentsScriptsParts, ...getAbstractComponentTemplatesParts(root, 'app', maybeComponentName)]
+  if (isModuleUnificationApp(root)) {
+    muComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'src/ui', maybeComponentName);
+  } else {
+    classicComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app', maybeComponentName);
+  }
+  const paths = [...podComponentsScriptsParts, ...muComponentsScriptsParts, ...classicComponentsScriptsParts]
   .map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
@@ -127,10 +134,21 @@ function getPathsForComponentScripts(
 ): string[] {
   const podModulePrefix = getPodModulePrefix(root);
   let podComponentsScriptsParts: string[][] = [];
+  let muComponentsScriptsParts: string[][] = [];
+  let classicComponentsScriptsParts: string[][] = [];
   if (podModulePrefix) {
-    podComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app' + path.sep + podModulePrefix, maybeComponentName);
+    podComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app/' + podModulePrefix, maybeComponentName);
   }
-  const paths = [...podComponentsScriptsParts, ...getAbstractComponentScriptsParts(root, 'app', maybeComponentName)].map((pathParts: any) => {
+  if (isModuleUnificationApp(root)) {
+    muComponentsScriptsParts =  getAbstractComponentScriptsParts(root, 'src/ui', maybeComponentName);
+  } else {
+    classicComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app', maybeComponentName);
+  }
+  const paths = [
+    ...muComponentsScriptsParts,
+    ...podComponentsScriptsParts,
+    ...classicComponentsScriptsParts
+    ].map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
   return paths;
@@ -138,10 +156,11 @@ function getPathsForComponentScripts(
 
 function getComponentNameFromURI(root: string, uri: string) {
   let fileName = uri.replace('file://', '').replace(root, '');
+  let splitter = fileName.includes(path.sep + '-components' + path.sep) ? '/-components/' : '/components/';
   let maybeComponentName = fileName
     .split(path.sep)
     .join('/')
-    .split('/components/')[1];
+    .split(splitter)[1];
   if (maybeComponentName.endsWith('/template.hbs')) {
     maybeComponentName = maybeComponentName.replace('/template.hbs', '');
   } else if (isTemplatePath(maybeComponentName)) {
