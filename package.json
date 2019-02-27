@@ -1,11 +1,11 @@
 {
   "name": "@emberwatch/ember-language-server",
   "description": "A language server implementation for Ember.js projects.",
-  "version": "0.2.2",
+  "version": "0.2.1",
   "contributors": [
     "Tobias Bieniek <tobias.bieniek@gmail.com>",
-	"Thomas Sauer <t-sauer@outlook.de>",
-	"Aleksandr Kanunnikov <lifeart92@gmail.com>"
+    "Thomas Sauer <t-sauer@outlook.de>",
+    "Aleksandr Kanunnikov <lifeart92@gmail.com>"
   ],
   "license": "MIT",
   "repository": {
