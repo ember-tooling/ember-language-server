@@ -346,7 +346,10 @@ export default class DefinitionProvider {
 
   isActionName(path: ASTPath) {
     let node = path.node;
-    if (path.parent.type !== 'PathExpression') {
+    if (!path.parent) {
+      return false;
+    }
+    if (path.parent.type !== 'PathExpression' && path.parent.type !== 'SubExpression') {
       return false;
     }
     if (
