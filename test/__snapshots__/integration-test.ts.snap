@@ -5,12 +5,12 @@ Array [
   Object {
     "detail": "component",
     "kind": 7,
-    "label": "another-awesome-component",
+    "label": "AnotherAwesomeComponent",
   },
   Object {
     "detail": "component",
     "kind": 7,
-    "label": "my-awesome-component",
+    "label": "MyAwesomeComponent",
   },
   Object {
     "detail": "component",
