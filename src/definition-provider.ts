@@ -15,10 +15,157 @@ import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
 import { getExtension } from './utils/file-extension';
+import { getProjectAddonsRoots } from './completion-provider/template-completion-provider';
 import URI from 'vscode-uri';
 const _ = require('lodash');
+const memoize = require('memoizee');
+
+const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
+  length: 1,
+  maxAge: 600000
+});
+const mAddonPathsForComponentTemplates = memoize(
+  getAddonPathsForComponentTemplates,
+  { length: 2, maxAge: 600000 }
+);
 
 const { preprocess } = require('@glimmer/syntax');
+
+function getAddonPathsForComponentTemplates(
+  root: string,
+  maybeComponentName: string
+) {
+  const roots = mProjectAddonsRoots(root);
+  let existingPaths: string[] = [];
+  let hasValidPath = false;
+  roots.forEach((rootPath: string) => {
+    if (hasValidPath) {
+      return;
+    }
+    const addonPaths = [];
+    addonPaths.push([
+      rootPath,
+      'addon',
+      'components',
+      maybeComponentName + '.js'
+    ]);
+    addonPaths.push([
+      rootPath,
+      'addon',
+      'components',
+      maybeComponentName + '.ts'
+    ]);
+    addonPaths.push([
+      rootPath,
+      'addon',
+      'components',
+      maybeComponentName,
+      'component.js'
+    ]);
+    addonPaths.push([
+      rootPath,
+      'addon',
+      'components',
+      maybeComponentName,
+      'component.ts'
+    ]);
+    addonPaths.push([
+      rootPath,
+      'addon',
+      'components',
+      maybeComponentName,
+      'template.hbs'
+    ]);
+    addonPaths.push([
+      rootPath,
+      'addon',
+      'templates',
+      'components',
+      maybeComponentName,
+      'templats.hbs'
+    ]);
+    addonPaths.push([
+      rootPath,
+      'app',
+      'components',
+      maybeComponentName + '.js'
+    ]);
+    addonPaths.push([
+      rootPath,
+      'app',
+      'templates',
+      'components',
+      maybeComponentName,
+      'templats.hbs'
+    ]);
+    addonPaths.push([rootPath, 'addon', 'helpers', `${maybeComponentName}.js`]);
+    addonPaths.push([rootPath, 'addon', 'helpers', `${maybeComponentName}.ts`]);
+    addonPaths.push([rootPath, 'app', 'helpers', `${maybeComponentName}.js`]);
+    addonPaths.push([rootPath, 'app', 'helpers', `${maybeComponentName}.ts`]);
+    const validPaths = addonPaths
+      .map((pathArr: string[]) => {
+        return path.join.apply(path, pathArr.filter((part: any) => !!part));
+      })
+      .filter(fs.existsSync);
+    if (validPaths.length) {
+      hasValidPath = true;
+      existingPaths = validPaths;
+    }
+  });
+
+  const hasAddonFile =
+    existingPaths.filter((name: string) =>
+      name.includes(path.sep + 'addon' + path.sep)
+    ).length > 0;
+  if (hasAddonFile) {
+    return existingPaths.filter((name: string) =>
+      name.includes(path.sep + 'addon' + path.sep)
+    );
+  }
+  return existingPaths;
+}
+
+function getPathsForComponentTemplates(
+  root: string,
+  maybeComponentName: string
+): string[] {
+  const paths = [
+    [root, 'app', 'components', maybeComponentName, 'template.hbs'],
+    [root, 'app', 'templates', 'components', maybeComponentName + '.hbs']
+  ].map((pathParts: any) => {
+    return path.join.apply(path, pathParts.filter((part: any) => !!part));
+  });
+  return paths;
+}
+
+function getPathsForComponentScripts(
+  root: string,
+  maybeComponentName: string
+): string[] {
+  const paths = [
+    [root, 'app', 'components', maybeComponentName + '.js'],
+    [root, 'app', 'components', maybeComponentName + '.ts'],
+    [root, 'app', 'components', maybeComponentName, 'component.js'],
+    [root, 'app', 'components', maybeComponentName, 'component.ts']
+  ].map((pathParts: any) => {
+    return path.join.apply(path, pathParts.filter((part: any) => !!part));
+  });
+  return paths;
+}
+
+function getComponentNameFromURI(root: string, uri: string) {
+  let fileName = uri.replace('file://', '').replace(root, '');
+  let maybeComponentName = fileName
+    .split(path.sep)
+    .join('/')
+    .split('/components/')[1];
+  if (maybeComponentName.endsWith('/template.hbs')) {
+    maybeComponentName = maybeComponentName.replace('/template.hbs', '');
+  } else if (maybeComponentName.endsWith('.hbs')) {
+    maybeComponentName = maybeComponentName.replace('.hbs', '');
+  }
+  return maybeComponentName;
+}
 
 export default class DefinitionProvider {
   constructor(private server: Server) {}
@@ -41,134 +188,101 @@ export default class DefinitionProvider {
         return null;
       }
 
-      if (this.isComponentWithBlock(focusPath)) {
-        let maybeComponentName = focusPath.node.path.original;
-        const paths = [
-          [
-            project.root,
-            'app',
-            'components',
-            maybeComponentName,
-            'template.hbs'
-          ],
-          [
-            project.root,
-            'app',
-            'templates',
-            'components',
-            maybeComponentName,
-            '.hbs'
-          ]
-        ].map((pathParts: any) => {
-          return path.join.apply(path, pathParts.filter((part: any) => !!part));
-        });
+      if (this.isAngleComponent(focusPath)) {
+        const maybeComponentName = _.kebabCase(focusPath.node.tag);
 
+        let paths = [
+          ...getPathsForComponentScripts(project.root, maybeComponentName),
+          ...getPathsForComponentTemplates(project.root, maybeComponentName)
+        ].filter(fs.existsSync);
+
+        if (!paths.length) {
+          paths = mAddonPathsForComponentTemplates(
+            project.root,
+            maybeComponentName
+          );
+        }
+
+        return pathsToLocations.apply(
+          null,
+          paths.length > 1
+            ? paths.filter((postfix: string) => postfix.endsWith('.hbs'))
+            : paths
+        );
+      } else if (this.isComponentWithBlock(focusPath)) {
+        let maybeComponentName = focusPath.node.path.original;
+        let paths: string[] = getPathsForComponentTemplates(
+          project.root,
+          maybeComponentName
+        ).filter(fs.existsSync);
+        if (!paths.length) {
+          paths = mAddonPathsForComponentTemplates(
+            project.root,
+            maybeComponentName
+          ).filter((name: string) => {
+            return name.endsWith('.hbs');
+          });
+        }
+        // mAddonPathsForComponentTemplates
         return pathsToLocationsWithPosition(paths, '{{yield');
       } else if (
         this.isActionName(focusPath) ||
         this.isLocalProperty(focusPath) ||
-        this.isHahPairWithLocalValue(focusPath)
+        this.isHashPairWithLocalValue(focusPath)
       ) {
-        let fileName = uri.replace('file://', '').replace(project.root, '');
-        let maybeComponentName = fileName
-          .split(path.sep)
-          .join('/')
-          .split('/components/')[1];
-        if (maybeComponentName.endsWith('/template.hbs')) {
-          maybeComponentName = maybeComponentName.replace('/template.hbs', '');
-        } else if (maybeComponentName.endsWith('.hbs')) {
-          maybeComponentName = maybeComponentName.replace('.hbs', '');
+        let maybeComponentName = getComponentNameFromURI(project.root, uri);
+        let paths: string[] = getPathsForComponentScripts(
+          project.root,
+          maybeComponentName
+        ).filter(fs.existsSync);
+        if (!paths.length) {
+          paths = mAddonPathsForComponentTemplates(
+            project.root,
+            maybeComponentName
+          ).filter((name: string) => {
+            return !name.endsWith('.hbs');
+          });
         }
-        const paths = [
-          [project.root, 'app', 'components', maybeComponentName, '.js'],
-          [project.root, 'app', 'components', maybeComponentName, '.ts'],
-          [
-            project.root,
-            'app',
-            'components',
-            maybeComponentName,
-            'component.js'
-          ],
-          [
-            project.root,
-            'app',
-            'components',
-            maybeComponentName,
-            'component.ts'
-          ]
-        ].map((pathParts: any) => {
-          return path.join.apply(path, pathParts.filter((part: any) => !!part));
-        });
-
-        const text = focusPath.node.type !== 'HashPair' ? focusPath.node.original : focusPath.node.value.original;
+        const text =
+          focusPath.node.type !== 'HashPair'
+            ? focusPath.node.original
+            : focusPath.node.value.original;
         return pathsToLocationsWithPosition(
           paths,
           text.replace('this.', '').split('.')[0]
         );
       } else if (this.isComponentOrHelperName(focusPath)) {
-        const componentOrHelperName =
+        const maybeComponentName =
           focusPath.node.type === 'ElementNode'
             ? _.kebabCase(focusPath.node.tag)
             : focusPath.node.original;
-        const componentPathParts = componentOrHelperName.split('/');
-        const maybeComponentName = componentPathParts.pop();
-        const paths = [
-          [
-            project.root,
-            'app',
-            'components',
-            ...componentPathParts,
-            maybeComponentName,
-            '.js'
-          ],
-          [
-            project.root,
-            'app',
-            'components',
-            ...componentPathParts,
-            maybeComponentName,
-            '.ts'
-          ],
-          [
-            project.root,
-            'app',
-            'components',
-            ...componentPathParts,
-            maybeComponentName,
-            'component.js'
-          ],
-          [
-            project.root,
-            'app',
-            'components',
-            ...componentPathParts,
-            maybeComponentName,
-            'component.ts'
-          ],
-          [
-            project.root,
-            'app',
-            'components',
-            ...componentPathParts,
-            maybeComponentName,
-            'template.hbs'
-          ],
-          [
-            project.root,
-            'app',
-            'templates',
-            'components',
-            ...componentPathParts,
-            maybeComponentName,
-            '.hbs'
-          ],
-          [project.root, 'app', 'helpers', `${componentOrHelperName}.js`],
-          [project.root, 'app', 'helpers', `${componentOrHelperName}.ts`]
+
+        let helpers = [
+          [project.root, 'app', 'helpers', `${maybeComponentName}.js`],
+          [project.root, 'app', 'helpers', `${maybeComponentName}.ts`]
         ].map((pathParts: any) => {
           return path.join.apply(path, pathParts.filter((part: any) => !!part));
-        }).filter(fs.existsSync);
+        });
 
-        return pathsToLocations.apply(null, paths.length > 1 ? paths.filter((postfix: string ) => postfix.endsWith('.hbs')) : paths);
+        let paths = [
+          ...getPathsForComponentScripts(project.root, maybeComponentName),
+          ...getPathsForComponentTemplates(project.root, maybeComponentName),
+          ...helpers
+        ].filter(fs.existsSync);
+
+        if (!paths.length) {
+          paths = mAddonPathsForComponentTemplates(
+            project.root,
+            maybeComponentName
+          );
+        }
+
+        return pathsToLocations.apply(
+          null,
+          paths.length > 1
+            ? paths.filter((postfix: string) => postfix.endsWith('.hbs'))
+            : paths
+        );
       } else {
         // let { line, column } =  toPosition(params.position);
         // let textLine = getLineFromText(content, line);
@@ -240,9 +354,13 @@ export default class DefinitionProvider {
     return false;
   }
 
-  isHahPairWithLocalValue(path: ASTPath) {
+  isHashPairWithLocalValue(path: ASTPath) {
     let node = path.node;
-    return node.type === 'HashPair' && node.value.type === 'PathExpression' && node.value.this;
+    return (
+      node.type === 'HashPair' &&
+      node.value.type === 'PathExpression' &&
+      node.value.this
+    );
   }
 
   isActionName(path: ASTPath) {
@@ -274,8 +392,23 @@ export default class DefinitionProvider {
     );
   }
 
+  isAngleComponent(path: ASTPath) {
+    let node = path.node;
+
+    if (node.type === 'ElementNode') {
+      if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
+        return true;
+      }
+    }
+  }
+
   isComponentOrHelperName(path: ASTPath) {
     let node = path.node;
+
+    if (this.isAngleComponent(path)) {
+      return true;
+    }
+
     if (node.type === 'StringLiteral') {
       // if (node.original.includes('/')) {
       //   return true;
@@ -290,11 +423,7 @@ export default class DefinitionProvider {
         return true;
       }
     }
-    if (node.type === 'ElementNode') {
-      if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
-        return true;
-      }
-    }
+
     if (node.type !== 'PathExpression') {
       return false;
     }

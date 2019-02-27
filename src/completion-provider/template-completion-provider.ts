@@ -204,23 +204,28 @@ function isEmeberAddon(info: any) {
   return info.keywords && info.keywords.includes('ember-addon');
 }
 
-function getProjectAddonsInfo(root: string) {
-  // console.log('getProjectAddonsInfo', root);
-  const pack = getPackageJSON(root);
-  // console.log('getPackageJSON', pack);
-  const items = [
-    ...Object.keys(pack.dependencies || {}),
-    ...Object.keys(pack.devDependencies || {})
-  ];
-  // console.log('items', items);
+export function getProjectAddonsRoots(root: string) {
+ // console.log('getProjectAddonsInfo', root);
+ const pack = getPackageJSON(root);
+ // console.log('getPackageJSON', pack);
+ const items = [
+   ...Object.keys(pack.dependencies || {}),
+   ...Object.keys(pack.devDependencies || {})
+ ];
+ // console.log('items', items);
 
-  const roots = items
-    .map((item: string) => {
-      return resolvePackageRoot(root, item);
-    })
-    .filter((p: string | boolean) => {
-      return p !== false;
-    });
+ const roots = items
+   .map((item: string) => {
+     return resolvePackageRoot(root, item);
+   })
+   .filter((p: string | boolean) => {
+     return p !== false;
+   });
+  return roots;
+}
+
+function getProjectAddonsInfo(root: string) {
+  const roots = getProjectAddonsRoots(root);
   // console.log('roots', roots);
   const meta: any = [];
   roots.forEach((packagePath: string) => {
