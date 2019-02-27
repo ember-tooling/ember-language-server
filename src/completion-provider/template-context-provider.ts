@@ -1,11 +1,14 @@
 import { join } from 'path';
 import uniqueBy from '../utils/unique-by';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import {
     CompletionItem,
     CompletionItemKind
 } from 'vscode-languageserver';
 
+import { 
+  isModuleUnificationApp, podModulePrefixForRoot, safeWalkSync
+} from './template-completion-provider';
 // const debug = false;
 // const fs = require('fs');
 // const util = require('util');
@@ -22,21 +25,58 @@ import {
 
 import { extractComponentInformationFromMeta, processJSFile, processTemplate }  from 'ember-meta-explorer';
 
-const walkSync = require('walk-sync');
-
 export function templateContextLookup(root: string, currentFilePath: string, templateContent: string) {
     console.log('templateContextLookup', root, currentFilePath, templateContent);
     const nameParts = currentFilePath.split('/components/');
     if (nameParts.length !== 2) {
         return [];
     }
-    const componentName = nameParts[1].split('.')[0];
+    let componentName = nameParts[1].split('.')[0];
+    if (componentName.endsWith('/component')) {
+      componentName = componentName.replace('/component', '');
+    } else if (componentName.endsWith('/template')) {
+      componentName = componentName.replace('/template', '');
+    }
     return componentsContextData(root, componentName, templateContent);
+}
+
+function getComponentsScriptsFolder(root: string) {
+  if (isModuleUnificationApp(root)) {
+    return join(root, 'src', 'ui', 'components');
+  } else {
+    return join(root, 'app', 'components');
+  }
+}
+
+function getComponentFileLocationPath(root: string, filePath: string) {
+  if (isModuleUnificationApp(root)) {
+    return join(root, 'src', 'ui', 'components', filePath);
+  } else {
+    return join(root, 'app', 'components', filePath);
+  }
+}
+
+function getPoddedComponentsScriptsFolder(root: string) {
+  let prefix = podModulePrefixForRoot(root);
+  if (prefix) {
+    return join(root, 'app', prefix, 'components');
+  } else {
+    return false;
+  }
+}
+
+function getPoddedComponentsFileLocationPath(root: string, filePath: string) {
+  let prefix = podModulePrefixForRoot(root);
+  if (prefix) {
+    return join(root, 'app', prefix, 'components', filePath);
+  } else {
+    return false;
+  }
 }
 
 function componentsContextData(root: string, postfix: string, templateContent: string): CompletionItem[] {
     console.log('templateContextLookup', root, postfix, templateContent);
-  const jsPaths = walkSync(join(root, 'app', 'components'), {
+  const jsPaths = safeWalkSync(getComponentsScriptsFolder(root), {
     directories: false,
     globs: [
       `**/${postfix}.js`,
@@ -45,11 +85,30 @@ function componentsContextData(root: string, postfix: string, templateContent: s
       `**/**/${postfix}/component.ts`
     ]
   });
+
+  const jsPodsPaths = safeWalkSync(getPoddedComponentsScriptsFolder(root), {
+    directories: false,
+    globs: [
+      `**/**/${postfix}/component.js`,
+      `**/**/${postfix}/component.ts`
+    ]
+  });
+
   console.log('jsPaths', jsPaths);
-  const infoItems = [].concat.apply([], jsPaths.map((filePath: string) => {
-    const fileLocation = join(root, 'app', 'components', filePath);
+  const infoItems = [].concat.apply([], [...jsPodsPaths, ...jsPaths].filter((fileName: string) => {
+    return !!fileName;
+  }).map((filePath: string) => {
+    const fileLocation = getComponentFileLocationPath(root, filePath);
+    const podFileLocation = getPoddedComponentsFileLocationPath(root, filePath);
     console.log('fileLocation', fileLocation);
-    const fileContent = readFileSync(fileLocation, { encoding: 'utf8' });
+    let fileContent = '';
+    if (existsSync(fileLocation)) {
+      fileContent = readFileSync(fileLocation, { encoding: 'utf8' });
+    } else if (podFileLocation && existsSync(podFileLocation)) {
+      fileContent = readFileSync(podFileLocation, { encoding: 'utf8'});
+    } else {
+      return null;
+    }
     console.log('fileContent', fileContent);
     try {
         const jsMeta = processJSFile(fileContent, filePath);
