@@ -18,7 +18,7 @@
   "main": "lib/start-server.js",
   "typings": "lib/start-server.d.ts",
   "dependencies": {
-    "@glimmer/syntax": "^0.38.1",
+    "@glimmer/syntax": "^0.39.2",
     "ast-types": "^0.11.3",
     "babylon": "^6.18.0",
     "ember-meta-explorer": "^0.0.5",
@@ -37,7 +37,7 @@
     "@types/estree": "*",
     "@types/fuzzaldrin": "^2.1.1",
     "@types/jest": "^23.3.13",
-    "@types/node": "^9.3.0",
+    "@types/node": "^11.9.5",
     "jest": "^23.6.0",
     "lerna-changelog": "^0.8.2",
     "ts-jest": "^22.4.3",
