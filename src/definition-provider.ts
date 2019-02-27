@@ -15,7 +15,11 @@ import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
 import { getExtension } from './utils/file-extension';
-import { getProjectAddonsRoots, getPodModulePrefix, isModuleUnificationApp } from './completion-provider/template-completion-provider';
+import {
+  getProjectAddonsRoots,
+  getPodModulePrefix,
+  isModuleUnificationApp
+} from './completion-provider/template-completion-provider';
 import URI from 'vscode-uri';
 const _ = require('lodash');
 const memoize = require('memoizee');
@@ -44,24 +48,44 @@ function getAddonPathsForComponentTemplates(
     }
     const addonPaths: string[][] = [];
 
-    getAbstractComponentScriptsParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
+    getAbstractComponentScriptsParts(
+      rootPath,
+      'addon',
+      maybeComponentName
+    ).forEach((parts: any) => {
       addonPaths.push(parts);
     });
-    getAbstractComponentScriptsParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
+    getAbstractComponentScriptsParts(
+      rootPath,
+      'app',
+      maybeComponentName
+    ).forEach((parts: any) => {
       addonPaths.push(parts);
     });
-    getAbstractComponentTemplatesParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
+    getAbstractComponentTemplatesParts(
+      rootPath,
+      'app',
+      maybeComponentName
+    ).forEach((parts: any) => {
       addonPaths.push(parts);
     });
-    getAbstractComponentTemplatesParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
+    getAbstractComponentTemplatesParts(
+      rootPath,
+      'addon',
+      maybeComponentName
+    ).forEach((parts: any) => {
       addonPaths.push(parts);
     });
-    getAbstractHelpersParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractHelpersParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
+    getAbstractHelpersParts(rootPath, 'app', maybeComponentName).forEach(
+      (parts: any) => {
+        addonPaths.push(parts);
+      }
+    );
+    getAbstractHelpersParts(rootPath, 'addon', maybeComponentName).forEach(
+      (parts: any) => {
+        addonPaths.push(parts);
+      }
+    );
 
     const validPaths = addonPaths
       .map((pathArr: string[]) => {
@@ -74,8 +98,7 @@ function getAddonPathsForComponentTemplates(
     }
   });
 
-  const addonFolderFiles =
-    existingPaths.filter(hasAddonFolderInPath);
+  const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
   if (addonFolderFiles.length) {
     return addonFolderFiles;
   }
@@ -91,21 +114,40 @@ function getPathsForComponentTemplates(
   let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
   if (podModulePrefix) {
-    podComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app' + path.sep + podModulePrefix, maybeComponentName);
+    podComponentsScriptsParts = getAbstractComponentTemplatesParts(
+      root,
+      'app' + path.sep + podModulePrefix,
+      maybeComponentName
+    );
   }
   if (isModuleUnificationApp(root)) {
-    muComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'src/ui', maybeComponentName);
+    muComponentsScriptsParts = getAbstractComponentTemplatesParts(
+      root,
+      'src/ui',
+      maybeComponentName
+    );
   } else {
-    classicComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app', maybeComponentName);
+    classicComponentsScriptsParts = getAbstractComponentTemplatesParts(
+      root,
+      'app',
+      maybeComponentName
+    );
   }
-  const paths = [...podComponentsScriptsParts, ...muComponentsScriptsParts, ...classicComponentsScriptsParts]
-  .map((pathParts: any) => {
+  const paths = [
+    ...podComponentsScriptsParts,
+    ...muComponentsScriptsParts,
+    ...classicComponentsScriptsParts
+  ].map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
   return paths;
 }
 
-function getAbstractComponentScriptsParts(root: string, prefix: string, maybeComponentName: string) {
+function getAbstractComponentScriptsParts(
+  root: string,
+  prefix: string,
+  maybeComponentName: string
+) {
   return [
     [root, prefix, 'components', maybeComponentName + '.js'],
     [root, prefix, 'components', maybeComponentName + '.ts'],
@@ -114,14 +156,22 @@ function getAbstractComponentScriptsParts(root: string, prefix: string, maybeCom
   ];
 }
 
-function getAbstractComponentTemplatesParts(root: string, prefix: string, maybeComponentName: string) {
+function getAbstractComponentTemplatesParts(
+  root: string,
+  prefix: string,
+  maybeComponentName: string
+) {
   return [
     [root, prefix, 'components', maybeComponentName, 'template.hbs'],
     [root, prefix, 'templates', 'components', maybeComponentName + '.hbs']
   ];
 }
 
-function getAbstractHelpersParts(root: string, prefix: string, maybeComponentName: string) {
+function getAbstractHelpersParts(
+  root: string,
+  prefix: string,
+  maybeComponentName: string
+) {
   return [
     [root, prefix, 'helpers', `${maybeComponentName}.js`],
     [root, prefix, 'helpers', `${maybeComponentName}.ts`]
@@ -137,18 +187,30 @@ function getPathsForComponentScripts(
   let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
   if (podModulePrefix) {
-    podComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app/' + podModulePrefix, maybeComponentName);
+    podComponentsScriptsParts = getAbstractComponentScriptsParts(
+      root,
+      'app/' + podModulePrefix,
+      maybeComponentName
+    );
   }
   if (isModuleUnificationApp(root)) {
-    muComponentsScriptsParts =  getAbstractComponentScriptsParts(root, 'src/ui', maybeComponentName);
+    muComponentsScriptsParts = getAbstractComponentScriptsParts(
+      root,
+      'src/ui',
+      maybeComponentName
+    );
   } else {
-    classicComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app', maybeComponentName);
+    classicComponentsScriptsParts = getAbstractComponentScriptsParts(
+      root,
+      'app',
+      maybeComponentName
+    );
   }
   const paths = [
     ...muComponentsScriptsParts,
     ...podComponentsScriptsParts,
     ...classicComponentsScriptsParts
-    ].map((pathParts: any) => {
+  ].map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
   return paths;
@@ -156,7 +218,9 @@ function getPathsForComponentScripts(
 
 function getComponentNameFromURI(root: string, uri: string) {
   let fileName = uri.replace('file://', '').replace(root, '');
-  let splitter = fileName.includes(path.sep + '-components' + path.sep) ? '/-components/' : '/components/';
+  let splitter = fileName.includes(path.sep + '-components' + path.sep)
+    ? '/-components/'
+    : '/components/';
   let maybeComponentName = fileName
     .split(path.sep)
     .join('/')
@@ -229,8 +293,7 @@ export default class DefinitionProvider {
         return pathsToLocationsWithPosition(paths, '{{yield');
       } else if (
         this.isActionName(focusPath) ||
-        this.isLocalProperty(focusPath) ||
-        this.isHashPairWithLocalValue(focusPath)
+        this.isLocalProperty(focusPath)
       ) {
         let maybeComponentName = getComponentNameFromURI(project.root, uri);
         let paths: string[] = getPathsForComponentScripts(
@@ -245,10 +308,7 @@ export default class DefinitionProvider {
             return !isTemplatePath(name);
           });
         }
-        const text =
-          focusPath.node.type !== 'HashPair'
-            ? focusPath.node.original
-            : focusPath.node.value.original;
+        const text = focusPath.node.original;
         return pathsToLocationsWithPosition(
           paths,
           text.replace('this.', '').split('.')[0]
@@ -259,8 +319,11 @@ export default class DefinitionProvider {
             ? _.kebabCase(focusPath.node.tag)
             : focusPath.node.original;
 
-        let helpers = getAbstractHelpersParts(project.root, 'app', maybeComponentName)
-        .map((pathParts: any) => {
+        let helpers = getAbstractHelpersParts(
+          project.root,
+          'app',
+          maybeComponentName
+        ).map((pathParts: any) => {
           return path.join.apply(path, pathParts.filter((part: any) => !!part));
         });
 
@@ -279,11 +342,29 @@ export default class DefinitionProvider {
 
         return pathsToLocations.apply(
           null,
-          paths.length > 1
-            ? paths.filter(isTemplatePath)
-            : paths
+          paths.length > 1 ? paths.filter(isTemplatePath) : paths
         );
-      } else {
+      } else if (this.isAnglePropertyAttribute(focusPath)) {
+        const maybeComponentName = _.kebabCase(focusPath.parent.tag);
+
+        let paths = [
+          ...getPathsForComponentScripts(project.root, maybeComponentName),
+          ...getPathsForComponentTemplates(project.root, maybeComponentName)
+        ].filter(fs.existsSync);
+
+        if (!paths.length) {
+          paths = mAddonPathsForComponentTemplates(
+            project.root,
+            maybeComponentName
+          );
+        }
+
+        const finalPaths =
+          paths.length > 1
+            ? paths.filter((postfix: string) => isTemplatePath(postfix))
+            : paths;
+        return pathsToLocationsWithPosition(finalPaths, focusPath.node.name);
+
         // let { line, column } =  toPosition(params.position);
         // let textLine = getLineFromText(content, line);
         // let leftLine = textLine.slice(0, column);
@@ -294,6 +375,36 @@ export default class DefinitionProvider {
         //   if (needle.indexOf('this.') > -1) {
         //   }
         // }
+      } else if (this.isHashPairKey(focusPath)) {
+        let parentPath = focusPath.parentPath;
+        if (parentPath && parentPath.parent && parentPath.parent.path) {
+          const maybeComponentName = parentPath.parent.path.original;
+          if (
+            !maybeComponentName.includes('.') &&
+            maybeComponentName.includes('-')
+          ) {
+            let paths = [
+              ...getPathsForComponentScripts(project.root, maybeComponentName),
+              ...getPathsForComponentTemplates(project.root, maybeComponentName)
+            ].filter(fs.existsSync);
+
+            if (!paths.length) {
+              paths = mAddonPathsForComponentTemplates(
+                project.root,
+                maybeComponentName
+              );
+            }
+
+            const finalPaths =
+              paths.length > 1
+                ? paths.filter((postfix: string) => isTemplatePath(postfix))
+                : paths;
+            return pathsToLocationsWithPosition(
+              finalPaths,
+              '@' + focusPath.node.key
+            );
+          }
+        }
       }
     } else if (extension === '.js') {
       let content = this.server.documents.get(uri).getText();
@@ -354,13 +465,18 @@ export default class DefinitionProvider {
     return false;
   }
 
-  isHashPairWithLocalValue(path: ASTPath) {
+  isHashPairKey(path: ASTPath) {
     let node = path.node;
-    return (
-      node.type === 'HashPair' &&
-      node.value.type === 'PathExpression' &&
-      node.value.this
-    );
+    return node.type === 'HashPair';
+  }
+
+  isAnglePropertyAttribute(path: ASTPath) {
+    let node = path.node;
+    if (node.type === 'AttrNode') {
+      if (node.name.charAt(0) === '@') {
+        return true;
+      }
+    }
   }
 
   isActionName(path: ASTPath) {
@@ -368,7 +484,12 @@ export default class DefinitionProvider {
     if (!path.parent) {
       return false;
     }
-    if (path.parent.type !== 'MustacheStatement' && path.parent.type !== 'PathExpression' && path.parent.type !== 'SubExpression' && path.parent.type !== 'ElementModifierStatement') {
+    if (
+      path.parent.type !== 'MustacheStatement' &&
+      path.parent.type !== 'PathExpression' &&
+      path.parent.type !== 'SubExpression' &&
+      path.parent.type !== 'ElementModifierStatement'
+    ) {
       return false;
     }
     if (
