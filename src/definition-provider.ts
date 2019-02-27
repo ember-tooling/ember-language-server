@@ -368,7 +368,7 @@ export default class DefinitionProvider {
     if (!path.parent) {
       return false;
     }
-    if (path.parent.type !== 'PathExpression' && path.parent.type !== 'SubExpression') {
+    if (path.parent.type !== 'PathExpression' && path.parent.type !== 'SubExpression' && path.parent.type !== 'ElementModifierStatement') {
       return false;
     }
     if (
