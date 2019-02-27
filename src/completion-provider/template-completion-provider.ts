@@ -262,7 +262,7 @@ function safeWalkSync(filePath: string, opts: any) {
   return walkSync(filePath, opts);
 }
 
-function listPodsComponents(root: string): CompletionItem[] {
+export function getPodModulePrefix(root: string): string | null {
   let podModulePrefix: any = '';
   // console.log('listPodsComponents');
   try {
@@ -274,12 +274,19 @@ function listPodsComponents(root: string): CompletionItem[] {
     }
   } catch (e) {
     // console.log('catch', e);
-    return [];
+    return null;
   }
   if (!podModulePrefix) {
+    return null;
+  }
+  return podModulePrefix.trim().length > 0 ? podModulePrefix : null;
+}
+
+function listPodsComponents(root: string): CompletionItem[] {
+  let podModulePrefix = getPodModulePrefix(root);
+  if (podModulePrefix === null) {
     return [];
   }
-
   // console.log('listComponents');
   const jsPaths = safeWalkSync(
     join(root, 'app', podModulePrefix, 'components'),

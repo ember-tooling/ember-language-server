@@ -15,7 +15,7 @@ import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
 import { getExtension } from './utils/file-extension';
-import { getProjectAddonsRoots } from './completion-provider/template-completion-provider';
+import { getProjectAddonsRoots, getPodModulePrefix } from './completion-provider/template-completion-provider';
 import URI from 'vscode-uri';
 const _ = require('lodash');
 const memoize = require('memoizee');
@@ -86,7 +86,12 @@ function getPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
 ): string[] {
-  const paths = getAbstractComponentTemplatesParts(root, 'app', maybeComponentName)
+  const podModulePrefix = getPodModulePrefix(root);
+  let podComponentsScriptsParts: string[][] = [];
+  if (podModulePrefix) {
+    podComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app' + path.sep + podModulePrefix, maybeComponentName);
+  }
+  const paths = [...podComponentsScriptsParts, ...getAbstractComponentTemplatesParts(root, 'app', maybeComponentName)]
   .map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
@@ -120,7 +125,12 @@ function getPathsForComponentScripts(
   root: string,
   maybeComponentName: string
 ): string[] {
-  const paths = getAbstractComponentScriptsParts(root, 'app', maybeComponentName).map((pathParts: any) => {
+  const podModulePrefix = getPodModulePrefix(root);
+  let podComponentsScriptsParts: string[][] = [];
+  if (podModulePrefix) {
+    podComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app' + path.sep + podModulePrefix, maybeComponentName);
+  }
+  const paths = [...podComponentsScriptsParts, ...getAbstractComponentScriptsParts(root, 'app', maybeComponentName)].map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
   return paths;
