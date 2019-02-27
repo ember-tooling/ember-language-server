@@ -42,66 +42,27 @@ function getAddonPathsForComponentTemplates(
     if (hasValidPath) {
       return;
     }
-    const addonPaths = [];
-    addonPaths.push([
-      rootPath,
-      'addon',
-      'components',
-      maybeComponentName + '.js'
-    ]);
-    addonPaths.push([
-      rootPath,
-      'addon',
-      'components',
-      maybeComponentName + '.ts'
-    ]);
-    addonPaths.push([
-      rootPath,
-      'addon',
-      'components',
-      maybeComponentName,
-      'component.js'
-    ]);
-    addonPaths.push([
-      rootPath,
-      'addon',
-      'components',
-      maybeComponentName,
-      'component.ts'
-    ]);
-    addonPaths.push([
-      rootPath,
-      'addon',
-      'components',
-      maybeComponentName,
-      'template.hbs'
-    ]);
-    addonPaths.push([
-      rootPath,
-      'addon',
-      'templates',
-      'components',
-      maybeComponentName,
-      'templats.hbs'
-    ]);
-    addonPaths.push([
-      rootPath,
-      'app',
-      'components',
-      maybeComponentName + '.js'
-    ]);
-    addonPaths.push([
-      rootPath,
-      'app',
-      'templates',
-      'components',
-      maybeComponentName,
-      'templats.hbs'
-    ]);
-    addonPaths.push([rootPath, 'addon', 'helpers', `${maybeComponentName}.js`]);
-    addonPaths.push([rootPath, 'addon', 'helpers', `${maybeComponentName}.ts`]);
-    addonPaths.push([rootPath, 'app', 'helpers', `${maybeComponentName}.js`]);
-    addonPaths.push([rootPath, 'app', 'helpers', `${maybeComponentName}.ts`]);
+    const addonPaths: string[][] = [];
+
+    getAbstractComponentScriptsParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
+      addonPaths.push(parts);
+    });
+    getAbstractComponentScriptsParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
+      addonPaths.push(parts);
+    });
+    getAbstractComponentTemplatesParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
+      addonPaths.push(parts);
+    });
+    getAbstractComponentTemplatesParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
+      addonPaths.push(parts);
+    });
+    getAbstractHelpersParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
+      addonPaths.push(parts);
+    });
+    getAbstractHelpersParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
+      addonPaths.push(parts);
+    });
+
     const validPaths = addonPaths
       .map((pathArr: string[]) => {
         return path.join.apply(path, pathArr.filter((part: any) => !!part));
@@ -113,14 +74,10 @@ function getAddonPathsForComponentTemplates(
     }
   });
 
-  const hasAddonFile =
-    existingPaths.filter((name: string) =>
-      name.includes(path.sep + 'addon' + path.sep)
-    ).length > 0;
-  if (hasAddonFile) {
-    return existingPaths.filter((name: string) =>
-      name.includes(path.sep + 'addon' + path.sep)
-    );
+  const addonFolderFiles =
+    existingPaths.filter(hasAddonFolderInPath);
+  if (addonFolderFiles.length) {
+    return addonFolderFiles;
   }
   return existingPaths;
 }
@@ -129,25 +86,41 @@ function getPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
 ): string[] {
-  const paths = [
-    [root, 'app', 'components', maybeComponentName, 'template.hbs'],
-    [root, 'app', 'templates', 'components', maybeComponentName + '.hbs']
-  ].map((pathParts: any) => {
+  const paths = getAbstractComponentTemplatesParts(root, 'app', maybeComponentName)
+  .map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
   return paths;
+}
+
+function getAbstractComponentScriptsParts(root: string, prefix: string, maybeComponentName: string) {
+  return [
+    [root, prefix, 'components', maybeComponentName + '.js'],
+    [root, prefix, 'components', maybeComponentName + '.ts'],
+    [root, prefix, 'components', maybeComponentName, 'component.js'],
+    [root, prefix, 'components', maybeComponentName, 'component.ts']
+  ];
+}
+
+function getAbstractComponentTemplatesParts(root: string, prefix: string, maybeComponentName: string) {
+  return [
+    [root, prefix, 'components', maybeComponentName, 'template.hbs'],
+    [root, prefix, 'templates', 'components', maybeComponentName + '.hbs']
+  ];
+}
+
+function getAbstractHelpersParts(root: string, prefix: string, maybeComponentName: string) {
+  return [
+    [root, prefix, 'helpers', `${maybeComponentName}.js`],
+    [root, prefix, 'helpers', `${maybeComponentName}.ts`]
+  ];
 }
 
 function getPathsForComponentScripts(
   root: string,
   maybeComponentName: string
 ): string[] {
-  const paths = [
-    [root, 'app', 'components', maybeComponentName + '.js'],
-    [root, 'app', 'components', maybeComponentName + '.ts'],
-    [root, 'app', 'components', maybeComponentName, 'component.js'],
-    [root, 'app', 'components', maybeComponentName, 'component.ts']
-  ].map((pathParts: any) => {
+  const paths = getAbstractComponentScriptsParts(root, 'app', maybeComponentName).map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
   return paths;
@@ -161,7 +134,7 @@ function getComponentNameFromURI(root: string, uri: string) {
     .split('/components/')[1];
   if (maybeComponentName.endsWith('/template.hbs')) {
     maybeComponentName = maybeComponentName.replace('/template.hbs', '');
-  } else if (maybeComponentName.endsWith('.hbs')) {
+  } else if (isTemplatePath(maybeComponentName)) {
     maybeComponentName = maybeComponentName.replace('.hbs', '');
   }
   return maybeComponentName;
@@ -206,7 +179,7 @@ export default class DefinitionProvider {
         return pathsToLocations.apply(
           null,
           paths.length > 1
-            ? paths.filter((postfix: string) => postfix.endsWith('.hbs'))
+            ? paths.filter((postfix: string) => isTemplatePath(postfix))
             : paths
         );
       } else if (this.isComponentWithBlock(focusPath)) {
@@ -220,7 +193,7 @@ export default class DefinitionProvider {
             project.root,
             maybeComponentName
           ).filter((name: string) => {
-            return name.endsWith('.hbs');
+            return isTemplatePath(name);
           });
         }
         // mAddonPathsForComponentTemplates
@@ -240,7 +213,7 @@ export default class DefinitionProvider {
             project.root,
             maybeComponentName
           ).filter((name: string) => {
-            return !name.endsWith('.hbs');
+            return !isTemplatePath(name);
           });
         }
         const text =
@@ -257,10 +230,8 @@ export default class DefinitionProvider {
             ? _.kebabCase(focusPath.node.tag)
             : focusPath.node.original;
 
-        let helpers = [
-          [project.root, 'app', 'helpers', `${maybeComponentName}.js`],
-          [project.root, 'app', 'helpers', `${maybeComponentName}.ts`]
-        ].map((pathParts: any) => {
+        let helpers = getAbstractHelpersParts(project.root, 'app', maybeComponentName)
+        .map((pathParts: any) => {
           return path.join.apply(path, pathParts.filter((part: any) => !!part));
         });
 
@@ -280,7 +251,7 @@ export default class DefinitionProvider {
         return pathsToLocations.apply(
           null,
           paths.length > 1
-            ? paths.filter((postfix: string) => postfix.endsWith('.hbs'))
+            ? paths.filter(isTemplatePath)
             : paths
         );
       } else {
@@ -490,6 +461,14 @@ function pathsToLocations(...paths: string[]): Location[] {
       Range.create(0, 0, 0, 0)
     );
   });
+}
+
+function isTemplatePath(filePath: string) {
+  return filePath.endsWith('.hbs');
+}
+
+function hasAddonFolderInPath(name: string) {
+  return name.includes(path.sep + 'addon' + path.sep);
 }
 
 // function getLineFromText(text: string, line: number) {
