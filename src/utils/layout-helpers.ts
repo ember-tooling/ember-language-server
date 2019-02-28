@@ -268,7 +268,6 @@ export function listRoutes(root: string): CompletionItem[] {
   return items;
 }
 
-
 export function getComponentNameFromURI(root: string, uri: string) {
     let fileName = uri.replace('file://', '').replace(root, '');
     let splitter = fileName.includes(sep + '-components' + sep)

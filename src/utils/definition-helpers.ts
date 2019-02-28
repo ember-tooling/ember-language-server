@@ -122,7 +122,6 @@ export function getPathsForComponentTemplates(
   return paths;
 }
 
-
 export function getAddonPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
