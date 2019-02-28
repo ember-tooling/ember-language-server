@@ -28,7 +28,7 @@
     "walk-sync": "^1.0.1"
   },
   "devDependencies": {
-    "@types/babylon": "^6.16.2",
+    "@types/babylon": "^6.16.5",
     "@types/estree": "*",
     "@types/fuzzaldrin": "^2.1.1",
     "@types/jest": "^23.3.13",
