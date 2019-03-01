@@ -47,19 +47,30 @@ export default class TemplateDefinitionProvider {
       return null;
     }
 
+    // <FooBar />
     if (this.isAngleComponent(focusPath)) {
       return this.provideAngleBrackedComponentDefinition(root, focusPath);
+
+      // {{#foo-bar}} {{/foo-bar}}
     } else if (this.isComponentWithBlock(focusPath)) {
       return this.provideBlockComponentDefinition(root, focusPath);
+
+      // {{action "fooBar"}}, (action "fooBar"), (action this.fooBar), this.someProperty
     } else if (
       this.isActionName(focusPath) ||
       this.isLocalProperty(focusPath)
     ) {
       return this.providePropertyDefinition(root, focusPath, uri);
+
+      // {{foo-bar}}
     } else if (this.isComponentOrHelperName(focusPath)) {
       return this.provideMustacheDefinition(root, focusPath);
+
+      // <FooBar @somePropertyToFindUsage="" />
     } else if (this.isAnglePropertyAttribute(focusPath)) {
       return this.provideAngleBracketComponentAttributeUsage(root, focusPath);
+
+      // {{hello propertyUsageToFind=someValue}}
     } else if (this.isHashPairKey(focusPath)) {
       return this.provideHashPropertyUsage(project.root, focusPath);
     }
