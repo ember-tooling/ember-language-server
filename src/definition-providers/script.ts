@@ -91,58 +91,28 @@ export default class ScriptDefinietionProvider {
     }
     return null;
   }
-  muModelPaths(root: string, modelName: string) {
-    return ['ts', 'js'].map((extName: string) => {
-      return path.join(
-        root,
-        'src',
-        'data',
-        'models',
-        modelName,
-        `model.${extName}`
-      );
+  joinPaths(...args: string[]) {
+    return ['.ts', '.js'].map((extName: string) => {
+      const lastArg = args.pop() + extName;
+      return path.join.apply(null, [...args, lastArg]);
     });
+  }
+  muModelPaths(root: string, modelName: string) {
+    return this.joinPaths(root, 'src', 'data', 'models', modelName, 'model');
   }
   muTransformPaths(root: string, transformName: string) {
-    return ['ts', 'js'].map((extName: string) => {
-      return path.join(
-        root,
-        'src',
-        'data',
-        'transforms',
-        `${transformName}.${extName}`
-      );
-    });
+    return this.joinPaths(root, 'src', 'data', 'transforms', transformName);
   }
   classicModelPaths(root: string, modelName: string) {
-    return ['ts', 'js'].map((extName: string) => {
-      return path.join(root, 'app', 'models', `${modelName}.${extName}`);
-    });
+    return this.joinPaths(root, 'app', 'models', modelName);
   }
   classicTransformPaths(root: string, transformName: string) {
-    return ['ts', 'js'].map((extName: string) => {
-      return path.join(
-        root,
-        'app',
-        'transforms',
-        `${transformName}.${extName}`
-      );
-    });
+    return this.joinPaths(root, 'app', 'transforms', transformName);
   }
   podTransformPaths(root: string, transformName: string, podPrefix: string) {
-    return ['ts', 'js'].map((extName: string) => {
-      return path.join(
-        root,
-        'app',
-        podPrefix,
-        transformName,
-        `transform.${extName}`
-      );
-    });
+    return this.joinPaths(root, 'app', podPrefix, transformName, 'transform');
   }
   podModelPaths(root: string, modelName: string, podPrefix: string) {
-    return ['ts', 'js'].map((extName: string) => {
-      return path.join(root, 'app', podPrefix, modelName, `model.${extName}`);
-    });
+    return this.joinPaths(root, 'app', podPrefix, modelName, 'model');
   }
 }
