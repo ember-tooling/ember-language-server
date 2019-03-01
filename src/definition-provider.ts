@@ -18,6 +18,8 @@ import { getExtension } from './utils/file-extension';
 import { isTransformReference, isModelReference } from './utils/ast-helpers';
 import {
   isTemplatePath,
+  isModuleUnificationApp,
+  podModulePrefixForRoot,
   getComponentNameFromURI
 } from './utils/layout-helpers';
 
@@ -222,19 +224,68 @@ export default class DefinitionProvider {
 
       if (isModelReference(astPath)) {
         let modelName = astPath.node.value;
-        const modelPath = path.join(
-          project.root,
-          'app',
-          'models',
-          `${modelName}.js`
-        );
-        const tsModelPath = path.join(
-          project.root,
-          'app',
-          'models',
-          `${modelName}.ts`
-        );
-        return pathsToLocations(modelPath, tsModelPath);
+
+        const guessedPaths = [];
+
+        if (isModuleUnificationApp(project.root)) {
+          const muModelPath = path.join(
+            project.root,
+            'src',
+            'data',
+            'models',
+            modelName,
+            `model.js`
+          );
+          const tsMuModelPath = path.join(
+            project.root,
+            'src',
+            'data',
+            'models',
+            modelName,
+            `model.ts`
+          );
+
+          guessedPaths.push(muModelPath);
+          guessedPaths.push(tsMuModelPath);
+        } else {
+          const modelPath = path.join(
+            project.root,
+            'app',
+            'models',
+            `${modelName}.js`
+          );
+          const tsModelPath = path.join(
+            project.root,
+            'app',
+            'models',
+            `${modelName}.ts`
+          );
+
+          guessedPaths.push(modelPath);
+          guessedPaths.push(tsModelPath);
+
+          const podPrefix = podModulePrefixForRoot(project.root);
+          if (podPrefix) {
+            const podsModelPath = path.join(
+              project.root,
+              'app',
+              podPrefix,
+              modelName,
+              'model.js'
+            );
+            const tspodsModelPath = path.join(
+              project.root,
+              'app',
+              podPrefix,
+              modelName,
+              'model.ts'
+            );
+            guessedPaths.push(podsModelPath);
+            guessedPaths.push(tspodsModelPath);
+          }
+        }
+
+        return pathsToLocations.apply(null, guessedPaths);
       } else if (isTransformReference(astPath)) {
         let transformName = astPath.node.value;
 
