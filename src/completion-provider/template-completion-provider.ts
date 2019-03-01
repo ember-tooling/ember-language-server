@@ -195,7 +195,7 @@ export default class TemplateCompletionProvider {
         completions.push(...emberSubExpressionItems);
       } else if (isLinkToTarget(focusPath)) {
         log('isLinkToTarget');
-        completions.push(...mListRoutes(root));
+        completions.push(...uniqBy(mListRoutes(root), 'label'));
       }
     } catch (e) {
       log('error', e);

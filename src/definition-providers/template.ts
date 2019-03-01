@@ -7,13 +7,20 @@ import {
   Definition
 } from 'vscode-languageserver';
 
+import {
+  isLinkToTarget
+} from './../utils/ast-helpers';
+
 import { toPosition } from './../estree-utils';
 import Server from './../server';
 import ASTPath from './../glimmer-utils';
+import { join } from 'path';
 
 import {
   isTemplatePath,
-  getComponentNameFromURI
+  getComponentNameFromURI,
+  isModuleUnificationApp,
+  getPodModulePrefix
 } from './../utils/layout-helpers';
 
 import {
@@ -73,9 +80,38 @@ export default class TemplateDefinitionProvider {
       // {{hello propertyUsageToFind=someValue}}
     } else if (this.isHashPairKey(focusPath)) {
       return this.provideHashPropertyUsage(project.root, focusPath);
+    } else if (isLinkToTarget(focusPath)) {
+      return this.provideRouteDefinition(project.root, focusPath.node.original);
     }
 
     return null;
+  }
+  provideRouteDefinition(root: string, routeName: string) {
+    const routeParts = routeName.split('.');
+    const lastRoutePart = routeParts.pop();
+    const routePaths = isModuleUnificationApp(root) ? [
+      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.js'],
+      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.ts'],
+      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.js'],
+      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.ts'],
+      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'template.hbs'],
+    ] : [
+      [root, 'app', 'routes', ...routeParts, lastRoutePart + '.js'],
+      [root, 'app', 'routes', ...routeParts, lastRoutePart + '.ts'],
+      [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.js'],
+      [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.ts'],
+      [root, 'app', 'templates', ...routeParts, lastRoutePart + '.hbs'],
+    ];
+    const podPrefix = getPodModulePrefix(root);
+    if (podPrefix) {
+      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.js']);
+      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.ts']);
+      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'controller.js']);
+      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'controller.ts']);
+      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'template.hbs']);
+    }
+    const filteredPaths = routePaths.map((parts: string[]) => join.apply(null, parts)).filter(fs.existsSync);
+    return pathsToLocations.apply(null, filteredPaths);
   }
   provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
     const maybeComponentName = kebabCase(focusPath.node.tag);
