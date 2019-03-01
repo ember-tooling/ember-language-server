@@ -140,12 +140,10 @@ export function getProjectAddonsInfo(root: string) {
 }
 
 export function pureComponentName(relativePath: string) {
-  // /foo/bar-baz.js
-  // /foo/bar-baz/component.js
-  // /foo/bar-baz/template.hbs
-  // -> foo/bar-baz
   const ext = extname(relativePath); // .hbs
-
+  if (relativePath.startsWith('/')) {
+    relativePath = relativePath.slice(1);
+  }
   if (relativePath.endsWith(`/template.hbs`)) {
     return relativePath.replace('/template.hbs', '');
   } else if (relativePath.endsWith(`/component${ext}`)) {
@@ -248,7 +246,15 @@ export function listRoutes(root: string): CompletionItem[] {
     globs: ['**/*.{js,ts}']
   });
 
-  const items = paths.map((filePath: string) => {
+  const templatePaths = safeWalkSync(join(root, 'app', 'templates'), {
+    directories: false,
+    globs: ['**/*.hbs']
+  }).filter((name: string) => {
+    const skipEndings = ['-loading', '-error', '/loading', '/error', 'index', 'application'];
+    return !name.startsWith('components/') && skipEndings.filter((ending: string) => name.endsWith(ending + '.hbs')).length === 0;
+  });
+
+  const items = [...templatePaths, ...paths].map((filePath: string) => {
     const label = filePath.replace(extname(filePath), '').replace(/\//g, '.');
     return {
       kind: CompletionItemKind.File,
@@ -269,5 +275,9 @@ export function getComponentNameFromURI(root: string, uri: string) {
     .split(sep)
     .join('/')
     .split(splitter)[1];
+
+  if (!maybeComponentName) {
+    return null;
+  }
   return pureComponentName(maybeComponentName);
 }

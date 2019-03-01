@@ -29,8 +29,7 @@ export function pathsToLocations(...paths: string[]): Location[] {
   });
 }
 
-export function getFirstTextPostion(filePath: string, content: string) {
-  const text = fs.readFileSync(filePath, 'utf8');
+export function getFirstTextPostion(text: string, content: string) {
   const arrayOfLines = text.match(/(.*?(?:\r\n?|\n|$))/gm) || [];
   let startLine = 0;
   let startCharacter = 0;
@@ -57,7 +56,8 @@ export function getFirstTextPostion(filePath: string, content: string) {
 
 export function pathsToLocationsWithPosition(paths: string[], findMe: string) {
   return paths.filter(fs.existsSync).map((fileName: string) => {
-    const [startLine, startCharacter] = getFirstTextPostion(fileName, findMe);
+    const text = fs.readFileSync(fileName, 'utf8');
+    const [startLine, startCharacter] = getFirstTextPostion(text, findMe);
     return Location.create(
       URI.file(fileName).toString(),
       Range.create(
