@@ -28,11 +28,11 @@ export default class DefinitionProvider {
     let extension = getExtension(params.textDocument);
 
     if (extension === '.hbs') {
-        return this.template.handle(params, project);
+      return this.template.handle(params, project);
     } else if (extension === '.js') {
-        return this.script.handle(params, project);
+      return this.script.handle(params, project);
     } else {
-        return null;
+      return null;
     }
   }
 
