@@ -114,6 +114,9 @@ export default class TemplateDefinitionProvider {
   }
   providePropertyDefinition(root: string, focusPath: ASTPath, uri: string) {
     let maybeComponentName = getComponentNameFromURI(root, uri);
+    if (!maybeComponentName) {
+      return null;
+    }
     let paths: string[] = getPathsForComponentScripts(
       root,
       maybeComponentName
