@@ -192,11 +192,6 @@ Array [
     "kind": 17,
     "label": "nested.nested-route",
   },
-  Object {
-    "detail": "route",
-    "kind": 17,
-    "label": "test-route",
-  },
 ]
 `;
 
@@ -216,11 +211,6 @@ Array [
     "detail": "route",
     "kind": 17,
     "label": "nested.nested-route",
-  },
-  Object {
-    "detail": "route",
-    "kind": 17,
-    "label": "test-route",
   },
 ]
 `;
