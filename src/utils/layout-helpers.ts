@@ -144,10 +144,12 @@ export function pureComponentName(relativePath: string) {
   if (relativePath.startsWith('/')) {
     relativePath = relativePath.slice(1);
   }
-  if (relativePath.endsWith(`/template.hbs`)) {
-    return relativePath.replace('/template.hbs', '');
+  if (relativePath.endsWith(`/template${ext}`)) {
+    return relativePath.replace(`/template${ext}`, '');
   } else if (relativePath.endsWith(`/component${ext}`)) {
     return relativePath.replace(`/component${ext}`, '');
+  } else if (relativePath.endsWith(`/helper${ext}`)) {
+    return relativePath.replace(`/helper${ext}`, '');
   } else {
     return relativePath.replace(ext, '');
   }
