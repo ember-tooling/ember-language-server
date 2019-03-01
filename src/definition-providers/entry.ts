@@ -15,7 +15,7 @@ export default class DefinitionProvider {
 
   constructor(private server: Server) {
     this.template = new TemplateDefinitionProvider(server);
-    this.script = new ScriptDefinietionProvider(server)
+    this.script = new ScriptDefinietionProvider(server);
   }
 
   handle(params: TextDocumentPositionParams): Definition | null {
