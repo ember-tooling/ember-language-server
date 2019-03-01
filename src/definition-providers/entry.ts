@@ -22,9 +22,11 @@ export default class DefinitionProvider {
     let uri = params.textDocument.uri;
 
     const project = this.server.projectRoots.projectForUri(uri);
+
     if (!project) {
       return null;
     }
+
     let extension = getExtension(params.textDocument);
 
     if (extension === '.hbs') {
