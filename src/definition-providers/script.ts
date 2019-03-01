@@ -61,7 +61,32 @@ export default class ScriptDefinietionProvider {
       return pathsToLocations.apply(null, guessedPaths);
     } else if (isTransformReference(astPath)) {
       let transformName = astPath.node.value;
-      const guessedPaths = this.classicTransformPaths(project.root, transformName);
+      const guessedPaths: string[] = [];
+
+      if (isModuleUnificationApp(project.root)) {
+        this.muTransformPaths(project.root, transformName).forEach(
+          (pathLocation: string) => {
+            guessedPaths.push(pathLocation);
+          }
+        );
+      } else {
+        this.classicTransformPaths(project.root, transformName).forEach(
+          (pathLocation: string) => {
+            guessedPaths.push(pathLocation);
+          }
+        );
+
+        const podPrefix = podModulePrefixForRoot(project.root);
+        if (podPrefix) {
+          this.podTransformPaths(
+            project.root,
+            transformName,
+            podPrefix
+          ).forEach((pathLocation: string) => {
+            guessedPaths.push(pathLocation);
+          });
+        }
+      }
       return pathsToLocations.apply(null, guessedPaths);
     }
     return null;
@@ -78,6 +103,17 @@ export default class ScriptDefinietionProvider {
       );
     });
   }
+  muTransformPaths(root: string, transformName: string) {
+    return ['ts', 'js'].map((extName: string) => {
+      return path.join(
+        root,
+        'src',
+        'data',
+        'transforms',
+        `${transformName}.${extName}`
+      );
+    });
+  }
   classicModelPaths(root: string, modelName: string) {
     return ['ts', 'js'].map((extName: string) => {
       return path.join(root, 'app', 'models', `${modelName}.${extName}`);
@@ -85,7 +121,23 @@ export default class ScriptDefinietionProvider {
   }
   classicTransformPaths(root: string, transformName: string) {
     return ['ts', 'js'].map((extName: string) => {
-      return path.join(root, 'app', 'transforms', `${transformName}.${extName}`);
+      return path.join(
+        root,
+        'app',
+        'transforms',
+        `${transformName}.${extName}`
+      );
+    });
+  }
+  podTransformPaths(root: string, transformName: string, podPrefix: string) {
+    return ['ts', 'js'].map((extName: string) => {
+      return path.join(
+        root,
+        'app',
+        podPrefix,
+        transformName,
+        `transform.${extName}`
+      );
     });
   }
   podModelPaths(root: string, modelName: string, podPrefix: string) {
