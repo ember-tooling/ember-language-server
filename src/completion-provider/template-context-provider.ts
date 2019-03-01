@@ -6,7 +6,8 @@ import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 import {
   isModuleUnificationApp,
   safeWalkSync,
-  podModulePrefixForRoot
+  podModulePrefixForRoot,
+  pureComponentName
 } from '../utils/layout-helpers';
 
 import { log } from '../utils/logger';
@@ -27,12 +28,7 @@ export function templateContextLookup(
   if (nameParts.length !== 2) {
     return [];
   }
-  let componentName = nameParts[1].split('.')[0];
-  if (componentName.endsWith('/component')) {
-    componentName = componentName.replace('/component', '');
-  } else if (componentName.endsWith('/template')) {
-    componentName = componentName.replace('/template', '');
-  }
+  let componentName = pureComponentName(nameParts[1].split('.')[0]);
   return componentsContextData(root, componentName, templateContent);
 }
 
@@ -79,16 +75,14 @@ function componentsContextData(
   const jsPaths = safeWalkSync(getComponentsScriptsFolder(root), {
     directories: false,
     globs: [
-      `**/${postfix}.js`,
-      `**/**/${postfix}/component.js`,
-      `**/${postfix}.ts`,
-      `**/**/${postfix}/component.ts`
+      `**/${postfix}.{js,ts}`,
+      `**/**/${postfix}/component.{js,ts}`
     ]
   });
 
   const jsPodsPaths = safeWalkSync(getPoddedComponentsScriptsFolder(root), {
     directories: false,
-    globs: [`**/**/${postfix}/component.js`, `**/**/${postfix}/component.ts`]
+    globs: [`**/**/${postfix}/component.{js,ts}`]
   });
 
   log('jsPaths', jsPaths);
