@@ -101,11 +101,11 @@ export function isEmeberAddon(info: any) {
 }
 
 export function isTemplatePath(filePath: string) {
-    return filePath.endsWith('.hbs');
+  return filePath.endsWith('.hbs');
 }
 
 export function hasAddonFolderInPath(name: string) {
-    return name.includes(sep + 'addon' + sep);
+  return name.includes(sep + 'addon' + sep);
 }
 
 export function getProjectAddonsInfo(root: string) {
@@ -139,6 +139,22 @@ export function getProjectAddonsInfo(root: string) {
   return normalizedResult;
 }
 
+export function pureComponentName(relativePath: string) {
+  // /foo/bar-baz.js
+  // /foo/bar-baz/component.js
+  // /foo/bar-baz/template.hbs
+  // -> foo/bar-baz
+  const ext = extname(relativePath); // .hbs
+
+  if (relativePath.endsWith(`/template.hbs`)) {
+    return relativePath.replace('/template.hbs', '');
+  } else if (relativePath.endsWith(`/component${ext}`)) {
+    return relativePath.replace(`/component${ext}`, '');
+  } else {
+    return relativePath.replace(ext, '');
+  }
+}
+
 export function listPodsComponents(root: string): CompletionItem[] {
   let podModulePrefix = podModulePrefixForRoot(root);
   if (podModulePrefix === null) {
@@ -151,20 +167,12 @@ export function listPodsComponents(root: string): CompletionItem[] {
       directories: false,
       globs: ['**/*.{js,ts,hbs}']
     }
-  ).map((name: string) => {
-    if (name.endsWith('/template.hbs')) {
-      return name.replace('/template', '');
-    } else if (name.includes('/component.')) {
-      return name.replace('/component', '');
-    } else {
-      return name;
-    }
-  });
+  );
 
   const items = jsPaths.map((filePath: string) => {
     return {
       kind: CompletionItemKind.Class,
-      label: filePath.replace(extname(filePath), ''),
+      label: pureComponentName(filePath),
       detail: 'component'
     };
   });
@@ -177,20 +185,12 @@ export function listMUComponents(root: string): CompletionItem[] {
   const jsPaths = safeWalkSync(join(root, 'src', 'ui', 'components'), {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
-  }).map((name: string) => {
-    if (name.endsWith('/template.hbs')) {
-      return name.replace('/template', '');
-    } else if (name.includes('/component.')) {
-      return name.replace('/component', '');
-    } else {
-      return name;
-    }
   });
 
   const items = jsPaths.map((filePath: string) => {
     return {
       kind: CompletionItemKind.Class,
-      label: filePath.replace(extname(filePath), ''),
+      label: pureComponentName(filePath),
       detail: 'component'
     };
   });
@@ -203,14 +203,6 @@ export function listComponents(root: string): CompletionItem[] {
   const jsPaths = safeWalkSync(join(root, 'app', 'components'), {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
-  }).map((name: string) => {
-    if (name.endsWith('/template.hbs')) {
-      return name.replace('/template', '');
-    } else if (name.includes('/component.')) {
-      return name.replace('/component', '');
-    } else {
-      return name;
-    }
   });
 
   const hbsPaths = safeWalkSync(join(root, 'app', 'templates', 'components'), {
@@ -223,7 +215,7 @@ export function listComponents(root: string): CompletionItem[] {
   const items = paths.map((filePath: string) => {
     return {
       kind: CompletionItemKind.Class,
-      label: filePath.replace(extname(filePath), ''),
+      label: pureComponentName(filePath),
       detail: 'component'
     };
   });
@@ -241,7 +233,7 @@ export function listHelpers(root: string): CompletionItem[] {
   const items = paths.map((filePath: string) => {
     return {
       kind: CompletionItemKind.Function,
-      label: filePath.replace(extname(filePath), ''),
+      label: pureComponentName(filePath),
       detail: 'helper'
     };
   });
@@ -269,18 +261,13 @@ export function listRoutes(root: string): CompletionItem[] {
 }
 
 export function getComponentNameFromURI(root: string, uri: string) {
-    let fileName = uri.replace('file://', '').replace(root, '');
-    let splitter = fileName.includes(sep + '-components' + sep)
-      ? '/-components/'
-      : '/components/';
-    let maybeComponentName = fileName
-      .split(sep)
-      .join('/')
-      .split(splitter)[1];
-    if (maybeComponentName.endsWith('/template.hbs')) {
-      maybeComponentName = maybeComponentName.replace('/template.hbs', '');
-    } else if (isTemplatePath(maybeComponentName)) {
-      maybeComponentName = maybeComponentName.replace('.hbs', '');
-    }
-    return maybeComponentName;
-  }
+  let fileName = uri.replace('file://', '').replace(root, '');
+  let splitter = fileName.includes(sep + '-components' + sep)
+    ? '/-components/'
+    : '/components/';
+  let maybeComponentName = fileName
+    .split(sep)
+    .join('/')
+    .split(splitter)[1];
+  return pureComponentName(maybeComponentName);
+}
