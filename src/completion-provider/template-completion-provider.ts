@@ -31,8 +31,7 @@ import {
   listPodsComponents,
   listHelpers,
   listRoutes,
-  mGetProjectAddonsInfo,
-  isTemplatePath
+  mGetProjectAddonsInfo
 } from '../utils/layout-helpers';
 
 const mTemplateContextLookup = memoize(templateContextLookup, {

@@ -17,15 +17,15 @@ export default class ScriptDefinietionProvider {
   constructor(private server: Server) {}
 
   handle(params: TextDocumentPositionParams, project: any): Definition | null {
-    let uri = params.textDocument.uri;
+    const uri = params.textDocument.uri;
+    const { root } = project;
+    const content = this.server.documents.get(uri).getText();
 
-    let content = this.server.documents.get(uri).getText();
-
-    let ast = parse(content, {
+    const ast = parse(content, {
       sourceType: 'module'
     });
 
-    let astPath = ASTPath.toPosition(ast, toPosition(params.position));
+    const astPath = ASTPath.toPosition(ast, toPosition(params.position));
 
     if (!astPath) {
       return null;
@@ -36,50 +36,49 @@ export default class ScriptDefinietionProvider {
 
       const guessedPaths: string[] = [];
 
-      if (isModuleUnificationApp(project.root)) {
-        this.muModelPaths(project.root, modelName).forEach(
+      if (isModuleUnificationApp(root)) {
+        this.muModelPaths(root, modelName).forEach(
           (pathLocation: string) => {
             guessedPaths.push(pathLocation);
           }
         );
       } else {
-        this.classicModelPaths(project.root, modelName).forEach(
+        this.classicModelPaths(root, modelName).forEach(
           (pathLocation: string) => {
             guessedPaths.push(pathLocation);
           }
         );
-        const podPrefix = podModulePrefixForRoot(project.root);
+        const podPrefix = podModulePrefixForRoot(root);
         if (podPrefix) {
-          this.podModelPaths(project.root, modelName, podPrefix).forEach(
+          this.podModelPaths(root, modelName, podPrefix).forEach(
             (pathLocation: string) => {
               guessedPaths.push(pathLocation);
             }
           );
         }
       }
-
       return pathsToLocations.apply(null, guessedPaths);
     } else if (isTransformReference(astPath)) {
       let transformName = astPath.node.value;
       const guessedPaths: string[] = [];
 
-      if (isModuleUnificationApp(project.root)) {
-        this.muTransformPaths(project.root, transformName).forEach(
+      if (isModuleUnificationApp(root)) {
+        this.muTransformPaths(root, transformName).forEach(
           (pathLocation: string) => {
             guessedPaths.push(pathLocation);
           }
         );
       } else {
-        this.classicTransformPaths(project.root, transformName).forEach(
+        this.classicTransformPaths(root, transformName).forEach(
           (pathLocation: string) => {
             guessedPaths.push(pathLocation);
           }
         );
 
-        const podPrefix = podModulePrefixForRoot(project.root);
+        const podPrefix = podModulePrefixForRoot(root);
         if (podPrefix) {
           this.podTransformPaths(
-            project.root,
+            root,
             transformName,
             podPrefix
           ).forEach((pathLocation: string) => {
@@ -93,8 +92,9 @@ export default class ScriptDefinietionProvider {
   }
   joinPaths(...args: string[]) {
     return ['.ts', '.js'].map((extName: string) => {
-      const lastArg = args.pop() + extName;
-      return path.join.apply(null, [...args, lastArg]);
+      const localArgs = args.slice(0);
+      const lastArg = localArgs.pop() + extName;
+      return path.join.apply(path, [...localArgs, lastArg]);
     });
   }
   muModelPaths(root: string, modelName: string) {

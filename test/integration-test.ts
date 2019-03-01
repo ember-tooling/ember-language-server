@@ -49,7 +49,7 @@ function normalizeUri(objects: Definition) {
   return objects.map(object => {
     if (object.uri) {
       const { uri } = object;
-      object.uri = replaceDynamicUriPart(object.uri);
+      object.uri = replaceDynamicUriPart(uri);
     }
 
     return object;
