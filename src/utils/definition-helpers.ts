@@ -1,6 +1,14 @@
 const path = require('path');
 const fs = require('fs');
 const memoize = require('memoizee');
+
+import {
+  Location,
+  Range
+} from 'vscode-languageserver';
+
+import URI from 'vscode-uri';
+
 import {
   isModuleUnificationApp,
   podModulePrefixForRoot,
@@ -11,6 +19,57 @@ const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
   length: 1,
   maxAge: 600000
 });
+
+export function pathsToLocations(...paths: string[]): Location[] {
+  return paths.filter(fs.existsSync).map(modulePath => {
+    return Location.create(
+      URI.file(modulePath).toString(),
+      Range.create(0, 0, 0, 0)
+    );
+  });
+}
+
+export function getFirstTextPostion(filePath: string, content: string) {
+  const text = fs.readFileSync(filePath, 'utf8');
+  const arrayOfLines = text.match(/(.*?(?:\r\n?|\n|$))/gm) || [];
+  let startLine = 0;
+  let startCharacter = 0;
+  arrayOfLines.forEach((line: string, index: number) => {
+    if (startLine || startCharacter) {
+      return;
+    }
+    let textPosition = line.indexOf(content);
+    let bounds = line.split(content);
+    if (textPosition > -1) {
+      if (
+        /\s/.test(bounds[0].charAt(bounds[0].length - 1)) ||
+        bounds[0].trim().length === 0
+      ) {
+        if (/^[A-Za-z]+$/.test(bounds[1].charAt(0)) === false) {
+          startLine = index;
+          startCharacter = textPosition;
+        }
+      }
+    }
+  });
+  return [startLine, startCharacter];
+}
+
+export function pathsToLocationsWithPosition(paths: string[], findMe: string) {
+  return paths.filter(fs.existsSync).map((fileName: string) => {
+    const [startLine, startCharacter] = getFirstTextPostion(fileName, findMe);
+    return Location.create(
+      URI.file(fileName).toString(),
+      Range.create(
+        startLine,
+        startCharacter,
+        startLine,
+        startCharacter + findMe.length
+      )
+    );
+  });
+}
+
 export function getAbstractHelpersParts(
   root: string,
   prefix: string,

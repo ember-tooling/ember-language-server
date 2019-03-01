@@ -16,7 +16,7 @@ import {
 } from 'vscode-languageserver';
 
 import ProjectRoots from './project-roots';
-import DefinitionProvider from './definition-provider';
+import DefinitionProvider from './definition-providers/entry';
 import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
