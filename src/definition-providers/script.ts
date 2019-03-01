@@ -1,11 +1,9 @@
 import * as path from 'path';
-
-import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
-
-import { parse } from 'babylon';
-import { toPosition } from './../estree-utils';
 import Server from './../server';
 import ASTPath from './../glimmer-utils';
+import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
+import { parse } from 'babylon';
+import { toPosition } from './../estree-utils';
 import { pathsToLocations } from '../utils/definition-helpers';
 import { isTransformReference, isModelReference } from './../utils/ast-helpers';
 import {
@@ -14,7 +12,7 @@ import {
 } from './../utils/layout-helpers';
 
 type ItemType = 'Model' | 'Transform';
-type LayoutCollectorFn = (root: string, typeName: string, podModulePrefix?: string) => string[];
+type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
 
 function joinPaths(...args: string[]) {
   return ['.ts', '.js'].map((extName: string) => {
