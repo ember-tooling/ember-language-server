@@ -50,6 +50,16 @@ const mListPodsComponents = memoize(listPodsComponents, {
 const mListHelpers = memoize(listHelpers, { length: 1, maxAge: 60000 }); // 1 second
 
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
+
+function mListMURouteLevelComponents(projectRoot: string, fileURI: string) {
+  // /**/routes/**/-components/**/*.{js,ts,hbs}
+  // we need to get current nesting level and resolve related components
+  // only if we have -components under current fileURI template path
+  if (!projectRoot || !fileURI) {
+    return [];
+  }
+  return [];
+}
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
 
@@ -65,6 +75,9 @@ export default class TemplateCompletionProvider {
       return [];
     }
     let document = this.server.documents.get(uri);
+    if (!document) {
+      return [];
+    }
     let offset = document.offsetAt(params.position);
     // log('offset', offset);
     let originalText = document.getText();
@@ -80,7 +93,8 @@ export default class TemplateCompletionProvider {
         .concat(
           mListMUComponents(project.root),
           mListComponents(project.root),
-          mListPodsComponents(project.root)
+          mListPodsComponents(project.root),
+          mListMURouteLevelComponents(project.root, uri)
         )
         .filter((item: any) => {
           return !item.label.includes('/');
