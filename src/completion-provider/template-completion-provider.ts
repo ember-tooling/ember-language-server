@@ -212,6 +212,7 @@ export default class TemplateCompletionProvider {
       log('error', e);
     }
 
+    log('prefix', getTextPrefix(focusPath, normalPlaceholder));
     return filter(completions, getTextPrefix(focusPath, normalPlaceholder), {
       key: 'label',
       maxResults: 40
@@ -219,6 +220,7 @@ export default class TemplateCompletionProvider {
   }
 }
 
-function getTextPrefix({ node: { original = '' } }: ASTPath, PLACEHOLDER: string): string {
-  return original.replace(PLACEHOLDER, '');
+function getTextPrefix({ node }: ASTPath, normalPlaceholder: string): string {
+  let target = node.original || node.tag || '';
+  return target.replace(normalPlaceholder, '').replace(PLACEHOLDER, '');
 }
