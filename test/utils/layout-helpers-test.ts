@@ -104,6 +104,7 @@ describe('definition-helpers', function() {
     it('return expected list of routes for classic project', function() {
         const components = listRoutes(join(__dirname, './../fixtures/full-project'));
         expect(components.map(({label}: {label: string}) => label )).toEqual([
+            'angle-completion',
             'definition',
             'test-route',
             'nested.nested-route',

@@ -91,16 +91,6 @@ export default class TemplateCompletionProvider {
       'label'
     );
   }
-  isLooksLikeAngleBracketAutocomplete(firstTextPart: string) {
-    if (
-      firstTextPart.indexOf('<') !== -1 &&
-      firstTextPart.lastIndexOf('>') < firstTextPart.lastIndexOf('<')
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
   getMustachePathCandidates(root: string, uri: string, originalText: string) {
     let candidates: any = [
       ...mTemplateContextLookup(root, uri, originalText),
@@ -136,7 +126,7 @@ export default class TemplateCompletionProvider {
     ];
     return candidates;
   }
-  getTextForGuessing(originalText: string, offset: number) {
+  getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
     return originalText.slice(0, offset) +
     PLACEHOLDER +
     originalText.slice(offset);
@@ -155,38 +145,49 @@ export default class TemplateCompletionProvider {
     const { root } = project;
     const offset = document.offsetAt(params.position);
     const originalText = document.getText();
-    const text = this.getTextForGuessing(originalText, offset);
+    log('originalText', originalText);
     const completions: CompletionItem[] = [];
-
+    let normalPlaceholder: any = PLACEHOLDER;
     let ast: any = {};
 
-    // looks like this is an angle-bracked component
-    const firstTextPart = originalText.slice(0, offset);
-    if (this.isLooksLikeAngleBracketAutocomplete(firstTextPart)) {
-      const angleComponents = this.getAllAngleBracketComponents(root, uri);
-      let tmp: any = firstTextPart.split('<').pop();
-      return filter(angleComponents, tmp, {
-        key: 'label',
-        maxResults: 40
-      });
-    }
+    const cases = [
+      PLACEHOLDER + ' />',
+      PLACEHOLDER,
+      PLACEHOLDER + '"',
+      PLACEHOLDER + '}}',
+      PLACEHOLDER + '\''
+    ];
 
-    try {
-      ast = preprocess(text);
-    } catch (e) {
-      log('unable to get ast', e, text);
+    while (cases.length) {
+      normalPlaceholder = cases.shift();
+      try {
+        let validText = this.getTextForGuessing(originalText, offset, normalPlaceholder);
+        ast = preprocess(validText);
+        log('validText', validText);
+        break;
+      } catch (e) {
+        log('parsing-error', this.getTextForGuessing(originalText, offset, normalPlaceholder));
+        ast = null;
+      }
+    }
+    log('ast must exists');
+    if (ast === null) {
       return [];
     }
+
     const focusPath = ASTPath.toPosition(ast, toPosition(params.position));
 
     if (!focusPath) {
+      log('focus path does not exists');
       return [];
     }
-
+    log(focusPath.node);
     try {
       if (isAngleComponentPath(focusPath)) {
+        log('isAngleComponentPath');
         // <Foo>
         const candidates = this.getAllAngleBracketComponents(root, uri);
+        log(candidates);
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isMustachePath(focusPath)) {
         // {{foo-bar?}}
@@ -211,13 +212,13 @@ export default class TemplateCompletionProvider {
       log('error', e);
     }
 
-    return filter(completions, getTextPrefix(focusPath), {
+    return filter(completions, getTextPrefix(focusPath, normalPlaceholder), {
       key: 'label',
       maxResults: 40
     });
   }
 }
 
-function getTextPrefix({ node: { original = '' } }: ASTPath): string {
+function getTextPrefix({ node: { original = '' } }: ASTPath, PLACEHOLDER: string): string {
   return original.replace(PLACEHOLDER, '');
 }

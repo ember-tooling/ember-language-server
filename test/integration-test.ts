@@ -116,14 +116,14 @@ describe('integration', function() {
     });
 
     it('returns all angle-bracket in a element expression', async () => {
-      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'application.hbs');
+      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'angle-completion.hbs');
       const params = {
         textDocument: {
           uri: `file://${applicationTemplatePath}`
         },
         position: {
-          line: 2,
-          character: 1
+          line: 1,
+          character: 2
         }
       };
 
