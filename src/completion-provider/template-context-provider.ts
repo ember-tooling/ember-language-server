@@ -1,11 +1,9 @@
 import { join } from 'path';
-import uniqueBy from '../utils/unique-by';
 import { readFileSync, existsSync } from 'fs';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
 import {
   isModuleUnificationApp,
-  safeWalkSync,
   podModulePrefixForRoot,
   pureComponentName
 } from '../utils/layout-helpers';
@@ -17,6 +15,18 @@ import {
   processJSFile,
   processTemplate
 } from 'ember-meta-explorer';
+
+const { uniqBy } = require('lodash');
+
+function localizeName(name: string) {
+  if (name.startsWith('this.')) {
+    return name;
+  } else if (name.startsWith('@')) {
+    return name;
+  } else {
+    return 'this.' + name;
+  }
+}
 
 export function templateContextLookup(
   root: string,
@@ -32,100 +42,55 @@ export function templateContextLookup(
   return componentsContextData(root, componentName, templateContent);
 }
 
-function getComponentsScriptsFolder(root: string) {
+function findComponentScripts(root: string, componentName: string) {
+  const possibleLocations = [];
   if (isModuleUnificationApp(root)) {
-    return join(root, 'src', 'ui', 'components');
+    possibleLocations.push([root, 'src', 'ui', 'components', componentName, 'component.js']);
+    possibleLocations.push([root, 'src', 'ui', 'components', componentName, 'component.ts']);
   } else {
-    return join(root, 'app', 'components');
+    possibleLocations.push([root, 'app', 'components', componentName, 'component.js']);
+    possibleLocations.push([root, 'app', 'components', componentName, 'component.ts']);
+    possibleLocations.push([root, 'app', 'components', componentName + '.js']);
+    possibleLocations.push([root, 'app', 'components', componentName + '.ts']);
+    const prefix = podModulePrefixForRoot(root);
+    if (prefix) {
+      possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.js']);
+      possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.ts']);
+    }
   }
-}
-
-function getComponentFileLocationPath(root: string, filePath: string) {
-  if (isModuleUnificationApp(root)) {
-    return join(root, 'src', 'ui', 'components', filePath);
-  } else {
-    return join(root, 'app', 'components', filePath);
-  }
-}
-
-function getPoddedComponentsScriptsFolder(root: string) {
-  let prefix = podModulePrefixForRoot(root);
-  if (prefix) {
-    return join(root, 'app', prefix, 'components');
-  } else {
-    return false;
-  }
-}
-
-function getPoddedComponentsFileLocationPath(root: string, filePath: string) {
-  let prefix = podModulePrefixForRoot(root);
-  if (prefix) {
-    return join(root, 'app', prefix, 'components', filePath);
-  } else {
-    return false;
-  }
+  return possibleLocations.map((locArr: string[]) => join.apply(null, locArr));
 }
 
 function componentsContextData(
   root: string,
-  postfix: string,
+  componentName: string,
   templateContent: string
 ): CompletionItem[] {
-  log('templateContextLookup', root, postfix, templateContent);
-  const jsPaths = safeWalkSync(getComponentsScriptsFolder(root), {
-    directories: false,
-    globs: [
-      `**/${postfix}.{js,ts}`,
-      `**/**/${postfix}/component.{js,ts}`
-    ]
-  });
+  const maybeScripts = findComponentScripts(root, componentName);
+  const existingScripts = maybeScripts.filter(existsSync);
+  if (!existingScripts.length) {
+    return [];
+  }
+  const filePath = existingScripts.pop();
+  const fileContent = readFileSync(filePath, { encoding: 'utf8' });
+  const infoItems: any[] = [];
 
-  const jsPodsPaths = safeWalkSync(getPoddedComponentsScriptsFolder(root), {
-    directories: false,
-    globs: [`**/**/${postfix}/component.{js,ts}`]
-  });
-
-  log('jsPaths', jsPaths);
-  const infoItems = [].concat.apply(
-    [],
-    [...jsPodsPaths, ...jsPaths]
-      .filter((fileName: string) => {
-        return !!fileName;
-      })
-      .map((filePath: string) => {
-        const fileLocation = getComponentFileLocationPath(root, filePath);
-        const podFileLocation = getPoddedComponentsFileLocationPath(
-          root,
-          filePath
-        );
-        log('fileLocation', fileLocation);
-        let fileContent = '';
-        if (existsSync(fileLocation)) {
-          fileContent = readFileSync(fileLocation, { encoding: 'utf8' });
-        } else if (podFileLocation && existsSync(podFileLocation)) {
-          fileContent = readFileSync(podFileLocation, { encoding: 'utf8' });
-        } else {
-          return null;
-        }
-        log('fileContent', fileContent);
-        try {
-          const jsMeta = processJSFile(fileContent, filePath);
-          log('jsMeta', jsMeta);
-          return jsMeta;
-        } catch (e) {
-          log('error', e);
-          return null;
-        }
-      })
-  );
-
-  let templateInfo: any = null;
   try {
+    const jsMeta = processJSFile(fileContent, filePath);
+    log('jsMeta', jsMeta);
+    infoItems.push(jsMeta);
+  } catch (e) {
+    log('error', e);
+  }
+
+  try {
+    let templateInfo: any = null;
     templateInfo = processTemplate(templateContent);
+    infoItems.push(templateInfo);
   } catch (e) {
     log('templateError', e);
   }
-  infoItems.push(templateInfo);
+
   log('infoItems', infoItems);
 
   const meta: any = infoItems
@@ -150,15 +115,6 @@ function componentsContextData(
     log('contextInforError', e);
   }
   log('contextInfo', contextInfo);
-  function localizeName(name: string) {
-    if (name.startsWith('this.')) {
-      return name;
-    } else if (name.startsWith('@')) {
-      return name;
-    } else {
-      return 'this.' + name;
-    }
-  }
 
   contextInfo.jsProps.forEach((propName: string) => {
     const [name]: any = propName.split(' ');
@@ -201,5 +157,5 @@ function componentsContextData(
   //   });
   // });
   // @todo actions
-  return uniqueBy(items, 'label');
+  return uniqBy(items, 'label');
 }
