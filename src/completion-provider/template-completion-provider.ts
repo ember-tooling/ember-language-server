@@ -100,33 +100,65 @@ export default class TemplateCompletionProvider {
       return false;
     }
   }
+  getMustachePathCandidates(root: string, uri: string, originalText: string) {
+    let candidates: any = [
+      ...mTemplateContextLookup(root, uri, originalText),
+      ...mListComponents(root),
+      ...mListMUComponents(root),
+      ...mListPodsComponents(root),
+      ...mListHelpers(root),
+      ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+        return detail === 'component' || detail === 'helper';
+      })
+    ];
+    return candidates;
+  }
+  getBlockPathCandidates(root: string, uri: string, originalText: string) {
+    let candidates = [
+      ...mTemplateContextLookup(root, uri, originalText),
+      ...mListComponents(root),
+      ...mListMUComponents(root),
+      ...mListPodsComponents(root),
+      ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+        return detail === 'component';
+      })
+    ];
+    return candidates;
+  }
+  getSubExpressionPathCandidates(root: string, uri: string, originalText: string) {
+    let candidates = [
+      ...mTemplateContextLookup(root, uri, originalText),
+      ...mListHelpers(root),
+      ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+        return detail === 'helper';
+      })
+    ];
+    return candidates;
+  }
+  getTextForGuessing(originalText: string, offset: number) {
+    return originalText.slice(0, offset) +
+    PLACEHOLDER +
+    originalText.slice(offset);
+  }
   provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
     log('provideCompletions');
-    const uri = params.textDocument.uri;
-
     if (getExtension(params.textDocument) !== '.hbs') {
       return [];
     }
+    const uri = params.textDocument.uri;
     const project = this.server.projectRoots.projectForUri(uri);
-    if (!project) {
+    const document = this.server.documents.get(uri);
+    if (!project || !document) {
       return [];
     }
     const { root } = project;
-    let document = this.server.documents.get(uri);
-    if (!document) {
-      return [];
-    }
-    let offset = document.offsetAt(params.position);
-    log('offset', offset);
-    let originalText = document.getText();
-    log('originalText', originalText);
-    let text =
-      originalText.slice(0, offset) +
-      PLACEHOLDER +
-      originalText.slice(offset);
-    let ast: any = {};
-    log('originalText', originalText);
+    const offset = document.offsetAt(params.position);
+    const originalText = document.getText();
+    const text = this.getTextForGuessing(originalText, offset);
+    const completions: CompletionItem[] = [];
     const angleComponents = this.getAllAngleBracketComponents(root, uri);
+
+    let ast: any = {};
 
     // looks like this is an angle-bracked component
     const firstTextPart = originalText.slice(0, offset);
@@ -139,71 +171,37 @@ export default class TemplateCompletionProvider {
     }
 
     try {
-      log('textFor AST', text);
       ast = preprocess(text);
     } catch (e) {
-      log('unable to get ast', text);
+      log('unable to get ast', e, text);
       return angleComponents;
     }
-    let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
+    const focusPath = ASTPath.toPosition(ast, toPosition(params.position));
+
     if (!focusPath) {
-      log(ast, params.position);
-      log('focusPath - exit');
       return [];
     }
-    log('go', focusPath);
-    let completions: CompletionItem[] = [];
-    log('focusPath', focusPath);
+
     try {
       if (isMustachePath(focusPath)) {
-        log('isMustachePath');
-        let candidates: any = [
-          ...mTemplateContextLookup(root, uri, originalText),
-          ...mListComponents(root),
-          ...mListMUComponents(root),
-          ...mListPodsComponents(root),
-          ...mListHelpers(root),
-          ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
-            return detail === 'component' || detail === 'helper';
-          })
-        ];
+        const candidates = this.getMustachePathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberMustacheItems);
       } else if (isBlockPath(focusPath)) {
-        log('isBlockPath');
-        let candidates = [
-          ...mTemplateContextLookup(root, uri, originalText),
-          ...mListComponents(root),
-          ...mListMUComponents(root),
-          ...mListPodsComponents(root),
-          ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
-            return detail === 'component';
-          })
-        ];
+        const candidates = this.getBlockPathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberBlockItems);
       } else if (isSubExpressionPath(focusPath)) {
-        log('isSubExpressionPath');
-        let candidates = [
-          ...mTemplateContextLookup(root, uri, originalText),
-          ...mListHelpers(root),
-          ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
-            return detail === 'helper';
-          })
-        ];
+        const candidates = this.getSubExpressionPathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
       } else if (isLinkToTarget(focusPath)) {
-        log('isLinkToTarget');
         completions.push(...uniqBy(mListRoutes(root), 'label'));
       }
     } catch (e) {
       log('error', e);
     }
 
-    // const normalizedResults = _.uniqueBy(completions, 'label');
-    log('normalizedResults', completions);
-    // log('getTextPrefix(focusPath)', getTextPrefix(focusPath));
     return filter(completions, getTextPrefix(focusPath), {
       key: 'label',
       maxResults: 40
