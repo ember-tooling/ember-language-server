@@ -115,6 +115,26 @@ describe('integration', function() {
       expect(response).toMatchSnapshot();
     });
 
+    it('returns all angle-bracket in a element expression', async () => {
+      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'application.hbs');
+      const params = {
+        textDocument: {
+          uri: `file://${applicationTemplatePath}`
+        },
+        position: {
+          line: 2,
+          character: 1
+        }
+      };
+
+      openFile(connection, applicationTemplatePath);
+
+      const response = await connection
+        .sendRequest(CompletionRequest.type, params);
+
+      expect(response).toMatchSnapshot();
+    });
+
     it('returns all routes when requesting completion items in an inline link-to', async () => {
       const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
       const params = {

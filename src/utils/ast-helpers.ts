@@ -20,6 +20,21 @@ export function isTransformReference(astPath: ASTPath): boolean {
   return identifier.name === 'attr';
 }
 
+export function isAngleComponentPath(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'ElementNode') {
+    return false;
+  }
+  if (node.tag.length === 0) {
+    return true;
+  }
+  if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 export function isMustachePath(path: ASTPath): boolean {
   let node = path.node;
   if (node.type !== 'PathExpression') {

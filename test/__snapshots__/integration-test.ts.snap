@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`integration Completion request returns all components and helpers when requesting completion items in a handlebars expression 1`] = `
+exports[`integration Completion request returns all angle-bracket in a element expression 1`] = `
 Array [
   Object {
     "detail": "component",
@@ -11,6 +11,21 @@ Array [
     "detail": "component",
     "kind": 7,
     "label": "MyAwesomeComponent",
+  },
+]
+`;
+
+exports[`integration Completion request returns all components and helpers when requesting completion items in a handlebars expression 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "another-awesome-component",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "my-awesome-component",
   },
   Object {
     "detail": "component",

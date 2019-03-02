@@ -23,7 +23,8 @@ import {
   isLinkToTarget,
   isMustachePath,
   isBlockPath,
-  isSubExpressionPath
+  isSubExpressionPath,
+  isAngleComponentPath
 } from '../utils/ast-helpers';
 import {
   listComponents,
@@ -156,13 +157,13 @@ export default class TemplateCompletionProvider {
     const originalText = document.getText();
     const text = this.getTextForGuessing(originalText, offset);
     const completions: CompletionItem[] = [];
-    const angleComponents = this.getAllAngleBracketComponents(root, uri);
 
     let ast: any = {};
 
     // looks like this is an angle-bracked component
     const firstTextPart = originalText.slice(0, offset);
     if (this.isLooksLikeAngleBracketAutocomplete(firstTextPart)) {
+      const angleComponents = this.getAllAngleBracketComponents(root, uri);
       let tmp: any = firstTextPart.split('<').pop();
       return filter(angleComponents, tmp, {
         key: 'label',
@@ -174,7 +175,7 @@ export default class TemplateCompletionProvider {
       ast = preprocess(text);
     } catch (e) {
       log('unable to get ast', e, text);
-      return angleComponents;
+      return [];
     }
     const focusPath = ASTPath.toPosition(ast, toPosition(params.position));
 
@@ -183,19 +184,27 @@ export default class TemplateCompletionProvider {
     }
 
     try {
-      if (isMustachePath(focusPath)) {
+      if (isAngleComponentPath(focusPath)) {
+        // <Foo>
+        const candidates = this.getAllAngleBracketComponents(root, uri);
+        completions.push(...uniqBy(candidates, 'label'));
+      } else if (isMustachePath(focusPath)) {
+        // {{foo-bar?}}
         const candidates = this.getMustachePathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberMustacheItems);
       } else if (isBlockPath(focusPath)) {
+        // {{#foo-bar?}} {{/foo-bar}}
         const candidates = this.getBlockPathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberBlockItems);
       } else if (isSubExpressionPath(focusPath)) {
+        // {{foo-bar name=(subexpr? )}}
         const candidates = this.getSubExpressionPathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
       } else if (isLinkToTarget(focusPath)) {
+        // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
         completions.push(...uniqBy(mListRoutes(root), 'label'));
       }
     } catch (e) {
