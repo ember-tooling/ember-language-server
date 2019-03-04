@@ -18,6 +18,11 @@ export const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
   maxAge: 600000
 }); // 1 second
 
+export const isAddonRoot = memoize(isProjectAddonRoot, {
+  length: 1,
+  maxAge: 600000
+});
+
 export function isMuApp(root: string) {
   return existsSync(join(root, 'src', 'ui'));
 }
@@ -65,6 +70,12 @@ export function resolvePackageRoot(root: string, addonName: string) {
     roots.pop();
   }
   return false;
+}
+
+export function isProjectAddonRoot(root: string) {
+  const pack = getPackageJSON(root);
+  const hasIndexJs = existsSync(join(root, 'index.js'));
+  return isEmeberAddon(pack) && hasIndexJs;
 }
 
 export function getProjectAddonsRoots(root: string) {
