@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const memoize = require('memoizee');
-
 import {
   Location,
   Range
@@ -93,6 +92,18 @@ export function getAbstractParts(
   ];
 }
 
+export function getAbstractPartsWithTemplates(
+  root: string,
+  prefix: string,
+  collection: string,
+  name: string
+) {
+  return [
+    [root, prefix, collection, `${name}.js`],
+    [root, prefix, collection, `${name}.ts`],
+    [root, prefix, collection, `${name}.hbs`]
+  ];
+}
 
 export function getAbstractComponentScriptsParts(
   root: string,
@@ -192,6 +203,62 @@ export function getPathsForComponentTemplates(
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
   return paths;
+}
+
+export function getAddonImport(root: string, importPath: string) {
+  let importParts = importPath.split('/');
+  let addonName = importParts.shift();
+  if (addonName && addonName.startsWith('@')) {
+    addonName = addonName + '/' + importParts.shift();
+  }
+  if (!addonName) {
+    return [];
+  }
+  let addonEnding = addonName.split('/').pop();
+  if (!addonEnding) {
+    return [];
+  }
+  const roots = mProjectAddonsRoots(root);
+  let existingPaths: string[] = [];
+  let hasValidPath = false;
+  roots.forEach((rootPath: string) => {
+    if (!rootPath.endsWith(addonEnding as string)) {
+      return;
+    }
+    if (hasValidPath) {
+      return;
+    }
+    const addonPaths: string[][] = [];
+    const possibleLocations = [
+      [rootPath, 'app', ...importParts],
+      [rootPath, 'addon', ...importParts],
+      [rootPath, ...importParts],
+    ];
+    possibleLocations.forEach((locationArr: any) => {
+      getAbstractPartsWithTemplates.apply(null, locationArr).forEach(
+        (parts: any) => {
+          addonPaths.push(parts);
+        }
+      );
+    });
+    const validPaths = addonPaths
+      .map(
+        (pathArr: string[]): string => {
+          return path.join.apply(path, pathArr.filter((part: any) => !!part));
+        }
+      )
+      .filter(fs.existsSync);
+    if (validPaths.length) {
+      hasValidPath = true;
+      existingPaths = validPaths;
+    }
+  });
+
+  const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
+  if (addonFolderFiles.length) {
+    return addonFolderFiles;
+  }
+  return existingPaths;
 }
 
 export function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {

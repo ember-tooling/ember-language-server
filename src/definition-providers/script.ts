@@ -4,7 +4,7 @@ import ASTPath from './../glimmer-utils';
 import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
 import { parse } from 'babylon';
 import { toPosition } from './../estree-utils';
-import { pathsToLocations, getAddonPathsForType } from '../utils/definition-helpers';
+import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils/definition-helpers';
 const { kebabCase } = require('lodash');
 import { isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
 import {
@@ -55,6 +55,9 @@ class PathResolvers {
   addonServicePaths(root: string, serviceName: string) {
     return getAddonPathsForType(root, 'services', serviceName);
   }
+  addonImportPaths(root: string, pathName: string) {
+    return getAddonImport(root, pathName);
+  }
   classicImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
     pathParts.shift();
@@ -92,8 +95,12 @@ export default class ScriptDefinietionProvider {
           guessedPaths.push(pathLocation);
         }
       );
-
     }
+    this.resolvers.addonImportPaths(root, importPath).forEach(
+      (pathLocation: string) => {
+        guessedPaths.push(pathLocation);
+      }
+    );
     return pathsToLocations.apply(null, guessedPaths);
   }
   guessPathsForType(root: string, fnName: ItemType, typeName: string) {
