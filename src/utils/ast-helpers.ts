@@ -99,6 +99,18 @@ export function isBlockLinkToTarget(path: ASTPath): boolean {
   return parent.params[0] === node && parent.path.original === 'link-to';
 }
 
+export function isImportPathDeclaration(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'StringLiteral') {
+    return false;
+  }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'ImportDeclaration') {
+    return false;
+  }
+  return true;
+}
+
 export function isModelReference(astPath: ASTPath): boolean {
   let node = astPath.node;
   if (node.type !== 'StringLiteral') {
