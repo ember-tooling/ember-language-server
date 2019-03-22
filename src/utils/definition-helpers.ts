@@ -209,20 +209,16 @@ export function getAddonImport(root: string, importPath: string) {
   let importParts = importPath.split('/');
   let addonName = importParts.shift();
   if (addonName && addonName.startsWith('@')) {
-    addonName = addonName + '/' + importParts.shift();
+    addonName = addonName + path.sep + importParts.shift();
   }
   if (!addonName) {
-    return [];
-  }
-  let addonEnding = addonName.split('/').pop();
-  if (!addonEnding) {
     return [];
   }
   const roots = mProjectAddonsRoots(root);
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {
-    if (!rootPath.endsWith(addonEnding as string)) {
+    if (!rootPath.endsWith(addonName as string)) {
       return;
     }
     if (hasValidPath) {
