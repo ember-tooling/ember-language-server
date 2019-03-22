@@ -81,6 +81,19 @@ export function getAbstractHelpersParts(
   ];
 }
 
+export function getAbstractParts(
+  root: string,
+  prefix: string,
+  collection: string,
+  name: string
+) {
+  return [
+    [root, prefix, collection, `${name}.js`],
+    [root, prefix, collection, `${name}.ts`]
+  ];
+}
+
+
 export function getAbstractComponentScriptsParts(
   root: string,
   prefix: string,
@@ -179,6 +192,45 @@ export function getPathsForComponentTemplates(
     return path.join.apply(path, pathParts.filter((part: any) => !!part));
   });
   return paths;
+}
+
+export function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
+  const roots = mProjectAddonsRoots(root);
+  let existingPaths: string[] = [];
+  let hasValidPath = false;
+  roots.forEach((rootPath: string) => {
+    if (hasValidPath) {
+      return;
+    }
+    const addonPaths: string[][] = [];
+    getAbstractParts(rootPath, 'app', collection, name).forEach(
+      (parts: any) => {
+        addonPaths.push(parts);
+      }
+    );
+    getAbstractParts(rootPath, 'addon', collection, name).forEach(
+      (parts: any) => {
+        addonPaths.push(parts);
+      }
+    );
+    const validPaths = addonPaths
+      .map(
+        (pathArr: string[]): string => {
+          return path.join.apply(path, pathArr.filter((part: any) => !!part));
+        }
+      )
+      .filter(fs.existsSync);
+    if (validPaths.length) {
+      hasValidPath = true;
+      existingPaths = validPaths;
+    }
+  });
+
+  const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
+  if (addonFolderFiles.length) {
+    return addonFolderFiles;
+  }
+  return existingPaths;
 }
 
 export function getAddonPathsForComponentTemplates(

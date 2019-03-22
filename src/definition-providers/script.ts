@@ -4,14 +4,15 @@ import ASTPath from './../glimmer-utils';
 import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
 import { parse } from 'babylon';
 import { toPosition } from './../estree-utils';
-import { pathsToLocations } from '../utils/definition-helpers';
-import { isTransformReference, isModelReference, isImportPathDeclaration } from './../utils/ast-helpers';
+import { pathsToLocations, getAddonPathsForType } from '../utils/definition-helpers';
+const { kebabCase } = require('lodash');
+import { isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
 import {
   isModuleUnificationApp,
   podModulePrefixForRoot
 } from './../utils/layout-helpers';
 
-type ItemType = 'Model' | 'Transform';
+type ItemType = 'Model' | 'Transform' | 'Service';
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
 
 function joinPaths(...args: string[]) {
@@ -30,17 +31,29 @@ class PathResolvers {
   muTransformPaths(root: string, transformName: string) {
     return joinPaths(root, 'src', 'data', 'transforms', transformName);
   }
+  muServicePaths(root: string, transformName: string) {
+    return joinPaths(root, 'src', 'services', transformName);
+  }
   classicModelPaths(root: string, modelName: string) {
     return joinPaths(root, 'app', 'models', modelName);
   }
   classicTransformPaths(root: string, transformName: string) {
     return joinPaths(root, 'app', 'transforms', transformName);
   }
+  classicServicePaths(root: string, modelName: string) {
+    return joinPaths(root, 'app', 'services', modelName);
+  }
   podTransformPaths(root: string, transformName: string, podPrefix: string) {
     return joinPaths(root, 'app', podPrefix, transformName, 'transform');
   }
   podModelPaths(root: string, modelName: string, podPrefix: string) {
     return joinPaths(root, 'app', podPrefix, modelName, 'model');
+  }
+  podServicePaths(root: string, modelName: string, podPrefix: string) {
+    return joinPaths(root, 'app', podPrefix, modelName, 'service');
+  }
+  addonServicePaths(root: string, serviceName: string) {
+    return getAddonPathsForType(root, 'services', serviceName);
   }
   classicImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
@@ -107,6 +120,12 @@ export default class ScriptDefinietionProvider {
         );
       }
     }
+
+    if (fnName === 'Service') {
+      this.resolvers.addonServicePaths(root, typeName).forEach((item: string) => {
+        guessedPaths.push(item);
+      });
+    }
     return pathsToLocations.apply(null, guessedPaths);
   }
   handle(params: TextDocumentPositionParams, project: any): Definition | null {
@@ -132,6 +151,16 @@ export default class ScriptDefinietionProvider {
       return this.guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
       return this.guessPathForImport(root, uri, astPath.node.value);
+    } else if (isServiceInjection(astPath)) {
+      let serviceName = astPath.node.name;
+      let args = astPath.parent.value.arguments;
+      if (args.length && args[0].type === 'StringLiteral') {
+        serviceName = args[0].value;
+      }
+      return this.guessPathsForType(root, 'Service', kebabCase(serviceName));
+    } else if (isNamedServiceInjection(astPath)) {
+      let serviceName = astPath.node.value;
+      return this.guessPathsForType(root, 'Service', kebabCase(serviceName));
     }
     return null;
   }
