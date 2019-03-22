@@ -5,7 +5,7 @@ import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
 import { parse } from 'babylon';
 import { toPosition } from './../estree-utils';
 import { pathsToLocations } from '../utils/definition-helpers';
-import { isTransformReference, isModelReference } from './../utils/ast-helpers';
+import { isTransformReference, isModelReference, isImportPathDeclaration } from './../utils/ast-helpers';
 import {
   isModuleUnificationApp,
   podModulePrefixForRoot
@@ -42,12 +42,46 @@ class PathResolvers {
   podModelPaths(root: string, modelName: string, podPrefix: string) {
     return joinPaths(root, 'app', podPrefix, modelName, 'model');
   }
+  classicImportPaths(root: string, pathName: string) {
+    const pathParts = pathName.split('/');
+    pathParts.shift();
+    const params = [root, 'app', ...pathParts];
+    return joinPaths.apply(null, params);
+  }
+  muImportPaths(root: string, pathName: string) {
+    const pathParts = pathName.split('/');
+    pathParts.shift();
+    const params = [root, ...pathParts];
+    return joinPaths.apply(null, params);
+  }
 }
 
 export default class ScriptDefinietionProvider {
   private resolvers!: PathResolvers;
   constructor(private server: Server) {
     this.resolvers = new PathResolvers();
+  }
+  guessPathForImport(root: string, uri: string, importPath: string ) {
+    if (!uri) {
+      return null;
+    }
+    const guessedPaths: string[] = [];
+    const fnName = 'Import';
+    if (isModuleUnificationApp(root)) {
+      this.resolvers[`mu${fnName}Paths`](root, importPath).forEach(
+        (pathLocation: string) => {
+          guessedPaths.push(pathLocation);
+        }
+      );
+    } else {
+      this.resolvers[`classic${fnName}Paths`](root, importPath).forEach(
+        (pathLocation: string) => {
+          guessedPaths.push(pathLocation);
+        }
+      );
+
+    }
+    return pathsToLocations.apply(null, guessedPaths);
   }
   guessPathsForType(root: string, fnName: ItemType, typeName: string) {
     const guessedPaths: string[] = [];
@@ -96,6 +130,8 @@ export default class ScriptDefinietionProvider {
     } else if (isTransformReference(astPath)) {
       const transformName = astPath.node.value;
       return this.guessPathsForType(root, 'Transform', transformName);
+    } else if (isImportPathDeclaration(astPath)) {
+      return this.guessPathForImport(root, uri, astPath.node.value);
     }
     return null;
   }
