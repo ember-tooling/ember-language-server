@@ -17,18 +17,21 @@ import {
   isRouteLookup,
   isModelReference,
   isNamedServiceInjection,
+  isTransformReference,
   isComputedPropertyArgument
 } from '../utils/ast-helpers';
 import {
   listRoutes,
   listModels,
   listServices,
-  mGetProjectAddonsInfo
+  mGetProjectAddonsInfo,
+  listTransforms
 } from '../utils/layout-helpers';
 
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
 const mListModels = memoize(listModels, { length: 1, maxAge: 60000 });
 const mListServices = memoize(listServices, { length: 1, maxAge: 60000 });
+const mListTransforms = memoize(listTransforms, { length: 1, maxAge: 60000 });
 
 export default class ScriptCompletionProvider {
   constructor(private server: Server) {}
@@ -113,6 +116,16 @@ export default class ScriptCompletionProvider {
               label: name,
               detail: 'ObjectProperty'
             });
+          }
+        });
+      } else if (isTransformReference(focusPath)) {
+        textPrefix = focusPath.node.value;
+        mListTransforms(root).forEach((model: any) => {
+          completions.push(model);
+        });
+        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
+          if (item.detail === 'transform') {
+            completions.push(item);
           }
         });
       }
