@@ -133,6 +133,7 @@ export function getProjectAddonsInfo(root: string) {
         ...listRoutes(packagePath),
         ...listHelpers(packagePath),
         ...listModels(packagePath),
+        ...listTransforms(packagePath),
         ...listServices(packagePath),
         ...listModifiers(packagePath)
       ];
