@@ -1,5 +1,4 @@
 import ASTPath from './../glimmer-utils';
-
 function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   let node = astPath.node;
   if (node.type !== 'StringLiteral') {
@@ -50,6 +49,42 @@ export function isStoreModelLookup(astPath: ASTPath): boolean {
     'hasRecordForId'
   ];
   return matches.includes(parent.callee.property.name);
+}
+
+export function isComputedPropertyArgument(astPath: ASTPath): boolean {
+  let node = astPath.node;
+  if (node.type !== 'StringLiteral') {
+    return false;
+  }
+  let parent = astPath.parent;
+  if (
+    !parent ||
+    parent.type !== 'CallExpression'
+  ) {
+    return false;
+  }
+  let isArgument = false;
+  parent.arguments.forEach((arg: any) => {
+    if (arg === node) {
+      isArgument = true;
+    }
+  });
+  if (!isArgument) {
+    return false;
+  }
+
+  let identifier =
+    parent.callee.type === 'Identifier'
+      ? parent.callee
+      : parent.callee.property;
+  if (identifier.name !== 'computed') {
+    return false;
+  }
+  const grandParent = astPath.parentPath;
+  if (!grandParent || !grandParent.parent) {
+    return false;
+  }
+  return grandParent.parent.type === 'ObjectProperty';
 }
 
 export function isTransformReference(astPath: ASTPath): boolean {
