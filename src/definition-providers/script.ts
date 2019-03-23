@@ -6,7 +6,7 @@ import { parse } from 'babylon';
 import { toPosition } from './../estree-utils';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils/definition-helpers';
 const { kebabCase } = require('lodash');
-import { isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
+import { isRouteLookup, isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
 import {
   isModuleUnificationApp,
   podModulePrefixForRoot
@@ -168,6 +168,9 @@ export default class ScriptDefinietionProvider {
     } else if (isNamedServiceInjection(astPath)) {
       let serviceName = astPath.node.value;
       return this.guessPathsForType(root, 'Service', kebabCase(serviceName));
+    } else if (isRouteLookup(astPath)) {
+      let routePath = astPath.node.value;
+      return this.server.definitionProvider.template.provideRouteDefinition(root, routePath);
     }
     return null;
   }
