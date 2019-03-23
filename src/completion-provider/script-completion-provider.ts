@@ -15,13 +15,14 @@ import { log } from '../utils/logger';
 import {
   isStoreModelLookup,
   isRouteLookup,
+  isModelReference,
   isNamedServiceInjection
 } from '../utils/ast-helpers';
 import {
   listRoutes,
   listModels,
-  listServices
-  // mGetProjectAddonsInfo
+  listServices,
+  mGetProjectAddonsInfo
 } from '../utils/layout-helpers';
 
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
@@ -57,20 +58,35 @@ export default class ScriptCompletionProvider {
     const completions: CompletionItem[] = [];
     let textPrefix = '';
     try {
-      if (isStoreModelLookup(focusPath)) {
+      if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
         textPrefix = focusPath.node.value;
         mListModels(root).forEach((model: any) => {
           completions.push(model);
+        });
+        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
+          if (item.detail === 'model') {
+            completions.push(item);
+          }
         });
       } else if (isRouteLookup(focusPath)) {
         textPrefix = focusPath.node.value;
         mListRoutes(root).forEach((model: any) => {
           completions.push(model);
         });
+        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
+          if (item.detail === 'route') {
+            completions.push(item);
+          }
+        });
       } else if (isNamedServiceInjection(focusPath)) {
         textPrefix = focusPath.node.value;
         mListServices(root).forEach((model: any) => {
           completions.push(model);
+        });
+        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
+          if (item.detail === 'service') {
+            completions.push(item);
+          }
         });
       }
     } catch (e) {
