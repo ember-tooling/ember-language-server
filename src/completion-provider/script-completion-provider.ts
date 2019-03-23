@@ -14,16 +14,19 @@ import { getExtension } from '../utils/file-extension';
 import { log } from '../utils/logger';
 import {
   isStoreModelLookup,
-  isRouteLookup
+  isRouteLookup,
+  isNamedServiceInjection
 } from '../utils/ast-helpers';
 import {
   listRoutes,
   listModels,
+  listServices
   // mGetProjectAddonsInfo
 } from '../utils/layout-helpers';
 
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
 const mListModels = memoize(listModels, { length: 1, maxAge: 60000 });
+const mListServices = memoize(listServices, { length: 1, maxAge: 60000 });
 
 export default class ScriptCompletionProvider {
   constructor(private server: Server) {}
@@ -62,6 +65,11 @@ export default class ScriptCompletionProvider {
       } else if (isRouteLookup(focusPath)) {
         textPrefix = focusPath.node.value;
         mListRoutes(root).forEach((model: any) => {
+          completions.push(model);
+        });
+      } else if (isNamedServiceInjection(focusPath)) {
+        textPrefix = focusPath.node.value;
+        mListServices(root).forEach((model: any) => {
           completions.push(model);
         });
       }

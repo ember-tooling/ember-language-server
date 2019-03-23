@@ -1,6 +1,6 @@
 import ASTPath from './../glimmer-utils';
 
-export function isRouteLookup(astPath: ASTPath): boolean {
+function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   let node = astPath.node;
   if (node.type !== 'StringLiteral') {
     return false;
@@ -16,6 +16,14 @@ export function isRouteLookup(astPath: ASTPath): boolean {
   if (!parent.callee || !parent.callee.property) {
     return false;
   }
+  return true;
+}
+
+export function isRouteLookup(astPath: ASTPath): boolean {
+  if (!isFirstStringParamInCallExpression(astPath)) {
+    return false;
+  }
+  let parent = astPath.parent;
   const matches = [
     'transitionTo',
     'intermediateTransitionTo',
@@ -26,21 +34,10 @@ export function isRouteLookup(astPath: ASTPath): boolean {
 }
 
 export function isStoreModelLookup(astPath: ASTPath): boolean {
-  let node = astPath.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isFirstStringParamInCallExpression(astPath)) {
     return false;
   }
   let parent = astPath.parent;
-  if (
-    !parent ||
-    parent.type !== 'CallExpression' ||
-    parent.arguments[0] !== node
-  ) {
-    return false;
-  }
-  if (!parent.callee || !parent.callee.property) {
-    return false;
-  }
   const matches = [
     'findRecord',
     'createRecord',
