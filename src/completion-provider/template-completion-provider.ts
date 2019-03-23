@@ -24,7 +24,8 @@ import {
   isMustachePath,
   isBlockPath,
   isSubExpressionPath,
-  isAngleComponentPath
+  isAngleComponentPath,
+  isModifierPath
 } from '../utils/ast-helpers';
 import {
   listComponents,
@@ -32,6 +33,8 @@ import {
   listPodsComponents,
   listHelpers,
   listRoutes,
+  listModifiers,
+  builtinModifiers,
   mGetProjectAddonsInfo
 } from '../utils/layout-helpers';
 
@@ -39,6 +42,7 @@ const mTemplateContextLookup = memoize(templateContextLookup, {
   length: 3,
   maxAge: 60000
 }); // 1 second
+const mListModifiers = memoize(listModifiers, { length: 1, maxAge: 60000 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
 const mListMUComponents = memoize(listMUComponents, {
   length: 1,
@@ -207,6 +211,11 @@ export default class TemplateCompletionProvider {
       } else if (isLinkToTarget(focusPath)) {
         // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
         completions.push(...uniqBy(mListRoutes(root), 'label'));
+      } else if (isModifierPath(focusPath)) {
+        const addonModifiers = mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+          return detail === 'modifier';
+        });
+        completions.push(...uniqBy([...mListModifiers(root), ...addonModifiers, ...builtinModifiers()], 'label'));
       }
     } catch (e) {
       log('error', e);
