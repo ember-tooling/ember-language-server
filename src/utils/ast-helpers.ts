@@ -35,6 +35,21 @@ export function isAngleComponentPath(path: ASTPath): boolean {
   }
 }
 
+export function isModifierPath(path: ASTPath): boolean {
+  let node = path.node;
+  if (node.type !== 'PathExpression') {
+    return false;
+  }
+  if (node.data) {
+    return false;
+  }
+  let parent = path.parent;
+  if (!parent || parent.type !== 'ElementModifierStatement') {
+    return false;
+  }
+  return node === parent.path;
+}
+
 export function isMustachePath(path: ASTPath): boolean {
   let node = path.node;
   if (node.type !== 'PathExpression') {

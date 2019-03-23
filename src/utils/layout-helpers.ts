@@ -131,7 +131,8 @@ export function getProjectAddonsInfo(root: string) {
       const extractedData = [
         ...listComponents(packagePath),
         ...listRoutes(packagePath),
-        ...listHelpers(packagePath)
+        ...listHelpers(packagePath),
+        ...listModifiers(packagePath)
       ];
       // log('extractedData', extractedData);
       if (extractedData.length) {
@@ -206,6 +207,35 @@ export function listMUComponents(root: string): CompletionItem[] {
     };
   });
 
+  return items;
+}
+
+export function builtinModifiers(): CompletionItem[] {
+  return [
+    {
+      kind: CompletionItemKind.Method,
+      label: 'action',
+      detail: 'modifier'
+    }
+  ];
+}
+
+export function listModifiers(root: string): CompletionItem[] {
+  const appPaths = safeWalkSync(join(root, 'app', 'modifiers'), {
+    directories: false,
+    globs: ['**/*.{js,ts}']
+  });
+  const addonPaths = safeWalkSync(join(root, 'addon', 'modifiers'), {
+    directories: false,
+    globs: ['**/*.{js,ts}']
+  });
+  const items = [...appPaths, ...addonPaths].map((filePath: string) => {
+    return {
+      kind: CompletionItemKind.Function,
+      label: pureComponentName(filePath),
+      detail: 'modifier'
+    };
+  });
   return items;
 }
 
