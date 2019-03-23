@@ -16,7 +16,8 @@ import {
   isStoreModelLookup,
   isRouteLookup,
   isModelReference,
-  isNamedServiceInjection
+  isNamedServiceInjection,
+  isComputedPropertyArgument
 } from '../utils/ast-helpers';
 import {
   listRoutes,
@@ -45,9 +46,14 @@ export default class ScriptCompletionProvider {
     const { root } = project;
     const content = document.getText();
 
-    const ast = parse(content, {
-      sourceType: 'module'
-    });
+    let ast = null;
+    try {
+      ast = parse(content, {
+        sourceType: 'module'
+      });
+    } catch (e) {
+      return [];
+    }
 
     const focusPath = ASTPath.toPosition(ast, toPosition(params.position));
 
@@ -86,6 +92,27 @@ export default class ScriptCompletionProvider {
         mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'service') {
             completions.push(item);
+          }
+        });
+      } else if (isComputedPropertyArgument(focusPath)) {
+        textPrefix = focusPath.node.value;
+        if (!focusPath.parentPath || !focusPath.parentPath.parentPath) {
+          return [];
+        }
+        const obj = focusPath.parentPath.parentPath.parent;
+        (obj.properties || []).forEach((property: any) => {
+          let name = null;
+          if (property.key.type === 'StringLiteral') {
+            name = property.key.value;
+          } else if (property.key.type === 'Identifier') {
+            name = property.key.name;
+          }
+          if (name !== null) {
+            completions.push({
+              kind: 10,
+              label: name,
+              detail: 'ObjectProperty'
+            });
           }
         });
       }
