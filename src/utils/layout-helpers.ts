@@ -222,25 +222,6 @@ export function builtinModifiers(): CompletionItem[] {
   ];
 }
 
-export function listModifiers(root: string): CompletionItem[] {
-  const appPaths = safeWalkSync(join(root, 'app', 'modifiers'), {
-    directories: false,
-    globs: ['**/*.{js,ts}']
-  });
-  const addonPaths = safeWalkSync(join(root, 'addon', 'modifiers'), {
-    directories: false,
-    globs: ['**/*.{js,ts}']
-  });
-  const items = [...appPaths, ...addonPaths].map((filePath: string) => {
-    return {
-      kind: CompletionItemKind.Function,
-      label: pureComponentName(filePath),
-      detail: 'modifier'
-    };
-  });
-  return items;
-}
-
 export function listComponents(root: string): CompletionItem[] {
   // log('listComponents');
   const jsPaths = safeWalkSync(join(root, 'app', 'components'), {
@@ -266,56 +247,41 @@ export function listComponents(root: string): CompletionItem[] {
   return items;
 }
 
-export function listModels(root: string): CompletionItem[] {
-  const paths = safeWalkSync(join(root, 'app', 'models'), {
+function listCollection(root: string, prefix: 'app' | 'addon', collectionName: 'transforms' | 'modifiers' | 'services' | 'models' | 'helpers', kindType: CompletionItemKind, detail: 'transform' | 'service' | 'model' | 'helper' | 'modifier') {
+  const paths = safeWalkSync(join(root, prefix, collectionName), {
     directories: false,
     globs: ['**/*.{js,ts}']
   });
 
   const items = paths.map((filePath: string) => {
     return {
-      kind: CompletionItemKind.Class,
+      kind: kindType,
       label: pureComponentName(filePath),
-      detail: 'model'
+      detail
     };
   });
 
   return items;
+}
+
+export function listModifiers(root: string): CompletionItem[] {
+  return listCollection(root, 'app', 'modifiers', CompletionItemKind.Function, 'modifier');
+}
+
+export function listModels(root: string): CompletionItem[] {
+  return listCollection(root, 'app', 'models', CompletionItemKind.Class, 'model');
 }
 
 export function listServices(root: string): CompletionItem[] {
-  const paths = safeWalkSync(join(root, 'app', 'services'), {
-    directories: false,
-    globs: ['**/*.{js,ts}']
-  });
-
-  const items = paths.map((filePath: string) => {
-    return {
-      kind: CompletionItemKind.Class,
-      label: pureComponentName(filePath),
-      detail: 'service'
-    };
-  });
-
-  return items;
+  return listCollection(root, 'app', 'services', CompletionItemKind.Class, 'service');
 }
 
 export function listHelpers(root: string): CompletionItem[] {
-  // log('listHelpers');
-  const paths = safeWalkSync(join(root, 'app', 'helpers'), {
-    directories: false,
-    globs: ['**/*.{js,ts}']
-  });
+  return listCollection(root, 'app', 'helpers', CompletionItemKind.Function, 'helper');
+}
 
-  const items = paths.map((filePath: string) => {
-    return {
-      kind: CompletionItemKind.Function,
-      label: pureComponentName(filePath),
-      detail: 'helper'
-    };
-  });
-
-  return items;
+export function listTransforms(root: string): CompletionItem[] {
+  return listCollection(root, 'app', 'transforms', CompletionItemKind.Function, 'transform');
 }
 
 export function listRoutes(root: string): CompletionItem[] {
