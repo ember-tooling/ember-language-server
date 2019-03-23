@@ -1,5 +1,60 @@
 import ASTPath from './../glimmer-utils';
 
+export function isRouteLookup(astPath: ASTPath): boolean {
+  let node = astPath.node;
+  if (node.type !== 'StringLiteral') {
+    return false;
+  }
+  let parent = astPath.parent;
+  if (
+    !parent ||
+    parent.type !== 'CallExpression' ||
+    parent.arguments[0] !== node
+  ) {
+    return false;
+  }
+  if (!parent.callee || !parent.callee.property) {
+    return false;
+  }
+  const matches = [
+    'transitionTo',
+    'intermediateTransitionTo',
+    'paramsFor',
+    'transitionToRoute'
+  ];
+  return matches.includes(parent.callee.property.name);
+}
+
+export function isStoreModelLookup(astPath: ASTPath): boolean {
+  let node = astPath.node;
+  if (node.type !== 'StringLiteral') {
+    return false;
+  }
+  let parent = astPath.parent;
+  if (
+    !parent ||
+    parent.type !== 'CallExpression' ||
+    parent.arguments[0] !== node
+  ) {
+    return false;
+  }
+  if (!parent.callee || !parent.callee.property) {
+    return false;
+  }
+  const matches = [
+    'findRecord',
+    'createRecord',
+    'findAll',
+    'queryRecord',
+    'peekAll',
+    'query',
+    'peekRecord',
+    'adapterFor',
+    'hasRecordForId'
+  ];
+  return matches.includes(parent.callee.property.name);
+}
+
 export function isTransformReference(astPath: ASTPath): boolean {
   let node = astPath.node;
   if (node.type !== 'StringLiteral') {

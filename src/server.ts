@@ -23,6 +23,7 @@ import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
+import ScriptCompletionProvider from  './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 export default class Server {
@@ -43,6 +44,7 @@ export default class Server {
   ];
 
   templateCompletionProvider: TemplateCompletionProvider = new TemplateCompletionProvider(this);
+  scriptCompletionProvider: ScriptCompletionProvider = new ScriptCompletionProvider(this);
 
   definitionProvider: DefinitionProvider = new DefinitionProvider(this);
 
@@ -105,7 +107,8 @@ export default class Server {
     const completionItems = [];
 
     const templateCompletions = this.templateCompletionProvider.provideCompletions(textDocumentPosition);
-    completionItems.push(...templateCompletions);
+    const scriptCompletions = this.scriptCompletionProvider.provideCompletions(textDocumentPosition);
+    completionItems.push(...templateCompletions, ...scriptCompletions);
 
     return completionItems;
   }

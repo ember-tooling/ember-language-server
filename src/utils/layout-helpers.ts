@@ -264,6 +264,23 @@ export function listComponents(root: string): CompletionItem[] {
   return items;
 }
 
+export function listModels(root: string): CompletionItem[] {
+  const paths = safeWalkSync(join(root, 'app', 'models'), {
+    directories: false,
+    globs: ['**/*.{js,ts}']
+  });
+
+  const items = paths.map((filePath: string) => {
+    return {
+      kind: CompletionItemKind.Class,
+      label: pureComponentName(filePath),
+      detail: 'model'
+    };
+  });
+
+  return items;
+}
+
 export function listHelpers(root: string): CompletionItem[] {
   // log('listHelpers');
   const paths = safeWalkSync(join(root, 'app', 'helpers'), {
