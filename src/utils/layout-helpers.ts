@@ -132,6 +132,7 @@ export function getProjectAddonsInfo(root: string) {
         ...listComponents(packagePath),
         ...listRoutes(packagePath),
         ...listHelpers(packagePath),
+        ...listServices(packagePath),
         ...listModifiers(packagePath)
       ];
       // log('extractedData', extractedData);
@@ -275,6 +276,23 @@ export function listModels(root: string): CompletionItem[] {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
       detail: 'model'
+    };
+  });
+
+  return items;
+}
+
+export function listServices(root: string): CompletionItem[] {
+  const paths = safeWalkSync(join(root, 'app', 'services'), {
+    directories: false,
+    globs: ['**/*.{js,ts}']
+  });
+
+  const items = paths.map((filePath: string) => {
+    return {
+      kind: CompletionItemKind.Class,
+      label: pureComponentName(filePath),
+      detail: 'service'
     };
   });
 
