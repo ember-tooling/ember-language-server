@@ -1,15 +1,15 @@
 import ASTPath from './../glimmer-utils';
+
 function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   let node = astPath.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isString(node)) {
     return false;
   }
   let parent = astPath.parent;
-  if (
-    !parent ||
-    parent.type !== 'CallExpression' ||
-    parent.arguments[0] !== node
-  ) {
+  if (!isCallExpression(parent)) {
+    return false;
+  }
+  if (!expressionHasArgument(parent, node, 0)) {
     return false;
   }
   if (!parent.callee || !parent.callee.property) {
@@ -29,7 +29,7 @@ export function isRouteLookup(astPath: ASTPath): boolean {
     'paramsFor',
     'transitionToRoute'
   ];
-  return matches.includes(parent.callee.property.name);
+  return expressionHasIdentifierName(parent, matches);
 }
 
 export function isStoreModelLookup(astPath: ASTPath): boolean {
@@ -48,36 +48,22 @@ export function isStoreModelLookup(astPath: ASTPath): boolean {
     'adapterFor',
     'hasRecordForId'
   ];
-  return matches.includes(parent.callee.property.name);
+  return expressionHasIdentifierName(parent, matches);
 }
 
 export function isComputedPropertyArgument(astPath: ASTPath): boolean {
   let node = astPath.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isString(node)) {
     return false;
   }
   let parent = astPath.parent;
-  if (
-    !parent ||
-    parent.type !== 'CallExpression'
-  ) {
+  if (!isCallExpression(parent)) {
     return false;
   }
-  let isArgument = false;
-  parent.arguments.forEach((arg: any) => {
-    if (arg === node) {
-      isArgument = true;
-    }
-  });
-  if (!isArgument) {
+  if (!expressionHasArgument(parent, node)) {
     return false;
   }
-
-  let identifier =
-    parent.callee.type === 'Identifier'
-      ? parent.callee
-      : parent.callee.property;
-  if (identifier.name !== 'computed') {
+  if (!expressionHasIdentifierName(parent, 'computed')) {
     return false;
   }
   const grandParent = astPath.parentPath;
@@ -89,22 +75,17 @@ export function isComputedPropertyArgument(astPath: ASTPath): boolean {
 
 export function isTransformReference(astPath: ASTPath): boolean {
   let node = astPath.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isString(node)) {
     return false;
   }
   let parent = astPath.parent;
-  if (
-    !parent ||
-    parent.type !== 'CallExpression' ||
-    parent.arguments[0] !== node
-  ) {
+  if (!isCallExpression(parent)) {
     return false;
   }
-  let identifier =
-    parent.callee.type === 'Identifier'
-      ? parent.callee
-      : parent.callee.property;
-  return identifier.name === 'attr';
+  if (!expressionHasArgument(parent, node, 0)) {
+    return false;
+  }
+  return expressionHasIdentifierName(parent, 'attr');
 }
 
 export function isAngleComponentPath(path: ASTPath): boolean {
@@ -124,7 +105,7 @@ export function isAngleComponentPath(path: ASTPath): boolean {
 
 export function isModifierPath(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'PathExpression') {
+  if (!isPathExpression(node)) {
     return false;
   }
   if (node.data) {
@@ -139,7 +120,7 @@ export function isModifierPath(path: ASTPath): boolean {
 
 export function isMustachePath(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'PathExpression') {
+  if (!isPathExpression(node)) {
     return false;
   }
   let parent = path.parent;
@@ -151,11 +132,11 @@ export function isMustachePath(path: ASTPath): boolean {
 
 export function isBlockPath(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'PathExpression') {
+  if (!isPathExpression(node)) {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'BlockStatement') {
+  if (!isBlock(parent)) {
     return false;
   }
   return parent.path === node;
@@ -163,7 +144,7 @@ export function isBlockPath(path: ASTPath): boolean {
 
 export function isSubExpressionPath(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'PathExpression') {
+  if (!isPathExpression(node)) {
     return false;
   }
   let parent = path.parent;
@@ -179,7 +160,7 @@ export function isLinkToTarget(path: ASTPath): boolean {
 
 export function isInlineLinkToTarget(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isString(node)) {
     return false;
   }
   let parent = path.parent;
@@ -191,11 +172,11 @@ export function isInlineLinkToTarget(path: ASTPath): boolean {
 
 export function isBlockLinkToTarget(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isString(node)) {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'BlockStatement') {
+  if (!isBlock(parent)) {
     return false;
   }
   return parent.params[0] === node && parent.path.original === 'link-to';
@@ -203,7 +184,7 @@ export function isBlockLinkToTarget(path: ASTPath): boolean {
 
 export function isImportPathDeclaration(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isString(node)) {
     return false;
   }
   let parent = path.parent;
@@ -222,40 +203,84 @@ export function isServiceInjection(path: ASTPath): boolean {
   if (!parent || parent.type !== 'ObjectProperty') {
     return false;
   }
-  if (!parent.value || parent.value.type !== 'CallExpression') {
+  if (!isCallExpression(parent.value)) {
     return false;
   }
-  return parent.value.callee.name === 'service';
+  return expressionHasIdentifierName(parent.value, 'service');
 }
 
 export function isNamedServiceInjection(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isString(node)) {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'CallExpression') {
+  if (!isCallExpression(parent)) {
     return false;
   }
-  return parent.callee.name === 'service';
+  return expressionHasIdentifierName(parent, 'service');
 }
 
 export function isModelReference(astPath: ASTPath): boolean {
   let node = astPath.node;
-  if (node.type !== 'StringLiteral') {
+  if (!isString(node)) {
     return false;
   }
   let parent = astPath.parent;
-  if (
-    !parent ||
-    parent.type !== 'CallExpression' ||
-    parent.arguments[0] !== node
-  ) {
+  if (!isCallExpression(parent)) {
     return false;
   }
+  if (!expressionHasArgument(parent, node, 0)) {
+    return false;
+  }
+  return expressionHasIdentifierName(parent, ['belongsTo', 'hasMany']);
+}
+function isBlock(node: any): boolean {
+  if (!node) {
+    return false;
+  }
+  return node.type === 'BlockStatement';
+}
+function isString(node: any): boolean {
+  if (!node) {
+    return false;
+  }
+  return node.type === 'StringLiteral';
+}
+function isCallExpression(node: any): boolean {
+  if (!node) {
+    return false;
+  }
+  return node.type === 'CallExpression';
+}
+function isPathExpression(node: any): boolean {
+  if (!node) {
+    return false;
+  }
+  return node.type === 'PathExpression';
+}
+function expressionHasIdentifierName(exp: any, name: string | string[]) {
+  const names = typeof name === 'string' ? [name] : name;
   let identifier =
-    parent.callee.type === 'Identifier'
-      ? parent.callee
-      : parent.callee.property;
-  return identifier.name === 'belongsTo' || identifier.name === 'hasMany';
+  exp.callee.type === 'Identifier'
+    ? exp.callee
+    : exp.callee.property;
+  return names.includes(identifier.name);
+}
+function expressionHasArgument(exp: any, arg: any, position = -1) {
+  if (!exp || !exp.arguments) {
+    return false;
+  }
+  let index = exp.arguments.indexOf(arg);
+  if (index === -1) {
+    return false;
+  }
+  if (position === -1) {
+    return true;
+  }
+  if (position === index) {
+    return true;
+  } else {
+    return false;
+  }
 }
