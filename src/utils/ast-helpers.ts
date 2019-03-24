@@ -67,10 +67,10 @@ export function isComputedPropertyArgument(astPath: ASTPath): boolean {
     return false;
   }
   const grandParent = astPath.parentPath;
-  if (!grandParent || !grandParent.parent) {
+  if (!grandParent) {
     return false;
   }
-  return grandParent.parent.type === 'ObjectProperty';
+  return hasNodeType(grandParent.parent, 'ObjectProperty');
 }
 
 export function isTransformReference(astPath: ASTPath): boolean {
@@ -90,7 +90,7 @@ export function isTransformReference(astPath: ASTPath): boolean {
 
 export function isAngleComponentPath(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'ElementNode') {
+  if (!hasNodeType(node, 'ElementNode')) {
     return false;
   }
   if (node.tag.length === 0) {
@@ -112,7 +112,7 @@ export function isModifierPath(path: ASTPath): boolean {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'ElementModifierStatement') {
+  if (!hasNodeType(parent, 'ElementModifierStatement')) {
     return false;
   }
   return node === parent.path;
@@ -124,7 +124,7 @@ export function isMustachePath(path: ASTPath): boolean {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'MustacheStatement') {
+  if (!hasNodeType(parent, 'MustacheStatement')) {
     return false;
   }
   return parent.path === node;
@@ -148,7 +148,7 @@ export function isSubExpressionPath(path: ASTPath): boolean {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'SubExpression') {
+  if (!hasNodeType(parent, 'SubExpression')) {
     return false;
   }
   return parent.path === node;
@@ -164,7 +164,7 @@ export function isInlineLinkToTarget(path: ASTPath): boolean {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'MustacheStatement') {
+  if (!hasNodeType(parent, 'MustacheStatement')) {
     return false;
   }
   return parent.params[1] === node && parent.path.original === 'link-to';
@@ -188,7 +188,7 @@ export function isImportPathDeclaration(path: ASTPath): boolean {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'ImportDeclaration') {
+  if (!hasNodeType(parent, 'ImportDeclaration')) {
     return false;
   }
   return true;
@@ -196,11 +196,11 @@ export function isImportPathDeclaration(path: ASTPath): boolean {
 
 export function isServiceInjection(path: ASTPath): boolean {
   let node = path.node;
-  if (node.type !== 'Identifier') {
+  if (!hasNodeType(node, 'Identifier')) {
     return false;
   }
   let parent = path.parent;
-  if (!parent || parent.type !== 'ObjectProperty') {
+  if (!hasNodeType(parent, 'ObjectProperty')) {
     return false;
   }
   if (!isCallExpression(parent.value)) {
@@ -235,34 +235,27 @@ export function isModelReference(astPath: ASTPath): boolean {
   }
   return expressionHasIdentifierName(parent, ['belongsTo', 'hasMany']);
 }
-function isBlock(node: any): boolean {
+function hasNodeType(node: any, type: string) {
   if (!node) {
     return false;
   }
-  return node.type === 'BlockStatement';
+  return node.type === type;
+}
+function isBlock(node: any): boolean {
+  return hasNodeType(node, 'BlockStatement');
 }
 function isString(node: any): boolean {
-  if (!node) {
-    return false;
-  }
-  return node.type === 'StringLiteral';
+  return hasNodeType(node, 'StringLiteral');
 }
 function isCallExpression(node: any): boolean {
-  if (!node) {
-    return false;
-  }
-  return node.type === 'CallExpression';
+  return hasNodeType(node, 'CallExpression');
 }
 function isPathExpression(node: any): boolean {
-  if (!node) {
-    return false;
-  }
-  return node.type === 'PathExpression';
+  return hasNodeType(node, 'PathExpression');
 }
 function expressionHasIdentifierName(exp: any, name: string | string[]) {
   const names = typeof name === 'string' ? [name] : name;
-  let identifier =
-  exp.callee.type === 'Identifier'
+  let identifier = hasNodeType(exp.callee, 'Identifier')
     ? exp.callee
     : exp.callee.property;
   return names.includes(identifier.name);
