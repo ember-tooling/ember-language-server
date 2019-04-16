@@ -28,7 +28,7 @@
     "lodash": "^4.17.11",
     "memoizee": "^0.4.14",
     "util": "^0.11.1",
-    "vscode-languageserver": "^4.1.2",
+    "vscode-languageserver": "^5.2.1",
     "vscode-uri": "^1.0.6",
     "walk-sync": "^1.0.1"
   },
@@ -44,7 +44,7 @@
     "tslint": "^5.14.0",
     "typescript": "^2.8.1",
     "vscode-jsonrpc": "^3.6.1",
-    "vscode-languageserver-protocol": "^3.7.1"
+    "vscode-languageserver-protocol": "^3.14.1"
   },
   "scripts": {
     "changelog": "lerna-changelog",

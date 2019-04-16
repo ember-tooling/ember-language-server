@@ -37,7 +37,13 @@ export default class TemplateLinter {
     }
 
     const TemplateLinter = await this.getLinter(textDocument.uri);
-    const linter = new TemplateLinter(config);
+
+    let linter = null;
+    try {
+      linter = new TemplateLinter(config);
+    } catch (e) {
+      return;
+    }
 
     const source = textDocument.getText();
 
@@ -78,7 +84,15 @@ export default class TemplateLinter {
     }
 
     try {
-      const linter = await (Files.resolveModule(project.root, 'ember-template-lint') as Promise<any>);
+      const nodePath = Files.resolveGlobalNodePath();
+      if (!nodePath) {
+        return;
+      }
+      const linterPath = await (Files.resolveModulePath(project.root, 'ember-template-lint', nodePath, () => {}) as Promise<any>);
+      if (!linterPath) {
+        return;
+      }
+      const linter = require(linterPath);
       this._linterCache.set(project, linter);
       return linter;
     } catch (error) {
