@@ -31,7 +31,7 @@ export default class DefinitionProvider {
 
     if (extension === '.hbs') {
       return this.template.handle(params, project);
-    } else if (extension === '.js') {
+    } else if (extension === '.js' || extension === '.ts') {
       return this.script.handle(params, project);
     } else {
       return null;

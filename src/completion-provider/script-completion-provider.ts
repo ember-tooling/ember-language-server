@@ -7,7 +7,7 @@ import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
-import { parse } from 'babylon';
+import { parseScriptFile as parse } from 'ember-meta-explorer';
 const { uniqBy } = require('lodash');
 const memoize = require('memoizee');
 import { getExtension } from '../utils/file-extension';
@@ -37,7 +37,7 @@ export default class ScriptCompletionProvider {
   constructor(private server: Server) {}
   provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
     log('provideCompletions');
-    if (getExtension(params.textDocument) !== '.js') {
+    if (!['.js', '.ts'].includes(getExtension(params.textDocument) as string)) {
       return [];
     }
     const uri = params.textDocument.uri;
@@ -54,9 +54,7 @@ export default class ScriptCompletionProvider {
 
     let ast = null;
     try {
-      ast = parse(content, {
-        sourceType: 'module'
-      });
+      ast = parse(content);
     } catch (e) {
       return [];
     }
