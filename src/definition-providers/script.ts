@@ -2,7 +2,7 @@ import * as path from 'path';
 import Server from './../server';
 import ASTPath from './../glimmer-utils';
 import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
-import { parse } from 'babylon';
+import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { toPosition } from './../estree-utils';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils/definition-helpers';
 const { kebabCase } = require('lodash');

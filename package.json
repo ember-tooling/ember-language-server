@@ -20,8 +20,7 @@
   "dependencies": {
     "@glimmer/syntax": "^0.39.3",
     "ast-types": "^0.11.3",
-    "babylon": "^6.18.0",
-    "ember-meta-explorer": "^0.0.9",
+    "ember-meta-explorer": "^0.0.10",
     "fs-extra": "^5.0.0",
     "fuzzaldrin": "^2.1.0",
     "i": "^0.3.5",
@@ -33,7 +32,6 @@
     "walk-sync": "^1.0.1"
   },
   "devDependencies": {
-    "@types/babylon": "^6.16.5",
     "@types/estree": "*",
     "@types/fuzzaldrin": "^2.1.1",
     "@types/jest": "^23.3.13",
