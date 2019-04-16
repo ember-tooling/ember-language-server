@@ -46,7 +46,11 @@ export default class TemplateDefinitionProvider {
   handle(params: TextDocumentPositionParams, project: any): Definition | null {
     let uri = params.textDocument.uri;
     const root = project.root;
-    let content = this.server.documents.get(uri).getText();
+    const document = this.server.documents.get(uri);
+    if (!document) {
+      return null;
+    }
+    let content = document.getText();
     let ast = preprocess(content);
     let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
 

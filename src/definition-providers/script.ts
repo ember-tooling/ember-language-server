@@ -138,7 +138,11 @@ export default class ScriptDefinietionProvider {
   handle(params: TextDocumentPositionParams, project: any): Definition | null {
     const uri = params.textDocument.uri;
     const { root } = project;
-    const content = this.server.documents.get(uri).getText();
+    const document = this.server.documents.get(uri);
+    if (!document) {
+      return null;
+    }
+    const content = document.getText();
 
     const ast = parse(content, {
       sourceType: 'module'
