@@ -46,6 +46,9 @@ export default class ScriptCompletionProvider {
       return [];
     }
     const document = this.server.documents.get(uri);
+    if (!document) {
+      return [];
+    }
     const { root } = project;
     const content = document.getText();
 
