@@ -80,7 +80,7 @@ function componentsContextData(
     log('jsMeta', jsMeta);
     infoItems.push(jsMeta);
   } catch (e) {
-    log('error', e);
+    log('template-context-lookup-error', e.toString());
   }
 
   try {
