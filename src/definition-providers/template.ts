@@ -41,6 +41,10 @@ const mAddonPathsForComponentTemplates = memoize(
   { length: 2, maxAge: 600000 }
 );
 
+function normalizeAngleTagName(tagName: string) {
+  return tagName.split('::').map((item: string) => kebabCase(item)).join('/');
+}
+
 export default class TemplateDefinitionProvider {
   constructor(private server: Server) {}
   handle(params: TextDocumentPositionParams, project: any): Definition | null {
@@ -118,7 +122,7 @@ export default class TemplateDefinitionProvider {
     return pathsToLocations.apply(null, filteredPaths);
   }
   provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
-    const maybeComponentName = kebabCase(focusPath.node.tag);
+    const maybeComponentName = normalizeAngleTagName(focusPath.node.tag);
 
     let paths = [
       ...getPathsForComponentScripts(root, maybeComponentName),
@@ -177,7 +181,7 @@ export default class TemplateDefinitionProvider {
   provideMustacheDefinition(root: string, focusPath: ASTPath) {
     const maybeComponentName =
       focusPath.node.type === 'ElementNode'
-        ? kebabCase(focusPath.node.tag)
+        ? normalizeAngleTagName(focusPath.node.tag)
         : focusPath.node.original;
 
     let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map(
@@ -231,7 +235,7 @@ export default class TemplateDefinitionProvider {
     return null;
   }
   provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath) {
-    const maybeComponentName = kebabCase(focusPath.parent.tag);
+    const maybeComponentName = normalizeAngleTagName(focusPath.parent.tag);
 
     let paths = [
       ...getPathsForComponentScripts(root, maybeComponentName),

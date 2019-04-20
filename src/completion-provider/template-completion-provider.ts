@@ -9,7 +9,7 @@ import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
 
 const { preprocess } = require('@glimmer/syntax');
-const { uniqBy } = require('lodash');
+const { uniqBy, startCase, camelCase } = require('lodash');
 const memoize = require('memoizee');
 import {
   emberBlockItems,
@@ -37,6 +37,12 @@ import {
   builtinModifiers,
   mGetProjectAddonsInfo
 } from '../utils/layout-helpers';
+
+function toAngleBrackedName(name: string) {
+  return name.split('/').map((part: string) => {
+    return startCase(camelCase(part)).split(' ').join('');
+  }).join('::');
+}
 
 const mTemplateContextLookup = memoize(templateContextLookup, {
   length: 3,
@@ -81,16 +87,10 @@ export default class TemplateCompletionProvider {
             return detail === 'component';
           })
         )
-        .filter((item: any) => {
-          return !item.label.includes('/');
-        })
         .map((item: any) => {
-          item.label = item.label
-            .split('-')
-            .reduce((result: string, name: string) => {
-              return result + name.charAt(0).toUpperCase() + name.substr(1);
-            }, '');
-          return item;
+          return Object.assign({}, item, {
+            label: toAngleBrackedName(item.label)
+          });
         }),
       'label'
     );
