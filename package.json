@@ -18,7 +18,7 @@
   "typings": "lib/start-server.d.ts",
   "dependencies": {
     "@glimmer/syntax": "^0.39.3",
-    "ast-types": "^0.11.3",
+    "ast-types": "^0.12.4",
     "babylon": "^6.18.0",
     "fs-extra": "^5.0.0",
     "fuzzaldrin": "^2.1.0",
