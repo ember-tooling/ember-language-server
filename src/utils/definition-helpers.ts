@@ -12,9 +12,14 @@ import {
   isModuleUnificationApp,
   podModulePrefixForRoot,
   hasAddonFolderInPath,
-  getProjectAddonsRoots
+  getProjectAddonsRoots,
+  getProjectInRepoAddonsRoots
 } from './layout-helpers';
 const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
+  length: 1,
+  maxAge: 600000
+});
+const mProjectInRepoAddonsRoots = memoize(getProjectInRepoAddonsRoots, {
   length: 1,
   maxAge: 600000
 });
@@ -214,7 +219,7 @@ export function getAddonImport(root: string, importPath: string) {
   if (!addonName) {
     return [];
   }
-  const roots = mProjectAddonsRoots(root);
+  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {
@@ -258,7 +263,7 @@ export function getAddonImport(root: string, importPath: string) {
 }
 
 export function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
-  const roots = mProjectAddonsRoots(root);
+  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {
@@ -300,7 +305,7 @@ export function getAddonPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
 ) {
-  const roots = mProjectAddonsRoots(root);
+  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {
