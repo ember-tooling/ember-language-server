@@ -10,7 +10,9 @@ import {
     listComponents,
     listHelpers,
     listRoutes,
-    getComponentNameFromURI
+    getComponentNameFromURI,
+    getProjectInRepoAddonsRoots,
+    getProjectAddonsRoots
 } from '../../src/utils/layout-helpers';
 import { join, sep } from 'path';
 
@@ -131,6 +133,22 @@ describe('definition-helpers', function() {
         const uri = 'file://' + join(__dirname, 'templates', 'foo-bar.hbs');
         const component = getComponentNameFromURI(root, uri);
         expect(component).toEqual(null);
+    });
+  });
+
+  describe('getProjectInRepoAddonsRoots()', function() {
+    it('must discover in-repo addons', function() {
+      const root = join(__dirname, './../fixtures/project-with-in-repo-addons');
+      const items = getProjectInRepoAddonsRoots(root);
+      expect(items.length).toEqual(1);
+    });
+  });
+
+  describe('getProjectAddonsRoots()', function() {
+    it('must resolve all related to project addons', function() {
+      const root = join(__dirname, './../fixtures/full-project');
+      const items = getProjectAddonsRoots(root, [], 'hope_modules');
+      expect(items.length).toEqual(2);
     });
   });
 

@@ -1,6 +1,6 @@
 const memoize = require('memoizee');
 const walkSync = require('walk-sync');
-import { join, sep, extname } from 'path';
+import { join, sep, extname, dirname } from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
 import { readFileSync, existsSync } from 'fs';
@@ -57,10 +57,10 @@ export function getPodModulePrefix(root: string): string | null {
   return podModulePrefix.trim().length > 0 ? podModulePrefix : null;
 }
 
-export function resolvePackageRoot(root: string, addonName: string) {
+export function resolvePackageRoot(root: string, addonName: string, packagesFolder = 'node_modules') {
   const roots = root.split(sep);
   while (roots.length) {
-    const maybePath = join(roots.join(sep), 'node_modules', addonName);
+    const maybePath = join(roots.join(sep), packagesFolder, addonName);
     const linkedPath = join(roots.join(sep), addonName);
     if (existsSync(join(maybePath, 'package.json'))) {
       return maybePath;
@@ -78,11 +78,40 @@ export function isProjectAddonRoot(root: string) {
   return isEmeberAddon(pack) && hasIndexJs;
 }
 
-export function getProjectAddonsRoots(root: string) {
+export function getProjectInRepoAddonsRoots(root: string) {
+  const addons = safeWalkSync(
+    join(root, 'lib'),
+    {
+      directories: true,
+      globs: ['**/package.json']
+    }
+  );
+  const roots: string[] = [];
+  addons.map((relativePath: string) => {
+    return dirname(join(root, 'lib', relativePath));
+  })
+  .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
+  .forEach((validRoot: string) => {
+    roots.push(validRoot);
+    getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
+      if (!roots.includes(relatedRoot)) {
+        roots.push(relatedRoot);
+      }
+    });
+  });
+  return roots;
+}
+
+export function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
   // log('getProjectAddonsInfo', root);
   const pack = getPackageJSON(root);
+  if (resolvedItems.length) {
+    if (!isEmeberAddon(pack)) {
+      return [];
+    }
+  }
   // log('getPackageJSON', pack);
-  const items = [
+  const items = resolvedItems.length ? [...Object.keys(pack.dependencies || {})] : [
     ...Object.keys(pack.dependencies || {}),
     ...Object.keys(pack.devDependencies || {})
   ];
@@ -90,12 +119,23 @@ export function getProjectAddonsRoots(root: string) {
 
   const roots = items
     .map((item: string) => {
-      return resolvePackageRoot(root, item);
+      return resolvePackageRoot(root, item, packageFolderName);
     })
     .filter((p: string | boolean) => {
       return p !== false;
     });
-  return roots;
+  const recursiveRoots: string[] = resolvedItems.slice(0);
+  roots.forEach((rootItem: string) => {
+    if (!recursiveRoots.includes(rootItem)) {
+      recursiveRoots.push(rootItem);
+      getProjectAddonsRoots(rootItem, recursiveRoots, packageFolderName).forEach((item: string) => {
+        if (!recursiveRoots.includes(item)) {
+          recursiveRoots.push(item);
+        }
+      });
+    }
+  });
+  return recursiveRoots;
 }
 
 export function getPackageJSON(file: string) {
@@ -120,7 +160,10 @@ export function hasAddonFolderInPath(name: string) {
 }
 
 export function getProjectAddonsInfo(root: string) {
-  const roots = getProjectAddonsRoots(root);
+  const roots = [].concat(
+    getProjectAddonsRoots(root) as any,
+    getProjectInRepoAddonsRoots(root) as any)
+  .filter((pathItem: any) => typeof pathItem === 'string');
   // log('roots', roots);
   const meta: any = [];
   roots.forEach((packagePath: string) => {
