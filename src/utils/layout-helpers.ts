@@ -112,8 +112,13 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
     }
   }
   // log('getPackageJSON', pack);
-  const items = resolvedItems.length ? [...Object.keys(pack.dependencies || {})] : [
+  const items = resolvedItems.length ?
+    [
+      ...Object.keys(pack.dependencies || {}),
+      ...Object.keys(pack.peerDependencies || {})
+    ] : [
     ...Object.keys(pack.dependencies || {}),
+    ...Object.keys(pack.peerDependencies || {}),
     ...Object.keys(pack.devDependencies || {})
   ];
   // log('items', items);
