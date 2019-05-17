@@ -61,11 +61,12 @@ export default class TemplateDefinitionProvider {
     if (!focusPath) {
       return null;
     }
-
-    // <FooBar />
-    if (this.isAngleComponent(focusPath)) {
+    // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
+    if  (this.maybeClassicComponentName(focusPath)) {
+      return this.provideComponentDefinition(project.root, this.extractValueForMaybeClassicComponentName(focusPath));
+    } else if (this.isAngleComponent(focusPath)) {
+      // <FooBar />
       return this.provideAngleBrackedComponentDefinition(root, focusPath);
-
       // {{#foo-bar}} {{/foo-bar}}
     } else if (this.isComponentWithBlock(focusPath)) {
       return this.provideBlockComponentDefinition(root, focusPath);
@@ -93,6 +94,31 @@ export default class TemplateDefinitionProvider {
     }
 
     return null;
+  }
+  looksLikeClassicComponentName(name: string) {
+    return name.length && !name.includes('.') && !name.includes(' ') && name === name.toLowerCase();
+  }
+  extractValueForMaybeClassicComponentName(focusPath: ASTPath) {
+    let value = '';
+    const node = focusPath.node;
+    const parent = focusPath.parent;
+    if (!parent) {
+      return value;
+    }
+    if (node.type === 'StringLiteral' && parent.type === 'HashPair') {
+      value = node.original;
+    } else if (node.type === 'TextNode' && parent.type === 'AttrNode') {
+      value = node.chars;
+    }
+    return value;
+  }
+  maybeClassicComponentName(focusPath: ASTPath) {
+    let value = this.extractValueForMaybeClassicComponentName(focusPath);
+    if (this.looksLikeClassicComponentName(value)) {
+      return true;
+    } else {
+      return false;
+    }
   }
   provideRouteDefinition(root: string, routeName: string) {
     const routeParts = routeName.split('.');
@@ -178,12 +204,7 @@ export default class TemplateDefinitionProvider {
       text.replace('this.', '').split('.')[0]
     );
   }
-  provideMustacheDefinition(root: string, focusPath: ASTPath) {
-    const maybeComponentName =
-      focusPath.node.type === 'ElementNode'
-        ? normalizeAngleTagName(focusPath.node.tag)
-        : focusPath.node.original;
-
+  provideComponentDefinition(root: string, maybeComponentName: string) {
     let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map(
       (pathParts: any) => {
         return path.join.apply(path, pathParts.filter((part: any) => !!part));
@@ -204,6 +225,13 @@ export default class TemplateDefinitionProvider {
       null,
       paths.length > 1 ? paths.filter(isTemplatePath) : paths
     );
+  }
+  provideMustacheDefinition(root: string, focusPath: ASTPath) {
+    const maybeComponentName =
+      focusPath.node.type === 'ElementNode'
+        ? normalizeAngleTagName(focusPath.node.tag)
+        : focusPath.node.original;
+    return this.provideComponentDefinition(root, maybeComponentName);
   }
   provideHashPropertyUsage(root: string, focusPath: ASTPath) {
     let parentPath = focusPath.parentPath;
