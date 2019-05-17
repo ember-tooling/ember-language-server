@@ -137,8 +137,13 @@ describe('definition-helpers', function() {
   });
 
   describe('getProjectInRepoAddonsRoots()', function() {
-    it('must discover in-repo addons', function() {
+    it('must discover in-repo addons for classic structure', function() {
       const root = join(__dirname, './../fixtures/project-with-in-repo-addons');
+      const items = getProjectInRepoAddonsRoots(root);
+      expect(items.length).toEqual(1);
+    });
+    it('must discover in-repo addons for MU structure', function() {
+      const root = join(__dirname, './../fixtures/mu-project-with-in-repo-addons');
       const items = getProjectInRepoAddonsRoots(root);
       expect(items.length).toEqual(1);
     });
