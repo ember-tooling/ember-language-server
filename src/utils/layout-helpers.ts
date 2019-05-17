@@ -79,8 +79,9 @@ export function isProjectAddonRoot(root: string) {
 }
 
 export function getProjectInRepoAddonsRoots(root: string) {
+  const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
   const addons = safeWalkSync(
-    join(root, 'lib'),
+    join(root, prefix),
     {
       directories: true,
       globs: ['**/package.json']
@@ -88,7 +89,7 @@ export function getProjectInRepoAddonsRoots(root: string) {
   );
   const roots: string[] = [];
   addons.map((relativePath: string) => {
-    return dirname(join(root, 'lib', relativePath));
+    return dirname(join(root, prefix, relativePath));
   })
   .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
   .forEach((validRoot: string) => {
