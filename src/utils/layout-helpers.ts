@@ -75,7 +75,7 @@ export function resolvePackageRoot(root: string, addonName: string, packagesFold
 export function isProjectAddonRoot(root: string) {
   const pack = getPackageJSON(root);
   const hasIndexJs = existsSync(join(root, 'index.js'));
-  return isEmeberAddon(pack) && hasIndexJs;
+  return isEmberAddon(pack) && hasIndexJs;
 }
 
 export function getProjectInRepoAddonsRoots(root: string) {
@@ -107,7 +107,7 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
   // log('getProjectAddonsInfo', root);
   const pack = getPackageJSON(root);
   if (resolvedItems.length) {
-    if (!isEmeberAddon(pack)) {
+    if (!isEmberAddon(pack)) {
       return [];
     }
   }
@@ -153,8 +153,19 @@ export function getPackageJSON(file: string) {
   }
 }
 
-export function isEmeberAddon(info: any) {
+export function isEmberAddon(info: any) {
   return info.keywords && info.keywords.includes('ember-addon');
+}
+
+function addonVersion(info: any) {
+  if (!isEmberAddon(info)) {
+    return null;
+  }
+  return isEmberAddonV2(info) ? 2 : 1;
+}
+
+function isEmberAddonV2(info: any) {
+  return info['ember-addon'] && info['ember-addon'].version === 2;
 }
 
 export function isTemplatePath(filePath: string) {
@@ -175,7 +186,11 @@ export function getProjectAddonsInfo(root: string) {
   roots.forEach((packagePath: string) => {
     const info = getPackageJSON(packagePath);
     // log('info', info);
-    if (isEmeberAddon(info)) {
+    const version = addonVersion(info);
+    if (version === null) {
+      return;
+    }
+    if (version === 1) {
       // log('isEmberAddon', packagePath);
       const extractedData = [
         ...listComponents(packagePath),
