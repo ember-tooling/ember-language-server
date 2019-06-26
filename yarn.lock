@@ -18,25 +18,25 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@glimmer/interfaces@^0.39.3":
-  version "0.39.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.39.3.tgz#1d46e1056c9ff3ce6174b82320893c027772e5f4"
-  integrity sha512-tmuZAUau8UbyGh4gLkpC6Vjdm0JP2dibAMMaU/yZG+SGSsQeT+bo+0XcEezscQDPihfXsBX4Z6yq98o15beYEA==
+"@glimmer/interfaces@^0.41.1":
+  version "0.41.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.41.1.tgz#8afee4186ed4256d6c98b5572e8ad0dbbc5f6c05"
+  integrity sha512-Wdn0WJN0OScZ8n9l6ijlEXbUxd7a5cWIWrq9UVnlfXm/CuC78RVXA3hZAP1LH0uWepg7GxEl3Ax5bhWGstUKhw==
 
-"@glimmer/syntax@^0.39.3":
-  version "0.39.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.39.3.tgz#a5220151b00c69fbd728e120dffc7f90fa5b4f24"
-  integrity sha512-Mb/d1hyWKZYANRPKoEGQ4wTc0kkcsjtxyN+J4ps2F1LQ5UKqJxDlgA/Tf9zXNHsd+A8dn25t5NIjQl7KIdsqOg==
+"@glimmer/syntax@^0.41.1":
+  version "0.41.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.41.1.tgz#72552c1c3eeb466c5e66777b4c1055212d879df6"
+  integrity sha512-jkRRxA1Y2y3PUz3mKrVBmehLzPxYL50APcm/brY5yMYabduA/WxI88PgBP1GfeURJK9YUhVo5S4lspcWbm9V8Q==
   dependencies:
-    "@glimmer/interfaces" "^0.39.3"
-    "@glimmer/util" "^0.39.3"
+    "@glimmer/interfaces" "^0.41.1"
+    "@glimmer/util" "^0.41.1"
     handlebars "^4.0.13"
     simple-html-tokenizer "^0.5.7"
 
-"@glimmer/util@^0.39.3":
-  version "0.39.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.39.3.tgz#f6b0417c4b0a30f4ea693990f466e3d1eb442d37"
-  integrity sha512-2tzpxdgaQxMu9bHFqTpGDBYDtSWJWQZkBCFfkzCmPrJuCis3YK7m9hzYIaow7CsVLnO44Xmur+Bpq6IM9gVFXw==
+"@glimmer/util@^0.41.1":
+  version "0.41.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.41.1.tgz#77e6257ad825359879f5fe463ea5e68376d034e6"
+  integrity sha512-jpJvSB+OIUNcurfw8cue57h09xRkNPPXJF+Zqtgi4vMQo9Gb7mkHZX8+Lw+Jv9Yf6eMoOX5ooXPXyf2+rS7RIA==
 
 "@types/babel-types@*":
   version "7.0.1"
