@@ -37,6 +37,7 @@ import {
   builtinModifiers,
   mGetProjectAddonsInfo
 } from '../utils/layout-helpers';
+import { searchAndExtractHbs } from 'extract-tagged-template-literals';
 
 function toAngleBrackedName(name: string) {
   return name.split('/').map((part: string) => {
@@ -71,6 +72,8 @@ function mListMURouteLevelComponents(projectRoot: string, fileURI: string) {
   }
   return [];
 }
+
+const extensionsToProvideTemplateCompletions = ['.hbs', '.js', '.ts'];
 
 const PLACEHOLDER = 'ELSCompletionDummy';
 export default class TemplateCompletionProvider {
@@ -137,9 +140,12 @@ export default class TemplateCompletionProvider {
   }
   provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
     log('provideCompletions');
-    if (getExtension(params.textDocument) !== '.hbs') {
+    const ext = getExtension(params.textDocument);
+
+    if (ext !== null && !extensionsToProvideTemplateCompletions.includes(ext)) {
       return [];
     }
+
     const uri = params.textDocument.uri;
     const project = this.server.projectRoots.projectForUri(uri);
     const document = this.server.documents.get(uri);
@@ -148,7 +154,8 @@ export default class TemplateCompletionProvider {
     }
     const { root } = project;
     const offset = document.offsetAt(params.position);
-    const originalText = document.getText();
+    const documentContent = document.getText();
+    const originalText = (ext === '.hbs') ? documentContent : searchAndExtractHbs(documentContent);
     log('originalText', originalText);
     const completions: CompletionItem[] = [];
     let normalPlaceholder: any = PLACEHOLDER;
