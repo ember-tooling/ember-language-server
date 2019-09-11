@@ -1,6 +1,7 @@
 import { Diagnostic, Files, TextDocument } from 'vscode-languageserver';
-import { hasExtension } from './utils/file-extension';
+import { getExtension } from './utils/file-extension';
 import { toDiagnostic } from './utils/diagnostic';
+import { searchAndExtractHbs } from 'extract-tagged-template-literals';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -19,6 +20,8 @@ export interface TemplateLinterError {
   source?: string;
 }
 
+const extensionsToLint: string[] = ['.hbs', '.js', '.ts'];
+
 export default class TemplateLinter {
 
   private _linterCache = new Map<Project, any>();
@@ -26,7 +29,9 @@ export default class TemplateLinter {
   constructor(private server: Server) {}
 
   async lint(textDocument: TextDocument) {
-    if (!hasExtension(textDocument, '.hbs')) {
+    const ext = getExtension(textDocument);
+
+    if (ext !== null && !extensionsToLint.includes(ext)) {
       return;
     }
 
@@ -45,7 +50,8 @@ export default class TemplateLinter {
       return;
     }
 
-    const source = textDocument.getText();
+    const documentContent = textDocument.getText();
+    const source = (ext === '.hbs') ? documentContent : searchAndExtractHbs(documentContent);
 
     const errors = linter.verify({
       source,
