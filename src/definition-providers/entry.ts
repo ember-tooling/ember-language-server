@@ -20,7 +20,7 @@ export default class DefinitionProvider {
 
   handle(params: TextDocumentPositionParams): Definition | null {
     let uri = params.textDocument.uri;
-
+    // this.server.setStatusText('Running');
     const project = this.server.projectRoots.projectForUri(uri);
 
     if (!project) {
