@@ -1,12 +1,7 @@
 {
   "name": "@emberwatch/ember-language-server",
-  "version": "0.2.1",
   "description": "A language server implementation for Ember.js projects.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/emberwatch/ember-language-server.git"
-  },
-  "license": "MIT",
+  "version": "0.2.2",
   "contributors": [
     "Tobias Bieniek <tobias.bieniek@gmail.com>",
     "Thomas Sauer <t-sauer@outlook.de>",
