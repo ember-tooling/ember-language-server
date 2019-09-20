@@ -1,4 +1,4 @@
-const walkSync = require('walk-sync');
+import * as walkSync from 'walk-sync';
 import { join, sep, extname, dirname } from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
@@ -8,7 +8,7 @@ export function isMuApp(root: string) {
   return existsSync(join(root, 'src', 'ui'));
 }
 
-export function safeWalkSync(filePath: string | false, opts: any) {
+export function safeWalkSync(filePath: string | false, opts: walkSync.Options) {
   if (!filePath) {
     return [];
   }
@@ -19,22 +19,25 @@ export function safeWalkSync(filePath: string | false, opts: any) {
 }
 
 export function getPodModulePrefix(root: string): string | null {
-  let podModulePrefix: any = '';
   // log('listPodsComponents');
+  let appConfig: (mode: string) => { podModulePrefix?: string };
   try {
-    const appConfig = require(join(root, 'config', 'environment.js'));
+    appConfig = require(join(root, 'config', 'environment.js'));
     // log('appConfig', appConfig);
-    podModulePrefix = appConfig('development').podModulePrefix || '';
-    if (podModulePrefix.includes('/')) {
-      podModulePrefix = podModulePrefix.split('/').pop();
-    }
   } catch (e) {
     // log('catch', e);
     return null;
   }
+
+  const prefixFromConfig = appConfig('development').podModulePrefix || '';
+  const podModulePrefix = prefixFromConfig.includes('/')
+    ? prefixFromConfig.split('/').pop()
+    : prefixFromConfig;
+
   if (!podModulePrefix) {
     return null;
   }
+
   return podModulePrefix.trim().length > 0 ? podModulePrefix : null;
 }
 
@@ -134,18 +137,25 @@ export function getPackageJSON(file: string) {
   }
 }
 
-export function isEmberAddon(info: any) {
+interface PackageInfo {
+  keywords?: string[]
+  'ember-addon'?: {
+    version?: number
+  }
+}
+
+export function isEmberAddon(info: PackageInfo) {
   return info.keywords && info.keywords.includes('ember-addon');
 }
 
-function addonVersion(info: any) {
+function addonVersion(info: PackageInfo) {
   if (!isEmberAddon(info)) {
     return null;
   }
   return isEmberAddonV2(info) ? 2 : 1;
 }
 
-function isEmberAddonV2(info: any) {
+function isEmberAddonV2(info: PackageInfo) {
   return info['ember-addon'] && info['ember-addon'].version === 2;
 }
 
@@ -157,46 +167,49 @@ export function hasAddonFolderInPath(name: string) {
   return name.includes(sep + 'addon' + sep);
 }
 
-export function getProjectAddonsInfo(root: string) {
-  const roots = [].concat(
-    getProjectAddonsRoots(root) as any,
-    getProjectInRepoAddonsRoots(root) as any)
-  .filter((pathItem: any) => typeof pathItem === 'string');
-  // log('roots', roots);
-  const meta: any = [];
-  roots.forEach((packagePath: string) => {
-    const info = getPackageJSON(packagePath);
-    // log('info', info);
-    const version = addonVersion(info);
-    if (version === null) {
-      return;
-    }
-    if (version === 1) {
-      // log('isEmberAddon', packagePath);
-      const extractedData = [
-        ...listComponents(packagePath),
-        ...listRoutes(packagePath),
-        ...listHelpers(packagePath),
-        ...listModels(packagePath),
-        ...listTransforms(packagePath),
-        ...listServices(packagePath),
-        ...listModifiers(packagePath)
-      ];
-      // log('extractedData', extractedData);
-      if (extractedData.length) {
-        meta.push(extractedData);
-      }
-    }
-  });
-  // log('meta', meta);
-  const normalizedResult: any[] = meta.reduce((arrs: any[], item: any[]) => {
-    if (!item.length) {
-      return arrs;
-    }
-    return arrs.concat(item);
-  }, []);
+/**
+  Push the items in `newContents` into `target` if `newContents` is not empty.
 
-  return normalizedResult;
+  Useful for cases where performance of reallocating arrays is a concern.
+
+  @warn **NOTE:** this mutates `target`. It returns `target` for convenience.
+ */
+function pushIfNotEmpty<T>(target: T[]): (newContents: T[]) => void {
+  return newContents => {
+    if (newContents.length) {
+      target.push(...newContents);
+    }
+  };
+}
+
+export function getProjectAddonsInfo(root: string) {
+  const roots = ([] as string[]).concat(
+    getProjectAddonsRoots(root),
+    getProjectInRepoAddonsRoots(root)
+  );
+
+  return roots.reduce(
+    (completionItems, root) => {
+      const info = getPackageJSON(root);
+      const version = addonVersion(info);
+      if (version === 1) {
+        let completionItemLists = [
+          listComponents(root),
+          listRoutes(root),
+          listHelpers(root),
+          listModels(root),
+          listTransforms(root),
+          listServices(root),
+          listModifiers(root)
+        ];
+
+        completionItemLists.forEach(pushIfNotEmpty(completionItems));
+      }
+
+      return completionItems;
+    },
+    [] as CompletionItem[]
+  );
 }
 
 export function pureComponentName(relativePath: string) {
