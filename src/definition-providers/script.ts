@@ -54,9 +54,9 @@ class PathResolvers {
   }
 }
 
-export default class ScriptDefinietionProvider {
   private resolvers!: PathResolvers;
   constructor(private server: Server) {
+export default class ScriptDefinitionProvider {
     this.resolvers = new PathResolvers();
   }
   guessPathForImport(root: string, uri: string, importPath: string ) {
