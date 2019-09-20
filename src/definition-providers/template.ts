@@ -39,8 +39,13 @@ function normalizeAngleTagName(tagName: string) {
 }
 
 export default class TemplateDefinitionProvider {
-  constructor(private server: Server) {}
   handle(params: TextDocumentPositionParams, project: any): Definition | null {
+  private server: Server;
+
+  constructor(server: Server) {
+    this.server = server;
+  }
+
     let uri = params.textDocument.uri;
     const root = project.root;
     const document = this.server.documents.get(uri);

@@ -12,10 +12,12 @@ import ScriptDefinitionProvider from './script';
 export default class DefinitionProvider {
   public template: TemplateDefinitionProvider;
   public script: ScriptDefinitionProvider;
+  private server: Server;
 
-  constructor(private server: Server) {
+  constructor(server: Server) {
     this.template = new TemplateDefinitionProvider(server);
     this.script = new ScriptDefinitionProvider(server);
+    this.server = server;
   }
 
   handle(params: TextDocumentPositionParams): Definition | null {
