@@ -56,9 +56,7 @@ export default class TemplateCompletionProvider {
         .concat(
           listComponents(root),
           listPodsComponents(root),
-          getProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
-            return detail === 'component';
-          })
+          getProjectAddonsInfo(root).filter(({detail}) => detail === 'component')
         )
         .map((item) => {
           return Object.assign({}, item, {
@@ -74,9 +72,9 @@ export default class TemplateCompletionProvider {
       ...listComponents(root),
       ...listPodsComponents(root),
       ...listHelpers(root),
-      ...getProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
-        return detail === 'component' || detail === 'helper';
-      })
+      ...getProjectAddonsInfo(root).filter(
+        ({detail}) => detail === 'component' || detail === 'helper'
+      )
     ];
     return candidates;
   }
@@ -85,9 +83,7 @@ export default class TemplateCompletionProvider {
       ...templateContextLookup(root, uri, originalText),
       ...listComponents(root),
       ...listPodsComponents(root),
-      ...getProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
-        return detail === 'component';
-      })
+      ...getProjectAddonsInfo(root).filter(({detail}) => detail === 'component')
     ];
     return candidates;
   }
@@ -95,9 +91,7 @@ export default class TemplateCompletionProvider {
     let candidates = [
       ...templateContextLookup(root, uri, originalText),
       ...listHelpers(root),
-      ...getProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
-        return detail === 'helper';
-      })
+      ...getProjectAddonsInfo(root).filter(({detail}) => detail === 'helper')
     ];
     return candidates;
   }
@@ -187,9 +181,9 @@ export default class TemplateCompletionProvider {
         // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
         completions.push(...uniqBy(listRoutes(root), 'label'));
       } else if (isModifierPath(focusPath)) {
-        const addonModifiers = getProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
-          return detail === 'modifier';
-        });
+        const addonModifiers = getProjectAddonsInfo(root).filter(
+          ({detail}) => detail === 'modifier'
+        );
         completions.push(...uniqBy([...listModifiers(root), ...addonModifiers, ...builtinModifiers()], 'label'));
       }
     } catch (e) {
