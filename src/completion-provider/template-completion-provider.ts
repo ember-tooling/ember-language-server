@@ -75,12 +75,15 @@ function mListMURouteLevelComponents(projectRoot: string, fileURI: string) {
 
 const extensionsToProvideTemplateCompletions = ['.hbs', '.js', '.ts'];
 
+type ComponentLabels = Array<{ label: string }>;
+
 const PLACEHOLDER = 'ELSCompletionDummy';
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getAllAngleBracketComponents(root: string, uri: string) {
+  getAllAngleBracketComponents(root: string, uri: string): ComponentLabels {
     return uniqBy(
-      []
+      ([] as CompletionItem[])
         .concat(
           mListMUComponents(root),
           mListComponents(root),
@@ -90,7 +93,7 @@ export default class TemplateCompletionProvider {
             return detail === 'component';
           })
         )
-        .map((item: any) => {
+        .map((item) => {
           return Object.assign({}, item, {
             label: toAngleBrackedName(item.label)
           });
