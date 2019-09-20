@@ -16,7 +16,7 @@ import {
   processTemplate
 } from 'ember-meta-explorer';
 
-const { uniqBy } = require('lodash');
+import { uniqBy } from 'lodash';
 
 function localizeName(name: string) {
   if (name.startsWith('this.')) {
@@ -106,7 +106,7 @@ function componentsContextData(
       });
       return result;
     }, {});
-  const items: any = [];
+  const items: CompletionItem[] = [];
   log('meta', meta);
   let contextInfo: any = {};
   try {
