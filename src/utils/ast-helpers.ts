@@ -1,157 +1,103 @@
 import ASTPath from './../glimmer-utils';
 
-function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
-  let node = astPath.node;
-  if (!isString(node)) {
-    return false;
-  }
-  let parent = astPath.parent;
-  if (!isCallExpression(parent)) {
-    return false;
-  }
-  if (!expressionHasArgument(parent, node, 0)) {
-    return false;
-  }
-  if (!parent.callee || !parent.callee.property) {
-    return false;
-  }
-  return true;
+function isFirstStringParamInCallExpression(path: ASTPath): boolean {
+  return (
+    isString(path.node) &&
+    isCallExpression(path.parent) &&
+    expressionHasArgument(path.parent, path.node, 0) &&
+    path.parent.callee &&
+    path.parent.callee.property
+  );
 }
 
 export function isRouteLookup(astPath: ASTPath): boolean {
-  if (!isFirstStringParamInCallExpression(astPath)) {
-    return false;
-  }
-  let parent = astPath.parent;
-  const matches = [
-    'transitionTo',
-    'intermediateTransitionTo',
-    'paramsFor',
-    'transitionToRoute'
-  ];
-  return expressionHasIdentifierName(parent, matches);
+  return (
+    isFirstStringParamInCallExpression(astPath) &&
+    expressionHasIdentifierName(astPath.parent, [
+      "transitionTo",
+      "intermediateTransitionTo",
+      "paramsFor",
+      "transitionToRoute"
+    ])
+  );
 }
 
-export function isStoreModelLookup(astPath: ASTPath): boolean {
-  if (!isFirstStringParamInCallExpression(astPath)) {
-    return false;
-  }
-  let parent = astPath.parent;
-  const matches = [
-    'findRecord',
-    'createRecord',
-    'findAll',
-    'queryRecord',
-    'peekAll',
-    'query',
-    'peekRecord',
-    'adapterFor',
-    'hasRecordForId'
-  ];
-  return expressionHasIdentifierName(parent, matches);
+export function isStoreModelLookup(path: ASTPath): boolean {
+  return (
+    isFirstStringParamInCallExpression(path) &&
+    expressionHasIdentifierName(path.parent, [
+      "findRecord",
+      "createRecord",
+      "findAll",
+      "queryRecord",
+      "peekAll",
+      "query",
+      "peekRecord",
+      "adapterFor",
+      "hasRecordForId"
+    ])
+  );
 }
 
-export function isComputedPropertyArgument(astPath: ASTPath): boolean {
-  let node = astPath.node;
-  if (!isString(node)) {
-    return false;
-  }
-  let parent = astPath.parent;
-  if (!isCallExpression(parent)) {
-    return false;
-  }
-  if (!expressionHasArgument(parent, node)) {
-    return false;
-  }
-  if (!expressionHasIdentifierName(parent, 'computed')) {
-    return false;
-  }
-  const grandParent = astPath.parentPath;
-  if (!grandParent) {
-    return false;
-  }
-  return hasNodeType(grandParent.parent, 'ObjectProperty');
+export function isComputedPropertyArgument(path: ASTPath): boolean {
+  return (
+    isString(path.node) &&
+    isCallExpression(path.parent) &&
+    expressionHasArgument(path.parent, path.node) &&
+    expressionHasIdentifierName(path.parent, "computed") &&
+    !!path.parentPath &&
+    hasNodeType(path.parentPath.parent, "ObjectProperty")
+  );
 }
 
-export function isTransformReference(astPath: ASTPath): boolean {
-  let node = astPath.node;
-  if (!isString(node)) {
-    return false;
-  }
-  let parent = astPath.parent;
-  if (!isCallExpression(parent)) {
-    return false;
-  }
-  if (!expressionHasArgument(parent, node, 0)) {
-    return false;
-  }
-  return expressionHasIdentifierName(parent, 'attr');
+export function isTransformReference(path: ASTPath): boolean {
+  return (
+    isString(path.node) &&
+    isCallExpression(path.parent) &&
+    expressionHasArgument(path.parent, path.node, 0) &&
+    expressionHasIdentifierName(path.parent, "attr")
+  );
 }
 
 export function isAngleComponentPath(path: ASTPath): boolean {
-  let node = path.node;
-  if (!hasNodeType(node, 'ElementNode')) {
-    return false;
-  }
-  if (node.tag.length === 0) {
-    return true;
-  }
-  if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
-    return true;
-  } else {
-    return false;
-  }
+  return (
+    hasNodeType(path.node, "ElementNode") &&
+    (path.node.tag.length === 0 ||
+      path.node.tag.charAt(0) === path.node.tag.charAt(0).toUpperCase())
+  );
 }
 
 export function isModifierPath(path: ASTPath): boolean {
-  let node = path.node;
-  if (!isPathExpression(node)) {
-    return false;
-  }
-  if (node.data) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!hasNodeType(parent, 'ElementModifierStatement')) {
-    return false;
-  }
-  return node === parent.path;
+  return (
+    isPathExpression(path.node) &&
+    !path.node.data &&
+    hasNodeType(path.parent, "ElementModifierStatement") &&
+    path.node === path.parent.path
+  );
 }
 
 export function isMustachePath(path: ASTPath): boolean {
-  let node = path.node;
-  if (!isPathExpression(node)) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!hasNodeType(parent, 'MustacheStatement')) {
-    return false;
-  }
-  return parent.path === node;
+  return (
+    isPathExpression(path.node) &&
+    hasNodeType(path.parent, "MustacheStatement") &&
+    path.parent.path === path.node
+  );
 }
 
 export function isBlockPath(path: ASTPath): boolean {
-  let node = path.node;
-  if (!isPathExpression(node)) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!isBlock(parent)) {
-    return false;
-  }
-  return parent.path === node;
+  return (
+    isPathExpression(path.node) &&
+    isBlock(path.parent) &&
+    path.parent.path === path.node
+  );
 }
 
 export function isSubExpressionPath(path: ASTPath): boolean {
-  let node = path.node;
-  if (!isPathExpression(node)) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!hasNodeType(parent, 'SubExpression')) {
-    return false;
-  }
-  return parent.path === node;
+  return (
+    isPathExpression(path.node) &&
+    hasNodeType(path.parent, "SubExpression") &&
+    path.parent.path === path.node
+  );
 }
 
 export function isLinkToTarget(path: ASTPath): boolean {
@@ -159,100 +105,73 @@ export function isLinkToTarget(path: ASTPath): boolean {
 }
 
 export function isInlineLinkToTarget(path: ASTPath): boolean {
-  let node = path.node;
-  if (!isString(node)) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!hasNodeType(parent, 'MustacheStatement')) {
-    return false;
-  }
-  return parent.params[1] === node && parent.path.original === 'link-to';
+  return (
+    isString(path.node) &&
+    hasNodeType(path.parent, "MustacheStatement") &&
+    path.parent.params[1] === path.node &&
+    path.parent.path.original === "link-to"
+  );
 }
 
 export function isBlockLinkToTarget(path: ASTPath): boolean {
-  let node = path.node;
-  if (!isString(node)) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!isBlock(parent)) {
-    return false;
-  }
-  return parent.params[0] === node && parent.path.original === 'link-to';
+  return (
+    isString(path.node) &&
+    isBlock(path.parent) &&
+    path.parent.params[0] === path.node &&
+    path.parent.path.original === "link-to"
+  );
 }
 
 export function isImportPathDeclaration(path: ASTPath): boolean {
-  let node = path.node;
-  if (!isString(node)) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!hasNodeType(parent, 'ImportDeclaration')) {
-    return false;
-  }
-  return true;
+  return isString(path.node) && hasNodeType(path.parent, 'ImportDeclaration')
 }
 
 export function isServiceInjection(path: ASTPath): boolean {
-  let node = path.node;
-  if (!hasNodeType(node, 'Identifier')) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!hasNodeType(parent, 'ObjectProperty')) {
-    return false;
-  }
-  if (!isCallExpression(parent.value)) {
-    return false;
-  }
-  return expressionHasIdentifierName(parent.value, 'service');
+  return (
+    hasNodeType(path.node, "Identifier") &&
+    hasNodeType(path.parent, "ObjectProperty") &&
+    isCallExpression(path.parent.value) &&
+    expressionHasIdentifierName(path.parent.value, "service")
+  );
 }
 
 export function isNamedServiceInjection(path: ASTPath): boolean {
-  let node = path.node;
-  if (!isString(node)) {
-    return false;
-  }
-  let parent = path.parent;
-  if (!isCallExpression(parent)) {
-    return false;
-  }
-  return expressionHasIdentifierName(parent, 'service');
+  return (
+    isString(path.node) &&
+    isCallExpression(path.parent) &&
+    expressionHasIdentifierName(path.parent, "service")
+  );
 }
 
-export function isModelReference(astPath: ASTPath): boolean {
-  let node = astPath.node;
-  if (!isString(node)) {
-    return false;
-  }
-  let parent = astPath.parent;
-  if (!isCallExpression(parent)) {
-    return false;
-  }
-  if (!expressionHasArgument(parent, node, 0)) {
-    return false;
-  }
-  return expressionHasIdentifierName(parent, ['belongsTo', 'hasMany']);
+export function isModelReference(path: ASTPath): boolean {
+  return (
+    isString(path.node) &&
+    isCallExpression(path.parent) &&
+    expressionHasArgument(path.parent, path.node, 0) &&
+    expressionHasIdentifierName(path.parent, ["belongsTo", "hasMany"])
+  );
 }
+
 function hasNodeType(node: any, type: string) {
-  if (!node) {
-    return false;
-  }
-  return node.type === type;
+  return node && node.type === type;
 }
+
 function isBlock(node: any): boolean {
   return hasNodeType(node, 'BlockStatement');
 }
+
 function isString(node: any): boolean {
   return hasNodeType(node, 'StringLiteral');
 }
+
 function isCallExpression(node: any): boolean {
   return hasNodeType(node, 'CallExpression');
 }
+
 function isPathExpression(node: any): boolean {
   return hasNodeType(node, 'PathExpression');
 }
+
 function expressionHasIdentifierName(exp: any, name: string | string[]) {
   const names = typeof name === 'string' ? [name] : name;
   let identifier = hasNodeType(exp.callee, 'Identifier')
@@ -260,20 +179,12 @@ function expressionHasIdentifierName(exp: any, name: string | string[]) {
     : exp.callee.property;
   return names.includes(identifier.name);
 }
+
 function expressionHasArgument(exp: any, arg: any, position = -1) {
   if (!exp || !exp.arguments) {
     return false;
   }
+
   let index = exp.arguments.indexOf(arg);
-  if (index === -1) {
-    return false;
-  }
-  if (position === -1) {
-    return true;
-  }
-  if (position === index) {
-    return true;
-  } else {
-    return false;
-  }
+  return index !== -1 && (position === -1 || position === index);
 }
