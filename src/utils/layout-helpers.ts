@@ -59,27 +59,26 @@ export function isProjectAddonRoot(root: string) {
 }
 
 export function getProjectInRepoAddonsRoots(root: string) {
-  const addons = safeWalkSync(
-    join(root, prefix),
-    {
-      directories: true,
-      globs: ['**/package.json']
-    }
-  );
   const prefix = 'lib';
+  const addons = safeWalkSync(join(root, prefix), {
+    directories: true,
+    globs: ['**/package.json']
+  });
+
   const roots: string[] = [];
-  addons.map((relativePath: string) => {
-    return dirname(join(root, prefix, relativePath));
-  })
-  .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
-  .forEach((validRoot: string) => {
+  const validRoots = addons
+    .map(relativePath => dirname(join(root, prefix, relativePath)))
+    .filter(isProjectAddonRoot);
+
+  for (const validRoot in validRoots) {
     roots.push(validRoot);
-    getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
+    for (const relatedRoot in getProjectAddonsRoots(validRoot, roots)) {
       if (!roots.includes(relatedRoot)) {
         roots.push(relatedRoot);
       }
-    });
-  });
+    }
+  }
+
   return roots;
 }
 
