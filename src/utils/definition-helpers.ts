@@ -80,19 +80,21 @@ export function getAbstractParts(
   prefix: string,
   collection: string,
   name: string
-) {
+): (string | undefined)[][] {
   return [
     [root, prefix, collection, `${name}.js`],
     [root, prefix, collection, `${name}.ts`]
   ];
 }
 
-export function getAbstractPartsWithTemplates(
-  root: string,
-  prefix: string,
-  collection: string,
-  name: string
-) {
+type LocationPathParts = [string, string, string, string];
+
+function getAbstractPartsWithTemplates([
+  root,
+  prefix,
+  collection,
+  name
+]: Partial<LocationPathParts>): Partial<LocationPathParts>[] {
   return [
     [root, prefix, collection, `${name}.js`],
     [root, prefix, collection, `${name}.ts`],
@@ -128,213 +130,205 @@ export function getPathsForComponentScripts(
   root: string,
   maybeComponentName: string
 ): string[] {
+  const classicComponentsScriptsParts = getAbstractComponentScriptsParts(
+    root,
+    "app",
+    maybeComponentName
+  );
+
   const podModulePrefix = getPodModulePrefix(root);
-  let podComponentsScriptsParts: string[][] = [];
-  let classicComponentsScriptsParts: string[][] = [];
-  if (podModulePrefix) {
-    podComponentsScriptsParts = getAbstractComponentScriptsParts(
-      root,
-      'app/' + podModulePrefix,
-      maybeComponentName
-    );
-  }
-    classicComponentsScriptsParts = getAbstractComponentScriptsParts(
-      root,
-      'app',
-      maybeComponentName
-    );
-  const paths = [
-    ...podComponentsScriptsParts,
-    ...classicComponentsScriptsParts
-  ].map((pathParts: any) => {
-    return path.join.apply(path, pathParts.filter((part: any) => !!part));
-  });
-  return paths;
+  const podComponentsScriptsParts = podModulePrefix
+    ? getAbstractComponentScriptsParts(
+        root,
+        "app/" + podModulePrefix,
+        maybeComponentName
+      )
+    : [];
+
+  return [...podComponentsScriptsParts, ...classicComponentsScriptsParts].map(
+    pathParts => path.join(...pathParts.filter(part => !!part))
+  );
 }
 
 export function getPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
 ): string[] {
+  const classicComponentsScriptsParts = getAbstractComponentTemplatesParts(
+    root,
+    "app",
+    maybeComponentName
+  );
+
   const podModulePrefix = getPodModulePrefix(root);
-  let podComponentsScriptsParts: string[][] = [];
-  let classicComponentsScriptsParts: string[][] = [];
-  if (podModulePrefix) {
-    podComponentsScriptsParts = getAbstractComponentTemplatesParts(
-      root,
-      'app' + path.sep + podModulePrefix,
-      maybeComponentName
-    );
-  }
-    classicComponentsScriptsParts = getAbstractComponentTemplatesParts(
-      root,
-      'app',
-      maybeComponentName
-    );
-  const paths = [
-    ...podComponentsScriptsParts,
-    ...classicComponentsScriptsParts
-  ].map((pathParts: any) => {
-    return path.join.apply(path, pathParts.filter((part: any) => !!part));
-  });
-  return paths;
+  const podComponentsScriptsParts = podModulePrefix
+    ? getAbstractComponentTemplatesParts(
+        root,
+        "app" + path.sep + podModulePrefix,
+        maybeComponentName
+      )
+    : [];
+
+  return [...podComponentsScriptsParts, ...classicComponentsScriptsParts].map(
+    pathParts => path.join(...pathParts.filter(part => !!part))
+  );
 }
 
-export function getAddonImport(root: string, importPath: string) {
+export function getAddonImport(root: string, importPath: string): string[] {
   let importParts = importPath.split('/');
   let addonName = importParts.shift();
   if (addonName && addonName.startsWith('@')) {
     addonName = addonName + path.sep + importParts.shift();
   }
+
   if (!addonName) {
     return [];
   }
-  const roots = ([] as string[]).concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root));
+
+  const roots = [
+    ...getProjectAddonsRoots(root),
+    ...getProjectInRepoAddonsRoots(root)
+  ];
+
   let existingPaths: string[] = [];
-  let hasValidPath = false;
-  roots.forEach((rootPath: string) => {
-    if (!rootPath.endsWith(addonName as string)) {
-      return;
-    }
-    if (hasValidPath) {
-      return;
-    }
-    const addonPaths: string[][] = [];
-    const possibleLocations = [
-      [rootPath, 'app', ...importParts],
-      [rootPath, 'addon', ...importParts],
-      [rootPath, ...importParts],
+  for (const rootPath in roots) {
+    // TODO: fix types here -- I'm pretty sure this is actually a *lie*.
+    const possibleLocations: LocationPathParts[] = [
+      [rootPath, "app", ...importParts] as LocationPathParts,
+      [rootPath, "addon", ...importParts] as LocationPathParts,
+      [rootPath, ...importParts] as LocationPathParts
     ];
-    possibleLocations.forEach((locationArr: any) => {
-      getAbstractPartsWithTemplates.apply(null, locationArr).forEach(
-        (parts: any) => {
-          addonPaths.push(parts);
+
+    // TODO: convert to a simple flatMap once on sufficiently recent Node (11+)
+    const pathsOnDisk = possibleLocations.reduce(
+      (paths, locations) => {
+        const pathParts = getAbstractPartsWithTemplates(locations);
+
+        // Cast b/c TS doesn't understand that the tuple of undefined items is
+        // to treat as a list of strings after filtering.
+        const validPathParts = pathParts.filter(part => !!part) as unknown as LocationPathParts;
+
+        const actualPath = path.join(...validPathParts);
+        if (fs.existsSync(actualPath)) {
+          paths.push();
         }
-      );
-    });
-    const validPaths = addonPaths
-      .map(
-        (pathArr: string[]): string => {
-          return path.join.apply(path, pathArr.filter((part: any) => !!part));
-        }
-      )
-      .filter(fs.existsSync);
-    if (validPaths.length) {
-      hasValidPath = true;
-      existingPaths = validPaths;
+
+        return paths;
+      },
+      [] as string[]
+    );
+
+    if (pathsOnDisk.length) {
+      existingPaths = pathsOnDisk;
+      break;
     }
-  });
+  }
 
   const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
-  if (addonFolderFiles.length) {
-    return addonFolderFiles;
+  return addonFolderFiles.length > 0 ? addonFolderFiles : existingPaths;
+}
+
+// To use as an argument to `reduce` functions. Note that this *mutates* the
+// `paths` array passed in, but with the same effect as creating a new array.
+function toFilesOnDisk(paths: string[], pathParts: (string | undefined)[]): string[] {
+  // This eliminates `null` and `undefined` but also `""`.
+  const validPathParts = pathParts.filter(part => !!part) as string[];
+  const actualPath = path.join(...validPathParts);
+  if (fs.existsSync(actualPath)) {
+    paths.push(actualPath);
   }
-  return existingPaths;
+  return paths
 }
 
 export function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
-  const roots = ([] as string[]).concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root));
+  const roots = [
+    ...getProjectAddonsRoots(root),
+    ...getProjectInRepoAddonsRoots(root)
+  ];
+
   let existingPaths: string[] = [];
-  let hasValidPath = false;
-  roots.forEach((rootPath: string) => {
-    if (hasValidPath) {
-      return;
+  for (const rootPath in roots) {
+    // NOTE: the inline cast on `reduce` is required to specify the overload it
+    // should resolve to. Without it, it tries to resolve as returning the same
+    // type as it receives, rather than a new type.
+    const pathsOnDisk = [
+      ...getAbstractParts(rootPath, "app", collection, name),
+      ...getAbstractParts(rootPath, "addon", collection, name)
+    ].reduce<string[]>(toFilesOnDisk, []);
+
+    if (pathsOnDisk.length) {
+      existingPaths = pathsOnDisk;
+      break;
     }
-    const addonPaths: string[][] = [];
-    getAbstractParts(rootPath, 'app', collection, name).forEach(
-      (parts: any) => {
-        addonPaths.push(parts);
-      }
-    );
-    getAbstractParts(rootPath, 'addon', collection, name).forEach(
-      (parts: any) => {
-        addonPaths.push(parts);
-      }
-    );
-    const validPaths = addonPaths
-      .map(
-        (pathArr: string[]): string => {
-          return path.join.apply(path, pathArr.filter((part: any) => !!part));
-        }
-      )
-      .filter(fs.existsSync);
-    if (validPaths.length) {
-      hasValidPath = true;
-      existingPaths = validPaths;
-    }
-  });
+  }
 
   const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
-  if (addonFolderFiles.length) {
-    return addonFolderFiles;
-  }
-  return existingPaths;
+  return addonFolderFiles.length > 0 ? addonFolderFiles : existingPaths;
 }
 
 export function getAddonPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
 ) {
-  const roots = ([] as string[]).concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root));
+  const roots = [
+    ...getProjectAddonsRoots(root),
+    ...getProjectInRepoAddonsRoots(root),
+  ];
+
   let existingPaths: string[] = [];
-  let hasValidPath = false;
-  roots.forEach((rootPath: string) => {
-    if (hasValidPath) {
-      return;
-    }
-    const addonPaths: string[][] = [];
-
-    getAbstractComponentScriptsParts(
+  for (const rootPath in roots) {
+    const addonScriptPathParts = getAbstractComponentScriptsParts(
       rootPath,
-      'addon',
+      "addon",
       maybeComponentName
-    ).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractComponentScriptsParts(
-      rootPath,
-      'app',
-      maybeComponentName
-    ).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractComponentTemplatesParts(
-      rootPath,
-      'app',
-      maybeComponentName
-    ).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractComponentTemplatesParts(
-      rootPath,
-      'addon',
-      maybeComponentName
-    ).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractHelpersParts(rootPath, 'app', maybeComponentName).forEach(
-      (parts: any) => {
-        addonPaths.push(parts);
-      }
-    );
-    getAbstractHelpersParts(rootPath, 'addon', maybeComponentName).forEach(
-      (parts: any) => {
-        addonPaths.push(parts);
-      }
     );
 
-    const validPaths = addonPaths
-      .map(
-        (pathArr: string[]): string => {
-          return path.join.apply(path, pathArr.filter((part: any) => !!part));
-        }
-      )
-      .filter(fs.existsSync);
+    const appScriptPathParts = getAbstractComponentScriptsParts(
+      rootPath,
+      "app",
+      maybeComponentName
+    );
+
+    const appTemplatePathParts = getAbstractComponentTemplatesParts(
+      rootPath,
+      "app",
+      maybeComponentName
+    );
+
+    const addonTemplatePathParts = getAbstractComponentTemplatesParts(
+      rootPath,
+      "addon",
+      maybeComponentName
+    );
+
+    const appHelperPathParts = getAbstractHelpersParts(
+      rootPath,
+      "app",
+      maybeComponentName
+    );
+
+    const addonHelperPathParts = getAbstractHelpersParts(
+      rootPath,
+      "addon",
+      maybeComponentName
+    );
+
+    const allPathParts = [
+      ...addonScriptPathParts,
+      ...appScriptPathParts,
+      ...appTemplatePathParts,
+      ...addonTemplatePathParts,
+      ...appHelperPathParts,
+      ...addonHelperPathParts,
+    ];
+
+    const validPaths = allPathParts.reduce(toFilesOnDisk, []);
+
     if (validPaths.length) {
-      hasValidPath = true;
       existingPaths = validPaths;
+      break;
     }
-  });
+  }
 
   const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
   if (addonFolderFiles.length) {
