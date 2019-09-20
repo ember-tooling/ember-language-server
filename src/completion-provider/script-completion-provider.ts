@@ -27,6 +27,8 @@ import {
   listTransforms
 } from '../utils/layout-helpers';
 
+import { ParseResult} from '@babel/core';
+
 const EXTENSIONS = ['.js', '.ts'];
 
 export default class ScriptCompletionProvider {
@@ -48,7 +50,7 @@ export default class ScriptCompletionProvider {
     const { root } = project;
     const content = document.getText();
 
-    let ast = null;
+    let ast: ParseResult | null = null;
     try {
       ast = parse(content);
     } catch (e) {

@@ -32,8 +32,8 @@ import {
   pathsToLocations
 } from './../utils/definition-helpers';
 
-const { kebabCase } = require('lodash');
-const { preprocess } = require('@glimmer/syntax');
+import { kebabCase }  from 'lodash';
+import { preprocess } from '@glimmer/syntax';
 
 function normalizeAngleTagName(tagName: string) {
   return tagName.split('::').map((item: string) => kebabCase(item)).join('/');
