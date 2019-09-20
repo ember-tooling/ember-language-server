@@ -31,7 +31,7 @@ export default class TemplateLinter {
   async lint(textDocument: TextDocument) {
     const ext = getExtension(textDocument);
 
-    if (ext !== null && !extensionsToLint.includes(ext)) {
+    if (!extensionsToLint.includes(ext)) {
       return;
     }
 

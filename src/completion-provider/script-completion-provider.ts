@@ -33,11 +33,13 @@ const mListModels = memoize(listModels, { length: 1, maxAge: 60000 });
 const mListServices = memoize(listServices, { length: 1, maxAge: 60000 });
 const mListTransforms = memoize(listTransforms, { length: 1, maxAge: 60000 });
 
+const EXTENSIONS = ['.js', '.ts'];
+
 export default class ScriptCompletionProvider {
   constructor(private server: Server) {}
   provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
     log('provideCompletions');
-    if (!['.js', '.ts'].includes(getExtension(params.textDocument) as string)) {
+    if (!EXTENSIONS.includes(getExtension(params.textDocument))) {
       return [];
     }
     const uri = params.textDocument.uri;

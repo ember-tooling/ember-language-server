@@ -142,7 +142,7 @@ export default class TemplateCompletionProvider {
     log('provideCompletions');
     const ext = getExtension(params.textDocument);
 
-    if (ext !== null && !extensionsToProvideTemplateCompletions.includes(ext)) {
+    if (!extensionsToProvideTemplateCompletions.includes(ext)) {
       return [];
     }
 
