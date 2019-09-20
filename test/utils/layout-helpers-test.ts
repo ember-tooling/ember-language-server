@@ -45,7 +45,6 @@ describe('definition-helpers', function() {
   describe('resolvePackageRoot()', function() {
     it('return package root folder', function() {
         expect(resolvePackageRoot(__dirname, 'lodash')).toContain(sep + 'lodash');
-        expect(resolvePackageRoot(__dirname, 'memoizee')).toContain(sep + 'memoizee');
     });
   });
 

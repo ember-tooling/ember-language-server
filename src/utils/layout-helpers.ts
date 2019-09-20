@@ -1,27 +1,8 @@
-const memoize = require('memoizee');
 const walkSync = require('walk-sync');
 import { join, sep, extname, dirname } from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
 import { readFileSync, existsSync } from 'fs';
-
-export const isModuleUnificationApp = memoize(isMuApp, {
-  length: 1,
-  maxAge: 60000
-});
-export const podModulePrefixForRoot = memoize(getPodModulePrefix, {
-  length: 1,
-  maxAge: 60000
-});
-export const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
-  length: 1,
-  maxAge: 600000
-}); // 1 second
-
-export const isAddonRoot = memoize(isProjectAddonRoot, {
-  length: 1,
-  maxAge: 600000
-});
 
 export function isMuApp(root: string) {
   return existsSync(join(root, 'src', 'ui'));
@@ -79,7 +60,7 @@ export function isProjectAddonRoot(root: string) {
 }
 
 export function getProjectInRepoAddonsRoots(root: string) {
-  const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
+  const prefix = isMuApp(root) ? 'packages' : 'lib';
   const addons = safeWalkSync(
     join(root, prefix),
     {
@@ -235,7 +216,7 @@ export function pureComponentName(relativePath: string) {
 }
 
 export function listPodsComponents(root: string): CompletionItem[] {
-  let podModulePrefix = podModulePrefixForRoot(root);
+  let podModulePrefix = getPodModulePrefix(root);
   if (podModulePrefix === null) {
     return [];
   }

@@ -8,8 +8,8 @@ import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils
 const { kebabCase } = require('lodash');
 import { isRouteLookup, isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
 import {
-  isModuleUnificationApp,
-  podModulePrefixForRoot
+  isMuApp,
+  getPodModulePrefix
 } from './../utils/layout-helpers';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
@@ -83,7 +83,7 @@ export default class ScriptDefinietionProvider {
     }
     const guessedPaths: string[] = [];
     const fnName = 'Import';
-    if (isModuleUnificationApp(root)) {
+    if (isMuApp(root)) {
       this.resolvers[`mu${fnName}Paths`](root, importPath).forEach(
         (pathLocation: string) => {
           guessedPaths.push(pathLocation);
@@ -106,7 +106,7 @@ export default class ScriptDefinietionProvider {
   guessPathsForType(root: string, fnName: ItemType, typeName: string) {
     const guessedPaths: string[] = [];
 
-    if (isModuleUnificationApp(root)) {
+    if (isMuApp(root)) {
       this.resolvers[`mu${fnName}Paths`](root, typeName).forEach(
         (pathLocation: string) => {
           guessedPaths.push(pathLocation);
@@ -118,7 +118,7 @@ export default class ScriptDefinietionProvider {
           guessedPaths.push(pathLocation);
         }
       );
-      const podPrefix = podModulePrefixForRoot(root);
+      const podPrefix = getPodModulePrefix(root);
       if (podPrefix) {
         this.resolvers[`pod${fnName}Paths`](root, typeName, podPrefix).forEach(
           (pathLocation: string) => {

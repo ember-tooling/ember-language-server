@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const memoize = require('memoizee');
 import {
   Location,
   Range
@@ -9,20 +8,12 @@ import {
 import URI from 'vscode-uri';
 
 import {
-  isModuleUnificationApp,
-  podModulePrefixForRoot,
+  isMuApp,
+  getPodModulePrefix,
   hasAddonFolderInPath,
   getProjectAddonsRoots,
   getProjectInRepoAddonsRoots
 } from './layout-helpers';
-const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
-  length: 1,
-  maxAge: 600000
-});
-const mProjectInRepoAddonsRoots = memoize(getProjectInRepoAddonsRoots, {
-  length: 1,
-  maxAge: 600000
-});
 
 export function pathsToLocations(...paths: string[]): Location[] {
   return paths.filter(fs.existsSync).map(modulePath => {
@@ -138,7 +129,7 @@ export function getPathsForComponentScripts(
   root: string,
   maybeComponentName: string
 ): string[] {
-  const podModulePrefix = podModulePrefixForRoot(root);
+  const podModulePrefix = getPodModulePrefix(root);
   let podComponentsScriptsParts: string[][] = [];
   let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
@@ -149,7 +140,7 @@ export function getPathsForComponentScripts(
       maybeComponentName
     );
   }
-  if (isModuleUnificationApp(root)) {
+  if (isMuApp(root)) {
     muComponentsScriptsParts = getAbstractComponentScriptsParts(
       root,
       'src/ui',
@@ -176,7 +167,7 @@ export function getPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
 ): string[] {
-  const podModulePrefix = podModulePrefixForRoot(root);
+  const podModulePrefix = getPodModulePrefix(root);
   let podComponentsScriptsParts: string[][] = [];
   let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
@@ -187,7 +178,7 @@ export function getPathsForComponentTemplates(
       maybeComponentName
     );
   }
-  if (isModuleUnificationApp(root)) {
+  if (isMuApp(root)) {
     muComponentsScriptsParts = getAbstractComponentTemplatesParts(
       root,
       'src/ui',
@@ -219,7 +210,7 @@ export function getAddonImport(root: string, importPath: string) {
   if (!addonName) {
     return [];
   }
-  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const roots = ([] as string[]).concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {
@@ -263,7 +254,7 @@ export function getAddonImport(root: string, importPath: string) {
 }
 
 export function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
-  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const roots = ([] as string[]).concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {
@@ -305,7 +296,7 @@ export function getAddonPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
 ) {
-  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const roots = ([] as string[]).concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {

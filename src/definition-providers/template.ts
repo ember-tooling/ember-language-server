@@ -19,7 +19,7 @@ import { join } from 'path';
 import {
   isTemplatePath,
   getComponentNameFromURI,
-  isModuleUnificationApp,
+  isMuApp,
   getPodModulePrefix
 } from './../utils/layout-helpers';
 
@@ -33,13 +33,7 @@ import {
 } from './../utils/definition-helpers';
 
 const { kebabCase } = require('lodash');
-const memoize = require('memoizee');
 const { preprocess } = require('@glimmer/syntax');
-
-const mAddonPathsForComponentTemplates = memoize(
-  getAddonPathsForComponentTemplates,
-  { length: 2, maxAge: 600000 }
-);
 
 function normalizeAngleTagName(tagName: string) {
   return tagName.split('::').map((item: string) => kebabCase(item)).join('/');
@@ -123,7 +117,7 @@ export default class TemplateDefinitionProvider {
   provideRouteDefinition(root: string, routeName: string) {
     const routeParts = routeName.split('.');
     const lastRoutePart = routeParts.pop();
-    const routePaths = isModuleUnificationApp(root) ? [
+    const routePaths = isMuApp(root) ? [
       [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.js'],
       [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.ts'],
       [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.js'],
@@ -156,7 +150,7 @@ export default class TemplateDefinitionProvider {
     ].filter(fs.existsSync);
 
     if (!paths.length) {
-      paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
+      paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
     }
 
     return pathsToLocations.apply(
@@ -173,13 +167,13 @@ export default class TemplateDefinitionProvider {
       maybeComponentName
     ).filter(fs.existsSync);
     if (!paths.length) {
-      paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter(
+      paths = getAddonPathsForComponentTemplates(root, maybeComponentName).filter(
         (name: string) => {
           return isTemplatePath(name);
         }
       );
     }
-    // mAddonPathsForComponentTemplates
+    // getAddonPathsForComponentTemplates
     return pathsToLocationsWithPosition(paths, '{{yield');
   }
   providePropertyDefinition(root: string, focusPath: ASTPath, uri: string) {
@@ -192,7 +186,7 @@ export default class TemplateDefinitionProvider {
       maybeComponentName
     ).filter(fs.existsSync);
     if (!paths.length) {
-      paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter(
+      paths = getAddonPathsForComponentTemplates(root, maybeComponentName).filter(
         (name: string) => {
           return !isTemplatePath(name);
         }
@@ -218,7 +212,7 @@ export default class TemplateDefinitionProvider {
     ].filter(fs.existsSync);
 
     if (!paths.length) {
-      paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
+      paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
     }
 
     return pathsToLocations.apply(
@@ -247,7 +241,7 @@ export default class TemplateDefinitionProvider {
         ].filter(fs.existsSync);
 
         if (!paths.length) {
-          paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
+          paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
         }
 
         const finalPaths =
@@ -271,7 +265,7 @@ export default class TemplateDefinitionProvider {
     ].filter(fs.existsSync);
 
     if (!paths.length) {
-      paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
+      paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
     }
 
     const finalPaths =

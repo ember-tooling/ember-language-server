@@ -9,7 +9,6 @@ import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 const { uniqBy } = require('lodash');
-const memoize = require('memoizee');
 import { getExtension } from '../utils/file-extension';
 import { log } from '../utils/logger';
 import {
@@ -24,14 +23,9 @@ import {
   listRoutes,
   listModels,
   listServices,
-  mGetProjectAddonsInfo,
+  getProjectAddonsInfo,
   listTransforms
 } from '../utils/layout-helpers';
-
-const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
-const mListModels = memoize(listModels, { length: 1, maxAge: 60000 });
-const mListServices = memoize(listServices, { length: 1, maxAge: 60000 });
-const mListTransforms = memoize(listTransforms, { length: 1, maxAge: 60000 });
 
 const EXTENSIONS = ['.js', '.ts'];
 
@@ -72,30 +66,30 @@ export default class ScriptCompletionProvider {
     try {
       if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
         textPrefix = focusPath.node.value;
-        mListModels(root).forEach((model: any) => {
+        listModels(root).forEach((model: any) => {
           completions.push(model);
         });
-        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
+        getProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'model') {
             completions.push(item);
           }
         });
       } else if (isRouteLookup(focusPath)) {
         textPrefix = focusPath.node.value;
-        mListRoutes(root).forEach((model: any) => {
+        listRoutes(root).forEach((model: any) => {
           completions.push(model);
         });
-        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
+        getProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'route') {
             completions.push(item);
           }
         });
       } else if (isNamedServiceInjection(focusPath)) {
         textPrefix = focusPath.node.value;
-        mListServices(root).forEach((model: any) => {
+        listServices(root).forEach((model: any) => {
           completions.push(model);
         });
-        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
+        getProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'service') {
             completions.push(item);
           }
@@ -123,10 +117,10 @@ export default class ScriptCompletionProvider {
         });
       } else if (isTransformReference(focusPath)) {
         textPrefix = focusPath.node.value;
-        mListTransforms(root).forEach((model: any) => {
+        listTransforms(root).forEach((model: any) => {
           completions.push(model);
         });
-        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
+        getProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'transform') {
             completions.push(item);
           }
