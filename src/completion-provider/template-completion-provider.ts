@@ -28,7 +28,6 @@ import {
 } from '../utils/ast-helpers';
 import {
   listComponents,
-  listMUComponents,
   listPodsComponents,
   listHelpers,
   listRoutes,
@@ -44,16 +43,6 @@ function toAngleBrackedName(name: string) {
   }).join('::');
 }
 
-function mListMURouteLevelComponents(projectRoot: string, fileURI: string) {
-  // /**/routes/**/-components/**/*.{js,ts,hbs}
-  // we need to get current nesting level and resolve related components
-  // only if we have -components under current fileURI template path
-  if (!projectRoot || !fileURI) {
-    return [];
-  }
-  return [];
-}
-
 const extensionsToProvideTemplateCompletions = ['.hbs', '.js', '.ts'];
 
 type ComponentLabels = Array<{ label: string }>;
@@ -65,10 +54,8 @@ export default class TemplateCompletionProvider {
     return uniqBy(
       ([] as CompletionItem[])
         .concat(
-          listMUComponents(root),
           listComponents(root),
           listPodsComponents(root),
-          mListMURouteLevelComponents(root, uri),
           getProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
             return detail === 'component';
           })
@@ -85,7 +72,6 @@ export default class TemplateCompletionProvider {
     let candidates: any = [
       ...templateContextLookup(root, uri, originalText),
       ...listComponents(root),
-      ...listMUComponents(root),
       ...listPodsComponents(root),
       ...listHelpers(root),
       ...getProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
@@ -98,7 +84,6 @@ export default class TemplateCompletionProvider {
     let candidates = [
       ...templateContextLookup(root, uri, originalText),
       ...listComponents(root),
-      ...listMUComponents(root),
       ...listPodsComponents(root),
       ...getProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
         return detail === 'component';

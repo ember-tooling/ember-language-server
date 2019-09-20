@@ -8,7 +8,6 @@ import {
 import URI from 'vscode-uri';
 
 import {
-  isMuApp,
   getPodModulePrefix,
   hasAddonFolderInPath,
   getProjectAddonsRoots,
@@ -131,7 +130,6 @@ export function getPathsForComponentScripts(
 ): string[] {
   const podModulePrefix = getPodModulePrefix(root);
   let podComponentsScriptsParts: string[][] = [];
-  let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
   if (podModulePrefix) {
     podComponentsScriptsParts = getAbstractComponentScriptsParts(
@@ -140,21 +138,12 @@ export function getPathsForComponentScripts(
       maybeComponentName
     );
   }
-  if (isMuApp(root)) {
-    muComponentsScriptsParts = getAbstractComponentScriptsParts(
-      root,
-      'src/ui',
-      maybeComponentName
-    );
-  } else {
     classicComponentsScriptsParts = getAbstractComponentScriptsParts(
       root,
       'app',
       maybeComponentName
     );
-  }
   const paths = [
-    ...muComponentsScriptsParts,
     ...podComponentsScriptsParts,
     ...classicComponentsScriptsParts
   ].map((pathParts: any) => {
@@ -169,7 +158,6 @@ export function getPathsForComponentTemplates(
 ): string[] {
   const podModulePrefix = getPodModulePrefix(root);
   let podComponentsScriptsParts: string[][] = [];
-  let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
   if (podModulePrefix) {
     podComponentsScriptsParts = getAbstractComponentTemplatesParts(
@@ -178,22 +166,13 @@ export function getPathsForComponentTemplates(
       maybeComponentName
     );
   }
-  if (isMuApp(root)) {
-    muComponentsScriptsParts = getAbstractComponentTemplatesParts(
-      root,
-      'src/ui',
-      maybeComponentName
-    );
-  } else {
     classicComponentsScriptsParts = getAbstractComponentTemplatesParts(
       root,
       'app',
       maybeComponentName
     );
-  }
   const paths = [
     ...podComponentsScriptsParts,
-    ...muComponentsScriptsParts,
     ...classicComponentsScriptsParts
   ].map((pathParts: any) => {
     return path.join.apply(path, pathParts.filter((part: any) => !!part));

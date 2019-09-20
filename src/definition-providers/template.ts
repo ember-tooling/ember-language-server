@@ -19,7 +19,6 @@ import { join } from 'path';
 import {
   isTemplatePath,
   getComponentNameFromURI,
-  isMuApp,
   getPodModulePrefix
 } from './../utils/layout-helpers';
 
@@ -117,13 +116,7 @@ export default class TemplateDefinitionProvider {
   provideRouteDefinition(root: string, routeName: string) {
     const routeParts = routeName.split('.');
     const lastRoutePart = routeParts.pop();
-    const routePaths = isMuApp(root) ? [
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.js'],
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.ts'],
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.js'],
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.ts'],
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'template.hbs'],
-    ] : [
+    const routePaths = [
       [root, 'app', 'routes', ...routeParts, lastRoutePart + '.js'],
       [root, 'app', 'routes', ...routeParts, lastRoutePart + '.ts'],
       [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.js'],

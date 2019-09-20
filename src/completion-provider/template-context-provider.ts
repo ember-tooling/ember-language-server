@@ -3,7 +3,6 @@ import { readFileSync, existsSync } from 'fs';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
 import {
-  isMuApp,
   getPodModulePrefix,
   pureComponentName
 } from '../utils/layout-helpers';
@@ -44,19 +43,14 @@ export function templateContextLookup(
 
 function findComponentScripts(root: string, componentName: string) {
   const possibleLocations = [];
-  if (isMuApp(root)) {
-    possibleLocations.push([root, 'src', 'ui', 'components', componentName, 'component.js']);
-    possibleLocations.push([root, 'src', 'ui', 'components', componentName, 'component.ts']);
-  } else {
-    possibleLocations.push([root, 'app', 'components', componentName, 'component.js']);
-    possibleLocations.push([root, 'app', 'components', componentName, 'component.ts']);
-    possibleLocations.push([root, 'app', 'components', componentName + '.js']);
-    possibleLocations.push([root, 'app', 'components', componentName + '.ts']);
-    const prefix = getPodModulePrefix(root);
-    if (prefix) {
-      possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.js']);
-      possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.ts']);
-    }
+  possibleLocations.push([root, 'app', 'components', componentName, 'component.js']);
+  possibleLocations.push([root, 'app', 'components', componentName, 'component.ts']);
+  possibleLocations.push([root, 'app', 'components', componentName + '.js']);
+  possibleLocations.push([root, 'app', 'components', componentName + '.ts']);
+  const prefix = getPodModulePrefix(root);
+  if (prefix) {
+    possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.js']);
+    possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.ts']);
   }
   return possibleLocations.map((locArr: string[]) => join.apply(null, locArr));
 }

@@ -1,12 +1,10 @@
 import {
-    isMuApp,
     getPodModulePrefix,
     safeWalkSync,
     resolvePackageRoot,
     getPackageJSON,
     pureComponentName,
     listPodsComponents,
-    listMUComponents,
     listComponents,
     listHelpers,
     listRoutes,
@@ -17,16 +15,6 @@ import {
 import { join, sep } from 'path';
 
 describe('definition-helpers', function() {
-
-  describe('isMuApp()', function() {
-    it('return true for paths, containing "src/ui"', function() {
-      expect(isMuApp(join(__dirname, './../fixtures/mu-project'))).toEqual(true);
-    });
-    it('return false for paths, without "src/ui"', function() {
-      expect(isMuApp(join(__dirname, './../fixtures/full-project'))).toEqual(false);
-    });
-  });
-
   describe('getPodModulePrefix()', function() {
     it('return pod relative pod prefix for projects with podModulePrefix in evironment.js', function() {
         expect(getPodModulePrefix(join(__dirname, './../fixtures/pod-project'))).toEqual('pods');
@@ -69,13 +57,6 @@ describe('definition-helpers', function() {
   describe('listPodsComponents()', function() {
     it('return expected list of components for pods project', function() {
         const components = listPodsComponents(join(__dirname, './../fixtures/pod-project'));
-        expect(components.map(({label}: {label: string}) => label )).toEqual(['foo-bar-js', 'foo-bar-js', 'foo-bar-ts']);
-    });
-  });
-
-  describe('listMUComponents()', function() {
-    it('return expected list of components for mu project', function() {
-        const components = listMUComponents(join(__dirname, './../fixtures/mu-project'));
         expect(components.map(({label}: {label: string}) => label )).toEqual(['foo-bar-js', 'foo-bar-js', 'foo-bar-ts']);
     });
   });
@@ -138,11 +119,6 @@ describe('definition-helpers', function() {
   describe('getProjectInRepoAddonsRoots()', function() {
     it('must discover in-repo addons for classic structure', function() {
       const root = join(__dirname, './../fixtures/project-with-in-repo-addons');
-      const items = getProjectInRepoAddonsRoots(root);
-      expect(items.length).toEqual(1);
-    });
-    it('must discover in-repo addons for MU structure', function() {
-      const root = join(__dirname, './../fixtures/mu-project-with-in-repo-addons');
       const items = getProjectInRepoAddonsRoots(root);
       expect(items.length).toEqual(1);
     });

@@ -7,10 +7,7 @@ import { toPosition } from './../estree-utils';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils/definition-helpers';
 const { kebabCase } = require('lodash');
 import { isRouteLookup, isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
-import {
-  isMuApp,
-  getPodModulePrefix
-} from './../utils/layout-helpers';
+import { getPodModulePrefix } from './../utils/layout-helpers';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
@@ -25,15 +22,6 @@ function joinPaths(...args: string[]) {
 
 class PathResolvers {
   [key: string]: LayoutCollectorFn;
-  muModelPaths(root: string, modelName: string) {
-    return joinPaths(root, 'src', 'data', 'models', modelName, 'model');
-  }
-  muTransformPaths(root: string, transformName: string) {
-    return joinPaths(root, 'src', 'data', 'transforms', transformName);
-  }
-  muServicePaths(root: string, transformName: string) {
-    return joinPaths(root, 'src', 'services', transformName);
-  }
   classicModelPaths(root: string, modelName: string) {
     return joinPaths(root, 'app', 'models', modelName);
   }
@@ -64,12 +52,6 @@ class PathResolvers {
     const params = [root, 'app', ...pathParts];
     return joinPaths.apply(null, params);
   }
-  muImportPaths(root: string, pathName: string) {
-    const pathParts = pathName.split('/');
-    pathParts.shift();
-    const params = [root, ...pathParts];
-    return joinPaths.apply(null, params);
-  }
 }
 
 export default class ScriptDefinietionProvider {
@@ -83,19 +65,11 @@ export default class ScriptDefinietionProvider {
     }
     const guessedPaths: string[] = [];
     const fnName = 'Import';
-    if (isMuApp(root)) {
-      this.resolvers[`mu${fnName}Paths`](root, importPath).forEach(
-        (pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        }
-      );
-    } else {
       this.resolvers[`classic${fnName}Paths`](root, importPath).forEach(
         (pathLocation: string) => {
           guessedPaths.push(pathLocation);
         }
       );
-    }
     this.resolvers.addonImportPaths(root, importPath).forEach(
       (pathLocation: string) => {
         guessedPaths.push(pathLocation);
@@ -106,13 +80,6 @@ export default class ScriptDefinietionProvider {
   guessPathsForType(root: string, fnName: ItemType, typeName: string) {
     const guessedPaths: string[] = [];
 
-    if (isMuApp(root)) {
-      this.resolvers[`mu${fnName}Paths`](root, typeName).forEach(
-        (pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        }
-      );
-    } else {
       this.resolvers[`classic${fnName}Paths`](root, typeName).forEach(
         (pathLocation: string) => {
           guessedPaths.push(pathLocation);
@@ -126,7 +93,6 @@ export default class ScriptDefinietionProvider {
           }
         );
       }
-    }
 
     if (fnName === 'Service') {
       this.resolvers.addonServicePaths(root, typeName).forEach((item: string) => {

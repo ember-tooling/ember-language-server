@@ -4,10 +4,6 @@ import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
 import { readFileSync, existsSync } from 'fs';
 
-export function isMuApp(root: string) {
-  return existsSync(join(root, 'src', 'ui'));
-}
-
 export function safeWalkSync(filePath: string | false, opts: walkSync.Options) {
   if (!filePath) {
     return [];
@@ -63,7 +59,6 @@ export function isProjectAddonRoot(root: string) {
 }
 
 export function getProjectInRepoAddonsRoots(root: string) {
-  const prefix = isMuApp(root) ? 'packages' : 'lib';
   const addons = safeWalkSync(
     join(root, prefix),
     {
@@ -71,6 +66,7 @@ export function getProjectInRepoAddonsRoots(root: string) {
       globs: ['**/package.json']
     }
   );
+  const prefix = 'lib';
   const roots: string[] = [];
   addons.map((relativePath: string) => {
     return dirname(join(root, prefix, relativePath));
@@ -251,23 +247,6 @@ export function listPodsComponents(root: string): CompletionItem[] {
   });
 
   // log('pods-items', items);
-  return items;
-}
-
-export function listMUComponents(root: string): CompletionItem[] {
-  const jsPaths = safeWalkSync(join(root, 'src', 'ui', 'components'), {
-    directories: false,
-    globs: ['**/*.{js,ts,hbs}']
-  });
-
-  const items = jsPaths.map((filePath: string) => {
-    return {
-      kind: CompletionItemKind.Class,
-      label: pureComponentName(filePath),
-      detail: 'component'
-    };
-  });
-
   return items;
 }
 
