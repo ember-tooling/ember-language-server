@@ -10,6 +10,7 @@ import { isRouteLookup, isTransformReference, isModelReference, isImportPathDecl
 import { getPodModulePrefix } from './../utils/layout-helpers';
 import { Project } from '../project-roots';
 import { ParseResult } from '@babel/core';
+import { provideRouteDefinition } from './template';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
@@ -141,7 +142,7 @@ export default class ScriptDefinitionProvider {
       return this.guessPathsForType(root, 'Service', kebabCase(serviceName));
     } else if (isRouteLookup(astPath)) {
       let routePath = astPath.node.value;
-      return this.server.definitionProvider.template.provideRouteDefinition(root, routePath);
+      return provideRouteDefinition(root, routePath);
     }
 
     return null;

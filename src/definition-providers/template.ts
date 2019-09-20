@@ -33,19 +33,323 @@ import {
 
 import { kebabCase }  from 'lodash';
 import { preprocess } from '@glimmer/syntax';
+import { Project } from '../project-roots';
 
 function normalizeAngleTagName(tagName: string) {
   return tagName.split('::').map((item: string) => kebabCase(item)).join('/');
 }
 
+function looksLikeClassicComponentName(name: string) {
+  return name.length && !name.includes('.') && !name.includes(' ') && name === name.toLowerCase();
+}
+
+function extractValueForMaybeClassicComponentName(focusPath: ASTPath) {
+  let value = '';
+  const node = focusPath.node;
+  const parent = focusPath.parent;
+  if (!parent) {
+    return value;
+  }
+  if (node.type === 'StringLiteral' && parent.type === 'HashPair') {
+    value = node.original;
+  } else if (node.type === 'TextNode' && parent.type === 'AttrNode') {
+    value = node.chars;
+  }
+  return value;
+};
+
+function maybeClassicComponentName(focusPath: ASTPath) {
+  let value = extractValueForMaybeClassicComponentName(focusPath);
+  return looksLikeClassicComponentName(value);
+}
+
+export function provideRouteDefinition(root: string, routeName: string) {
+  const routeParts = routeName.split('.');
+  const lastRoutePart = routeParts.pop();
+  if (!lastRoutePart) {
+    throw new Error(`Route name ${routeName} is ill-formed!`);
+  }
+
+  const routePaths = [
+    join(root, "app", "routes", ...routeParts, lastRoutePart + ".js"),
+    join(root, "app", "routes", ...routeParts, lastRoutePart + ".ts"),
+    join(root, "app", "controllers", ...routeParts, lastRoutePart + ".js"),
+    join(root, "app", "controllers", ...routeParts, lastRoutePart + ".ts"),
+    join(root, "app", "templates", ...routeParts, lastRoutePart + ".hbs")
+  ];
+
+  const podPrefix = getPodModulePrefix(root);
+  if (podPrefix) {
+    routePaths.push(join(root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.js'));
+    routePaths.push(join(root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.ts'));
+    routePaths.push(join(root, 'app', podPrefix, ...routeParts, lastRoutePart, 'controller.js'));
+    routePaths.push(join(root, 'app', podPrefix, ...routeParts, lastRoutePart, 'controller.ts'));
+    routePaths.push(join(root, 'app', podPrefix, ...routeParts, lastRoutePart, 'template.hbs'));
+  }
+
+  return pathsToLocations(...routePaths);
+}
+
+function provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
+  const maybeComponentName = normalizeAngleTagName(focusPath.node.tag);
+
+  let paths = [
+    ...getPathsForComponentScripts(root, maybeComponentName),
+    ...getPathsForComponentTemplates(root, maybeComponentName)
+  ].filter(fs.existsSync);
+
+  if (!paths.length) {
+    paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
+  }
+
+  return pathsToLocations.apply(
+    null,
+    paths.length > 1
+      ? paths.filter((postfix: string) => isTemplatePath(postfix))
+      : paths
+  );
+}
+
+function provideBlockComponentDefinition(root: string, focusPath: ASTPath) {
+  let maybeComponentName = focusPath.node.path.original;
+  let paths: string[] = getPathsForComponentTemplates(
+    root,
+    maybeComponentName
+  ).filter(fs.existsSync);
+  if (!paths.length) {
+    paths = getAddonPathsForComponentTemplates(root, maybeComponentName).filter(
+      (name: string) => {
+        return isTemplatePath(name);
+      }
+    );
+  }
+  // getAddonPathsForComponentTemplates
+  return pathsToLocationsWithPosition(paths, '{{yield');
+}
+
+function providePropertyDefinition(root: string, focusPath: ASTPath, uri: string) {
+  let maybeComponentName = getComponentNameFromURI(root, uri);
+  if (!maybeComponentName) {
+    return null;
+  }
+  let paths: string[] = getPathsForComponentScripts(
+    root,
+    maybeComponentName
+  ).filter(fs.existsSync);
+  if (!paths.length) {
+    paths = getAddonPathsForComponentTemplates(root, maybeComponentName).filter(
+      (name: string) => {
+        return !isTemplatePath(name);
+      }
+    );
+  }
+  const text = focusPath.node.original;
+  return pathsToLocationsWithPosition(
+    paths,
+    text.replace('this.', '').split('.')[0]
+  );
+}
+
+function provideComponentDefinition(root: string, maybeComponentName: string) {
+  let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map(
+    (pathParts) => {
+      return path.join.apply(path, pathParts.filter((part: any) => !!part));
+    }
+  );
+
+  let paths = [
+    ...getPathsForComponentScripts(root, maybeComponentName),
+    ...getPathsForComponentTemplates(root, maybeComponentName),
+    ...helpers
+  ].filter(fs.existsSync);
+
+  if (!paths.length) {
+    paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
+  }
+
+  return pathsToLocations.apply(
+    null,
+    paths.length > 1 ? paths.filter(isTemplatePath) : paths
+  );
+}
+
+function provideMustacheDefinition(root: string, focusPath: ASTPath) {
+  const maybeComponentName =
+    focusPath.node.type === 'ElementNode'
+      ? normalizeAngleTagName(focusPath.node.tag)
+      : focusPath.node.original;
+  return provideComponentDefinition(root, maybeComponentName);
+}
+
+function provideHashPropertyUsage(root: string, focusPath: ASTPath) {
+  let parentPath = focusPath.parentPath;
+  if (parentPath && parentPath.parent && parentPath.parent.path) {
+    const maybeComponentName = parentPath.parent.path.original;
+    if (
+      !maybeComponentName.includes('.') &&
+      maybeComponentName.includes('-')
+    ) {
+      let paths = [
+        ...getPathsForComponentScripts(root, maybeComponentName),
+        ...getPathsForComponentTemplates(root, maybeComponentName)
+      ].filter(fs.existsSync);
+
+      if (!paths.length) {
+        paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
+      }
+
+      const finalPaths =
+        paths.length > 1
+          ? paths.filter((postfix: string) => isTemplatePath(postfix))
+          : paths;
+      return pathsToLocationsWithPosition(
+        finalPaths,
+        '@' + focusPath.node.key
+      );
+    }
+  }
+  return null;
+}
+
+function provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath) {
+  const maybeComponentName = normalizeAngleTagName(focusPath.parent.tag);
+
+  let paths = [
+    ...getPathsForComponentScripts(root, maybeComponentName),
+    ...getPathsForComponentTemplates(root, maybeComponentName)
+  ].filter(fs.existsSync);
+
+  if (!paths.length) {
+    paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
+  }
+
+  const finalPaths =
+    paths.length > 1
+      ? paths.filter((postfix: string) => isTemplatePath(postfix))
+      : paths;
+  return pathsToLocationsWithPosition(finalPaths, focusPath.node.name);
+}
+
+function isLocalProperty(path: ASTPath) {
+  let node = path.node;
+  if (node.type === 'PathExpression') {
+    return node.this;
+  }
+  return false;
+}
+
+function isHashPairKey(path: ASTPath) {
+  let node = path.node;
+  return node.type === 'HashPair';
+}
+
+function isAnglePropertyAttribute(path: ASTPath) {
+  let node = path.node;
+  if (node.type === 'AttrNode') {
+    if (node.name.charAt(0) === '@') {
+      return true;
+    }
+  }
+}
+
+function isActionName(path: ASTPath) {
+  let node = path.node;
+  if (!path.parent) {
+    return false;
+  }
+  if (
+    path.parent.type !== 'MustacheStatement' &&
+    path.parent.type !== 'PathExpression' &&
+    path.parent.type !== 'SubExpression' &&
+    path.parent.type !== 'ElementModifierStatement'
+  ) {
+    return false;
+  }
+  if (
+    !path.parent ||
+    path.parent.path.original !== 'action' ||
+    !path.parent.params[0] === node
+  ) {
+    return false;
+  }
+  if (node.type === 'StringLiteral') {
+    return true;
+  } else if (node.type === 'PathExpression' && node.this) {
+    return true;
+  }
+  return false;
+}
+
+function isComponentWithBlock(path: ASTPath) {
+  let node = path.node;
+  return (
+    node.type === 'BlockStatement' &&
+    node.path.type === 'PathExpression' &&
+    node.path.this === false &&
+    node.path.original.includes('-') &&
+    node.path.original.charAt(0) !== '-' &&
+    !node.path.original.includes('.')
+  );
+}
+
+function isAngleComponent(path: ASTPath) {
+  let node = path.node;
+
+  if (node.type === 'ElementNode') {
+    if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
+      return true;
+    }
+  }
+}
+
+function isComponentOrHelperName(path: ASTPath) {
+  let node = path.node;
+
+  if (this.isAngleComponent(path)) {
+    return true;
+  }
+
+  if (node.type === 'StringLiteral') {
+    // if (node.original.includes('/')) {
+    //   return true;
+    // } else if (!node.original.includes('.') && node.original.includes('-')) {
+    //   return true;
+    // }
+    if (
+      path.parent &&
+      path.parent.path.original === 'component' &&
+      path.parent.params[0] === node
+    ) {
+      return true;
+    }
+  }
+
+  if (node.type !== 'PathExpression') {
+    return false;
+  }
+
+  let parent = path.parent;
+  if (
+    !parent ||
+    parent.path !== node ||
+    (parent.type !== 'MustacheStatement' &&
+      parent.type !== 'BlockStatement' &&
+      parent.type !== 'SubExpression')
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 export default class TemplateDefinitionProvider {
-  handle(params: TextDocumentPositionParams, project: any): Definition | null {
   private server: Server;
 
   constructor(server: Server) {
     this.server = server;
   }
 
+  handle(params: TextDocumentPositionParams, project: Project): Definition | null {
     let uri = params.textDocument.uri;
     const root = project.root;
     const document = this.server.documents.get(uri);
@@ -60,332 +364,41 @@ export default class TemplateDefinitionProvider {
       return null;
     }
     // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
-    if  (this.maybeClassicComponentName(focusPath)) {
-      return this.provideComponentDefinition(project.root, this.extractValueForMaybeClassicComponentName(focusPath));
-    } else if (this.isAngleComponent(focusPath)) {
+    if  (maybeClassicComponentName(focusPath)) {
+      return provideComponentDefinition(project.root, extractValueForMaybeClassicComponentName(focusPath));
+    } else if (isAngleComponent(focusPath)) {
       // <FooBar />
-      return this.provideAngleBrackedComponentDefinition(root, focusPath);
+      return provideAngleBrackedComponentDefinition(root, focusPath);
       // {{#foo-bar}} {{/foo-bar}}
-    } else if (this.isComponentWithBlock(focusPath)) {
-      return this.provideBlockComponentDefinition(root, focusPath);
+    } else if (isComponentWithBlock(focusPath)) {
+      return provideBlockComponentDefinition(root, focusPath);
 
       // {{action "fooBar"}}, (action "fooBar"), (action this.fooBar), this.someProperty
     } else if (
-      this.isActionName(focusPath) ||
-      this.isLocalProperty(focusPath)
+      isActionName(focusPath) ||
+      isLocalProperty(focusPath)
     ) {
-      return this.providePropertyDefinition(root, focusPath, uri);
+      return providePropertyDefinition(root, focusPath, uri);
 
       // {{foo-bar}}
-    } else if (this.isComponentOrHelperName(focusPath)) {
-      return this.provideMustacheDefinition(root, focusPath);
+    } else if (isComponentOrHelperName(focusPath)) {
+      return provideMustacheDefinition(root, focusPath);
 
       // <FooBar @somePropertyToFindUsage="" />
-    } else if (this.isAnglePropertyAttribute(focusPath)) {
-      return this.provideAngleBracketComponentAttributeUsage(root, focusPath);
+    } else if (isAnglePropertyAttribute(focusPath)) {
+      return provideAngleBracketComponentAttributeUsage(root, focusPath);
 
       // {{hello propertyUsageToFind=someValue}}
-    } else if (this.isHashPairKey(focusPath)) {
-      return this.provideHashPropertyUsage(project.root, focusPath);
+    } else if (isHashPairKey(focusPath)) {
+      return provideHashPropertyUsage(project.root, focusPath);
     } else if (isLinkToTarget(focusPath)) {
-      return this.provideRouteDefinition(project.root, focusPath.node.original);
+      return provideRouteDefinition(project.root, focusPath.node.original);
     }
 
     return null;
-  }
-  looksLikeClassicComponentName(name: string) {
-    return name.length && !name.includes('.') && !name.includes(' ') && name === name.toLowerCase();
-  }
-  extractValueForMaybeClassicComponentName(focusPath: ASTPath) {
-    let value = '';
-    const node = focusPath.node;
-    const parent = focusPath.parent;
-    if (!parent) {
-      return value;
-    }
-    if (node.type === 'StringLiteral' && parent.type === 'HashPair') {
-      value = node.original;
-    } else if (node.type === 'TextNode' && parent.type === 'AttrNode') {
-      value = node.chars;
-    }
-    return value;
-  }
-  maybeClassicComponentName(focusPath: ASTPath) {
-    let value = this.extractValueForMaybeClassicComponentName(focusPath);
-    if (this.looksLikeClassicComponentName(value)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  provideRouteDefinition(root: string, routeName: string) {
-    const routeParts = routeName.split('.');
-    const lastRoutePart = routeParts.pop();
-    const routePaths = [
-      [root, 'app', 'routes', ...routeParts, lastRoutePart + '.js'],
-      [root, 'app', 'routes', ...routeParts, lastRoutePart + '.ts'],
-      [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.js'],
-      [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.ts'],
-      [root, 'app', 'templates', ...routeParts, lastRoutePart + '.hbs'],
-    ];
-    const podPrefix = getPodModulePrefix(root);
-    if (podPrefix) {
-      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.js']);
-      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.ts']);
-      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'controller.js']);
-      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'controller.ts']);
-      routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'template.hbs']);
-    }
-    const filteredPaths = routePaths.map((parts: string[]) => join.apply(null, parts)).filter(fs.existsSync);
-    return pathsToLocations.apply(null, filteredPaths);
-  }
-  provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
-    const maybeComponentName = normalizeAngleTagName(focusPath.node.tag);
-
-    let paths = [
-      ...getPathsForComponentScripts(root, maybeComponentName),
-      ...getPathsForComponentTemplates(root, maybeComponentName)
-    ].filter(fs.existsSync);
-
-    if (!paths.length) {
-      paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
-    }
-
-    return pathsToLocations.apply(
-      null,
-      paths.length > 1
-        ? paths.filter((postfix: string) => isTemplatePath(postfix))
-        : paths
-    );
-  }
-  provideBlockComponentDefinition(root: string, focusPath: ASTPath) {
-    let maybeComponentName = focusPath.node.path.original;
-    let paths: string[] = getPathsForComponentTemplates(
-      root,
-      maybeComponentName
-    ).filter(fs.existsSync);
-    if (!paths.length) {
-      paths = getAddonPathsForComponentTemplates(root, maybeComponentName).filter(
-        (name: string) => {
-          return isTemplatePath(name);
-        }
-      );
-    }
-    // getAddonPathsForComponentTemplates
-    return pathsToLocationsWithPosition(paths, '{{yield');
-  }
-  providePropertyDefinition(root: string, focusPath: ASTPath, uri: string) {
-    let maybeComponentName = getComponentNameFromURI(root, uri);
-    if (!maybeComponentName) {
-      return null;
-    }
-    let paths: string[] = getPathsForComponentScripts(
-      root,
-      maybeComponentName
-    ).filter(fs.existsSync);
-    if (!paths.length) {
-      paths = getAddonPathsForComponentTemplates(root, maybeComponentName).filter(
-        (name: string) => {
-          return !isTemplatePath(name);
-        }
-      );
-    }
-    const text = focusPath.node.original;
-    return pathsToLocationsWithPosition(
-      paths,
-      text.replace('this.', '').split('.')[0]
-    );
-  }
-  provideComponentDefinition(root: string, maybeComponentName: string) {
-    let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map(
-      (pathParts: any) => {
-        return path.join.apply(path, pathParts.filter((part: any) => !!part));
-      }
-    );
-
-    let paths = [
-      ...getPathsForComponentScripts(root, maybeComponentName),
-      ...getPathsForComponentTemplates(root, maybeComponentName),
-      ...helpers
-    ].filter(fs.existsSync);
-
-    if (!paths.length) {
-      paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
-    }
-
-    return pathsToLocations.apply(
-      null,
-      paths.length > 1 ? paths.filter(isTemplatePath) : paths
-    );
-  }
-  provideMustacheDefinition(root: string, focusPath: ASTPath) {
-    const maybeComponentName =
-      focusPath.node.type === 'ElementNode'
-        ? normalizeAngleTagName(focusPath.node.tag)
-        : focusPath.node.original;
-    return this.provideComponentDefinition(root, maybeComponentName);
-  }
-  provideHashPropertyUsage(root: string, focusPath: ASTPath) {
-    let parentPath = focusPath.parentPath;
-    if (parentPath && parentPath.parent && parentPath.parent.path) {
-      const maybeComponentName = parentPath.parent.path.original;
-      if (
-        !maybeComponentName.includes('.') &&
-        maybeComponentName.includes('-')
-      ) {
-        let paths = [
-          ...getPathsForComponentScripts(root, maybeComponentName),
-          ...getPathsForComponentTemplates(root, maybeComponentName)
-        ].filter(fs.existsSync);
-
-        if (!paths.length) {
-          paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
-        }
-
-        const finalPaths =
-          paths.length > 1
-            ? paths.filter((postfix: string) => isTemplatePath(postfix))
-            : paths;
-        return pathsToLocationsWithPosition(
-          finalPaths,
-          '@' + focusPath.node.key
-        );
-      }
-    }
-    return null;
-  }
-  provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath) {
-    const maybeComponentName = normalizeAngleTagName(focusPath.parent.tag);
-
-    let paths = [
-      ...getPathsForComponentScripts(root, maybeComponentName),
-      ...getPathsForComponentTemplates(root, maybeComponentName)
-    ].filter(fs.existsSync);
-
-    if (!paths.length) {
-      paths = getAddonPathsForComponentTemplates(root, maybeComponentName);
-    }
-
-    const finalPaths =
-      paths.length > 1
-        ? paths.filter((postfix: string) => isTemplatePath(postfix))
-        : paths;
-    return pathsToLocationsWithPosition(finalPaths, focusPath.node.name);
   }
 
   get handler(): RequestHandler<TextDocumentPositionParams, Definition, void> {
     return this.handle.bind(this);
-  }
-
-  isLocalProperty(path: ASTPath) {
-    let node = path.node;
-    if (node.type === 'PathExpression') {
-      return node.this;
-    }
-    return false;
-  }
-
-  isHashPairKey(path: ASTPath) {
-    let node = path.node;
-    return node.type === 'HashPair';
-  }
-
-  isAnglePropertyAttribute(path: ASTPath) {
-    let node = path.node;
-    if (node.type === 'AttrNode') {
-      if (node.name.charAt(0) === '@') {
-        return true;
-      }
-    }
-  }
-
-  isActionName(path: ASTPath) {
-    let node = path.node;
-    if (!path.parent) {
-      return false;
-    }
-    if (
-      path.parent.type !== 'MustacheStatement' &&
-      path.parent.type !== 'PathExpression' &&
-      path.parent.type !== 'SubExpression' &&
-      path.parent.type !== 'ElementModifierStatement'
-    ) {
-      return false;
-    }
-    if (
-      !path.parent ||
-      path.parent.path.original !== 'action' ||
-      !path.parent.params[0] === node
-    ) {
-      return false;
-    }
-    if (node.type === 'StringLiteral') {
-      return true;
-    } else if (node.type === 'PathExpression' && node.this) {
-      return true;
-    }
-    return false;
-  }
-
-  isComponentWithBlock(path: ASTPath) {
-    let node = path.node;
-    return (
-      node.type === 'BlockStatement' &&
-      node.path.type === 'PathExpression' &&
-      node.path.this === false &&
-      node.path.original.includes('-') &&
-      node.path.original.charAt(0) !== '-' &&
-      !node.path.original.includes('.')
-    );
-  }
-
-  isAngleComponent(path: ASTPath) {
-    let node = path.node;
-
-    if (node.type === 'ElementNode') {
-      if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
-        return true;
-      }
-    }
-  }
-
-  isComponentOrHelperName(path: ASTPath) {
-    let node = path.node;
-
-    if (this.isAngleComponent(path)) {
-      return true;
-    }
-
-    if (node.type === 'StringLiteral') {
-      // if (node.original.includes('/')) {
-      //   return true;
-      // } else if (!node.original.includes('.') && node.original.includes('-')) {
-      //   return true;
-      // }
-      if (
-        path.parent &&
-        path.parent.path.original === 'component' &&
-        path.parent.params[0] === node
-      ) {
-        return true;
-      }
-    }
-
-    if (node.type !== 'PathExpression') {
-      return false;
-    }
-
-    let parent = path.parent;
-    if (
-      !parent ||
-      parent.path !== node ||
-      (parent.type !== 'MustacheStatement' &&
-        parent.type !== 'BlockStatement' &&
-        parent.type !== 'SubExpression')
-    ) {
-      return false;
-    }
-
-    return true;
   }
 }
