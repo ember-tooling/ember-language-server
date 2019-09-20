@@ -10,8 +10,8 @@ import TemplateDefinitionProvider from './template';
 import ScriptDefinitionProvider from './script';
 
 export default class DefinitionProvider {
-  public template !: TemplateDefinitionProvider;
-  public script !: ScriptDefinitionProvider;
+  public template: TemplateDefinitionProvider;
+  public script: ScriptDefinitionProvider;
 
   constructor(private server: Server) {
     this.template = new TemplateDefinitionProvider(server);
