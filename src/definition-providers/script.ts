@@ -8,49 +8,58 @@ import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils
 const { kebabCase } = require('lodash');
 import { isRouteLookup, isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
 import { getPodModulePrefix } from './../utils/layout-helpers';
+import { Project } from '../project-roots';
+import { ParseResult } from '@babel/core';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
 
-function joinPaths(...args: string[]) {
-  return ['.ts', '.js'].map((extName: string) => {
+function joinPaths(...args: string[]): string[] {
+  return ['.ts', '.js'].map(extName => {
     const localArgs = args.slice(0);
     const lastArg = localArgs.pop() + extName;
-    return path.join.apply(path, [...localArgs, lastArg]);
+    return path.join(...localArgs, lastArg);
   });
 }
 
 class PathResolvers {
   [key: string]: LayoutCollectorFn;
-  classicModelPaths(root: string, modelName: string) {
+  classicModelPaths(root: string, modelName: string): string[] {
     return joinPaths(root, 'app', 'models', modelName);
   }
-  classicTransformPaths(root: string, transformName: string) {
+
+  classicTransformPaths(root: string, transformName: string): string[] {
     return joinPaths(root, 'app', 'transforms', transformName);
   }
-  classicServicePaths(root: string, modelName: string) {
+
+  classicServicePaths(root: string, modelName: string): string[] {
     return joinPaths(root, 'app', 'services', modelName);
   }
-  podTransformPaths(root: string, transformName: string, podPrefix: string) {
+
+  podTransformPaths(root: string, transformName: string, podPrefix: string): string[] {
     return joinPaths(root, 'app', podPrefix, transformName, 'transform');
   }
-  podModelPaths(root: string, modelName: string, podPrefix: string) {
+
+  podModelPaths(root: string, modelName: string, podPrefix: string): string[] {
     return joinPaths(root, 'app', podPrefix, modelName, 'model');
   }
-  podServicePaths(root: string, modelName: string, podPrefix: string) {
+
+  podServicePaths(root: string, modelName: string, podPrefix: string): string[] {
     return joinPaths(root, 'app', podPrefix, modelName, 'service');
   }
-  addonServicePaths(root: string, serviceName: string) {
+
+  addonServicePaths(root: string, serviceName: string): string[] {
     return getAddonPathsForType(root, 'services', serviceName);
   }
-  addonImportPaths(root: string, pathName: string) {
+
+  addonImportPaths(root: string, pathName: string): string[] {
     return getAddonImport(root, pathName);
   }
-  classicImportPaths(root: string, pathName: string) {
+
+  classicImportPaths(root: string, pathName: string): string[] {
     const pathParts = pathName.split('/');
     pathParts.shift();
-    const params = [root, 'app', ...pathParts];
-    return joinPaths.apply(null, params);
+    return joinPaths(root, 'app', ...pathParts);
   }
 }
 
@@ -62,49 +71,38 @@ export default class ScriptDefinitionProvider {
     this.server = server;
     this.resolvers = new PathResolvers();
   }
+
   guessPathForImport(root: string, uri: string, importPath: string ) {
     if (!uri) {
       return null;
     }
-    const guessedPaths: string[] = [];
-    const fnName = 'Import';
-      this.resolvers[`classic${fnName}Paths`](root, importPath).forEach(
-        (pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        }
-      );
-    this.resolvers.addonImportPaths(root, importPath).forEach(
-      (pathLocation: string) => {
-        guessedPaths.push(pathLocation);
-      }
+
+    return pathsToLocations(
+      ...this.resolvers.classicImportPaths(root, importPath),
+      ...this.resolvers.addonImportPaths(root, importPath)
     );
-    return pathsToLocations.apply(null, guessedPaths);
   }
+
   guessPathsForType(root: string, fnName: ItemType, typeName: string) {
-    const guessedPaths: string[] = [];
+    const classicPaths = this.resolvers[`classic${fnName}Paths`](root, typeName);
 
-      this.resolvers[`classic${fnName}Paths`](root, typeName).forEach(
-        (pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        }
-      );
-      const podPrefix = getPodModulePrefix(root);
-      if (podPrefix) {
-        this.resolvers[`pod${fnName}Paths`](root, typeName, podPrefix).forEach(
-          (pathLocation: string) => {
-            guessedPaths.push(pathLocation);
-          }
-        );
-      }
+    const podPrefix = getPodModulePrefix(root);
+    const podsPaths = podPrefix
+      ? this.resolvers[`pod${fnName}Paths`](root, typeName, podPrefix)
+      : [];
 
-    if (fnName === 'Service') {
-      this.resolvers.addonServicePaths(root, typeName).forEach((item: string) => {
-        guessedPaths.push(item);
-      });
-    }
-    return pathsToLocations.apply(null, guessedPaths);
+    const addonPaths = fnName === 'Service'
+      ? this.resolvers.addonServicePaths(root, typeName)
+      : [];
+
+    return pathsToLocations(
+      ...classicPaths,
+      ...podsPaths,
+      ...addonPaths,
+    );
   }
-  handle(params: TextDocumentPositionParams, project: any): Definition | null {
+
+  handle(params: TextDocumentPositionParams, project: Project): Definition | null {
     const uri = params.textDocument.uri;
     const { root } = project;
     const document = this.server.documents.get(uri);
@@ -113,7 +111,7 @@ export default class ScriptDefinitionProvider {
     }
     const content = document.getText();
 
-    const ast = parse(content, {
+    const ast: ParseResult = parse(content, {
       sourceType: 'module'
     });
 
@@ -145,6 +143,7 @@ export default class ScriptDefinitionProvider {
       let routePath = astPath.node.value;
       return this.server.definitionProvider.template.provideRouteDefinition(root, routePath);
     }
+
     return null;
   }
 }
