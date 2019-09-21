@@ -24,10 +24,6 @@ import { ParseResult } from "@babel/core";
 import { provideRouteDefinition } from "./template";
 
 type ItemType = 'Model' | 'Transform' | 'Service';
-type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
-type Resolvers = {
-    [key: string]: LayoutCollectorFn
-};
 
 function joinPaths(...args: string[]): string[] {
   return [".ts", ".js"].map(extName => {
@@ -37,6 +33,12 @@ function joinPaths(...args: string[]): string[] {
   });
 }
 
+// Define these types and create this constant to allow dynamic lookup of
+// resolvers in the `ScriptDefinitionProvider#handle` method.
+type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
+type Resolvers = {
+    [key: string]: LayoutCollectorFn
+};
 const RESOLVERS: Resolvers = {
   classicModelPaths(root: string, modelName: string): string[] {
     return joinPaths(root, "app", "models", modelName);
