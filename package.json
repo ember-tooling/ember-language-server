@@ -17,7 +17,7 @@
   "main": "lib/start-server.js",
   "typings": "lib/start-server.d.ts",
   "dependencies": {
-    "@glimmer/syntax": "^0.39.3",
+    "@glimmer/syntax": "^0.42.1",
     "ast-types": "^0.13.2",
     "babylon": "^6.18.0",
     "fs-extra": "^5.0.0",
