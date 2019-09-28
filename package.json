@@ -35,6 +35,7 @@
     "@types/node": "^12.12.17",
     "jest": "^23.6.0",
     "lerna-changelog": "^0.8.3",
+    "rimraf": "^3.0.0",
     "ts-jest": "^22.4.3",
     "tslint": "^5.20.1",
     "typescript": "^2.8.1",
@@ -43,7 +44,7 @@
   },
   "scripts": {
     "changelog": "lerna-changelog",
-    "clean": "rm -rf lib/",
+    "clean": "rimraf lib/",
     "compile": "tsc -p .",
     "lint": "tslint --project ./tsconfig.json",
     "prepublish": "yarn clean && yarn compile",
