@@ -1,15 +1,15 @@
-import * as path from "path";
-import Server from "./../server";
-import ASTPath from "./../glimmer-utils";
-import { TextDocumentPositionParams, Definition } from "vscode-languageserver";
-import { parseScriptFile as parse } from "ember-meta-explorer";
-import { toPosition } from "./../estree-utils";
+import * as path from 'path';
+import Server from './../server';
+import ASTPath from './../glimmer-utils';
+import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
+import { parseScriptFile as parse } from 'ember-meta-explorer';
+import { toPosition } from './../estree-utils';
 import {
   pathsToLocations,
   getAddonPathsForType,
   getAddonImport
-} from "../utils/definition-helpers";
-const { kebabCase } = require("lodash");
+} from '../utils/definition-helpers';
+const { kebabCase } = require('lodash');
 import {
   isRouteLookup,
   isTransformReference,
@@ -17,16 +17,16 @@ import {
   isImportPathDeclaration,
   isServiceInjection,
   isNamedServiceInjection
-} from "./../utils/ast-helpers";
-import { getPodModulePrefix } from "./../utils/layout-helpers";
-import { Project } from "../project-roots";
-import { ParseResult } from "@babel/core";
-import { provideRouteDefinition } from "./template";
+} from './../utils/ast-helpers';
+import { getPodModulePrefix } from './../utils/layout-helpers';
+import { Project } from '../project-roots';
+import { ParseResult } from '@babel/core';
+import { provideRouteDefinition } from './template';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 
 function joinPaths(...args: string[]): string[] {
-  return [".ts", ".js"].map(extName => {
+  return ['.ts', '.js'].map(extName => {
     const localArgs = args.slice(0);
     const lastArg = localArgs.pop() + extName;
     return path.join(...localArgs, lastArg);
@@ -41,15 +41,15 @@ type Resolvers = {
 };
 const RESOLVERS: Resolvers = {
   classicModelPaths(root: string, modelName: string): string[] {
-    return joinPaths(root, "app", "models", modelName);
+    return joinPaths(root, 'app', 'models', modelName);
   },
 
   classicTransformPaths(root: string, transformName: string): string[] {
-    return joinPaths(root, "app", "transforms", transformName);
+    return joinPaths(root, 'app', 'transforms', transformName);
   },
 
   classicServicePaths(root: string, modelName: string): string[] {
-    return joinPaths(root, "app", "services", modelName);
+    return joinPaths(root, 'app', 'services', modelName);
   },
 
   podTransformPaths(
@@ -57,11 +57,11 @@ const RESOLVERS: Resolvers = {
     transformName: string,
     podPrefix: string
   ): string[] {
-    return joinPaths(root, "app", podPrefix, transformName, "transform");
+    return joinPaths(root, 'app', podPrefix, transformName, 'transform');
   },
 
   podModelPaths(root: string, modelName: string, podPrefix: string): string[] {
-    return joinPaths(root, "app", podPrefix, modelName, "model");
+    return joinPaths(root, 'app', podPrefix, modelName, 'model');
   },
 
   podServicePaths(
@@ -69,11 +69,11 @@ const RESOLVERS: Resolvers = {
     modelName: string,
     podPrefix: string
   ): string[] {
-    return joinPaths(root, "app", podPrefix, modelName, "service");
+    return joinPaths(root, 'app', podPrefix, modelName, 'service');
   },
 
   addonServicePaths(root: string, serviceName: string): string[] {
-    return getAddonPathsForType(root, "services", serviceName);
+    return getAddonPathsForType(root, 'services', serviceName);
   },
 
   addonImportPaths(root: string, pathName: string): string[] {
@@ -81,9 +81,9 @@ const RESOLVERS: Resolvers = {
   },
 
   classicImportPaths(root: string, pathName: string): string[] {
-    const pathParts = pathName.split("/");
+    const pathParts = pathName.split('/');
     pathParts.shift();
-    return joinPaths(root, "app", ...pathParts);
+    return joinPaths(root, 'app', ...pathParts);
   }
 };
 
@@ -110,7 +110,7 @@ function guessPathsForType(root: string, fnName: ItemType, typeName: string) {
     : [];
 
   const addonPaths =
-    fnName === "Service"
+    fnName === 'Service'
       ? RESOLVERS.addonServicePaths(root, typeName)
       : [];
 
@@ -136,7 +136,7 @@ export default class ScriptDefinitionProvider {
     }
     const content = document.getText();
 
-    const ast: ParseResult = parse(content, { sourceType: "module" });
+    const ast: ParseResult = parse(content, { sourceType: 'module' });
 
     const astPath = ASTPath.toPosition(ast, toPosition(params.position));
 
@@ -146,22 +146,22 @@ export default class ScriptDefinitionProvider {
 
     if (isModelReference(astPath)) {
       const modelName = astPath.node.value;
-      return guessPathsForType(root, "Model", modelName);
+      return guessPathsForType(root, 'Model', modelName);
     } else if (isTransformReference(astPath)) {
       const transformName = astPath.node.value;
-      return guessPathsForType(root, "Transform", transformName);
+      return guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
       return guessPathForImport(root, uri, astPath.node.value);
     } else if (isServiceInjection(astPath)) {
       let serviceName = astPath.node.name;
       let args = astPath.parent.value.arguments;
-      if (args.length && args[0].type === "StringLiteral") {
+      if (args.length && args[0].type === 'StringLiteral') {
         serviceName = args[0].value;
       }
-      return guessPathsForType(root, "Service", kebabCase(serviceName));
+      return guessPathsForType(root, 'Service', kebabCase(serviceName));
     } else if (isNamedServiceInjection(astPath)) {
       let serviceName = astPath.node.value;
-      return guessPathsForType(root, "Service", kebabCase(serviceName));
+      return guessPathsForType(root, 'Service', kebabCase(serviceName));
     } else if (isRouteLookup(astPath)) {
       let routePath = astPath.node.value;
       return provideRouteDefinition(root, routePath);

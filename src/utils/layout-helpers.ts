@@ -133,10 +133,10 @@ export function getPackageJSON(file: string) {
 }
 
 interface PackageInfo {
-  keywords?: string[]
+  keywords?: string[];
   'ember-addon'?: {
     version?: number
-  }
+  };
 }
 
 export function isEmberAddon(info: PackageInfo) {
