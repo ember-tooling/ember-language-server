@@ -28,14 +28,14 @@
     "ast-types": "^0.13.2",
     "ember-meta-explorer": "^0.0.11",
     "extract-tagged-template-literals": "^1.0.0",
-    "fs-extra": "^5.0.0",
+    "fs-extra": "^8.1.0",
     "fuzzaldrin": "^2.1.0",
     "i": "^0.3.5",
     "lodash": "^4.17.11",
-    "util": "^0.11.1",
+    "util": "^0.12.1",
     "vscode-languageserver": "^5.2.1",
     "vscode-uri": "^1.0.6",
-    "walk-sync": "^1.0.1"
+    "walk-sync": "^2.0.2"
   },
   "devDependencies": {
     "@types/babel__core": "^7.1.3",
