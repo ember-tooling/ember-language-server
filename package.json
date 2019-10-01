@@ -24,7 +24,7 @@
     "watch": "tsc --watch -p ."
   },
   "dependencies": {
-    "@glimmer/syntax": "^0.39.3",
+    "@glimmer/syntax": "^0.42.1",
     "ast-types": "^0.13.2",
     "ember-meta-explorer": "^0.0.11",
     "extract-tagged-template-literals": "^1.0.0",
