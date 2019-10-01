@@ -68,7 +68,7 @@ export default class ScriptCompletionProvider {
     try {
       if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
         textPrefix = focusPath.node.value;
-        listModels(root).forEach((model) => {
+        listModels(root).forEach(model => {
           completions.push(model);
         });
         getProjectAddonsInfo(root).filter((item: CompletionItem) => {
@@ -78,7 +78,7 @@ export default class ScriptCompletionProvider {
         });
       } else if (isRouteLookup(focusPath)) {
         textPrefix = focusPath.node.value;
-        listRoutes(root).forEach((model) => {
+        listRoutes(root).forEach(model => {
           completions.push(model);
         });
         getProjectAddonsInfo(root).filter((item: CompletionItem) => {
@@ -88,7 +88,7 @@ export default class ScriptCompletionProvider {
         });
       } else if (isNamedServiceInjection(focusPath)) {
         textPrefix = focusPath.node.value;
-        listServices(root).forEach((model) => {
+        listServices(root).forEach(model => {
           completions.push(model);
         });
         getProjectAddonsInfo(root).filter((item: CompletionItem) => {

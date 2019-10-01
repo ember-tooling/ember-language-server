@@ -1,21 +1,21 @@
-import { join } from "path";
-import * as fs from "fs";
+import { join } from 'path';
+import * as fs from 'fs';
 
 import {
   RequestHandler,
   TextDocumentPositionParams,
   Definition
-} from "vscode-languageserver";
+} from 'vscode-languageserver';
 
-import { isLinkToTarget } from "./../utils/ast-helpers";
-import { toPosition } from "./../estree-utils";
-import Server from "./../server";
-import ASTPath from "./../glimmer-utils";
+import { isLinkToTarget } from './../utils/ast-helpers';
+import { toPosition } from './../estree-utils';
+import Server from './../server';
+import ASTPath from './../glimmer-utils';
 import {
   isTemplatePath,
   getComponentNameFromURI,
   getPodModulePrefix
-} from "./../utils/layout-helpers";
+} from './../utils/layout-helpers';
 
 import {
   getAbstractHelpersParts,
@@ -24,38 +24,38 @@ import {
   getPathsForComponentScripts,
   pathsToLocationsWithPosition,
   pathsToLocations
-} from "./../utils/definition-helpers";
+} from './../utils/definition-helpers';
 
-import { kebabCase } from "lodash";
-import { preprocess } from "@glimmer/syntax";
-import { Project } from "../project-roots";
+import { kebabCase } from 'lodash';
+import { preprocess } from '@glimmer/syntax';
+import { Project } from '../project-roots';
 
 function normalizeAngleTagName(tagName: string) {
   return tagName
-    .split("::")
+    .split('::')
     .map((item: string) => kebabCase(item))
-    .join("/");
+    .join('/');
 }
 
 function looksLikeClassicComponentName(name: string) {
   return (
     name.length &&
-    !name.includes(".") &&
-    !name.includes(" ") &&
+    !name.includes('.') &&
+    !name.includes(' ') &&
     name === name.toLowerCase()
   );
 }
 
 function extractValueForMaybeClassicComponentName(focusPath: ASTPath) {
-  let value = "";
+  let value = '';
   const { node, parent } = focusPath;
   if (!parent) {
     return value;
   }
 
-  if (node.type === "StringLiteral" && parent.type === "HashPair") {
+  if (node.type === 'StringLiteral' && parent.type === 'HashPair') {
     value = node.original;
-  } else if (node.type === "TextNode" && parent.type === "AttrNode") {
+  } else if (node.type === 'TextNode' && parent.type === 'AttrNode') {
     value = node.chars;
   }
 
@@ -68,31 +68,31 @@ function maybeClassicComponentName(focusPath: ASTPath) {
 }
 
 export function provideRouteDefinition(root: string, routeName: string) {
-  const routeParts = routeName.split(".");
+  const routeParts = routeName.split('.');
   const lastRoutePart = routeParts.pop();
   if (!lastRoutePart) {
     throw new Error(`Route name ${routeName} is ill-formed!`);
   }
 
   const routePaths = [
-    join(root, "app", "routes", ...routeParts, lastRoutePart + ".js"),
-    join(root, "app", "routes", ...routeParts, lastRoutePart + ".ts"),
-    join(root, "app", "controllers", ...routeParts, lastRoutePart + ".js"),
-    join(root, "app", "controllers", ...routeParts, lastRoutePart + ".ts"),
-    join(root, "app", "templates", ...routeParts, lastRoutePart + ".hbs")
+    join(root, 'app', 'routes', ...routeParts, lastRoutePart + '.js'),
+    join(root, 'app', 'routes', ...routeParts, lastRoutePart + '.ts'),
+    join(root, 'app', 'controllers', ...routeParts, lastRoutePart + '.js'),
+    join(root, 'app', 'controllers', ...routeParts, lastRoutePart + '.ts'),
+    join(root, 'app', 'templates', ...routeParts, lastRoutePart + '.hbs')
   ];
 
   const podPrefix = getPodModulePrefix(root);
   if (podPrefix) {
     for (const file in [
-      "route.js",
-      "route.ts",
-      "controller.js",
-      "controller.ts",
-      "template.hbs"
+      'route.js',
+      'route.ts',
+      'controller.js',
+      'controller.ts',
+      'template.hbs'
     ]) {
       routePaths.push(
-        join(root, "app", podPrefix, ...routeParts, lastRoutePart, file)
+        join(root, 'app', podPrefix, ...routeParts, lastRoutePart, file)
       );
     }
   }
@@ -134,7 +134,7 @@ function provideBlockComponentDefinition(root: string, focusPath: ASTPath) {
         );
 
   // getAddonPathsForComponentTemplates
-  return pathsToLocationsWithPosition(paths, "{{yield");
+  return pathsToLocationsWithPosition(paths, '{{yield');
 }
 
 function providePropertyDefinition(
@@ -161,12 +161,12 @@ function providePropertyDefinition(
   const text = focusPath.node.original;
   return pathsToLocationsWithPosition(
     paths,
-    text.replace("this.", "").split(".")[0]
+    text.replace('this.', '').split('.')[0]
   );
 }
 
 function provideComponentDefinition(root: string, maybeComponentName: string) {
-  let helpers = getAbstractHelpersParts(root, "app", maybeComponentName).map(
+  let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map(
     pathParts => join(...pathParts.filter((part: any) => !!part))
   );
 
@@ -188,7 +188,7 @@ function provideComponentDefinition(root: string, maybeComponentName: string) {
 
 function provideMustacheDefinition(root: string, focusPath: ASTPath) {
   const maybeComponentName =
-    focusPath.node.type === "ElementNode"
+    focusPath.node.type === 'ElementNode'
       ? normalizeAngleTagName(focusPath.node.tag)
       : focusPath.node.original;
   return provideComponentDefinition(root, maybeComponentName);
@@ -198,7 +198,7 @@ function provideHashPropertyUsage(root: string, focusPath: ASTPath) {
   let parentPath = focusPath.parentPath;
   if (parentPath && parentPath.parent && parentPath.parent.path) {
     const maybeComponentName = parentPath.parent.path.original;
-    if (!maybeComponentName.includes(".") && maybeComponentName.includes("-")) {
+    if (!maybeComponentName.includes('.') && maybeComponentName.includes('-')) {
       const appPaths = [
         ...getPathsForComponentScripts(root, maybeComponentName),
         ...getPathsForComponentTemplates(root, maybeComponentName)
@@ -209,7 +209,7 @@ function provideHashPropertyUsage(root: string, focusPath: ASTPath) {
         : getAddonPathsForComponentTemplates(root, maybeComponentName)
       ).filter(isTemplatePath);
 
-      return pathsToLocationsWithPosition(paths, "@" + focusPath.node.key);
+      return pathsToLocationsWithPosition(paths, '@' + focusPath.node.key);
     }
   }
   return null;
@@ -235,15 +235,15 @@ function provideAngleBracketComponentAttributeUsage(
 }
 
 function isLocalProperty(path: ASTPath) {
-  return path.node.type === "PathExpression" && !!path.node.this;
+  return path.node.type === 'PathExpression' && !!path.node.this;
 }
 
 function isHashPairKey(path: ASTPath) {
-  return path.node.type === "HashPair";
+  return path.node.type === 'HashPair';
 }
 
 function isAnglePropertyAttribute(path: ASTPath) {
-  return path.node.type === "AttrNode" && path.node.name.charAt(0) === "@";
+  return path.node.type === 'AttrNode' && path.node.name.charAt(0) === '@';
 }
 
 function isActionName(path: ASTPath) {
@@ -252,25 +252,25 @@ function isActionName(path: ASTPath) {
     return false;
   }
   if (
-    path.parent.type !== "MustacheStatement" &&
-    path.parent.type !== "PathExpression" &&
-    path.parent.type !== "SubExpression" &&
-    path.parent.type !== "ElementModifierStatement"
+    path.parent.type !== 'MustacheStatement' &&
+    path.parent.type !== 'PathExpression' &&
+    path.parent.type !== 'SubExpression' &&
+    path.parent.type !== 'ElementModifierStatement'
   ) {
     return false;
   }
 
   if (
     !path.parent ||
-    path.parent.path.original !== "action" ||
+    path.parent.path.original !== 'action' ||
     !path.parent.params[0] === node
   ) {
     return false;
   }
 
-  if (node.type === "StringLiteral") {
+  if (node.type === 'StringLiteral') {
     return true;
-  } else if (node.type === "PathExpression" && node.this) {
+  } else if (node.type === 'PathExpression' && node.this) {
     return true;
   }
 
@@ -280,18 +280,18 @@ function isActionName(path: ASTPath) {
 function isComponentWithBlock(path: ASTPath) {
   let node = path.node;
   return (
-    node.type === "BlockStatement" &&
-    node.path.type === "PathExpression" &&
+    node.type === 'BlockStatement' &&
+    node.path.type === 'PathExpression' &&
     node.path.this === false &&
-    node.path.original.includes("-") &&
-    node.path.original.charAt(0) !== "-" &&
-    !node.path.original.includes(".")
+    node.path.original.includes('-') &&
+    node.path.original.charAt(0) !== '-' &&
+    !node.path.original.includes('.')
   );
 }
 
 function isAngleComponent(path: ASTPath) {
   return (
-    path.node.type === "ElementNode" &&
+    path.node.type === 'ElementNode' &&
     path.node.tag.charAt(0) === path.node.tag.charAt(0).toUpperCase()
   );
 }
@@ -301,7 +301,7 @@ function isComponentOrHelperName(path: ASTPath) {
     return true;
   }
 
-  if (path.node.type === "StringLiteral") {
+  if (path.node.type === 'StringLiteral') {
     // if (node.original.includes('/')) {
     //   return true;
     // } else if (!node.original.includes('.') && node.original.includes('-')) {
@@ -309,14 +309,14 @@ function isComponentOrHelperName(path: ASTPath) {
     // }
     if (
       path.parent &&
-      path.parent.path.original === "component" &&
+      path.parent.path.original === 'component' &&
       path.parent.params[0] === path.node
     ) {
       return true;
     }
   }
 
-  if (path.node.type !== "PathExpression") {
+  if (path.node.type !== 'PathExpression') {
     return false;
   }
 
@@ -324,9 +324,9 @@ function isComponentOrHelperName(path: ASTPath) {
   if (
     !parent ||
     parent.path !== path.node ||
-    (parent.type !== "MustacheStatement" &&
-      parent.type !== "BlockStatement" &&
-      parent.type !== "SubExpression")
+    (parent.type !== 'MustacheStatement' &&
+      parent.type !== 'BlockStatement' &&
+      parent.type !== 'SubExpression')
   ) {
     return false;
   }

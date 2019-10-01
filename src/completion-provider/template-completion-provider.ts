@@ -51,6 +51,7 @@ const PLACEHOLDER = 'ELSCompletionDummy';
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getAllAngleBracketComponents(root: string, uri: string): ComponentLabels {
+    log(uri);
     return uniqBy(
       ([] as CompletionItem[])
         .concat(
@@ -58,7 +59,7 @@ export default class TemplateCompletionProvider {
           listPodsComponents(root),
           getProjectAddonsInfo(root).filter(({detail}) => detail === 'component')
         )
-        .map((item) => {
+        .map(item => {
           return Object.assign({}, item, {
             label: toAngleBrackedName(item.label)
           });

@@ -132,7 +132,7 @@ export function getPathsForComponentScripts(
 ): string[] {
   const classicComponentsScriptsParts = getAbstractComponentScriptsParts(
     root,
-    "app",
+    'app',
     maybeComponentName
   );
 
@@ -140,7 +140,7 @@ export function getPathsForComponentScripts(
   const podComponentsScriptsParts = podModulePrefix
     ? getAbstractComponentScriptsParts(
         root,
-        "app/" + podModulePrefix,
+        'app/' + podModulePrefix,
         maybeComponentName
       )
     : [];
@@ -156,7 +156,7 @@ export function getPathsForComponentTemplates(
 ): string[] {
   const classicComponentsScriptsParts = getAbstractComponentTemplatesParts(
     root,
-    "app",
+    'app',
     maybeComponentName
   );
 
@@ -164,7 +164,7 @@ export function getPathsForComponentTemplates(
   const podComponentsScriptsParts = podModulePrefix
     ? getAbstractComponentTemplatesParts(
         root,
-        "app" + path.sep + podModulePrefix,
+        'app' + path.sep + podModulePrefix,
         maybeComponentName
       )
     : [];
@@ -194,8 +194,8 @@ export function getAddonImport(root: string, importPath: string): string[] {
   for (const rootPath in roots) {
     // TODO: fix types here -- I'm pretty sure this is actually a *lie*.
     const possibleLocations: LocationPathParts[] = [
-      [rootPath, "app", ...importParts] as LocationPathParts,
-      [rootPath, "addon", ...importParts] as LocationPathParts,
+      [rootPath, 'app', ...importParts] as LocationPathParts,
+      [rootPath, 'addon', ...importParts] as LocationPathParts,
       [rootPath, ...importParts] as LocationPathParts
     ];
 
@@ -237,7 +237,7 @@ function toFilesOnDisk(paths: string[], pathParts: (string | undefined)[]): stri
   if (fs.existsSync(actualPath)) {
     paths.push(actualPath);
   }
-  return paths
+  return paths;
 }
 
 export function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
@@ -252,8 +252,8 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
     // should resolve to. Without it, it tries to resolve as returning the same
     // type as it receives, rather than a new type.
     const pathsOnDisk = [
-      ...getAbstractParts(rootPath, "app", collection, name),
-      ...getAbstractParts(rootPath, "addon", collection, name)
+      ...getAbstractParts(rootPath, 'app', collection, name),
+      ...getAbstractParts(rootPath, 'addon', collection, name)
     ].reduce<string[]>(toFilesOnDisk, []);
 
     if (pathsOnDisk.length) {
@@ -279,37 +279,37 @@ export function getAddonPathsForComponentTemplates(
   for (const rootPath in roots) {
     const addonScriptPathParts = getAbstractComponentScriptsParts(
       rootPath,
-      "addon",
+      'addon',
       maybeComponentName
     );
 
     const appScriptPathParts = getAbstractComponentScriptsParts(
       rootPath,
-      "app",
+      'app',
       maybeComponentName
     );
 
     const appTemplatePathParts = getAbstractComponentTemplatesParts(
       rootPath,
-      "app",
+      'app',
       maybeComponentName
     );
 
     const addonTemplatePathParts = getAbstractComponentTemplatesParts(
       rootPath,
-      "addon",
+      'addon',
       maybeComponentName
     );
 
     const appHelperPathParts = getAbstractHelpersParts(
       rootPath,
-      "app",
+      'app',
       maybeComponentName
     );
 
     const addonHelperPathParts = getAbstractHelpersParts(
       rootPath,
-      "addon",
+      'addon',
       maybeComponentName
     );
 
