@@ -34,7 +34,7 @@
     "lodash": "^4.17.11",
     "util": "^0.12.1",
     "vscode-languageserver": "^5.2.1",
-    "vscode-uri": "^1.0.6",
+    "vscode-uri": "^2.0.3",
     "walk-sync": "^2.0.2"
   },
   "devDependencies": {
