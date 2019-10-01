@@ -8,7 +8,10 @@ import {
   InitializeRequest,
   CompletionRequest,
   DefinitionRequest,
-  Definition
+  Location,
+  LocationLink,
+  Definition,
+  DefinitionLink
 } from 'vscode-languageserver-protocol';
 
 function startServer() {
@@ -23,7 +26,9 @@ function openFile(connection: MessageConnection, filePath: string) {
   connection.sendNotification(DidOpenTextDocumentNotification.type, {
     textDocument: {
       uri: `file://${filePath}`,
-      text: fs.readFileSync(filePath, 'utf8')
+      text: fs.readFileSync(filePath, 'utf8'),
+      languageId: null,
+      version: null
     }
   });
 }
@@ -40,16 +45,18 @@ function replaceDynamicUriPart(uri: string) {
     .replace(/\\/g, '/');
 }
 
-function normalizeUri(objects: Definition) {
+function normalizeUri(objects: Location | Location[] | LocationLink[]) {
+
   if (!Array.isArray(objects)) {
     objects.uri = replaceDynamicUriPart(objects.uri);
     return objects;
   }
 
-  return objects.map(object => {
-    if (object.uri) {
-      const { uri } = object;
-      object.uri = replaceDynamicUriPart(uri);
+  return (objects as Array<any>).map(object => {
+    if ((object as Location).uri) {
+      (object as Location).uri = replaceDynamicUriPart((object as Location).uri);
+    } else {
+      (object as DefinitionLink).targetUri = replaceDynamicUriPart((object as DefinitionLink).targetUri)
     }
 
     return object;
