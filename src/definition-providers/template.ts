@@ -297,7 +297,7 @@ function isAngleComponent(path: ASTPath) {
 }
 
 function isComponentOrHelperName(path: ASTPath) {
-  if (this.isAngleComponent(path)) {
+  if (isAngleComponent(path)) {
     return true;
   }
 
