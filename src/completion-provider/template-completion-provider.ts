@@ -51,6 +51,7 @@ const PLACEHOLDER = 'ELSCompletionDummy';
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getAllAngleBracketComponents(root: string, uri: string): ComponentLabels {
+    log(uri)
     return uniqBy(
       ([] as CompletionItem[])
         .concat(
