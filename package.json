@@ -50,7 +50,6 @@
     "ts-jest": "^22.0.0",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3",
-    "vscode-jsonrpc": "^3.6.1",
     "vscode-languageserver-protocol": "^3.14.1"
   },
   "engines": {

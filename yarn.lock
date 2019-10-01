@@ -5625,11 +5625,6 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vscode-jsonrpc@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-3.6.1.tgz#3f9b8f902077da27f1ffd37c7317a77bd4696a49"
-  integrity sha512-+Eb+Dxf2kC2h079msx61hkblxAKE0S2j78+8QpnigLAO2aIIjkCwTIH34etBrU8E8VItRinec7YEwULx9at5bQ==
-
 vscode-jsonrpc@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-4.0.0.tgz#a7bf74ef3254d0a0c272fab15c82128e378b3be9"
