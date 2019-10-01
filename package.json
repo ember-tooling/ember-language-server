@@ -1,27 +1,33 @@
 {
   "name": "@emberwatch/ember-language-server",
-  "description": "A language server implementation for Ember.js projects.",
   "version": "0.2.1",
+  "description": "A language server implementation for Ember.js projects.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emberwatch/ember-language-server.git"
+  },
+  "license": "MIT",
   "contributors": [
     "Tobias Bieniek <tobias.bieniek@gmail.com>",
     "Thomas Sauer <t-sauer@outlook.de>",
     "Aleksandr Kanunnikov <lifeart92@gmail.com>"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/emberwatch/ember-language-server.git"
-  },
-  "engines": {
-    "node": "*"
-  },
   "main": "lib/start-server.js",
   "typings": "lib/start-server.d.ts",
+  "scripts": {
+    "changelog": "lerna-changelog",
+    "clean": "rimraf lib/",
+    "compile": "tsc --skipLibCheck -p .",
+    "lint": "tslint --project ./tsconfig.json",
+    "prepublish": "yarn clean && yarn compile",
+    "test": "jest",
+    "watch": "tsc --watch -p ."
+  },
   "dependencies": {
     "@glimmer/syntax": "^0.39.3",
+    "ast-types": "^0.13.2",
     "ember-meta-explorer": "^0.0.11",
     "extract-tagged-template-literals": "^1.0.0",
-    "ast-types": "^0.13.2",
     "fs-extra": "^5.0.0",
     "fuzzaldrin": "^2.1.0",
     "i": "^0.3.5",
@@ -42,18 +48,12 @@
     "lerna-changelog": "^0.8.2",
     "rimraf": "^3.0.0",
     "ts-jest": "^22.4.3",
-    "typescript": "^3.6.3",
     "tslint": "^5.20.0",
+    "typescript": "^3.6.3",
     "vscode-jsonrpc": "^3.6.1",
     "vscode-languageserver-protocol": "^3.14.1"
   },
-  "scripts": {
-    "changelog": "lerna-changelog",
-    "clean": "rimraf lib/",
-    "compile": "tsc --skipLibCheck -p .",
-    "lint": "tslint --project ./tsconfig.json",
-    "prepublish": "yarn clean && yarn compile",
-    "test": "jest",
-    "watch": "tsc --watch -p ."
+  "engines": {
+    "node": "*"
   }
 }
