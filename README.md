@@ -23,3 +23,4 @@ All features currently only work in Ember CLI application that use the default c
 
 * VSCode: [vscode-ember](https://github.com/emberwatch/vscode-ember)
 * Atom: [atom-languageserver-ember](https://github.com/josa42/atom-languageserver-ember)
+* Vim/Neovim: [coc-ember](https://github.com/NullVoxPopuli/coc-ember)
