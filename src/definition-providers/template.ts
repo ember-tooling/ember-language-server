@@ -14,7 +14,6 @@ import {
 import { toPosition } from './../estree-utils';
 import Server from './../server';
 import ASTPath from './../glimmer-utils';
-import { join } from 'path';
 
 import {
   isTemplatePath,
@@ -33,7 +32,7 @@ import {
 } from './../utils/definition-helpers';
 
 import { kebabCase } from 'lodash';
-import memoize from 'memoizee';
+import * as memoize from 'memoizee';
 import { preprocess } from '@glimmer/syntax';
 
 const mAddonPathsForComponentTemplates = memoize(
@@ -144,7 +143,7 @@ export default class TemplateDefinitionProvider {
       routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'controller.ts']);
       routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'template.hbs']);
     }
-    const filteredPaths = routePaths.map((parts: string[]) => join.apply(null, parts)).filter(fs.existsSync);
+    const filteredPaths = routePaths.map((parts: string[]) => path.join.apply(null, parts)).filter(fs.existsSync);
     return pathsToLocations.apply(null, filteredPaths);
   }
   provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {

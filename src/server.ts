@@ -4,8 +4,8 @@
  * ------------------------------------------------------------------------------------------ */
 'use strict';
 
-import { extname } from 'path';
-import { readFileSync } from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 
 import {
   IPCMessageReader, IPCMessageWriter,
@@ -137,14 +137,14 @@ export default class Server {
       return [];
     }
 
-    let extension = extname(filePath);
+    let extension = path.extname(filePath);
 
     let providers = this.documentSymbolProviders
       .filter(provider => provider.extensions.indexOf(extension) !== -1);
 
     if (providers.length === 0) return [];
 
-    let content = readFileSync(filePath, 'utf-8');
+    let content = fs.readFileSync(filePath, 'utf-8');
 
     return providers
       .map(providers => providers.process(content))

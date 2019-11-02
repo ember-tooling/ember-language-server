@@ -1,9 +1,9 @@
 'use strict';
 
-import { dirname, join } from 'path';
+import * as path from 'path';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
-import walkSync from 'walk-sync';
+import * as walkSync from 'walk-sync';
 
 export class Project {
 
@@ -32,7 +32,7 @@ export default class ProjectRoots {
     });
 
     roots.forEach((rootPath: string) => {
-      const fullPath = dirname(join(workspaceRoot, rootPath));
+      const fullPath = path.dirname(path.join(workspaceRoot, rootPath));
       this.onProjectAdd(fullPath);
     });
   }

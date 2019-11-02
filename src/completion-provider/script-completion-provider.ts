@@ -9,7 +9,7 @@ import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { uniqBy } from 'lodash';
-import memoize from 'memoizee';
+import * as memoize from 'memoizee';
 import { getExtension } from '../utils/file-extension';
 import { log } from '../utils/logger';
 import {

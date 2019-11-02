@@ -1,5 +1,5 @@
-import { join } from 'path';
-import { readFileSync, existsSync } from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
 import {
@@ -58,7 +58,7 @@ function findComponentScripts(root: string, componentName: string) {
       possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.ts']);
     }
   }
-  return possibleLocations.map((locArr: string[]) => join.apply(null, locArr));
+  return possibleLocations.map((locArr: string[]) => path.join.apply(null, locArr));
 }
 
 function componentsContextData(
@@ -67,12 +67,12 @@ function componentsContextData(
   templateContent: string
 ): CompletionItem[] {
   const maybeScripts = findComponentScripts(root, componentName);
-  const existingScripts = maybeScripts.filter(existsSync);
+  const existingScripts = maybeScripts.filter(fs.existsSync);
   if (!existingScripts.length) {
     return [];
   }
   const filePath = existingScripts.pop();
-  const fileContent = readFileSync(filePath, { encoding: 'utf8' });
+  const fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
   const infoItems: any[] = [];
 
   try {

@@ -1,9 +1,8 @@
-import memoize from 'memoizee';
-import walkSync from 'walk-sync';
-import { join, sep, extname, dirname } from 'path';
+import * as memoize from 'memoizee';
+import * as walkSync from 'walk-sync';
+import * as fs from 'fs';
+import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
-
-import { readFileSync, existsSync } from 'fs';
 
 export const isModuleUnificationApp = memoize(isMuApp, {
   length: 1,
@@ -24,14 +23,14 @@ export const isAddonRoot = memoize(isProjectAddonRoot, {
 });
 
 export function isMuApp(root: string) {
-  return existsSync(join(root, 'src', 'ui'));
+  return fs.existsSync(path.join(root, 'src', 'ui'));
 }
 
 export function safeWalkSync(filePath: string | false, opts: any) {
   if (!filePath) {
     return [];
   }
-  if (!existsSync(filePath)) {
+  if (!fs.existsSync(filePath)) {
     return [];
   }
   return walkSync(filePath, opts);
@@ -41,7 +40,7 @@ export function getPodModulePrefix(root: string): string | null {
   let podModulePrefix: any = '';
   // log('listPodsComponents');
   try {
-    const appConfig = require(join(root, 'config', 'environment.js'));
+    const appConfig = require(path.join(root, 'config', 'environment.js'));
     // log('appConfig', appConfig);
     podModulePrefix = appConfig('development').podModulePrefix || '';
     if (podModulePrefix.includes('/')) {
@@ -58,13 +57,13 @@ export function getPodModulePrefix(root: string): string | null {
 }
 
 export function resolvePackageRoot(root: string, addonName: string, packagesFolder = 'node_modules') {
-  const roots = root.split(sep);
+  const roots = root.split(path.sep);
   while (roots.length) {
-    const maybePath = join(roots.join(sep), packagesFolder, addonName);
-    const linkedPath = join(roots.join(sep), addonName);
-    if (existsSync(join(maybePath, 'package.json'))) {
+    const maybePath = path.join(roots.join(path.sep), packagesFolder, addonName);
+    const linkedPath = path.join(roots.join(path.sep), addonName);
+    if (fs.existsSync(path.join(maybePath, 'package.json'))) {
       return maybePath;
-    } else if (existsSync(join(linkedPath, 'package.json'))) {
+    } else if (fs.existsSync(path.join(linkedPath, 'package.json'))) {
       return linkedPath;
     }
     roots.pop();
@@ -74,14 +73,14 @@ export function resolvePackageRoot(root: string, addonName: string, packagesFold
 
 export function isProjectAddonRoot(root: string) {
   const pack = getPackageJSON(root);
-  const hasIndexJs = existsSync(join(root, 'index.js'));
+  const hasIndexJs = fs.existsSync(path.join(root, 'index.js'));
   return isEmberAddon(pack) && hasIndexJs;
 }
 
 export function getProjectInRepoAddonsRoots(root: string) {
   const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
   const addons = safeWalkSync(
-    join(root, prefix),
+    path.join(root, prefix),
     {
       directories: true,
       globs: ['**/package.json']
@@ -89,7 +88,7 @@ export function getProjectInRepoAddonsRoots(root: string) {
   );
   const roots: string[] = [];
   addons.map((relativePath: string) => {
-    return dirname(join(root, prefix, relativePath));
+    return path.dirname(path.join(root, prefix, relativePath));
   })
   .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
   .forEach((validRoot: string) => {
@@ -146,7 +145,7 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
 
 export function getPackageJSON(file: string) {
   try {
-    const result = JSON.parse(readFileSync(join(file, 'package.json'), 'utf8'));
+    const result = JSON.parse(fs.readFileSync(path.join(file, 'package.json'), 'utf8'));
     return result;
   } catch (e) {
     return {};
@@ -173,7 +172,7 @@ export function isTemplatePath(filePath: string) {
 }
 
 export function hasAddonFolderInPath(name: string) {
-  return name.includes(sep + 'addon' + sep);
+  return name.includes(path.sep + 'addon' + path.sep);
 }
 
 export function getProjectAddonsInfo(root: string) {
@@ -219,7 +218,7 @@ export function getProjectAddonsInfo(root: string) {
 }
 
 export function pureComponentName(relativePath: string) {
-  const ext = extname(relativePath); // .hbs
+  const ext = path.extname(relativePath); // .hbs
   if (relativePath.startsWith('/')) {
     relativePath = relativePath.slice(1);
   }
@@ -243,7 +242,7 @@ export function listPodsComponents(root: string): CompletionItem[] {
   }
   // log('listComponents');
   const jsPaths = safeWalkSync(
-    join(root, 'app', podModulePrefix, 'components'),
+    path.join(root, 'app', podModulePrefix, 'components'),
     {
       directories: false,
       globs: ['**/*.{js,ts,hbs}']
@@ -263,7 +262,7 @@ export function listPodsComponents(root: string): CompletionItem[] {
 }
 
 export function listMUComponents(root: string): CompletionItem[] {
-  const jsPaths = safeWalkSync(join(root, 'src', 'ui', 'components'), {
+  const jsPaths = safeWalkSync(path.join(root, 'src', 'ui', 'components'), {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   });
@@ -291,12 +290,12 @@ export function builtinModifiers(): CompletionItem[] {
 
 export function listComponents(root: string): CompletionItem[] {
   // log('listComponents');
-  const jsPaths = safeWalkSync(join(root, 'app', 'components'), {
+  const jsPaths = safeWalkSync(path.join(root, 'app', 'components'), {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   });
 
-  const hbsPaths = safeWalkSync(join(root, 'app', 'templates', 'components'), {
+  const hbsPaths = safeWalkSync(path.join(root, 'app', 'templates', 'components'), {
     directories: false,
     globs: ['**/*.hbs']
   });
@@ -315,7 +314,7 @@ export function listComponents(root: string): CompletionItem[] {
 }
 
 function listCollection(root: string, prefix: 'app' | 'addon', collectionName: 'transforms' | 'modifiers' | 'services' | 'models' | 'helpers', kindType: CompletionItemKind, detail: 'transform' | 'service' | 'model' | 'helper' | 'modifier') {
-  const paths = safeWalkSync(join(root, prefix, collectionName), {
+  const paths = safeWalkSync(path.join(root, prefix, collectionName), {
     directories: false,
     globs: ['**/*.{js,ts}']
   });
@@ -353,12 +352,12 @@ export function listTransforms(root: string): CompletionItem[] {
 
 export function listRoutes(root: string): CompletionItem[] {
   // log('listRoutes');
-  const paths = safeWalkSync(join(root, 'app', 'routes'), {
+  const paths = safeWalkSync(path.join(root, 'app', 'routes'), {
     directories: false,
     globs: ['**/*.{js,ts}']
   });
 
-  const templatePaths = safeWalkSync(join(root, 'app', 'templates'), {
+  const templatePaths = safeWalkSync(path.join(root, 'app', 'templates'), {
     directories: false,
     globs: ['**/*.hbs']
   }).filter((name: string) => {
@@ -367,7 +366,7 @@ export function listRoutes(root: string): CompletionItem[] {
   });
 
   const items = [...templatePaths, ...paths].map((filePath: string) => {
-    const label = filePath.replace(extname(filePath), '').replace(/\//g, '.');
+    const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
     return {
       kind: CompletionItemKind.File,
       label,
@@ -380,11 +379,11 @@ export function listRoutes(root: string): CompletionItem[] {
 
 export function getComponentNameFromURI(root: string, uri: string) {
   let fileName = uri.replace('file://', '').replace(root, '');
-  let splitter = fileName.includes(sep + '-components' + sep)
+  let splitter = fileName.includes(path.sep + '-components' + path.sep)
     ? '/-components/'
     : '/components/';
   let maybeComponentName = fileName
-    .split(sep)
+    .split(path.sep)
     .join('/')
     .split(splitter)[1];
 

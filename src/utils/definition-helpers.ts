@@ -1,6 +1,6 @@
-import path from 'path';
-import fs from 'fs';
-import memoize from 'memoizee';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as memoize from 'memoizee';
 import {
   Location,
   Range

@@ -11,4 +11,9 @@ module.exports = {
     "json",
     "node"
   ],
+  globals: {
+    'ts-jest': {
+      diagnostics: false
+    }
+  }
 }

@@ -11,7 +11,7 @@ import { filter } from 'fuzzaldrin';
 import { preprocess } from '@glimmer/syntax';
 import { uniqBy, startCase, camelCase } from 'lodash';
 
-import memoize from 'memoizee';
+import * as memoize from 'memoizee';
 import {
   emberBlockItems,
   emberMustacheItems,

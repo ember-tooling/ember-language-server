@@ -1,9 +1,9 @@
-import { createWriteStream } from 'fs';
+import * as fs from 'fs';
 import util from 'util';
 
 const debug = false;
 const log_file = debug
-  ? createWriteStream(__dirname + '/debug.log', { flags: 'w' })
+  ? fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' })
   : null;
 
 export function log(...args: any[]) {
