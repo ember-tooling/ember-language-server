@@ -2,9 +2,7 @@ import * as fs from 'fs';
 import util from 'util';
 
 const debug = false;
-const log_file = debug
-  ? fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' })
-  : null;
+const log_file = debug ? fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' }) : null;
 
 export function log(...args: any[]) {
   if (!debug || !log_file) {

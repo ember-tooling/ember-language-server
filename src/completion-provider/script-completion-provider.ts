@@ -1,7 +1,4 @@
-import {
-  CompletionItem,
-  TextDocumentPositionParams
-} from 'vscode-languageserver';
+import { CompletionItem, TextDocumentPositionParams } from 'vscode-languageserver';
 
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
@@ -20,13 +17,7 @@ import {
   isTransformReference,
   isComputedPropertyArgument
 } from '../utils/ast-helpers';
-import {
-  listRoutes,
-  listModels,
-  listServices,
-  mGetProjectAddonsInfo,
-  listTransforms
-} from '../utils/layout-helpers';
+import { listRoutes, listModels, listServices, mGetProjectAddonsInfo, listTransforms } from '../utils/layout-helpers';
 
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
 const mListModels = memoize(listModels, { length: 1, maxAge: 60000 });

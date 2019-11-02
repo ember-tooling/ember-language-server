@@ -1,8 +1,4 @@
-import {
-  RequestHandler,
-  TextDocumentPositionParams,
-  Definition
-} from 'vscode-languageserver';
+import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-languageserver';
 
 import Server from './../server';
 import { getExtension } from './../utils/file-extension';
@@ -10,8 +6,8 @@ import TemplateDefinitionProvider from './template';
 import ScriptDefinietionProvider from './script';
 
 export default class DefinitionProvider {
-  public template !: TemplateDefinitionProvider;
-  public script !: ScriptDefinietionProvider;
+  public template!: TemplateDefinitionProvider;
+  public script!: ScriptDefinietionProvider;
 
   constructor(private server: Server) {
     this.template = new TemplateDefinitionProvider(server);

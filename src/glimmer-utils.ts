@@ -38,7 +38,7 @@ function _findFocusPath(node: any, position: Position, seen = new Set()): any {
   }
 
   for (let key in node) {
-    if (!node.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(node, key)) {
       continue;
     }
 

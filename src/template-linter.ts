@@ -23,7 +23,6 @@ export interface TemplateLinterError {
 const extensionsToLint: string[] = ['.hbs', '.js', '.ts'];
 
 export default class TemplateLinter {
-
   private _linterCache = new Map<Project, any>();
 
   constructor(private server: Server) {}
@@ -51,16 +50,14 @@ export default class TemplateLinter {
     }
 
     const documentContent = textDocument.getText();
-    const source = (ext === '.hbs') ? documentContent : searchAndExtractHbs(documentContent);
+    const source = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
 
     const errors = linter.verify({
       source,
       moduleId: textDocument.uri
     });
 
-    const diagnostics: Diagnostic[] = errors.map((error: TemplateLinterError) =>
-      toDiagnostic(source, error)
-    );
+    const diagnostics: Diagnostic[] = errors.map((error: TemplateLinterError) => toDiagnostic(source, error));
 
     this.server.connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
   }

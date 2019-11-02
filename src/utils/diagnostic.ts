@@ -24,7 +24,6 @@ function toLineRange(source: string, idx: number): [number, number] {
 }
 
 function toMessage({ message }: TemplateLinterError): string {
-
   if (ParseErrorExp.test(message)) {
     return message.split('\n').pop() || '';
   }
@@ -35,7 +34,6 @@ function toMessage({ message }: TemplateLinterError): string {
 }
 
 function toRange(source: string, error: TemplateLinterError): Range {
-
   let line: number;
   let column: number;
 

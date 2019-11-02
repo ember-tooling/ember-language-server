@@ -1,26 +1,15 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import {
-  RequestHandler,
-  TextDocumentPositionParams,
-  Definition
-} from 'vscode-languageserver';
+import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-languageserver';
 
-import {
-  isLinkToTarget
-} from './../utils/ast-helpers';
+import { isLinkToTarget } from './../utils/ast-helpers';
 
 import { toPosition } from './../estree-utils';
 import Server from './../server';
 import ASTPath from './../glimmer-utils';
 
-import {
-  isTemplatePath,
-  getComponentNameFromURI,
-  isModuleUnificationApp,
-  getPodModulePrefix
-} from './../utils/layout-helpers';
+import { isTemplatePath, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../utils/layout-helpers';
 
 import {
   getAbstractHelpersParts,
@@ -35,13 +24,13 @@ import { kebabCase } from 'lodash';
 import * as memoize from 'memoizee';
 import { preprocess } from '@glimmer/syntax';
 
-const mAddonPathsForComponentTemplates = memoize(
-  getAddonPathsForComponentTemplates,
-  { length: 2, maxAge: 600000 }
-);
+const mAddonPathsForComponentTemplates = memoize(getAddonPathsForComponentTemplates, { length: 2, maxAge: 600000 });
 
 function normalizeAngleTagName(tagName: string) {
-  return tagName.split('::').map((item: string) => kebabCase(item)).join('/');
+  return tagName
+    .split('::')
+    .map((item: string) => kebabCase(item))
+    .join('/');
 }
 
 export default class TemplateDefinitionProvider {
@@ -61,7 +50,7 @@ export default class TemplateDefinitionProvider {
       return null;
     }
     // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
-    if  (this.maybeClassicComponentName(focusPath)) {
+    if (this.maybeClassicComponentName(focusPath)) {
       return this.provideComponentDefinition(project.root, this.extractValueForMaybeClassicComponentName(focusPath));
     } else if (this.isAngleComponent(focusPath)) {
       // <FooBar />
@@ -71,10 +60,7 @@ export default class TemplateDefinitionProvider {
       return this.provideBlockComponentDefinition(root, focusPath);
 
       // {{action "fooBar"}}, (action "fooBar"), (action this.fooBar), this.someProperty
-    } else if (
-      this.isActionName(focusPath) ||
-      this.isLocalProperty(focusPath)
-    ) {
+    } else if (this.isActionName(focusPath) || this.isLocalProperty(focusPath)) {
       return this.providePropertyDefinition(root, focusPath, uri);
 
       // {{foo-bar}}
@@ -122,19 +108,21 @@ export default class TemplateDefinitionProvider {
   provideRouteDefinition(root: string, routeName: string) {
     const routeParts = routeName.split('.');
     const lastRoutePart = routeParts.pop();
-    const routePaths = isModuleUnificationApp(root) ? [
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.js'],
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.ts'],
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.js'],
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.ts'],
-      [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'template.hbs'],
-    ] : [
-      [root, 'app', 'routes', ...routeParts, lastRoutePart + '.js'],
-      [root, 'app', 'routes', ...routeParts, lastRoutePart + '.ts'],
-      [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.js'],
-      [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.ts'],
-      [root, 'app', 'templates', ...routeParts, lastRoutePart + '.hbs'],
-    ];
+    const routePaths = isModuleUnificationApp(root)
+      ? [
+          [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.js'],
+          [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.ts'],
+          [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.js'],
+          [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.ts'],
+          [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'template.hbs']
+        ]
+      : [
+          [root, 'app', 'routes', ...routeParts, lastRoutePart + '.js'],
+          [root, 'app', 'routes', ...routeParts, lastRoutePart + '.ts'],
+          [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.js'],
+          [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.ts'],
+          [root, 'app', 'templates', ...routeParts, lastRoutePart + '.hbs']
+        ];
     const podPrefix = getPodModulePrefix(root);
     if (podPrefix) {
       routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.js']);
@@ -149,34 +137,21 @@ export default class TemplateDefinitionProvider {
   provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
     const maybeComponentName = normalizeAngleTagName(focusPath.node.tag);
 
-    let paths = [
-      ...getPathsForComponentScripts(root, maybeComponentName),
-      ...getPathsForComponentTemplates(root, maybeComponentName)
-    ].filter(fs.existsSync);
+    let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
 
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
 
-    return pathsToLocations.apply(
-      null,
-      paths.length > 1
-        ? paths.filter((postfix: string) => isTemplatePath(postfix))
-        : paths
-    );
+    return pathsToLocations.apply(null, paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths);
   }
   provideBlockComponentDefinition(root: string, focusPath: ASTPath) {
     let maybeComponentName = focusPath.node.path.original;
-    let paths: string[] = getPathsForComponentTemplates(
-      root,
-      maybeComponentName
-    ).filter(fs.existsSync);
+    let paths: string[] = getPathsForComponentTemplates(root, maybeComponentName).filter(fs.existsSync);
     if (!paths.length) {
-      paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter(
-        (name: string) => {
-          return isTemplatePath(name);
-        }
-      );
+      paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter((name: string) => {
+        return isTemplatePath(name);
+      });
     }
     // mAddonPathsForComponentTemplates
     return pathsToLocationsWithPosition(paths, '{{yield');
@@ -186,77 +161,49 @@ export default class TemplateDefinitionProvider {
     if (!maybeComponentName) {
       return null;
     }
-    let paths: string[] = getPathsForComponentScripts(
-      root,
-      maybeComponentName
-    ).filter(fs.existsSync);
+    let paths: string[] = getPathsForComponentScripts(root, maybeComponentName).filter(fs.existsSync);
     if (!paths.length) {
-      paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter(
-        (name: string) => {
-          return !isTemplatePath(name);
-        }
-      );
+      paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter((name: string) => {
+        return !isTemplatePath(name);
+      });
     }
     const text = focusPath.node.original;
-    return pathsToLocationsWithPosition(
-      paths,
-      text.replace('this.', '').split('.')[0]
-    );
+    return pathsToLocationsWithPosition(paths, text.replace('this.', '').split('.')[0]);
   }
   provideComponentDefinition(root: string, maybeComponentName: string) {
-    let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map(
-      (pathParts: any) => {
-        return path.join.apply(path, pathParts.filter((part: any) => !!part));
-      }
-    );
+    let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map((pathParts: any) => {
+      return path.join.apply(path, pathParts.filter((part: any) => !!part));
+    });
 
-    let paths = [
-      ...getPathsForComponentScripts(root, maybeComponentName),
-      ...getPathsForComponentTemplates(root, maybeComponentName),
-      ...helpers
-    ].filter(fs.existsSync);
+    let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName), ...helpers].filter(
+      fs.existsSync
+    );
 
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
 
-    return pathsToLocations.apply(
-      null,
-      paths.length > 1 ? paths.filter(isTemplatePath) : paths
-    );
+    return pathsToLocations.apply(null, paths.length > 1 ? paths.filter(isTemplatePath) : paths);
   }
   provideMustacheDefinition(root: string, focusPath: ASTPath) {
-    const maybeComponentName =
-      focusPath.node.type === 'ElementNode'
-        ? normalizeAngleTagName(focusPath.node.tag)
-        : focusPath.node.original;
+    const maybeComponentName = focusPath.node.type === 'ElementNode' ? normalizeAngleTagName(focusPath.node.tag) : focusPath.node.original;
     return this.provideComponentDefinition(root, maybeComponentName);
   }
   provideHashPropertyUsage(root: string, focusPath: ASTPath) {
     let parentPath = focusPath.parentPath;
     if (parentPath && parentPath.parent && parentPath.parent.path) {
       const maybeComponentName = parentPath.parent.path.original;
-      if (
-        !maybeComponentName.includes('.') &&
-        maybeComponentName.includes('-')
-      ) {
-        let paths = [
-          ...getPathsForComponentScripts(root, maybeComponentName),
-          ...getPathsForComponentTemplates(root, maybeComponentName)
-        ].filter(fs.existsSync);
+      if (!maybeComponentName.includes('.') && maybeComponentName.includes('-')) {
+        let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(
+          fs.existsSync
+        );
 
         if (!paths.length) {
           paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
         }
 
-        const finalPaths =
-          paths.length > 1
-            ? paths.filter((postfix: string) => isTemplatePath(postfix))
-            : paths;
-        return pathsToLocationsWithPosition(
-          finalPaths,
-          '@' + focusPath.node.key
-        );
+        const finalPaths = paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths;
+        return pathsToLocationsWithPosition(finalPaths, '@' + focusPath.node.key);
       }
     }
     return null;
@@ -264,19 +211,13 @@ export default class TemplateDefinitionProvider {
   provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath) {
     const maybeComponentName = normalizeAngleTagName(focusPath.parent.tag);
 
-    let paths = [
-      ...getPathsForComponentScripts(root, maybeComponentName),
-      ...getPathsForComponentTemplates(root, maybeComponentName)
-    ].filter(fs.existsSync);
+    let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
 
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
 
-    const finalPaths =
-      paths.length > 1
-        ? paths.filter((postfix: string) => isTemplatePath(postfix))
-        : paths;
+    const finalPaths = paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths;
     return pathsToLocationsWithPosition(finalPaths, focusPath.node.name);
   }
 
@@ -319,11 +260,7 @@ export default class TemplateDefinitionProvider {
     ) {
       return false;
     }
-    if (
-      !path.parent ||
-      path.parent.path.original !== 'action' ||
-      !path.parent.params[0] === node
-    ) {
+    if (!path.parent || path.parent.path.original !== 'action' || !path.parent.params[0] === node) {
       return false;
     }
     if (node.type === 'StringLiteral') {
@@ -369,11 +306,7 @@ export default class TemplateDefinitionProvider {
       // } else if (!node.original.includes('.') && node.original.includes('-')) {
       //   return true;
       // }
-      if (
-        path.parent &&
-        path.parent.path.original === 'component' &&
-        path.parent.params[0] === node
-      ) {
+      if (path.parent && path.parent.path.original === 'component' && path.parent.params[0] === node) {
         return true;
       }
     }
@@ -383,13 +316,7 @@ export default class TemplateDefinitionProvider {
     }
 
     let parent = path.parent;
-    if (
-      !parent ||
-      parent.path !== node ||
-      (parent.type !== 'MustacheStatement' &&
-        parent.type !== 'BlockStatement' &&
-        parent.type !== 'SubExpression')
-    ) {
+    if (!parent || parent.path !== node || (parent.type !== 'MustacheStatement' && parent.type !== 'BlockStatement' && parent.type !== 'SubExpression')) {
       return false;
     }
 

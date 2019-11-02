@@ -6,11 +6,15 @@ import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { toPosition } from './../estree-utils';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils/definition-helpers';
 import { kebabCase } from 'lodash';
-import { isRouteLookup, isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
 import {
-  isModuleUnificationApp,
-  podModulePrefixForRoot
-} from './../utils/layout-helpers';
+  isRouteLookup,
+  isTransformReference,
+  isModelReference,
+  isImportPathDeclaration,
+  isServiceInjection,
+  isNamedServiceInjection
+} from './../utils/ast-helpers';
+import { isModuleUnificationApp, podModulePrefixForRoot } from './../utils/layout-helpers';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
@@ -77,54 +81,42 @@ export default class ScriptDefinietionProvider {
   constructor(private server: Server) {
     this.resolvers = new PathResolvers();
   }
-  guessPathForImport(root: string, uri: string, importPath: string ) {
+  guessPathForImport(root: string, uri: string, importPath: string) {
     if (!uri) {
       return null;
     }
     const guessedPaths: string[] = [];
     const fnName = 'Import';
     if (isModuleUnificationApp(root)) {
-      this.resolvers[`mu${fnName}Paths`](root, importPath).forEach(
-        (pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        }
-      );
-    } else {
-      this.resolvers[`classic${fnName}Paths`](root, importPath).forEach(
-        (pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        }
-      );
-    }
-    this.resolvers.addonImportPaths(root, importPath).forEach(
-      (pathLocation: string) => {
+      this.resolvers[`mu${fnName}Paths`](root, importPath).forEach((pathLocation: string) => {
         guessedPaths.push(pathLocation);
-      }
-    );
+      });
+    } else {
+      this.resolvers[`classic${fnName}Paths`](root, importPath).forEach((pathLocation: string) => {
+        guessedPaths.push(pathLocation);
+      });
+    }
+    this.resolvers.addonImportPaths(root, importPath).forEach((pathLocation: string) => {
+      guessedPaths.push(pathLocation);
+    });
     return pathsToLocations.apply(null, guessedPaths);
   }
   guessPathsForType(root: string, fnName: ItemType, typeName: string) {
     const guessedPaths: string[] = [];
 
     if (isModuleUnificationApp(root)) {
-      this.resolvers[`mu${fnName}Paths`](root, typeName).forEach(
-        (pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        }
-      );
+      this.resolvers[`mu${fnName}Paths`](root, typeName).forEach((pathLocation: string) => {
+        guessedPaths.push(pathLocation);
+      });
     } else {
-      this.resolvers[`classic${fnName}Paths`](root, typeName).forEach(
-        (pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        }
-      );
+      this.resolvers[`classic${fnName}Paths`](root, typeName).forEach((pathLocation: string) => {
+        guessedPaths.push(pathLocation);
+      });
       const podPrefix = podModulePrefixForRoot(root);
       if (podPrefix) {
-        this.resolvers[`pod${fnName}Paths`](root, typeName, podPrefix).forEach(
-          (pathLocation: string) => {
-            guessedPaths.push(pathLocation);
-          }
-        );
+        this.resolvers[`pod${fnName}Paths`](root, typeName, podPrefix).forEach((pathLocation: string) => {
+          guessedPaths.push(pathLocation);
+        });
       }
     }
 

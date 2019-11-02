@@ -21,7 +21,7 @@ export default class JSDocumentSymbolProvider implements DocumentSymbolProvider 
         symbols.push(symbol);
 
         this.traverse(path);
-      },
+      }
     });
 
     return symbols;

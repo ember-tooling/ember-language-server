@@ -20,9 +20,11 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
       },
       BlockStatement(node: any) {
         if (node.hash.pairs.length) {
-          node.hash.pairs.filter((el: any ) => el.type === 'HashPair').forEach((pair: any) => {
-            symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
-          });
+          node.hash.pairs
+            .filter((el: any) => el.type === 'HashPair')
+            .forEach((pair: any) => {
+              symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
+            });
         }
 
         if (node.program.blockParams.length === 0) return;
@@ -34,9 +36,11 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
       },
       MustacheStatement(node: any) {
         if (node.hash.pairs.length) {
-          node.hash.pairs.filter((el: any ) => el.type === 'HashPair').forEach((pair: any) => {
-            symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
-          });
+          node.hash.pairs
+            .filter((el: any) => el.type === 'HashPair')
+            .forEach((pair: any) => {
+              symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
+            });
         }
         if (node.path.type === 'PathExpression') {
           if (node.path.data) {

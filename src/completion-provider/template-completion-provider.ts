@@ -1,7 +1,4 @@
-import {
-  CompletionItem,
-  TextDocumentPositionParams
-} from 'vscode-languageserver';
+import { CompletionItem, TextDocumentPositionParams } from 'vscode-languageserver';
 
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
@@ -12,22 +9,11 @@ import { preprocess } from '@glimmer/syntax';
 import { uniqBy, startCase, camelCase } from 'lodash';
 
 import * as memoize from 'memoizee';
-import {
-  emberBlockItems,
-  emberMustacheItems,
-  emberSubExpressionItems
-} from './ember-helpers';
+import { emberBlockItems, emberMustacheItems, emberSubExpressionItems } from './ember-helpers';
 import { templateContextLookup } from './template-context-provider';
 import { getExtension } from '../utils/file-extension';
 import { log } from '../utils/logger';
-import {
-  isLinkToTarget,
-  isMustachePath,
-  isBlockPath,
-  isSubExpressionPath,
-  isAngleComponentPath,
-  isModifierPath
-} from '../utils/ast-helpers';
+import { isLinkToTarget, isMustachePath, isBlockPath, isSubExpressionPath, isAngleComponentPath, isModifierPath } from '../utils/ast-helpers';
 import {
   listComponents,
   listMUComponents,
@@ -41,9 +27,14 @@ import {
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
 
 function toAngleBrackedName(name: string) {
-  return name.split('/').map((part: string) => {
-    return startCase(camelCase(part)).split(' ').join('');
-  }).join('::');
+  return name
+    .split('/')
+    .map((part: string) => {
+      return startCase(camelCase(part))
+        .split(' ')
+        .join('');
+    })
+    .join('::');
 }
 
 const mTemplateContextLookup = memoize(templateContextLookup, {
@@ -88,7 +79,7 @@ export default class TemplateCompletionProvider {
           mListComponents(root),
           mListPodsComponents(root),
           mListMURouteLevelComponents(root, uri),
-          mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+          mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
             return detail === 'component';
           })
         )
@@ -107,7 +98,7 @@ export default class TemplateCompletionProvider {
       ...mListMUComponents(root),
       ...mListPodsComponents(root),
       ...mListHelpers(root),
-      ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+      ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
         return detail === 'component' || detail === 'helper';
       })
     ];
@@ -119,7 +110,7 @@ export default class TemplateCompletionProvider {
       ...mListComponents(root),
       ...mListMUComponents(root),
       ...mListPodsComponents(root),
-      ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+      ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
         return detail === 'component';
       })
     ];
@@ -129,16 +120,14 @@ export default class TemplateCompletionProvider {
     let candidates: CompletionItem[] = [
       ...mTemplateContextLookup(root, uri, originalText),
       ...mListHelpers(root),
-      ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+      ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
         return detail === 'helper';
       })
     ];
     return candidates;
   }
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
-    return originalText.slice(0, offset) +
-    PLACEHOLDER +
-    originalText.slice(offset);
+    return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
   provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
     log('provideCompletions');
@@ -157,19 +146,13 @@ export default class TemplateCompletionProvider {
     const { root } = project;
     const offset = document.offsetAt(params.position);
     const documentContent = document.getText();
-    const originalText = (ext === '.hbs') ? documentContent : searchAndExtractHbs(documentContent);
+    const originalText = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
     log('originalText', originalText);
     const completions: CompletionItem[] = [];
     let normalPlaceholder: any = PLACEHOLDER;
     let ast: any = {};
 
-    const cases = [
-      PLACEHOLDER + ' />',
-      PLACEHOLDER,
-      PLACEHOLDER + '"',
-      PLACEHOLDER + '}}',
-      PLACEHOLDER + '\''
-    ];
+    const cases = [PLACEHOLDER + ' />', PLACEHOLDER, PLACEHOLDER + '"', PLACEHOLDER + '}}', PLACEHOLDER + "'"];
 
     while (cases.length) {
       normalPlaceholder = cases.shift();
@@ -221,7 +204,7 @@ export default class TemplateCompletionProvider {
         // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
         completions.push(...uniqBy(mListRoutes(root), 'label'));
       } else if (isModifierPath(focusPath)) {
-        const addonModifiers = mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {
+        const addonModifiers = mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
           return detail === 'modifier';
         });
         completions.push(...uniqBy([...mListModifiers(root), ...addonModifiers, ...builtinModifiers()], 'label'));

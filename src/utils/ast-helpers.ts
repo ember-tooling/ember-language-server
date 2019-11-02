@@ -23,12 +23,7 @@ export function isRouteLookup(astPath: ASTPath): boolean {
     return false;
   }
   let parent = astPath.parent;
-  const matches = [
-    'transitionTo',
-    'intermediateTransitionTo',
-    'paramsFor',
-    'transitionToRoute'
-  ];
+  const matches = ['transitionTo', 'intermediateTransitionTo', 'paramsFor', 'transitionToRoute'];
   return expressionHasIdentifierName(parent, matches);
 }
 
@@ -37,17 +32,7 @@ export function isStoreModelLookup(astPath: ASTPath): boolean {
     return false;
   }
   let parent = astPath.parent;
-  const matches = [
-    'findRecord',
-    'createRecord',
-    'findAll',
-    'queryRecord',
-    'peekAll',
-    'query',
-    'peekRecord',
-    'adapterFor',
-    'hasRecordForId'
-  ];
+  const matches = ['findRecord', 'createRecord', 'findAll', 'queryRecord', 'peekAll', 'query', 'peekRecord', 'adapterFor', 'hasRecordForId'];
   return expressionHasIdentifierName(parent, matches);
 }
 
@@ -255,9 +240,7 @@ function isPathExpression(node: any): boolean {
 }
 function expressionHasIdentifierName(exp: any, name: string | string[]) {
   const names = typeof name === 'string' ? [name] : name;
-  let identifier = hasNodeType(exp.callee, 'Identifier')
-    ? exp.callee
-    : exp.callee.property;
+  let identifier = hasNodeType(exp.callee, 'Identifier') ? exp.callee : exp.callee.property;
   return names.includes(identifier.name);
 }
 function expressionHasArgument(exp: any, arg: any, position = -1) {

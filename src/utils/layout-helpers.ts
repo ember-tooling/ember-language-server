@@ -79,26 +79,24 @@ export function isProjectAddonRoot(root: string) {
 
 export function getProjectInRepoAddonsRoots(root: string) {
   const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
-  const addons = safeWalkSync(
-    path.join(root, prefix),
-    {
-      directories: true,
-      globs: ['**/package.json']
-    }
-  );
-  const roots: string[] = [];
-  addons.map((relativePath: string) => {
-    return path.dirname(path.join(root, prefix, relativePath));
-  })
-  .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
-  .forEach((validRoot: string) => {
-    roots.push(validRoot);
-    getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
-      if (!roots.includes(relatedRoot)) {
-        roots.push(relatedRoot);
-      }
-    });
+  const addons = safeWalkSync(path.join(root, prefix), {
+    directories: true,
+    globs: ['**/package.json']
   });
+  const roots: string[] = [];
+  addons
+    .map((relativePath: string) => {
+      return path.dirname(path.join(root, prefix, relativePath));
+    })
+    .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
+    .forEach((validRoot: string) => {
+      roots.push(validRoot);
+      getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
+        if (!roots.includes(relatedRoot)) {
+          roots.push(relatedRoot);
+        }
+      });
+    });
   return roots;
 }
 
@@ -111,15 +109,9 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
     }
   }
   // log('getPackageJSON', pack);
-  const items = resolvedItems.length ?
-    [
-      ...Object.keys(pack.dependencies || {}),
-      ...Object.keys(pack.peerDependencies || {})
-    ] : [
-    ...Object.keys(pack.dependencies || {}),
-    ...Object.keys(pack.peerDependencies || {}),
-    ...Object.keys(pack.devDependencies || {})
-  ];
+  const items = resolvedItems.length
+    ? [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.peerDependencies || {})]
+    : [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.peerDependencies || {}), ...Object.keys(pack.devDependencies || {})];
   // log('items', items);
 
   const roots = items
@@ -176,10 +168,7 @@ export function hasAddonFolderInPath(name: string) {
 }
 
 export function getProjectAddonsInfo(root: string) {
-  const roots = [].concat(
-    getProjectAddonsRoots(root) as any,
-    getProjectInRepoAddonsRoots(root) as any)
-  .filter((pathItem: any) => typeof pathItem === 'string');
+  const roots = [].concat(getProjectAddonsRoots(root) as any, getProjectInRepoAddonsRoots(root) as any).filter((pathItem: any) => typeof pathItem === 'string');
   // log('roots', roots);
   const meta: any = [];
   roots.forEach((packagePath: string) => {
@@ -241,13 +230,10 @@ export function listPodsComponents(root: string): CompletionItem[] {
     return [];
   }
   // log('listComponents');
-  const jsPaths = safeWalkSync(
-    path.join(root, 'app', podModulePrefix, 'components'),
-    {
-      directories: false,
-      globs: ['**/*.{js,ts,hbs}']
-    }
-  );
+  const jsPaths = safeWalkSync(path.join(root, 'app', podModulePrefix, 'components'), {
+    directories: false,
+    globs: ['**/*.{js,ts,hbs}']
+  });
 
   const items = jsPaths.map((filePath: string) => {
     return {
@@ -313,7 +299,13 @@ export function listComponents(root: string): CompletionItem[] {
   return items;
 }
 
-function listCollection(root: string, prefix: 'app' | 'addon', collectionName: 'transforms' | 'modifiers' | 'services' | 'models' | 'helpers', kindType: CompletionItemKind, detail: 'transform' | 'service' | 'model' | 'helper' | 'modifier') {
+function listCollection(
+  root: string,
+  prefix: 'app' | 'addon',
+  collectionName: 'transforms' | 'modifiers' | 'services' | 'models' | 'helpers',
+  kindType: CompletionItemKind,
+  detail: 'transform' | 'service' | 'model' | 'helper' | 'modifier'
+) {
   const paths = safeWalkSync(path.join(root, prefix, collectionName), {
     directories: false,
     globs: ['**/*.{js,ts}']
@@ -379,9 +371,7 @@ export function listRoutes(root: string): CompletionItem[] {
 
 export function getComponentNameFromURI(root: string, uri: string) {
   let fileName = uri.replace('file://', '').replace(root, '');
-  let splitter = fileName.includes(path.sep + '-components' + path.sep)
-    ? '/-components/'
-    : '/components/';
+  let splitter = fileName.includes(path.sep + '-components' + path.sep) ? '/-components/' : '/components/';
   let maybeComponentName = fileName
     .split(path.sep)
     .join('/')

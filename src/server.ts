@@ -8,11 +8,19 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import {
-  IPCMessageReader, IPCMessageWriter,
-  createConnection, IConnection,
-  TextDocuments, InitializeResult, InitializeParams, DocumentSymbolParams,
-  SymbolInformation, TextDocumentPositionParams, CompletionItem,
-  StreamMessageReader, StreamMessageWriter
+  IPCMessageReader,
+  IPCMessageWriter,
+  createConnection,
+  IConnection,
+  TextDocuments,
+  InitializeResult,
+  InitializeParams,
+  DocumentSymbolParams,
+  SymbolInformation,
+  TextDocumentPositionParams,
+  CompletionItem,
+  StreamMessageReader,
+  StreamMessageWriter
 } from 'vscode-languageserver';
 
 import ProjectRoots from './project-roots';
@@ -23,14 +31,15 @@ import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
-import ScriptCompletionProvider from  './completion-provider/script-completion-provider';
+import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 export default class Server {
-
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
   // also supports stdio via command line flag
-  connection: IConnection = (process.argv.includes('--stdio')) ? createConnection(new StreamMessageReader(process.stdin), new StreamMessageWriter(process.stdout)) : createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+  connection: IConnection = process.argv.includes('--stdio')
+    ? createConnection(new StreamMessageReader(process.stdin), new StreamMessageWriter(process.stdout))
+    : createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 
   // Create a simple text document manager. The text document manager
   // supports full document sync only
@@ -38,10 +47,7 @@ export default class Server {
 
   projectRoots: ProjectRoots = new ProjectRoots();
 
-  documentSymbolProviders: DocumentSymbolProvider[] = [
-    new JSDocumentSymbolProvider(),
-    new HBSDocumentSymbolProvider(),
-  ];
+  documentSymbolProviders: DocumentSymbolProvider[] = [new JSDocumentSymbolProvider(), new HBSDocumentSymbolProvider()];
 
   templateCompletionProvider: TemplateCompletionProvider = new TemplateCompletionProvider(this);
   scriptCompletionProvider: ScriptCompletionProvider = new ScriptCompletionProvider(this);
@@ -65,8 +71,8 @@ export default class Server {
     // 'els.showStatusBarText'
 
     // let params: ExecuteCommandParams = {
-      // command,
-      // arguments: args
+    // command,
+    // arguments: args
     // };
     // return client.sendRequest(ExecuteCommandRequest.type, params)
 
@@ -81,7 +87,6 @@ export default class Server {
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
   private onInitialize({ rootUri, rootPath }: InitializeParams): InitializeResult {
-
     rootPath = rootUri ? uriToFilePath(rootUri) : rootPath;
     if (!rootPath) {
       return { capabilities: {} };
@@ -100,7 +105,7 @@ export default class Server {
         definitionProvider: true,
         documentSymbolProvider: true,
         completionProvider: {
-          resolveProvider: true,
+          resolveProvider: true
           // triggerCharacters: ['{{', '<', '@', 'this.']
         }
       }
@@ -127,7 +132,7 @@ export default class Server {
   }
 
   // public setStatusText(text: string) {
-    // this.connection.sendNotification('els.setStatusBarText', [text]);
+  // this.connection.sendNotification('els.setStatusBarText', [text]);
   // }
 
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
@@ -139,15 +144,12 @@ export default class Server {
 
     let extension = path.extname(filePath);
 
-    let providers = this.documentSymbolProviders
-      .filter(provider => provider.extensions.indexOf(extension) !== -1);
+    let providers = this.documentSymbolProviders.filter((provider) => provider.extensions.indexOf(extension) !== -1);
 
     if (providers.length === 0) return [];
 
     let content = fs.readFileSync(filePath, 'utf-8');
 
-    return providers
-      .map(providers => providers.process(content))
-      .reduce((a, b) => a.concat(b), []);
+    return providers.map((providers) => providers.process(content)).reduce((a, b) => a.concat(b), []);
   }
 }

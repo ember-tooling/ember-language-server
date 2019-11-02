@@ -2,19 +2,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
-import {
-  isModuleUnificationApp,
-  podModulePrefixForRoot,
-  pureComponentName
-} from '../utils/layout-helpers';
+import { isModuleUnificationApp, podModulePrefixForRoot, pureComponentName } from '../utils/layout-helpers';
 
 import { log } from '../utils/logger';
 
-import {
-  extractComponentInformationFromMeta,
-  processJSFile,
-  processTemplate
-} from 'ember-meta-explorer';
+import { extractComponentInformationFromMeta, processJSFile, processTemplate } from 'ember-meta-explorer';
 
 import { uniqBy } from 'lodash';
 
@@ -28,11 +20,7 @@ function localizeName(name: string) {
   }
 }
 
-export function templateContextLookup(
-  root: string,
-  currentFilePath: string,
-  templateContent: string
-) {
+export function templateContextLookup(root: string, currentFilePath: string, templateContent: string) {
   log('templateContextLookup', root, currentFilePath, templateContent);
   const nameParts = currentFilePath.split('/components/');
   if (nameParts.length !== 2) {
@@ -61,11 +49,7 @@ function findComponentScripts(root: string, componentName: string) {
   return possibleLocations.map((locArr: string[]) => path.join.apply(null, locArr));
 }
 
-function componentsContextData(
-  root: string,
-  componentName: string,
-  templateContent: string
-): CompletionItem[] {
+function componentsContextData(root: string, componentName: string, templateContent: string): CompletionItem[] {
   const maybeScripts = findComponentScripts(root, componentName);
   const existingScripts = maybeScripts.filter(fs.existsSync);
   if (!existingScripts.length) {
@@ -97,7 +81,7 @@ function componentsContextData(
     .filter((item: any) => item !== null)
     .reduce((result: any, it: any) => {
       log('it', it);
-      Object.keys(it).forEach(name => {
+      Object.keys(it).forEach((name) => {
         if (name in result) {
           result[name] = result[name].concat(it[name]);
         } else {
