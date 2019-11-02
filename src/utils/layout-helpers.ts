@@ -229,6 +229,8 @@ export function pureComponentName(relativePath: string) {
     return relativePath.replace(`/component${ext}`, '');
   } else if (relativePath.endsWith(`/helper${ext}`)) {
     return relativePath.replace(`/helper${ext}`, '');
+  } else if (relativePath.endsWith(`/index${ext}`)) {
+    return relativePath.replace(`/index${ext}`, '');
   } else {
     return relativePath.replace(ext, '');
   }
