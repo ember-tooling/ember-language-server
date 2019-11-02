@@ -1818,9 +1818,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-tagged-template-literals@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/extract-tagged-template-literals/-/extract-tagged-template-literals-1.0.0.tgz#b5fc82eda93770c9a3436ef55eef017de6f571a4"
+extract-tagged-template-literals@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/extract-tagged-template-literals/-/extract-tagged-template-literals-1.0.1.tgz#c44e030d3aabc67a9525df8881de2504ff32b3b1"
+  integrity sha512-yN2arFj4hEiaqdPxPWCdM60Y+vITPIBlklbLqSDskYvmoCqK1YqV2cr+W+vcUZrZBuk9st7WLEkux5W7gdQXQQ==
 
 extsprintf@1.3.0, extsprintf@^1.2.0:
   version "1.3.0"

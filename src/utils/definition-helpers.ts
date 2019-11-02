@@ -119,7 +119,9 @@ export function getAbstractComponentScriptsParts(
     [root, prefix, 'components', maybeComponentName + '.js'],
     [root, prefix, 'components', maybeComponentName + '.ts'],
     [root, prefix, 'components', maybeComponentName, 'component.js'],
-    [root, prefix, 'components', maybeComponentName, 'component.ts']
+    [root, prefix, 'components', maybeComponentName, 'component.ts'],
+    [root, prefix, 'components', maybeComponentName, 'index.js'],
+    [root, prefix, 'components', maybeComponentName, 'index.ts']
   ];
 }
 
@@ -130,6 +132,8 @@ export function getAbstractComponentTemplatesParts(
 ) {
   return [
     [root, prefix, 'components', maybeComponentName, 'template.hbs'],
+    [root, prefix, 'components', maybeComponentName, 'index.hbs'],
+    [root, prefix, 'components', maybeComponentName + '.hbs'],
     [root, prefix, 'templates', 'components', maybeComponentName + '.hbs']
   ];
 }
@@ -161,6 +165,7 @@ export function getPathsForComponentScripts(
       'app',
       maybeComponentName
     );
+    
   }
   const paths = [
     ...muComponentsScriptsParts,
