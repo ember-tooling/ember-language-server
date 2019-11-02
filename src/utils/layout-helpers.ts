@@ -1,5 +1,5 @@
-const memoize = require('memoizee');
-const walkSync = require('walk-sync');
+import memoize from 'memoizee';
+import walkSync from 'walk-sync';
 import { join, sep, extname, dirname } from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 

@@ -32,9 +32,9 @@ import {
   pathsToLocations
 } from './../utils/definition-helpers';
 
-const { kebabCase } = require('lodash');
-const memoize = require('memoizee');
-const { preprocess } = require('@glimmer/syntax');
+import { kebabCase } from 'lodash';
+import memoize from 'memoizee';
+import { preprocess } from '@glimmer/syntax';
 
 const mAddonPathsForComponentTemplates = memoize(
   getAddonPathsForComponentTemplates,

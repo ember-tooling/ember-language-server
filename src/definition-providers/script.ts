@@ -5,7 +5,7 @@ import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { toPosition } from './../estree-utils';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils/definition-helpers';
-const { kebabCase } = require('lodash');
+import { kebabCase } from 'lodash';
 import { isRouteLookup, isTransformReference, isModelReference, isImportPathDeclaration, isServiceInjection, isNamedServiceInjection } from './../utils/ast-helpers';
 import {
   isModuleUnificationApp,

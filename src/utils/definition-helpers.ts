@@ -1,6 +1,6 @@
-const path = require('path');
-const fs = require('fs');
-const memoize = require('memoizee');
+import path from 'path';
+import fs from 'fs';
+import memoize from 'memoizee';
 import {
   Location,
   Range
@@ -224,7 +224,8 @@ export function getAddonImport(root: string, importPath: string) {
   if (!addonName) {
     return [];
   }
-  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const items: string[] = [];
+  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {
@@ -268,7 +269,8 @@ export function getAddonImport(root: string, importPath: string) {
 }
 
 export function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
-  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const items: string[] = [];
+  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {
@@ -310,7 +312,8 @@ export function getAddonPathsForComponentTemplates(
   root: string,
   maybeComponentName: string
 ) {
-  const roots = [].concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const items: string[] = [];
+  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
   roots.forEach((rootPath: string) => {

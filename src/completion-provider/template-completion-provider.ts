@@ -8,9 +8,10 @@ import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
 
-const { preprocess } = require('@glimmer/syntax');
-const { uniqBy, startCase, camelCase } = require('lodash');
-const memoize = require('memoizee');
+import { preprocess } from '@glimmer/syntax';
+import { uniqBy, startCase, camelCase } from 'lodash';
+
+import memoize from 'memoizee';
 import {
   emberBlockItems,
   emberMustacheItems,
@@ -79,8 +80,9 @@ const PLACEHOLDER = 'ELSCompletionDummy';
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getAllAngleBracketComponents(root: string, uri: string) {
+    const items: CompletionItem[] = [];
     return uniqBy(
-      []
+      items
         .concat(
           mListMUComponents(root),
           mListComponents(root),
@@ -99,7 +101,7 @@ export default class TemplateCompletionProvider {
     );
   }
   getMustachePathCandidates(root: string, uri: string, originalText: string) {
-    let candidates: any = [
+    let candidates: CompletionItem[] = [
       ...mTemplateContextLookup(root, uri, originalText),
       ...mListComponents(root),
       ...mListMUComponents(root),
@@ -112,7 +114,7 @@ export default class TemplateCompletionProvider {
     return candidates;
   }
   getBlockPathCandidates(root: string, uri: string, originalText: string) {
-    let candidates = [
+    let candidates: CompletionItem[] = [
       ...mTemplateContextLookup(root, uri, originalText),
       ...mListComponents(root),
       ...mListMUComponents(root),
@@ -124,7 +126,7 @@ export default class TemplateCompletionProvider {
     return candidates;
   }
   getSubExpressionPathCandidates(root: string, uri: string, originalText: string) {
-    let candidates = [
+    let candidates: CompletionItem[] = [
       ...mTemplateContextLookup(root, uri, originalText),
       ...mListHelpers(root),
       ...mGetProjectAddonsInfo(root).filter(({detail}: {detail: string}) => {

@@ -8,8 +8,8 @@ import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
-const { uniqBy } = require('lodash');
-const memoize = require('memoizee');
+import { uniqBy } from 'lodash';
+import memoize from 'memoizee';
 import { getExtension } from '../utils/file-extension';
 import { log } from '../utils/logger';
 import {

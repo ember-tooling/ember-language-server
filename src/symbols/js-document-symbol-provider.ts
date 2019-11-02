@@ -3,7 +3,7 @@ import { parseScriptFile as parse } from 'ember-meta-explorer';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';
 
-const types = require('ast-types');
+import types from 'ast-types';
 
 export default class JSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.js'];

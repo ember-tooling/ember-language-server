@@ -1,5 +1,5 @@
 import { SymbolInformation, SymbolKind } from 'vscode-languageserver';
-const { preprocess, traverse } = require('@glimmer/syntax');
+import { preprocess, traverse } from '@glimmer/syntax';
 
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';

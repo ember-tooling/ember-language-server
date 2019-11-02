@@ -3,7 +3,7 @@
 import { dirname, join } from 'path';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
-const walkSync = require('walk-sync');
+import walkSync from 'walk-sync';
 
 export class Project {
 

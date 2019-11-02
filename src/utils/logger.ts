@@ -1,7 +1,7 @@
 import { createWriteStream } from 'fs';
+import util from 'util';
 
 const debug = false;
-const util = require('util');
 const log_file = debug
   ? createWriteStream(__dirname + '/debug.log', { flags: 'w' })
   : null;
