@@ -44,13 +44,27 @@
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-prettier": "^3.1.1",
+    "husky": "^3.0.9",
     "jest": "^24.9.0",
     "lerna-changelog": "^0.8.2",
+    "lint-staged": "^9.4.2",
     "prettier": "^1.18.2",
     "ts-jest": "^24.1.0",
     "typescript": "^3.6.4",
     "vscode-jsonrpc": "^4.0.0",
     "vscode-languageserver-protocol": "^3.14.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "yarn lint --fix",
+      "yarn clean",
+      "yarn compile"
+    ]
   },
   "prettier": {
     "tabWidth": 2,
