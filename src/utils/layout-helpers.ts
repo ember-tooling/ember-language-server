@@ -79,17 +79,21 @@ export function isProjectAddonRoot(root: string) {
 
 export function getProjectInRepoAddonsRoots(root: string) {
   const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
+  console.log('prefix', prefix);
   const addons = safeWalkSync(path.join(root, prefix), {
     directories: true,
     globs: ['**/package.json']
   });
+  console.log('addons', addons);
   const roots: string[] = [];
   addons
     .map((relativePath: string) => {
+      console.log('relativePath', relativePath);
       return path.dirname(path.join(root, prefix, relativePath));
     })
     .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
     .forEach((validRoot: string) => {
+      console.log('validRoot', validRoot);
       roots.push(validRoot);
       getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
         if (!roots.includes(relatedRoot)) {
