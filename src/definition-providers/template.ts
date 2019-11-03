@@ -2,6 +2,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-languageserver';
+import { searchAndExtractHbs } from 'extract-tagged-template-literals';
+import { getExtension } from './../utils/file-extension';
 
 import { isLinkToTarget } from './../utils/ast-helpers';
 
@@ -42,7 +44,9 @@ export default class TemplateDefinitionProvider {
     if (!document) {
       return null;
     }
-    let content = document.getText();
+    const ext = getExtension(params.textDocument);
+    const isScript = ['.ts','.js'].includes(ext as string);
+    let content = isScript ? searchAndExtractHbs(document.getText()) : document.getText();
     let ast = preprocess(content);
     let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
 

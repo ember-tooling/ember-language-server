@@ -27,6 +27,25 @@ export function isRouteLookup(astPath: ASTPath): boolean {
   return expressionHasIdentifierName(parent, matches);
 }
 
+export function isTemplateElement(astPath: ASTPath): boolean {
+  let node = astPath.node;
+  if (node.type !== 'TemplateElement') {
+    return false;
+  }
+  let parent = astPath.parent;
+  if (parent.type !== 'TemplateLiteral') {
+    return false;
+  }
+  let grandpa = astPath.parentPath && astPath.parentPath.parent;
+  if (grandpa.type !== 'TaggedTemplateExpression') {
+    return false;
+  }
+  if (grandpa.tag && grandpa.tag.type === 'Identifier' && grandpa.tag.name === 'hbs') {
+    return true;
+  }
+  return false;
+}
+
 export function isStoreModelLookup(astPath: ASTPath): boolean {
   if (!isFirstStringParamInCallExpression(astPath)) {
     return false;

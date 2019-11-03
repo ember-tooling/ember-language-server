@@ -100,6 +100,34 @@ export function getProjectInRepoAddonsRoots(root: string) {
   return roots;
 }
 
+export function listGlimmerXComponents(root: string) {
+  try {
+    const jsPaths = safeWalkSync(root, {
+      directories: false,
+      globs: ['**/*.{js,ts,jsx,hbs}'],
+      ignore: ['dist', 'lib', 'node_modules', 'tmp', 'cache', '.*', '.cache', '.git', '.*.{js,ts,jsx,hbs,gbx}']
+    });
+  
+    return jsPaths.map((p)=>{
+      const fileName = p.split('/').pop();
+      if (fileName === undefined) {
+        return '';
+      }
+      return fileName.slice(0, fileName.lastIndexOf('.'));
+    }).filter((p)=>{
+      return p.length && p.charAt(0) === p.charAt(0).toUpperCase() && !p.endsWith('-test') && !p.endsWith('.test');
+    }).map((name)=>{
+      return {
+        kind: CompletionItemKind.Class,
+        label: name,
+        detail: 'component'
+      };
+    });
+  } catch(e) {
+    return [];
+  }
+}
+
 export function listGlimmerNativeComponents(root: string) {
   try {
     const possiblePath = resolvePackageRoot(root, 'glimmer-native', 'node_modules');
@@ -128,6 +156,20 @@ export function isGlimmerNativeProject(root: string) {
     return true;
   }
   if (pack.peerDependencies && pack.peerDependencies['glimmer-native']) {
+    return true;
+  }
+  return false;
+}
+
+export function isGlimmerXProject(root: string) {
+  const pack = getPackageJSON(root);
+  if (pack.dependencies && pack.dependencies['@glimmerx/core']) {
+    return true;
+  }
+  if (pack.devDependencies && pack.devDependencies['@glimmerx/core']) {
+    return true;
+  }
+  if (pack.peerDependencies && pack.peerDependencies['@glimmerx/core']) {
     return true;
   }
   return false;
@@ -231,6 +273,10 @@ export function getProjectAddonsInfo(root: string) {
   // log('meta', meta);
   if (isGlimmerNativeProject(root)) {
     meta.push(listGlimmerNativeComponents(root));
+  }
+
+  if (isGlimmerXProject(root)) {
+    meta.push(listGlimmerXComponents(root));
   }
 
   let normalizedResult: any[] = meta.reduce((arrs: any[], item: any[]) => {

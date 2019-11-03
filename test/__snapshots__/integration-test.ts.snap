@@ -688,6 +688,59 @@ Array [
 ]
 `;
 
+exports[`integration GlimmerX able to provide list of locally defined components 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "App",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Button",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Ball",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Border",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Bus",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Table",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to component from typescripted inline template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/templates/components/darling.hbs",
+  },
+]
+`;
+
 exports[`integration Go to definition works for all supported cases go to local template-only component 1`] = `
 Array [
   Object {

@@ -12,7 +12,8 @@ import {
   isModelReference,
   isImportPathDeclaration,
   isServiceInjection,
-  isNamedServiceInjection
+  isNamedServiceInjection,
+  isTemplateElement
 } from './../utils/ast-helpers';
 import { isModuleUnificationApp, podModulePrefixForRoot } from './../utils/layout-helpers';
 
@@ -146,7 +147,9 @@ export default class ScriptDefinietionProvider {
       return null;
     }
 
-    if (isModelReference(astPath)) {
+    if (isTemplateElement(astPath)) {
+      return this.server.definitionProvider.template.handle(params, project);
+    } else if (isModelReference(astPath)) {
       const modelName = astPath.node.value;
       return this.guessPathsForType(root, 'Model', modelName);
     } else if (isTransformReference(astPath)) {
