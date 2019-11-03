@@ -65,10 +65,14 @@ function replaceDynamicUriPart(uri: string) {
 }
 
 function replaceTempUriPart(uri: string, base: string) {
-  return path.normalize(uri.replace('file://', '')).replace(base, '').split(path.sep).join('/');
+  return path
+    .normalize(uri.replace('file://', ''))
+    .replace(base, '')
+    .split(path.sep)
+    .join('/');
 }
 
-function normalizeUri(objects: Definition,  base?: string) {
+function normalizeUri(objects: Definition, base?: string) {
   if (!Array.isArray(objects)) {
     objects.uri = replaceDynamicUriPart(objects.uri);
     if (base) {
@@ -339,7 +343,7 @@ describe('integration', function() {
           app: {
             components: {
               'hello.hbs': '<Darling />',
-              'darling': {
+              darling: {
                 'index.hbs': ''
               }
             }
@@ -359,7 +363,7 @@ describe('integration', function() {
           app: {
             components: {
               'hello.hbs': '<Darling />',
-              'darling': {
+              darling: {
                 'template.hbs': ''
               }
             }
@@ -378,7 +382,7 @@ describe('integration', function() {
         {
           app: {
             components: {
-              'hello.hbs': '<Darling />',
+              'hello.hbs': '<Darling />'
             },
             templates: {
               components: {
