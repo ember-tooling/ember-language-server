@@ -62,9 +62,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "yarn lint --fix",
-      "yarn clean",
-      "yarn compile"
+      "yarn lint --fix"
     ]
   },
   "prettier": {
