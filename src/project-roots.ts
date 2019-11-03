@@ -4,6 +4,7 @@ import * as path from 'path';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 
 import * as walkSync from 'walk-sync';
+import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
 
 export class Project {
   constructor(public readonly root: string) {}
@@ -19,13 +20,24 @@ export default class ProjectRoots {
 
     const roots = walkSync(workspaceRoot, {
       directories: false,
-      globs: ['**/ember-cli-build.js'],
+      globs: ['**/ember-cli-build.js', '**/package.json'],
       ignore: ['**/.git/**', '**/bower_components/**', '**/dist/**', '**/node_modules/**', '**/tmp/**']
     });
 
     roots.forEach((rootPath: string) => {
-      const fullPath = path.dirname(path.join(workspaceRoot, rootPath));
-      this.onProjectAdd(fullPath);
+      const filePath = path.join(workspaceRoot, rootPath);
+      const fullPath = path.dirname(filePath);
+      if (filePath.endsWith('package.json')) {
+        try {
+          if (isGlimmerNativeProject(fullPath) || isGlimmerXProject(fullPath)) {
+            this.onProjectAdd(fullPath);
+          }
+        } catch (e) {
+          // ignore
+        }
+      } else {
+        this.onProjectAdd(fullPath);
+      }
     });
   }
 

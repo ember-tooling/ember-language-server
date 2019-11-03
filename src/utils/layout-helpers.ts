@@ -175,6 +175,17 @@ export function isGlimmerXProject(root: string) {
   if (pack.peerDependencies && pack.peerDependencies['@glimmerx/core']) {
     return true;
   }
+
+  if (pack.dependencies && pack.dependencies['glimmer-lite-core']) {
+    return true;
+  }
+  if (pack.devDependencies && pack.devDependencies['glimmer-lite-core']) {
+    return true;
+  }
+  if (pack.peerDependencies && pack.peerDependencies['glimmer-lite-core']) {
+    return true;
+  }
+
   return false;
 }
 
