@@ -407,21 +407,21 @@ describe('integration', function() {
         {
           app: {
             components: {
-              'hello.hbs': '<',
+              'hello.hbs': '<'
             }
           },
-          'package.json': JSON.stringify({dependencies: { 'glimmer-native': true }}),
-          'node_modules': {
+          'package.json': JSON.stringify({ dependencies: { 'glimmer-native': true } }),
+          node_modules: {
             'glimmer-native': {
               dist: {
                 'index.js': 'module.exports = () => {};',
                 src: {
                   glimmer: {
                     'native-components': {
-                      'ListView': {
+                      ListView: {
                         'component.js': ''
                       },
-                      'Button': {
+                      Button: {
                         'template.js': ''
                       }
                     }
@@ -429,8 +429,8 @@ describe('integration', function() {
                 }
               },
               'package.json': JSON.stringify({
-                "name": "glimmer-native",
-                "main": "dist/index.js",
+                name: 'glimmer-native',
+                main: 'dist/index.js'
               })
             }
           }
@@ -440,8 +440,7 @@ describe('integration', function() {
       );
 
       expect(result).toMatchSnapshot();
-    })
-
+    });
   });
 
   describe('Autocomplete works for broken templates', () => {

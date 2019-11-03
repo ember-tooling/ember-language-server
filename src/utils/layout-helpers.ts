@@ -106,15 +106,15 @@ export function listGlimmerNativeComponents(root: string) {
     if (!possiblePath) {
       return [];
     }
-    const components = fs.readdirSync(path.join(possiblePath, 'dist', 'src', 'glimmer', 'native-components'))
-    return components.map((name)=>{
+    const components = fs.readdirSync(path.join(possiblePath, 'dist', 'src', 'glimmer', 'native-components'));
+    return components.map((name) => {
       return {
         kind: CompletionItemKind.Class,
         label: name,
         detail: 'component'
       };
-    })
-  } catch(e) {
+    });
+  } catch (e) {
     return [];
   }
 }
