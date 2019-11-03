@@ -107,23 +107,26 @@ export function listGlimmerXComponents(root: string) {
       globs: ['**/*.{js,ts,jsx,hbs}'],
       ignore: ['dist', 'lib', 'node_modules', 'tmp', 'cache', '.*', '.cache', '.git', '.*.{js,ts,jsx,hbs,gbx}']
     });
-  
-    return jsPaths.map((p)=>{
-      const fileName = p.split('/').pop();
-      if (fileName === undefined) {
-        return '';
-      }
-      return fileName.slice(0, fileName.lastIndexOf('.'));
-    }).filter((p)=>{
-      return p.length && p.charAt(0) === p.charAt(0).toUpperCase() && !p.endsWith('-test') && !p.endsWith('.test');
-    }).map((name)=>{
-      return {
-        kind: CompletionItemKind.Class,
-        label: name,
-        detail: 'component'
-      };
-    });
-  } catch(e) {
+
+    return jsPaths
+      .map((p) => {
+        const fileName = p.split('/').pop();
+        if (fileName === undefined) {
+          return '';
+        }
+        return fileName.slice(0, fileName.lastIndexOf('.'));
+      })
+      .filter((p) => {
+        return p.length && p.charAt(0) === p.charAt(0).toUpperCase() && !p.endsWith('-test') && !p.endsWith('.test');
+      })
+      .map((name) => {
+        return {
+          kind: CompletionItemKind.Class,
+          label: name,
+          detail: 'component'
+        };
+      });
+  } catch (e) {
     return [];
   }
 }

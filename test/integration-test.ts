@@ -430,17 +430,19 @@ describe('integration', function() {
           'Button.ts': '',
           'Button-test.ts': '',
           'App.js': 'export default hbs`<`',
-          'Components': {
+          Components: {
             'Table.js': '',
             'Border.ts': '',
             'Border.test.ts': '',
             'Ball.jsx': '',
             'Bus.hbs': ''
           },
-          'package.json': JSON.stringify({ dependencies: { '@glimmerx/core': true } }),
-        },'App.js',
-        { line: 0, character: 20 })
-        expect(result).toMatchSnapshot();
+          'package.json': JSON.stringify({ dependencies: { '@glimmerx/core': true } })
+        },
+        'App.js',
+        { line: 0, character: 20 }
+      );
+      expect(result).toMatchSnapshot();
     });
   });
 
