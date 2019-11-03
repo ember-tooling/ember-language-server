@@ -765,6 +765,17 @@ Object {
   "capabilities": Object {
     "completionProvider": Object {
       "resolveProvider": true,
+      "triggerCharacters": Array [
+        ".",
+        "::",
+        "=",
+        "/",
+        "{{",
+        "(",
+        "<",
+        "@",
+        "this.",
+      ],
     },
     "definitionProvider": true,
     "documentSymbolProvider": true,

@@ -117,8 +117,8 @@ export default class Server {
         },
         documentSymbolProvider: true,
         completionProvider: {
-          resolveProvider: true
-          // triggerCharacters: ['{{', '<', '@', 'this.']
+          resolveProvider: true,
+          triggerCharacters: ['.','::','=','/','{{','(', '<', '@', 'this.']
         }
       }
     };
