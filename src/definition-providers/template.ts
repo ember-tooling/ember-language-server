@@ -212,7 +212,7 @@ export default class TemplateDefinitionProvider {
     }
     return null;
   }
-  provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath) : null | Definition {
+  provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath): null | Definition {
     const maybeComponentName = normalizeAngleTagName(focusPath.parent.tag);
 
     let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
