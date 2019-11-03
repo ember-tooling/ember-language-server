@@ -23,6 +23,7 @@ export const isAddonRoot = memoize(isProjectAddonRoot, {
 });
 
 export function isMuApp(root: string) {
+  console.log('isMuApp', path.join(root, 'src', 'ui'));
   return fs.existsSync(path.join(root, 'src', 'ui'));
 }
 
@@ -31,6 +32,7 @@ export function safeWalkSync(filePath: string | false, opts: any) {
     return [];
   }
   if (!fs.existsSync(filePath)) {
+    console.log('does not exitss', filePath);
     return [];
   }
   return walkSync(filePath, opts);
@@ -82,6 +84,7 @@ export function getProjectInRepoAddonsRoots(root: string) {
   const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
   console.log('root', root);
   console.log('prefix', prefix);
+  console.log('dir', path.join(root, prefix));
   const addons = safeWalkSync(path.join(root, prefix), {
     directories: true,
     globs: ['**/package.json']
