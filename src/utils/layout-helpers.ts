@@ -78,7 +78,9 @@ export function isProjectAddonRoot(root: string) {
 }
 
 export function getProjectInRepoAddonsRoots(root: string) {
+  console.log('----- getProjectInRepoAddonsRoots -----');
   const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
+  console.log('root', root);
   console.log('prefix', prefix);
   const addons = safeWalkSync(path.join(root, prefix), {
     directories: true,
