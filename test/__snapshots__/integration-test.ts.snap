@@ -668,6 +668,78 @@ Array [
 ]
 `;
 
+exports[`integration Go to definition works for all supported cases go to local template-only component 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/darling.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to local template-only component in module 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/darling/index.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to local template-only component in pod-like 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/darling/template.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to local template-only component in templates dir 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/templates/components/darling.hbs",
+  },
+]
+`;
+
 exports[`integration Initialize request returns an initialize request 1`] = `
 Object {
   "capabilities": Object {

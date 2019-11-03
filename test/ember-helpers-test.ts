@@ -1,8 +1,4 @@
-import {
-  emberBlockItems,
-  emberMustacheItems,
-  emberSubExpressionItems
-} from '../src/completion-provider/ember-helpers';
+import { emberBlockItems, emberMustacheItems, emberSubExpressionItems } from '../src/completion-provider/ember-helpers';
 
 describe('ember-helpers', function() {
   it('should provide all block helper', function() {

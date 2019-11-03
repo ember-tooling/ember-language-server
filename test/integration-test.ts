@@ -21,7 +21,7 @@ function startServer() {
   });
 }
 
-async function getResult(connection, files, fileToInspect, position) {
+async function getResult(reqType, connection, files, fileToInspect, position) {
   const dir = await createTempDir();
   dir.write(files);
   const normalizedPath = path
@@ -38,9 +38,9 @@ async function getResult(connection, files, fileToInspect, position) {
   };
   await connection.sendRequest(ExecuteCommandRequest.type, ['els:registerProjectPath', normalizedPath]);
   openFile(connection, modelPath);
-  let response = await connection.sendRequest(CompletionRequest.type, params);
+  let response = await connection.sendRequest(reqType, params);
   await dir.dispose();
-  return normalizeUri(response);
+  return normalizeUri(response, normalizedPath);
 }
 
 function openFile(connection: MessageConnection, filePath: string) {
@@ -64,9 +64,16 @@ function replaceDynamicUriPart(uri: string) {
     .replace(/\\/g, '/');
 }
 
-function normalizeUri(objects: Definition) {
+function replaceTempUriPart(uri: string, base: string) {
+  return path.normalize(uri.replace('file://', '')).replace(base, '').split(path.sep).join('/');
+}
+
+function normalizeUri(objects: Definition,  base?: string) {
   if (!Array.isArray(objects)) {
     objects.uri = replaceDynamicUriPart(objects.uri);
+    if (base) {
+      objects.uri = replaceTempUriPart(objects.uri, base);
+    }
     return objects;
   }
 
@@ -74,6 +81,9 @@ function normalizeUri(objects: Definition) {
     if (object.uri) {
       const { uri } = object;
       object.uri = replaceDynamicUriPart(uri);
+      if (base) {
+        object.uri = replaceTempUriPart(object.uri, base);
+      }
     }
 
     return object;
@@ -302,9 +312,93 @@ describe('integration', function() {
     });
   });
 
+  describe('Go to definition works for all supported cases', () => {
+    it('go to local template-only component', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '<Darling />',
+              'darling.hbs': ''
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 2 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+    it('go to local template-only component in module', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '<Darling />',
+              'darling': {
+                'index.hbs': ''
+              }
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 2 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+    it('go to local template-only component in pod-like', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '<Darling />',
+              'darling': {
+                'template.hbs': ''
+              }
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 2 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+    it('go to local template-only component in templates dir', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '<Darling />',
+            },
+            templates: {
+              components: {
+                'darling.hbs': ''
+              }
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 2 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+  });
+
   describe('Autocomplete works for broken templates', () => {
     it('autocomplete information for component #1 {{', async () => {
       const result = await getResult(
+        CompletionRequest.type,
         connection,
         {
           app: {
@@ -323,6 +417,7 @@ describe('integration', function() {
 
     it('autocomplete information for component #2 <', async () => {
       const result = await getResult(
+        CompletionRequest.type,
         connection,
         {
           app: {
@@ -341,6 +436,7 @@ describe('integration', function() {
 
     it('autocomplete information for component #3 {{#', async () => {
       const result = await getResult(
+        CompletionRequest.type,
         connection,
         {
           app: {
@@ -359,6 +455,7 @@ describe('integration', function() {
 
     it('autocomplete information for modifier #4 <Foo {{', async () => {
       const result = await getResult(
+        CompletionRequest.type,
         connection,
         {
           app: {
@@ -379,6 +476,7 @@ describe('integration', function() {
 
     it('autocomplete information for helper #5 {{name (', async () => {
       const result = await getResult(
+        CompletionRequest.type,
         connection,
         {
           app: {
@@ -399,6 +497,7 @@ describe('integration', function() {
 
     it('autocomplete information for helper #6 {{name (foo (', async () => {
       const result = await getResult(
+        CompletionRequest.type,
         connection,
         {
           app: {
