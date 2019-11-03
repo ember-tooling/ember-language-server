@@ -152,7 +152,19 @@ export default class TemplateCompletionProvider {
     let normalPlaceholder: any = PLACEHOLDER;
     let ast: any = {};
 
-    const cases = [PLACEHOLDER + ' />', PLACEHOLDER, PLACEHOLDER + '"', PLACEHOLDER + '}}', PLACEHOLDER + "'"];
+    const cases = [
+      PLACEHOLDER + ' />',
+      PLACEHOLDER,
+      PLACEHOLDER + '"',
+      PLACEHOLDER + "'",
+      PLACEHOLDER + '}} />',
+      PLACEHOLDER + '"}}',
+      PLACEHOLDER + '}}',
+      PLACEHOLDER + '}} {{/' + PLACEHOLDER + '}}',
+      PLACEHOLDER + ')}}',
+      PLACEHOLDER + '))}}',
+      PLACEHOLDER + ')))}}'
+    ];
 
     while (cases.length) {
       normalPlaceholder = cases.shift();
@@ -174,10 +186,8 @@ export default class TemplateCompletionProvider {
     const focusPath = ASTPath.toPosition(ast, toPosition(params.position));
 
     if (!focusPath) {
-      log('focus path does not exists');
       return [];
     }
-    log(focusPath.node);
     try {
       if (isAngleComponentPath(focusPath)) {
         log('isAngleComponentPath');
@@ -187,23 +197,28 @@ export default class TemplateCompletionProvider {
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isMustachePath(focusPath)) {
         // {{foo-bar?}}
+        log('isMustachePath');
         const candidates = this.getMustachePathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberMustacheItems);
       } else if (isBlockPath(focusPath)) {
         // {{#foo-bar?}} {{/foo-bar}}
+        log('isBlockPath');
         const candidates = this.getBlockPathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberBlockItems);
       } else if (isSubExpressionPath(focusPath)) {
         // {{foo-bar name=(subexpr? )}}
+        log('isSubExpressionPath');
         const candidates = this.getSubExpressionPathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
       } else if (isLinkToTarget(focusPath)) {
         // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
+        log('isLinkToTarget');
         completions.push(...uniqBy(mListRoutes(root), 'label'));
       } else if (isModifierPath(focusPath)) {
+        log('isModifierPath');
         const addonModifiers = mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
           return detail === 'modifier';
         });
@@ -213,7 +228,6 @@ export default class TemplateCompletionProvider {
       log('error', e);
     }
 
-    log('prefix', getTextPrefix(focusPath, normalPlaceholder));
     return filter(completions, getTextPrefix(focusPath, normalPlaceholder), {
       key: 'label',
       maxResults: 40

@@ -68,6 +68,8 @@ export default class Server {
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
     this.connection.onDefinition(this.definitionProvider.handler);
     this.connection.onCompletion(this.onCompletion.bind(this));
+    this.connection.onExecuteCommand(this.onExecute.bind(this));
+    this.connection.telemetry.logEvent({ connected: true });
     // 'els.showStatusBarText'
 
     // let params: ExecuteCommandParams = {
@@ -78,6 +80,13 @@ export default class Server {
 
     // this.connection.client.sendRequest()
     // this.connection.onEx
+  }
+
+  onExecute(params: string[]) {
+    if (params[0] === 'els:registerProjectPath') {
+      this.projectRoots.onProjectAdd(params[1]);
+    }
+    return params;
   }
 
   listen() {
@@ -103,6 +112,9 @@ export default class Server {
         // Tell the client that the server works in FULL text document sync mode
         textDocumentSync: this.documents.syncKind,
         definitionProvider: true,
+        executeCommandProvider: {
+          commands: ['els:registerProjectPath']
+        },
         documentSymbolProvider: true,
         completionProvider: {
           resolveProvider: true

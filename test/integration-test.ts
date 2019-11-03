@@ -1,6 +1,8 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
+import { createTempDir } from 'broccoli-test-helper';
+
 
 import { createMessageConnection, MessageConnection, Logger, IPCMessageReader, IPCMessageWriter } from 'vscode-jsonrpc';
 import {
@@ -8,6 +10,7 @@ import {
   InitializeRequest,
   CompletionRequest,
   DefinitionRequest,
+  ExecuteCommandRequest,
   Definition
 } from 'vscode-languageserver-protocol';
 
@@ -18,6 +21,30 @@ function startServer() {
     cwd: path.join(__dirname, '..')
   });
 }
+
+async function getResult(connection, files, fileToInspect, position) {
+  const dir = await createTempDir();
+  dir.write(files);
+  const normalizedPath = path
+    .normalize(dir.path())
+    .split(':')
+    .pop();
+  const modelPath = path.join(normalizedPath, fileToInspect);
+
+  const params = {
+    textDocument: {
+      uri: `file://${modelPath}`
+    },
+    position
+  };
+  await connection.sendRequest(ExecuteCommandRequest.type, ['els:registerProjectPath', normalizedPath]);
+  openFile(connection, modelPath);
+  let response = await connection
+  .sendRequest(CompletionRequest.type, params);
+  await dir.dispose();
+  return normalizeUri(response);
+}
+
 
 function openFile(connection: MessageConnection, filePath: string) {
   connection.sendNotification(DidOpenTextDocumentNotification.type, {
@@ -46,7 +73,7 @@ function normalizeUri(objects: Definition) {
     return objects;
   }
 
-  return objects.map(object => {
+  return objects.map((object) => {
     if (object.uri) {
       const { uri } = object;
       object.uri = replaceDynamicUriPart(uri);
@@ -280,6 +307,129 @@ describe('integration', function() {
 
       response = normalizeUri(response);
       expect(response).toMatchSnapshot();
+    });
+  });
+
+  describe('Autocomplete works for broken templates', () => {
+    it('autocomplete information for component #1 {{', async () => {
+
+      const result = await getResult(
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '\n{{',
+              'darling.hbs': ''
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 1, character: 2 }
+      );
+
+      expect(result.filter(({ kind }) => kind === 7)).toMatchSnapshot();
+    });
+
+    it('autocomplete information for component #2 <', async () => {
+
+      const result = await getResult(
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '\n<',
+              'darling.hbs': ''
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 1, character: 1 }
+      );
+
+      expect(result.filter(({ kind }) => kind === 7)).toMatchSnapshot();
+    });
+
+    it('autocomplete information for component #3 {{#', async () => {
+
+      const result = await getResult(
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '\n{{#',
+              'darling.hbs': ''
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 1, character: 3 }
+      );
+
+      expect(result.filter(({ kind }) => kind === 7)).toMatchSnapshot();
+    });
+
+    it('autocomplete information for modifier #4 <Foo {{', async () => {
+
+      const result = await getResult(
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '<Foo {{'
+            },
+            modifiers: {
+              'boo.js': ''
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 7 }
+      );
+
+      expect(result).toMatchSnapshot();
+      
+    });
+
+    it('autocomplete information for helper #5 {{name (', async () => {
+
+      const result = await getResult(
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '{{name ('
+            },
+            helpers: {
+              'boo.js': ''
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 8 }
+      );
+
+      expect(result.filter(({ kind }) => kind === 3)).toMatchSnapshot();
+    });
+
+    it('autocomplete information for helper #6 {{name (foo (', async () => {
+
+      const result = await getResult(
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '{{name (foo ('
+            },
+            helpers: {
+              'boo.js': ''
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 13 }
+      );
+
+      expect(result.filter(({ kind }) => kind === 3)).toMatchSnapshot();
     });
   });
 });

@@ -1,5 +1,313 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`integration Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "darling",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "hello",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "input",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "link-to",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "textarea",
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for component #2 < 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Darling",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Hello",
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for component #3 {{# 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "darling",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "hello",
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 1`] = `
+Array [
+  Object {
+    "detail": "helper",
+    "kind": 3,
+    "label": "boo",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "action",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember 1.13.0",
+    "kind": 3,
+    "label": "concat",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.13.0",
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "get",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "hash",
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "loc",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "mut",
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "query-params",
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unbound",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 1`] = `
+Array [
+  Object {
+    "detail": "helper",
+    "kind": 3,
+    "label": "boo",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "action",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember 1.13.0",
+    "kind": 3,
+    "label": "concat",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.13.0",
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "get",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "hash",
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "loc",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "mut",
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "query-params",
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unbound",
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for modifier #4 <Foo {{ 1`] = `
+Array [
+  Object {
+    "detail": "modifier",
+    "kind": 3,
+    "label": "boo",
+  },
+  Object {
+    "detail": "modifier",
+    "kind": 2,
+    "label": "action",
+  },
+]
+`;
+
 exports[`integration Completion request returns all angle-bracket in a element expression 1`] = `
 Array [
   Object {
@@ -338,6 +646,11 @@ Object {
     },
     "definitionProvider": true,
     "documentSymbolProvider": true,
+    "executeCommandProvider": Object {
+      "commands": Array [
+        "els:registerProjectPath",
+      ],
+    },
     "textDocumentSync": 1,
   },
 }
