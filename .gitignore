@@ -1,4 +1,5 @@
 out
 node_modules
 lib/
-!test/**/lib
+!test/**/
+coverage
