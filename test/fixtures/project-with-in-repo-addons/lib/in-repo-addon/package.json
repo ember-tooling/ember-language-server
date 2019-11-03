@@ -1,0 +1,9 @@
+{
+    "name": "classic-in-repo-addon",
+    "keywords": [
+      "ember-addon"
+    ],
+    "dependencies": {
+    
+    }
+  }
