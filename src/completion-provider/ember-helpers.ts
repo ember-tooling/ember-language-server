@@ -25,6 +25,7 @@ const emberCompletionItems: EmberCompletionItem[] = [
   new EmberCompletionItem('each', HelperItem, ['BlockPath']),
   new EmberCompletionItem('each-in', HelperItem, ['BlockPath'], '2.1.0'),
   new EmberCompletionItem('get', HelperItem, ['MustachePath', 'SubExpressionPath'], '2.1.0'),
+  new EmberCompletionItem('fn', HelperItem, ['MustachePath', 'SubExpressionPath'], '3.12.0'),
   new EmberCompletionItem('hash', HelperItem, ['SubExpressionPath']),
   new EmberCompletionItem('if', HelperItem, ['BlockPath', 'MustachePath', 'SubExpressionPath']),
   new EmberCompletionItem('input', ComponentItem, ['MustachePath']),

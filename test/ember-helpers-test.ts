@@ -10,10 +10,10 @@ describe('ember-helpers', function() {
   });
 
   it('should provide all non-block helper', function() {
-    expect(emberMustacheItems).toHaveLength(17);
+    expect(emberMustacheItems).toHaveLength(18);
   });
 
   it('should provide all subexpression helper', function() {
-    expect(emberSubExpressionItems).toHaveLength(11);
+    expect(emberSubExpressionItems).toHaveLength(12);
   });
 });
