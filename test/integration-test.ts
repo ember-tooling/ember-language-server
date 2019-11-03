@@ -3,7 +3,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { createTempDir } from 'broccoli-test-helper';
 
-
 import { createMessageConnection, MessageConnection, Logger, IPCMessageReader, IPCMessageWriter } from 'vscode-jsonrpc';
 import {
   DidOpenTextDocumentNotification,
@@ -39,12 +38,10 @@ async function getResult(connection, files, fileToInspect, position) {
   };
   await connection.sendRequest(ExecuteCommandRequest.type, ['els:registerProjectPath', normalizedPath]);
   openFile(connection, modelPath);
-  let response = await connection
-  .sendRequest(CompletionRequest.type, params);
+  let response = await connection.sendRequest(CompletionRequest.type, params);
   await dir.dispose();
   return normalizeUri(response);
 }
-
 
 function openFile(connection: MessageConnection, filePath: string) {
   connection.sendNotification(DidOpenTextDocumentNotification.type, {
@@ -89,16 +86,20 @@ describe('integration', function() {
 
   beforeAll(() => {
     serverProcess = startServer();
-    connection = createMessageConnection(
-      new IPCMessageReader(serverProcess),
-      new IPCMessageWriter(serverProcess),
-      <Logger>{
-        error(msg) { console.log('error', msg); },
-        log(msg) { console.log('log', msg); },
-        info(msg) { console.log('info', msg); },
-        warn(msg) { console.log('warn', msg); },
+    connection = createMessageConnection(new IPCMessageReader(serverProcess), new IPCMessageWriter(serverProcess), <Logger>{
+      error(msg) {
+        console.log('error', msg);
+      },
+      log(msg) {
+        console.log('log', msg);
+      },
+      info(msg) {
+        console.log('info', msg);
+      },
+      warn(msg) {
+        console.log('warn', msg);
       }
-    );
+    });
 
     connection.listen();
   });
@@ -136,8 +137,7 @@ describe('integration', function() {
 
       openFile(connection, applicationTemplatePath);
 
-      const response = await connection
-        .sendRequest(CompletionRequest.type, params);
+      const response = await connection.sendRequest(CompletionRequest.type, params);
 
       expect(response).toMatchSnapshot();
     });
@@ -156,8 +156,7 @@ describe('integration', function() {
 
       openFile(connection, applicationTemplatePath);
 
-      const response = await connection
-        .sendRequest(CompletionRequest.type, params);
+      const response = await connection.sendRequest(CompletionRequest.type, params);
 
       expect(response).toMatchSnapshot();
     });
@@ -176,8 +175,7 @@ describe('integration', function() {
 
       openFile(connection, templatePath);
 
-      const response = await connection
-        .sendRequest(CompletionRequest.type, params);
+      const response = await connection.sendRequest(CompletionRequest.type, params);
 
       expect(response).toMatchSnapshot();
     });
@@ -196,8 +194,7 @@ describe('integration', function() {
 
       openFile(connection, templatePath);
 
-      const response = await connection
-        .sendRequest(CompletionRequest.type, params);
+      const response = await connection.sendRequest(CompletionRequest.type, params);
 
       expect(response).toMatchSnapshot();
     });
@@ -218,8 +215,7 @@ describe('integration', function() {
 
       openFile(connection, definitionTemplatePath);
 
-      let response = await connection
-        .sendRequest(DefinitionRequest.type, params);
+      let response = await connection.sendRequest(DefinitionRequest.type, params);
 
       response = normalizeUri(response);
       expect(response).toMatchSnapshot();
@@ -239,8 +235,7 @@ describe('integration', function() {
 
       openFile(connection, definitionTemplatePath);
 
-      let response = await connection
-        .sendRequest(DefinitionRequest.type, params);
+      let response = await connection.sendRequest(DefinitionRequest.type, params);
 
       response = normalizeUri(response);
       expect(response).toMatchSnapshot();
@@ -260,8 +255,7 @@ describe('integration', function() {
 
       openFile(connection, modelPath);
 
-      let response = await connection
-        .sendRequest(DefinitionRequest.type, params);
+      let response = await connection.sendRequest(DefinitionRequest.type, params);
 
       response = normalizeUri(response);
       expect(response).toMatchSnapshot();
@@ -281,8 +275,7 @@ describe('integration', function() {
 
       openFile(connection, modelPath);
 
-      let response = await connection
-        .sendRequest(DefinitionRequest.type, params);
+      let response = await connection.sendRequest(DefinitionRequest.type, params);
 
       response = normalizeUri(response);
       expect(response).toMatchSnapshot();
@@ -302,8 +295,7 @@ describe('integration', function() {
 
       openFile(connection, modelPath);
 
-      let response = await connection
-        .sendRequest(DefinitionRequest.type, params);
+      let response = await connection.sendRequest(DefinitionRequest.type, params);
 
       response = normalizeUri(response);
       expect(response).toMatchSnapshot();
@@ -312,7 +304,6 @@ describe('integration', function() {
 
   describe('Autocomplete works for broken templates', () => {
     it('autocomplete information for component #1 {{', async () => {
-
       const result = await getResult(
         connection,
         {
@@ -331,7 +322,6 @@ describe('integration', function() {
     });
 
     it('autocomplete information for component #2 <', async () => {
-
       const result = await getResult(
         connection,
         {
@@ -350,7 +340,6 @@ describe('integration', function() {
     });
 
     it('autocomplete information for component #3 {{#', async () => {
-
       const result = await getResult(
         connection,
         {
@@ -369,7 +358,6 @@ describe('integration', function() {
     });
 
     it('autocomplete information for modifier #4 <Foo {{', async () => {
-
       const result = await getResult(
         connection,
         {
@@ -387,11 +375,9 @@ describe('integration', function() {
       );
 
       expect(result).toMatchSnapshot();
-      
     });
 
     it('autocomplete information for helper #5 {{name (', async () => {
-
       const result = await getResult(
         connection,
         {
@@ -412,7 +398,6 @@ describe('integration', function() {
     });
 
     it('autocomplete information for helper #6 {{name (foo (', async () => {
-
       const result = await getResult(
         connection,
         {
