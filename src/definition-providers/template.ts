@@ -149,7 +149,7 @@ export default class TemplateDefinitionProvider {
 
     return pathsToLocations.apply(null, paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths);
   }
-  provideBlockComponentDefinition(root: string, focusPath: ASTPath) {
+  provideBlockComponentDefinition(root: string, focusPath: ASTPath): null | Definition {
     let maybeComponentName = focusPath.node.path.original;
     let paths: string[] = getPathsForComponentTemplates(root, maybeComponentName).filter(fs.existsSync);
     if (!paths.length) {
@@ -160,7 +160,7 @@ export default class TemplateDefinitionProvider {
     // mAddonPathsForComponentTemplates
     return pathsToLocationsWithPosition(paths, '{{yield');
   }
-  providePropertyDefinition(root: string, focusPath: ASTPath, uri: string) {
+  providePropertyDefinition(root: string, focusPath: ASTPath, uri: string): null | Definition {
     let maybeComponentName = getComponentNameFromURI(root, uri);
     if (!maybeComponentName) {
       return null;
@@ -193,7 +193,7 @@ export default class TemplateDefinitionProvider {
     const maybeComponentName = focusPath.node.type === 'ElementNode' ? normalizeAngleTagName(focusPath.node.tag) : focusPath.node.original;
     return this.provideComponentDefinition(root, maybeComponentName);
   }
-  provideHashPropertyUsage(root: string, focusPath: ASTPath) {
+  provideHashPropertyUsage(root: string, focusPath: ASTPath): null | Definition {
     let parentPath = focusPath.parentPath;
     if (parentPath && parentPath.parent && parentPath.parent.path) {
       const maybeComponentName = parentPath.parent.path.original;
@@ -212,7 +212,7 @@ export default class TemplateDefinitionProvider {
     }
     return null;
   }
-  provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath) {
+  provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath) : null | Definition {
     const maybeComponentName = normalizeAngleTagName(focusPath.parent.tag);
 
     let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
