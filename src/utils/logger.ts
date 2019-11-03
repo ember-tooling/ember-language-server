@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import util from 'util';
+import * as util from 'util';
 
 const debug = false;
 const log_file = debug ? fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' }) : null;
