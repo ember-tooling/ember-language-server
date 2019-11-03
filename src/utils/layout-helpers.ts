@@ -100,6 +100,39 @@ export function getProjectInRepoAddonsRoots(root: string) {
   return roots;
 }
 
+export function listGlimmerNativeComponents(root: string) {
+  try {
+    const possiblePath = resolvePackageRoot(root, 'glimmer-native', 'node_modules');
+    if (!possiblePath) {
+      return [];
+    }
+    const components = fs.readdirSync(path.join(possiblePath, 'dist', 'src', 'glimmer', 'native-components'))
+    return components.map((name)=>{
+      return {
+        kind: CompletionItemKind.Class,
+        label: name,
+        detail: 'component'
+      };
+    })
+  } catch(e) {
+    return [];
+  }
+}
+
+export function isGlimmerNativeProject(root: string) {
+  const pack = getPackageJSON(root);
+  if (pack.dependencies && pack.dependencies['glimmer-native']) {
+    return true;
+  }
+  if (pack.devDependencies && pack.devDependencies['glimmer-native']) {
+    return true;
+  }
+  if (pack.peerDependencies && pack.peerDependencies['glimmer-native']) {
+    return true;
+  }
+  return false;
+}
+
 export function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
   // log('getProjectAddonsInfo', root);
   const pack = getPackageJSON(root);
@@ -196,7 +229,11 @@ export function getProjectAddonsInfo(root: string) {
     }
   });
   // log('meta', meta);
-  const normalizedResult: any[] = meta.reduce((arrs: any[], item: any[]) => {
+  if (isGlimmerNativeProject(root)) {
+    meta.push(listGlimmerNativeComponents(root));
+  }
+
+  let normalizedResult: any[] = meta.reduce((arrs: any[], item: any[]) => {
     if (!item.length) {
       return arrs;
     }

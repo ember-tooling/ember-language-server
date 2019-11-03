@@ -399,6 +399,51 @@ describe('integration', function() {
     });
   });
 
+  describe('GlimmerNative', () => {
+    it('able to provide glimmer-native component', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '<',
+            }
+          },
+          'package.json': JSON.stringify({dependencies: { 'glimmer-native': true }}),
+          'node_modules': {
+            'glimmer-native': {
+              dist: {
+                'index.js': 'module.exports = () => {};',
+                src: {
+                  glimmer: {
+                    'native-components': {
+                      'ListView': {
+                        'component.js': ''
+                      },
+                      'Button': {
+                        'template.js': ''
+                      }
+                    }
+                  }
+                }
+              },
+              'package.json': JSON.stringify({
+                "name": "glimmer-native",
+                "main": "dist/index.js",
+              })
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 1 }
+      );
+
+      expect(result).toMatchSnapshot();
+    })
+
+  });
+
   describe('Autocomplete works for broken templates', () => {
     it('autocomplete information for component #1 {{', async () => {
       const result = await getResult(

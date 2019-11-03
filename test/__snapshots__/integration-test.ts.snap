@@ -668,6 +668,26 @@ Array [
 ]
 `;
 
+exports[`integration GlimmerNative able to provide glimmer-native component 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Hello",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Button",
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "ListView",
+  },
+]
+`;
+
 exports[`integration Go to definition works for all supported cases go to local template-only component 1`] = `
 Array [
   Object {
