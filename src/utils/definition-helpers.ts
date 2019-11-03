@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as memoize from 'memoizee';
 import { Location, Range } from 'vscode-languageserver';
 
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 
 import { isModuleUnificationApp, podModulePrefixForRoot, hasAddonFolderInPath, getProjectAddonsRoots, getProjectInRepoAddonsRoots } from './layout-helpers';
 const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
