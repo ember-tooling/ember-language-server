@@ -9,16 +9,23 @@ The Ember Language Server (ELS) implements the [Language Server Protocol](https:
 
 All features currently only work in Ember CLI application that use the default classic structure, and are a rough first draft with a lot of room for improvements. Pods and addons are not supported yet.
 
-- Component and helper autocompletion for inline and sub expressions
+- Autocompletion
+  - `*.{js/ts}`: services, models, routes, transforms
+  - `*.hbs`: components, route names, helpers, modifiers, local paths
+  - GlimmerNative components autocompletion support
+ 
 - Definition providers for (enable features like "Go To Definition" or "Peek Definition"):
   - Components (in Templates)
   - Helpers (in Templates)
+  - Modifiers (in Templates)
   - Models
   - Transforms
+  - Component imports (from addons)
+
 - Route autocompletion in `link-to`
 - Diagnostics for ember-template-lint (if it is included in a project)
 
 ## Editor Plugins
 
-* VSCode: [vscode-ember](https://github.com/emberwatch/vscode-ember)
-* Atom: [atom-languageserver-ember](https://github.com/josa42/atom-languageserver-ember)
+* VSCode: [Unstable Ember Language Server](https://github.com/lifeart/vscode-ember)
+* Neo (Vim): [coc-ember](https://github.com/NullVoxPopuli/coc-ember)
