@@ -29,7 +29,7 @@ import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
-
+import { log } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -101,7 +101,7 @@ export default class Server {
       return { capabilities: {} };
     }
 
-    console.log(`Initializing Ember Language Server at ${rootPath}`);
+    log(`Initializing Ember Language Server at ${rootPath}`);
 
     this.projectRoots.initialize(rootPath);
 

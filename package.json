@@ -62,7 +62,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "yarn lint --fix"
+      "yarn lint --fix", "git add"
     ]
   },
   "prettier": {

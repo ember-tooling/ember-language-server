@@ -2,6 +2,7 @@ import { Diagnostic, Files, TextDocument } from 'vscode-languageserver';
 import { getExtension } from './utils/file-extension';
 import { toDiagnostic } from './utils/diagnostic';
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
+import { log } from './utils/logger';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -99,7 +100,7 @@ export default class TemplateLinter {
       this._linterCache.set(project, linter);
       return linter;
     } catch (error) {
-      console.log('Module ember-template-lint not found.');
+      log('Module ember-template-lint not found.');
     }
   }
 }

@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
-
+import { log } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
 
@@ -42,7 +42,8 @@ export default class ProjectRoots {
   }
 
   onProjectAdd(path: string) {
-    console.log(`Ember CLI project added at ${path}`);
+    log(`Ember CLI project added at ${path}`);
+
     this.projects.set(path, new Project(path));
   }
 
