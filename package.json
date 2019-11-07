@@ -20,7 +20,7 @@
   "dependencies": {
     "@glimmer/syntax": "^0.43.0",
     "ast-types": "^0.13.2",
-    "ember-meta-explorer": "^0.0.41",
+    "ember-meta-explorer": "^0.1.0",
     "extract-tagged-template-literals": "^1.0.1",
     "fs-extra": "^8.1.0",
     "fuzzaldrin": "^2.1.0",
