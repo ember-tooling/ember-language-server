@@ -10,7 +10,7 @@ Array [
       "newText": "@foo",
       "range": Object {
         "end": Object {
-          "character": 21,
+          "character": 18,
           "line": 0,
         },
         "start": Object {
@@ -28,7 +28,7 @@ Array [
       "newText": "@name",
       "range": Object {
         "end": Object {
-          "character": 22,
+          "character": 18,
           "line": 0,
         },
         "start": Object {
@@ -46,7 +46,7 @@ Array [
       "newText": "@picture",
       "range": Object {
         "end": Object {
-          "character": 25,
+          "character": 18,
           "line": 0,
         },
         "start": Object {
@@ -69,7 +69,7 @@ Array [
       "newText": "this.lastName",
       "range": Object {
         "end": Object {
-          "character": 15,
+          "character": 7,
           "line": 0,
         },
         "start": Object {
@@ -87,7 +87,7 @@ Array [
       "newText": "this.firstName",
       "range": Object {
         "end": Object {
-          "character": 16,
+          "character": 7,
           "line": 0,
         },
         "start": Object {
@@ -110,7 +110,7 @@ Array [
       "newText": "this.lastName",
       "range": Object {
         "end": Object {
-          "character": 19,
+          "character": 11,
           "line": 0,
         },
         "start": Object {
@@ -128,7 +128,7 @@ Array [
       "newText": "this.firstName",
       "range": Object {
         "end": Object {
-          "character": 20,
+          "character": 11,
           "line": 0,
         },
         "start": Object {
@@ -151,7 +151,7 @@ Array [
       "newText": "this.lastName",
       "range": Object {
         "end": Object {
-          "character": 25,
+          "character": 17,
           "line": 0,
         },
         "start": Object {
@@ -169,7 +169,7 @@ Array [
       "newText": "this.firstName",
       "range": Object {
         "end": Object {
-          "character": 26,
+          "character": 17,
           "line": 0,
         },
         "start": Object {
@@ -192,7 +192,7 @@ Array [
       "newText": "darling",
       "range": Object {
         "end": Object {
-          "character": 9,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -210,7 +210,7 @@ Array [
       "newText": "hello",
       "range": Object {
         "end": Object {
-          "character": 7,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -228,7 +228,7 @@ Array [
       "newText": "input",
       "range": Object {
         "end": Object {
-          "character": 7,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -249,7 +249,7 @@ Array [
       "newText": "link-to",
       "range": Object {
         "end": Object {
-          "character": 9,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -270,7 +270,7 @@ Array [
       "newText": "textarea",
       "range": Object {
         "end": Object {
-          "character": 10,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -296,7 +296,7 @@ Array [
       "newText": "Darling",
       "range": Object {
         "end": Object {
-          "character": 8,
+          "character": 1,
           "line": 1,
         },
         "start": Object {
@@ -314,7 +314,7 @@ Array [
       "newText": "Hello",
       "range": Object {
         "end": Object {
-          "character": 6,
+          "character": 1,
           "line": 1,
         },
         "start": Object {
@@ -337,7 +337,7 @@ Array [
       "newText": "darling",
       "range": Object {
         "end": Object {
-          "character": 10,
+          "character": 3,
           "line": 1,
         },
         "start": Object {
@@ -355,7 +355,7 @@ Array [
       "newText": "hello",
       "range": Object {
         "end": Object {
-          "character": 8,
+          "character": 3,
           "line": 1,
         },
         "start": Object {
@@ -378,7 +378,7 @@ Array [
       "newText": "boo",
       "range": Object {
         "end": Object {
-          "character": 11,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -396,7 +396,7 @@ Array [
       "newText": "action",
       "range": Object {
         "end": Object {
-          "character": 14,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -418,7 +418,7 @@ Array [
       "newText": "component",
       "range": Object {
         "end": Object {
-          "character": 17,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -442,7 +442,7 @@ Array [
       "newText": "concat",
       "range": Object {
         "end": Object {
-          "character": 14,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -465,7 +465,7 @@ Array [
       "newText": "get",
       "range": Object {
         "end": Object {
-          "character": 11,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -488,7 +488,7 @@ Array [
       "newText": "fn",
       "range": Object {
         "end": Object {
-          "character": 10,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -511,7 +511,7 @@ Array [
       "newText": "hash",
       "range": Object {
         "end": Object {
-          "character": 12,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -532,7 +532,7 @@ Array [
       "newText": "if",
       "range": Object {
         "end": Object {
-          "character": 10,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -555,7 +555,7 @@ Array [
       "newText": "loc",
       "range": Object {
         "end": Object {
-          "character": 11,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -577,7 +577,7 @@ Array [
       "newText": "mut",
       "range": Object {
         "end": Object {
-          "character": 11,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -598,7 +598,7 @@ Array [
       "newText": "query-params",
       "range": Object {
         "end": Object {
-          "character": 20,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -619,7 +619,7 @@ Array [
       "newText": "unbound",
       "range": Object {
         "end": Object {
-          "character": 15,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -641,7 +641,7 @@ Array [
       "newText": "unless",
       "range": Object {
         "end": Object {
-          "character": 14,
+          "character": 8,
           "line": 0,
         },
         "start": Object {
@@ -669,7 +669,7 @@ Array [
       "newText": "boo",
       "range": Object {
         "end": Object {
-          "character": 16,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -687,7 +687,7 @@ Array [
       "newText": "action",
       "range": Object {
         "end": Object {
-          "character": 19,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -709,7 +709,7 @@ Array [
       "newText": "component",
       "range": Object {
         "end": Object {
-          "character": 22,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -733,7 +733,7 @@ Array [
       "newText": "concat",
       "range": Object {
         "end": Object {
-          "character": 19,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -756,7 +756,7 @@ Array [
       "newText": "get",
       "range": Object {
         "end": Object {
-          "character": 16,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -779,7 +779,7 @@ Array [
       "newText": "fn",
       "range": Object {
         "end": Object {
-          "character": 15,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -802,7 +802,7 @@ Array [
       "newText": "hash",
       "range": Object {
         "end": Object {
-          "character": 17,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -823,7 +823,7 @@ Array [
       "newText": "if",
       "range": Object {
         "end": Object {
-          "character": 15,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -846,7 +846,7 @@ Array [
       "newText": "loc",
       "range": Object {
         "end": Object {
-          "character": 16,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -868,7 +868,7 @@ Array [
       "newText": "mut",
       "range": Object {
         "end": Object {
-          "character": 16,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -889,7 +889,7 @@ Array [
       "newText": "query-params",
       "range": Object {
         "end": Object {
-          "character": 25,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -910,7 +910,7 @@ Array [
       "newText": "unbound",
       "range": Object {
         "end": Object {
-          "character": 20,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -932,7 +932,7 @@ Array [
       "newText": "unless",
       "range": Object {
         "end": Object {
-          "character": 19,
+          "character": 13,
           "line": 0,
         },
         "start": Object {
@@ -960,7 +960,7 @@ Array [
       "newText": "boo",
       "range": Object {
         "end": Object {
-          "character": 10,
+          "character": 7,
           "line": 0,
         },
         "start": Object {
@@ -978,7 +978,7 @@ Array [
       "newText": "action",
       "range": Object {
         "end": Object {
-          "character": 13,
+          "character": 7,
           "line": 0,
         },
         "start": Object {
@@ -1001,7 +1001,7 @@ Array [
       "newText": "foo.bar.baz",
       "range": Object {
         "end": Object {
-          "character": 27,
+          "character": 16,
           "line": 0,
         },
         "start": Object {
@@ -1024,7 +1024,7 @@ Array [
       "newText": "AnotherAwesomeComponent",
       "range": Object {
         "end": Object {
-          "character": 24,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1042,7 +1042,7 @@ Array [
       "newText": "MyAwesomeComponent",
       "range": Object {
         "end": Object {
-          "character": 19,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1065,7 +1065,7 @@ Array [
       "newText": "another-awesome-component",
       "range": Object {
         "end": Object {
-          "character": 27,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1083,7 +1083,7 @@ Array [
       "newText": "my-awesome-component",
       "range": Object {
         "end": Object {
-          "character": 22,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1101,7 +1101,7 @@ Array [
       "newText": "nested/nested-component",
       "range": Object {
         "end": Object {
-          "character": 25,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1119,7 +1119,7 @@ Array [
       "newText": "some-helper",
       "range": Object {
         "end": Object {
-          "character": 13,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1137,7 +1137,7 @@ Array [
       "newText": "action",
       "range": Object {
         "end": Object {
-          "character": 8,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1159,7 +1159,7 @@ Array [
       "newText": "component",
       "range": Object {
         "end": Object {
-          "character": 11,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1183,7 +1183,7 @@ Array [
       "newText": "concat",
       "range": Object {
         "end": Object {
-          "character": 8,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1206,7 +1206,7 @@ Array [
       "newText": "debugger",
       "range": Object {
         "end": Object {
-          "character": 10,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1227,7 +1227,7 @@ Array [
       "newText": "get",
       "range": Object {
         "end": Object {
-          "character": 5,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1250,7 +1250,7 @@ Array [
       "newText": "fn",
       "range": Object {
         "end": Object {
-          "character": 4,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1273,7 +1273,7 @@ Array [
       "newText": "if",
       "range": Object {
         "end": Object {
-          "character": 4,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1296,7 +1296,7 @@ Array [
       "newText": "input",
       "range": Object {
         "end": Object {
-          "character": 7,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1317,7 +1317,7 @@ Array [
       "newText": "link-to",
       "range": Object {
         "end": Object {
-          "character": 9,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1338,7 +1338,7 @@ Array [
       "newText": "loc",
       "range": Object {
         "end": Object {
-          "character": 5,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1360,7 +1360,7 @@ Array [
       "newText": "log",
       "range": Object {
         "end": Object {
-          "character": 5,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1381,7 +1381,7 @@ Array [
       "newText": "mount",
       "range": Object {
         "end": Object {
-          "character": 7,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1402,7 +1402,7 @@ Array [
       "newText": "outlet",
       "range": Object {
         "end": Object {
-          "character": 8,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1423,7 +1423,7 @@ Array [
       "newText": "partial",
       "range": Object {
         "end": Object {
-          "character": 9,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1444,7 +1444,7 @@ Array [
       "newText": "render",
       "range": Object {
         "end": Object {
-          "character": 8,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1465,7 +1465,7 @@ Array [
       "newText": "textarea",
       "range": Object {
         "end": Object {
-          "character": 10,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1486,7 +1486,7 @@ Array [
       "newText": "unbound",
       "range": Object {
         "end": Object {
-          "character": 9,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1508,7 +1508,7 @@ Array [
       "newText": "unless",
       "range": Object {
         "end": Object {
-          "character": 8,
+          "character": 2,
           "line": 1,
         },
         "start": Object {
@@ -1536,7 +1536,7 @@ Array [
       "newText": "angle-completion",
       "range": Object {
         "end": Object {
-          "character": 28,
+          "character": 12,
           "line": 3,
         },
         "start": Object {
@@ -1554,7 +1554,7 @@ Array [
       "newText": "definition",
       "range": Object {
         "end": Object {
-          "character": 22,
+          "character": 12,
           "line": 3,
         },
         "start": Object {
@@ -1572,7 +1572,7 @@ Array [
       "newText": "test-route",
       "range": Object {
         "end": Object {
-          "character": 22,
+          "character": 12,
           "line": 3,
         },
         "start": Object {
@@ -1590,7 +1590,7 @@ Array [
       "newText": "nested.nested-route",
       "range": Object {
         "end": Object {
-          "character": 31,
+          "character": 12,
           "line": 3,
         },
         "start": Object {
@@ -1613,7 +1613,7 @@ Array [
       "newText": "angle-completion",
       "range": Object {
         "end": Object {
-          "character": 39,
+          "character": 23,
           "line": 2,
         },
         "start": Object {
@@ -1631,7 +1631,7 @@ Array [
       "newText": "definition",
       "range": Object {
         "end": Object {
-          "character": 33,
+          "character": 23,
           "line": 2,
         },
         "start": Object {
@@ -1649,7 +1649,7 @@ Array [
       "newText": "test-route",
       "range": Object {
         "end": Object {
-          "character": 33,
+          "character": 23,
           "line": 2,
         },
         "start": Object {
@@ -1667,7 +1667,7 @@ Array [
       "newText": "nested.nested-route",
       "range": Object {
         "end": Object {
-          "character": 42,
+          "character": 23,
           "line": 2,
         },
         "start": Object {
@@ -1780,7 +1780,7 @@ Array [
       "newText": "Hello",
       "range": Object {
         "end": Object {
-          "character": 6,
+          "character": 1,
           "line": 0,
         },
         "start": Object {
@@ -1798,7 +1798,7 @@ Array [
       "newText": "Button",
       "range": Object {
         "end": Object {
-          "character": 7,
+          "character": 1,
           "line": 0,
         },
         "start": Object {
@@ -1816,7 +1816,7 @@ Array [
       "newText": "ListView",
       "range": Object {
         "end": Object {
-          "character": 9,
+          "character": 1,
           "line": 0,
         },
         "start": Object {
@@ -1839,7 +1839,7 @@ Array [
       "newText": "App",
       "range": Object {
         "end": Object {
-          "character": 23,
+          "character": 20,
           "line": 0,
         },
         "start": Object {
@@ -1857,7 +1857,7 @@ Array [
       "newText": "Button",
       "range": Object {
         "end": Object {
-          "character": 26,
+          "character": 20,
           "line": 0,
         },
         "start": Object {
@@ -1875,7 +1875,7 @@ Array [
       "newText": "Ball",
       "range": Object {
         "end": Object {
-          "character": 24,
+          "character": 20,
           "line": 0,
         },
         "start": Object {
@@ -1893,7 +1893,7 @@ Array [
       "newText": "Border",
       "range": Object {
         "end": Object {
-          "character": 26,
+          "character": 20,
           "line": 0,
         },
         "start": Object {
@@ -1911,7 +1911,7 @@ Array [
       "newText": "Bus",
       "range": Object {
         "end": Object {
-          "character": 23,
+          "character": 20,
           "line": 0,
         },
         "start": Object {
@@ -1929,7 +1929,7 @@ Array [
       "newText": "Table",
       "range": Object {
         "end": Object {
-          "character": 25,
+          "character": 20,
           "line": 0,
         },
         "start": Object {

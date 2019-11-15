@@ -287,6 +287,7 @@ export default class TemplateCompletionProvider {
     }
 
     const textPrefix = getTextPrefix(focusPath, normalPlaceholder);
+    const endCharacterPosition = position.character;
     if (textPrefix.length) {
       position.character -= textPrefix.length;
     }
@@ -296,7 +297,7 @@ export default class TemplateCompletionProvider {
     }).map((el) => {
       let endPosition = {
         line: position.line,
-        character: position.character + el.label.length
+        character: endCharacterPosition
       };
       el.textEdit = {
         newText: el.label,
