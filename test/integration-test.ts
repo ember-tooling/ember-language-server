@@ -317,6 +317,31 @@ describe('integration', function() {
   });
 
   describe('Go to definition works for all supported cases', () => {
+    it('to to route defintion from LinkTo component', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          app: {
+            templates: {
+              foo: {
+                bar: {
+                  'baz.hbs': ''
+                }
+              }
+            },
+            components: {
+              'hello.hbs': '<LinkTo @route="foo.bar.baz" />'
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 17 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+
     it('go to local template-only component', async () => {
       const result = await getResult(
         DefinitionRequest.type,
@@ -486,6 +511,114 @@ describe('integration', function() {
         { line: 0, character: 1 }
       );
 
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Able to provide autocomplete information for angle component arguments names', () => {
+    it('support template-only collocated components arguments extraction', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'foo.hbs': '<MyBar @n />',
+              'my-bar.hbs': '{{@name}} {{@name.boo}} {{@picture}} {{#each @foo as |bar|}}{{/each}}'
+            }
+          }
+        },
+        'app/components/foo.hbs',
+        { line: 0, character: 9 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Able to provide autocomplete information for local context access', () => {
+    it('support collocated components', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              hello: {
+                'index.js': 'export default class Foo extends Bar { firstName = "a"; lastName = "b"; }',
+                'index.hbs': '{{this.}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 7 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+
+    it('support collocated components in mustache arguments', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              hello: {
+                'index.js': 'export default class Foo extends Bar { firstName = "a"; lastName = "b"; }',
+                'index.hbs': '{{foo this.}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 11 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+
+    it('support collocated components in node attributes', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              hello: {
+                'index.js': 'export default class Foo extends Bar { firstName = "a"; lastName = "b"; }',
+                'index.hbs': '<div prop={{this.}}>'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 17 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Autocomplete works in LinkTo components for @route argument', () => {
+    it('able to autocomplete basic routes', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            templates: {
+              foo: {
+                bar: {
+                  'baz.hbs': ''
+                }
+              }
+            },
+            components: {
+              'hello.hbs': '<LinkTo @route="" />'
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 16 }
+      );
       expect(result).toMatchSnapshot();
     });
   });

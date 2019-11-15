@@ -1,5 +1,70 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`integration Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
+Array [
+  Object {
+    "detail": "@name = undefined // (used in template)",
+    "kind": 10,
+    "label": "@name",
+  },
+  Object {
+    "detail": "@picture = undefined // (used in template)",
+    "kind": 10,
+    "label": "@picture",
+  },
+  Object {
+    "detail": "@foo = undefined // (used in template)",
+    "kind": 10,
+    "label": "@foo",
+  },
+]
+`;
+
+exports[`integration Able to provide autocomplete information for local context access support collocated components 1`] = `
+Array [
+  Object {
+    "detail": "lastName = \\"b\\"",
+    "kind": 10,
+    "label": "this.lastName",
+  },
+  Object {
+    "detail": "firstName = \\"a\\"",
+    "kind": 10,
+    "label": "this.firstName",
+  },
+]
+`;
+
+exports[`integration Able to provide autocomplete information for local context access support collocated components in mustache arguments 1`] = `
+Array [
+  Object {
+    "detail": "lastName = \\"b\\"",
+    "kind": 10,
+    "label": "this.lastName",
+  },
+  Object {
+    "detail": "firstName = \\"a\\"",
+    "kind": 10,
+    "label": "this.firstName",
+  },
+]
+`;
+
+exports[`integration Able to provide autocomplete information for local context access support collocated components in node attributes 1`] = `
+Array [
+  Object {
+    "detail": "lastName = \\"b\\"",
+    "kind": 10,
+    "label": "this.lastName",
+  },
+  Object {
+    "detail": "firstName = \\"a\\"",
+    "kind": 10,
+    "label": "this.firstName",
+  },
+]
+`;
+
 exports[`integration Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
 Array [
   Object {
@@ -324,6 +389,16 @@ Array [
     "detail": "modifier",
     "kind": 2,
     "label": "action",
+  },
+]
+`;
+
+exports[`integration Autocomplete works in LinkTo components for @route argument able to autocomplete basic routes 1`] = `
+Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "foo.bar.baz",
   },
 ]
 `;
@@ -809,6 +884,24 @@ Array [
       },
     },
     "uri": "/app/templates/components/darling.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/templates/foo/bar/baz.hbs",
   },
 ]
 `;

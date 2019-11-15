@@ -20,8 +20,11 @@ function localizeName(name: string) {
   }
 }
 
-export function templateContextLookup(root: string, currentFilePath: string, templateContent: string) {
-  log('templateContextLookup', root, currentFilePath, templateContent);
+export function templateContextLookup(root: string, rawCurrentFilePath: string, templateContent: string) {
+  const currentFilePath = rawCurrentFilePath
+    .replace('file://', '')
+    .split('\\')
+    .join('/');
   const nameParts = currentFilePath.split('/components/');
   if (nameParts.length !== 2) {
     return [];
@@ -38,6 +41,8 @@ function findComponentScripts(root: string, componentName: string) {
   } else {
     possibleLocations.push([root, 'app', 'components', componentName, 'component.js']);
     possibleLocations.push([root, 'app', 'components', componentName, 'component.ts']);
+    possibleLocations.push([root, 'app', 'components', componentName, 'index.js']);
+    possibleLocations.push([root, 'app', 'components', componentName, 'index.ts']);
     possibleLocations.push([root, 'app', 'components', componentName + '.js']);
     possibleLocations.push([root, 'app', 'components', componentName + '.ts']);
     const prefix = podModulePrefixForRoot(root);
@@ -52,19 +57,19 @@ function findComponentScripts(root: string, componentName: string) {
 function componentsContextData(root: string, componentName: string, templateContent: string): CompletionItem[] {
   const maybeScripts = findComponentScripts(root, componentName);
   const existingScripts = maybeScripts.filter(fs.existsSync);
-  if (!existingScripts.length) {
-    return [];
-  }
-  const filePath = existingScripts.pop();
-  const fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
   const infoItems: any[] = [];
 
-  try {
-    const jsMeta = processJSFile(fileContent, filePath);
-    log('jsMeta', jsMeta);
-    infoItems.push(jsMeta);
-  } catch (e) {
-    log('template-context-lookup-error', e.toString());
+  if (existingScripts.length) {
+    const filePath = existingScripts.pop();
+    const fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
+
+    try {
+      const jsMeta = processJSFile(fileContent, filePath);
+      log('jsMeta', jsMeta);
+      infoItems.push(jsMeta);
+    } catch (e) {
+      log('template-context-lookup-error', e.toString());
+    }
   }
 
   try {
@@ -99,7 +104,6 @@ function componentsContextData(root: string, componentName: string, templateCont
     log('contextInforError', e);
   }
   log('contextInfo', contextInfo);
-
   contextInfo.jsProps.forEach((propName: string) => {
     const [name]: any = propName.split(' ');
     items.push({
@@ -127,7 +131,7 @@ function componentsContextData(root: string, componentName: string, templateCont
   contextInfo.hbsProps.forEach((propName: string) => {
     const [name]: any = propName.split(' ');
     items.push({
-      kind: CompletionItemKind.Function,
+      kind: CompletionItemKind.Property,
       label: name,
       detail: 'Template Property: ' + propName
     });

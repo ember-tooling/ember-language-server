@@ -254,6 +254,15 @@ function isString(node: any): boolean {
 function isCallExpression(node: any): boolean {
   return hasNodeType(node, 'CallExpression');
 }
+export function isLocalPathExpression(path: any): boolean {
+  return isPathExpression(path.node) && path.node.this === true;
+}
+export function isComponentArgumentName(path: any): boolean {
+  return hasNodeType(path.node, 'AttrNode') && path.node.name.startsWith('@');
+}
+export function isLinkComponentRouteTarget(path: any): boolean {
+  return hasNodeType(path.node, 'TextNode') && hasNodeType(path.parent, 'AttrNode') && path.parent.name === '@route';
+}
 function isPathExpression(node: any): boolean {
   return hasNodeType(node, 'PathExpression');
 }

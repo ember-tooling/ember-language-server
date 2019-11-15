@@ -5,7 +5,7 @@ import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-l
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
 import { getExtension } from './../utils/file-extension';
 
-import { isLinkToTarget } from './../utils/ast-helpers';
+import { isLinkToTarget, isLinkComponentRouteTarget } from './../utils/ast-helpers';
 
 import { toPosition } from './../estree-utils';
 import Server from './../server';
@@ -72,6 +72,9 @@ export default class TemplateDefinitionProvider {
       return this.provideMustacheDefinition(root, focusPath);
 
       // <FooBar @somePropertyToFindUsage="" />
+    } else if (isLinkComponentRouteTarget(focusPath)) {
+      // <LinkTo @route="name" />
+      return this.provideRouteDefinition(project.root, focusPath.node.chars);
     } else if (this.isAnglePropertyAttribute(focusPath)) {
       return this.provideAngleBracketComponentAttributeUsage(root, focusPath);
 
@@ -138,16 +141,21 @@ export default class TemplateDefinitionProvider {
     const filteredPaths = routePaths.map((parts: string[]) => path.join.apply(null, parts)).filter(fs.existsSync);
     return pathsToLocations.apply(null, filteredPaths);
   }
-  provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
-    const maybeComponentName = normalizeAngleTagName(focusPath.node.tag);
-
+  _provideLikelyRawComponentTemplatePaths(root: string, rawComponentName: string) {
+    const maybeComponentName = normalizeAngleTagName(rawComponentName);
     let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
 
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
-
+    return paths;
+  }
+  provideLikelyComponentTemplatePath(root: string, rawComponentName: string) {
+    let paths = this._provideLikelyRawComponentTemplatePaths(root, rawComponentName);
     return pathsToLocations.apply(null, paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths);
+  }
+  provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
+    return this.provideLikelyComponentTemplatePath(root, focusPath.node.tag);
   }
   provideBlockComponentDefinition(root: string, focusPath: ASTPath): null | Definition {
     let maybeComponentName = focusPath.node.path.original;

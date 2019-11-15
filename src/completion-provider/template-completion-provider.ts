@@ -9,11 +9,22 @@ import { preprocess } from '@glimmer/syntax';
 import { uniqBy, startCase, camelCase } from 'lodash';
 
 import * as memoize from 'memoizee';
+import * as fs from 'fs';
 import { emberBlockItems, emberMustacheItems, emberSubExpressionItems } from './ember-helpers';
 import { templateContextLookup } from './template-context-provider';
 import { getExtension } from '../utils/file-extension';
 import { log } from '../utils/logger';
-import { isLinkToTarget, isMustachePath, isBlockPath, isSubExpressionPath, isAngleComponentPath, isModifierPath } from '../utils/ast-helpers';
+import {
+  isLinkToTarget,
+  isComponentArgumentName,
+  isLocalPathExpression,
+  isLinkComponentRouteTarget,
+  isMustachePath,
+  isBlockPath,
+  isSubExpressionPath,
+  isAngleComponentPath,
+  isModifierPath
+} from '../utils/ast-helpers';
 import {
   listComponents,
   listMUComponents,
@@ -90,6 +101,10 @@ export default class TemplateCompletionProvider {
         }),
       'label'
     );
+  }
+  getPathExpressionCandidates(root: string, uri: string, originalText: string) {
+    let candidates: CompletionItem[] = [...mTemplateContextLookup(root, uri, originalText)];
+    return candidates;
   }
   getMustachePathCandidates(root: string, uri: string, originalText: string) {
     let candidates: CompletionItem[] = [
@@ -195,6 +210,37 @@ export default class TemplateCompletionProvider {
         const candidates = this.getAllAngleBracketComponents(root, uri);
         log(candidates);
         completions.push(...uniqBy(candidates, 'label'));
+      } else if (isComponentArgumentName(focusPath)) {
+        // <Foo @name.. />
+
+        const maybeComponentName = focusPath.parent.tag;
+        const isValidComponent =
+          !['Input', 'Textarea', 'LinkTo'].includes(maybeComponentName) &&
+          !maybeComponentName.startsWith('@') &&
+          !maybeComponentName.startsWith(':') &&
+          !maybeComponentName.includes('.');
+        if (isValidComponent) {
+          const tpls: any[] = this.server.definitionProvider.template._provideLikelyRawComponentTemplatePaths(root, maybeComponentName);
+          const existingTpls = tpls.filter(fs.existsSync);
+          let hasValidTemplates = existingTpls.length && existingTpls[0].endsWith('.hbs');
+          if (hasValidTemplates) {
+            const content = fs.readFileSync(existingTpls[0], 'utf8');
+            let candidates = this.getPathExpressionCandidates(root, tpls[0], content);
+            let preResults: CompletionItem[] = [];
+            candidates.forEach((obj: CompletionItem) => {
+              if (obj.label.startsWith('@')) {
+                preResults.push({
+                  label: obj.label.split('.')[0],
+                  detail: obj.detail,
+                  kind: obj.kind
+                });
+              }
+            });
+            if (preResults.length) {
+              completions.push(...uniqBy(preResults, 'label'));
+            }
+          }
+        }
       } else if (isMustachePath(focusPath)) {
         // {{foo-bar?}}
         log('isMustachePath');
@@ -213,9 +259,19 @@ export default class TemplateCompletionProvider {
         const candidates = this.getSubExpressionPathCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
+      } else if (isLocalPathExpression(focusPath)) {
+        // {{foo-bar this.na?}}
+        log('isLocalPathExpression');
+        const candidates = this.getPathExpressionCandidates(root, uri, originalText);
+        completions.push(...uniqBy(candidates, 'label'));
+        completions.push(...emberMustacheItems);
       } else if (isLinkToTarget(focusPath)) {
         // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
         log('isLinkToTarget');
+        completions.push(...uniqBy(mListRoutes(root), 'label'));
+      } else if (isLinkComponentRouteTarget(focusPath)) {
+        // <LinkTo @route="foo.." />
+        log('isLinkComponentRouteTarget');
         completions.push(...uniqBy(mListRoutes(root), 'label'));
       } else if (isModifierPath(focusPath)) {
         log('isModifierPath');
