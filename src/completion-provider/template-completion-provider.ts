@@ -160,6 +160,7 @@ export default class TemplateCompletionProvider {
     }
     const { root } = project;
     const offset = document.offsetAt(params.position);
+    const position = document.positionAt(offset);
     const documentContent = document.getText();
     const originalText = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
     log('originalText', originalText);
@@ -286,9 +287,25 @@ export default class TemplateCompletionProvider {
     }
 
     const textPrefix = getTextPrefix(focusPath, normalPlaceholder);
+    if (textPrefix.length) {
+      position.character -= textPrefix.length;
+    }
     return filter(completions, textPrefix, {
       key: 'label',
       maxResults: 40
+    }).map((el) => {
+      let endPosition = {
+        line: position.line,
+        character: position.character + el.label.length
+      };
+      el.textEdit = {
+        newText: el.label,
+        range: {
+          start: position,
+          end: endPosition
+        }
+      };
+      return el;
     });
   }
 }
