@@ -523,13 +523,13 @@ describe('integration', function() {
         {
           app: {
             components: {
-              'foo.hbs': '<MyBar @n />',
-              'my-bar.hbs': '{{@name}} {{@name.boo}} {{@picture}} {{#each @foo as |bar|}}{{/each}}'
+              'foo.hbs': '<MyBar @doo="12" @n />',
+              'my-bar.hbs': '{{@name}} {{@name.boo}} {{@doo}} {{@picture}} {{#each @foo as |bar|}}{{/each}}'
             }
           }
         },
         'app/components/foo.hbs',
-        { line: 0, character: 9 }
+        { line: 0, character: 19 }
       );
       expect(result).toMatchSnapshot();
     });

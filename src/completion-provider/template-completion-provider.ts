@@ -223,13 +223,15 @@ export default class TemplateCompletionProvider {
           const tpls: any[] = this.server.definitionProvider.template._provideComponentTemplatePaths(root, maybeComponentName);
           const existingTpls = tpls.filter(fs.existsSync);
           if (existingTpls.length) {
+            const existingAttributes = focusPath.parent.attributes.map((attr: any) => attr.name).filter((name: string) => name.startsWith('@'));
             const content = fs.readFileSync(existingTpls[0], 'utf8');
             let candidates = this.getPathExpressionCandidates(root, tpls[0], content);
             let preResults: CompletionItem[] = [];
             candidates.forEach((obj: CompletionItem) => {
-              if (obj.label.startsWith('@')) {
+              const name = obj.label.split('.')[0];
+              if (name.startsWith('@') && !existingAttributes.includes(name)) {
                 preResults.push({
-                  label: obj.label.split('.')[0],
+                  label: name,
                   detail: obj.detail,
                   kind: obj.kind
                 });
