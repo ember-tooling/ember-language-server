@@ -141,6 +141,15 @@ export default class TemplateDefinitionProvider {
     const filteredPaths = routePaths.map((parts: string[]) => path.join.apply(null, parts)).filter(fs.existsSync);
     return pathsToLocations.apply(null, filteredPaths);
   }
+  _provideComponentTemplatePaths(root: string, rawComponentName: string) {
+    const maybeComponentName = normalizeAngleTagName(rawComponentName);
+    let paths = [...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
+
+    if (!paths.length) {
+      paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
+    }
+    return paths;
+  }
   _provideLikelyRawComponentTemplatePaths(root: string, rawComponentName: string) {
     const maybeComponentName = normalizeAngleTagName(rawComponentName);
     let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);

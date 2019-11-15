@@ -220,10 +220,9 @@ export default class TemplateCompletionProvider {
           !maybeComponentName.startsWith(':') &&
           !maybeComponentName.includes('.');
         if (isValidComponent) {
-          const tpls: any[] = this.server.definitionProvider.template._provideLikelyRawComponentTemplatePaths(root, maybeComponentName);
+          const tpls: any[] = this.server.definitionProvider.template._provideComponentTemplatePaths(root, maybeComponentName);
           const existingTpls = tpls.filter(fs.existsSync);
-          let hasValidTemplates = existingTpls.length && existingTpls[0].endsWith('.hbs');
-          if (hasValidTemplates) {
+          if (existingTpls.length) {
             const content = fs.readFileSync(existingTpls[0], 'utf8');
             let candidates = this.getPathExpressionCandidates(root, tpls[0], content);
             let preResults: CompletionItem[] = [];

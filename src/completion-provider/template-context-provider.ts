@@ -60,10 +60,9 @@ function componentsContextData(root: string, componentName: string, templateCont
   const infoItems: any[] = [];
 
   if (existingScripts.length) {
-    const filePath = existingScripts.pop();
-    const fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
-
     try {
+      const filePath = existingScripts.pop();
+      const fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
       const jsMeta = processJSFile(fileContent, filePath);
       log('jsMeta', jsMeta);
       infoItems.push(jsMeta);
