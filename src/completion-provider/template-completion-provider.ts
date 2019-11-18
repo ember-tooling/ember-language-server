@@ -10,7 +10,7 @@ import { uniqBy, startCase, camelCase } from 'lodash';
 
 import * as memoize from 'memoizee';
 import * as fs from 'fs';
-import { emberBlockItems, emberMustacheItems, emberSubExpressionItems } from './ember-helpers';
+import { emberBlockItems, emberModifierItems, emberMustacheItems, emberSubExpressionItems } from './ember-helpers';
 import { templateContextLookup } from './template-context-provider';
 import { getExtension } from '../utils/file-extension';
 import { log } from '../utils/logger';
@@ -280,7 +280,7 @@ export default class TemplateCompletionProvider {
         const addonModifiers = mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
           return detail === 'modifier';
         });
-        completions.push(...uniqBy([...mListModifiers(root), ...addonModifiers, ...builtinModifiers()], 'label'));
+        completions.push(...uniqBy([...emberModifierItems, ...mListModifiers(root), ...addonModifiers, ...builtinModifiers()], 'label'));
       }
     } catch (e) {
       log('error', e);
