@@ -1,5 +1,58 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`integration Able to provide API:Completion support dummy addon completion:script 1`] = `
+Array [
+  Object {
+    "label": "name",
+  },
+]
+`;
+
+exports[`integration Able to provide API:Completion support dummy addon completion:template 1`] = `
+Array [
+  Object {
+    "detail": "n = undefined",
+    "kind": 10,
+    "label": "this.n",
+    "textEdit": Object {
+      "newText": "this.n",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "label": "this.name",
+    "textEdit": Object {
+      "newText": "this.name",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Able to provide API:Definition support dummy addon definition:template 1`] = `
+Array [
+  null,
+]
+`;
+
 exports[`integration Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
 Array [
   Object {

@@ -50,7 +50,6 @@ export default class TemplateDefinitionProvider {
     let content = isScript ? searchAndExtractHbs(document.getText()) : document.getText();
     let ast = preprocess(content);
     let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
-
     if (!focusPath) {
       return null;
     }
@@ -98,7 +97,10 @@ export default class TemplateDefinitionProvider {
     addonResults.forEach((result: Definition[]) => {
       if (Array.isArray(result)) {
         result.forEach((item) => {
-          (definitions as Location[]).push(pathsToLocations.apply(null, [item])[0]);
+          const fixedPath = ((item as unknown) as string).split(':').pop();
+          const locations = pathsToLocations(fixedPath as string);
+          // console.error('locations', JSON.stringify(locations));
+          (definitions as Location[]).push(locations[0]);
         });
       }
     });

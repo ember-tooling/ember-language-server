@@ -82,6 +82,9 @@ function normalizeUri(objects: Definition, base?: string) {
   }
 
   return objects.map((object) => {
+    if (object === null) {
+      return object;
+    }
     if (object.uri) {
       const { uri } = object;
       object.uri = replaceDynamicUriPart(uri);
@@ -530,6 +533,135 @@ describe('integration', function() {
         },
         'app/components/foo.hbs',
         { line: 0, character: 18 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Able to provide API:Completion', () => {
+    it('support dummy addon completion:template', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js':
+                  'module.exports.onComplete = function(root, { type }) { if (type !== "template") { return null }; return [{label: "this.name"}]; }'
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    completionProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this.n}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 8 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+    it('support dummy addon completion:script', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': 'module.exports.onComplete = function(root, { type }) { if (type !== "script") { return null }; return [{label: "name"}]; }'
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    completionProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.js': 'var a = "na"'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.js',
+        { line: 0, character: 11 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Able to provide API:Definition', () => {
+    it('support dummy addon definition:template', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': `
+                  module.exports.onDefinition = function(root) { 
+                    let filePath = require("path").join(__dirname, "./../../../app/components/hello.hbs");
+                    return [ filePath ];
+                  }
+                `
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    definitionProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 3 }
       );
       expect(result).toMatchSnapshot();
     });

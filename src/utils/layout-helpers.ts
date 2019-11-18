@@ -347,13 +347,13 @@ export function collectProjectProviders(root: string): ProjectProviders {
       result.completionProviders.push(handlerObject.handler.onComplete);
     }
     if (handlerObject.capabilities.referencesProvider && typeof handlerObject.handler.onReference === 'function') {
-      result.completionProviders.push(handlerObject.handler.onReference);
+      result.referencesProviders.push(handlerObject.handler.onReference);
     }
     if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
-      result.completionProviders.push(handlerObject.handler.onDefinition);
+      result.definitionProviders.push(handlerObject.handler.onDefinition);
     }
     if (handlerObject.capabilities.resolveProvider && typeof handlerObject.handler.onResolve === 'function') {
-      result.completionProviders.push(handlerObject.handler.onResolve);
+      result.resolveProviders.push(handlerObject.handler.onResolve);
     }
   });
 
