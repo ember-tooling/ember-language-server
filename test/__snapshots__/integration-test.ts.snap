@@ -1,0 +1,2164 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`integration Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
+Array [
+  Object {
+    "detail": "@foo = undefined // (used in template)",
+    "kind": 10,
+    "label": "@foo",
+    "textEdit": Object {
+      "newText": "@foo",
+      "range": Object {
+        "end": Object {
+          "character": 18,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 17,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "@name = undefined // (used in template)",
+    "kind": 10,
+    "label": "@name",
+    "textEdit": Object {
+      "newText": "@name",
+      "range": Object {
+        "end": Object {
+          "character": 18,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 17,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "@picture = undefined // (used in template)",
+    "kind": 10,
+    "label": "@picture",
+    "textEdit": Object {
+      "newText": "@picture",
+      "range": Object {
+        "end": Object {
+          "character": 18,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 17,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Able to provide autocomplete information for local context access support collocated components 1`] = `
+Array [
+  Object {
+    "detail": "lastName = \\"b\\"",
+    "kind": 10,
+    "label": "this.lastName",
+    "textEdit": Object {
+      "newText": "this.lastName",
+      "range": Object {
+        "end": Object {
+          "character": 7,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "firstName = \\"a\\"",
+    "kind": 10,
+    "label": "this.firstName",
+    "textEdit": Object {
+      "newText": "this.firstName",
+      "range": Object {
+        "end": Object {
+          "character": 7,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Able to provide autocomplete information for local context access support collocated components in mustache arguments 1`] = `
+Array [
+  Object {
+    "detail": "lastName = \\"b\\"",
+    "kind": 10,
+    "label": "this.lastName",
+    "textEdit": Object {
+      "newText": "this.lastName",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 6,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "firstName = \\"a\\"",
+    "kind": 10,
+    "label": "this.firstName",
+    "textEdit": Object {
+      "newText": "this.firstName",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 6,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Able to provide autocomplete information for local context access support collocated components in node attributes 1`] = `
+Array [
+  Object {
+    "detail": "lastName = \\"b\\"",
+    "kind": 10,
+    "label": "this.lastName",
+    "textEdit": Object {
+      "newText": "this.lastName",
+      "range": Object {
+        "end": Object {
+          "character": 17,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "firstName = \\"a\\"",
+    "kind": 10,
+    "label": "this.firstName",
+    "textEdit": Object {
+      "newText": "this.firstName",
+      "range": Object {
+        "end": Object {
+          "character": 17,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "darling",
+    "textEdit": Object {
+      "newText": "darling",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "hello",
+    "textEdit": Object {
+      "newText": "hello",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "input",
+    "textEdit": Object {
+      "newText": "input",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "link-to",
+    "textEdit": Object {
+      "newText": "link-to",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "textarea",
+    "textEdit": Object {
+      "newText": "textarea",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for component #2 < 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Darling",
+    "textEdit": Object {
+      "newText": "Darling",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Hello",
+    "textEdit": Object {
+      "newText": "Hello",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 1,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for component #3 {{# 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "darling",
+    "textEdit": Object {
+      "newText": "darling",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "hello",
+    "textEdit": Object {
+      "newText": "hello",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 1`] = `
+Array [
+  Object {
+    "detail": "helper",
+    "kind": 3,
+    "label": "boo",
+    "textEdit": Object {
+      "newText": "boo",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "action",
+    "textEdit": Object {
+      "newText": "action",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "textEdit": Object {
+      "newText": "component",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember 1.13.0",
+    "kind": 3,
+    "label": "concat",
+    "textEdit": Object {
+      "newText": "concat",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.13.0",
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "get",
+    "textEdit": Object {
+      "newText": "get",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember 3.12.0",
+    "kind": 3,
+    "label": "fn",
+    "textEdit": Object {
+      "newText": "fn",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "3.12.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "hash",
+    "textEdit": Object {
+      "newText": "hash",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "has-block",
+    "textEdit": Object {
+      "newText": "has-block",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "textEdit": Object {
+      "newText": "if",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "loc",
+    "textEdit": Object {
+      "newText": "loc",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "mut",
+    "textEdit": Object {
+      "newText": "mut",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "query-params",
+    "textEdit": Object {
+      "newText": "query-params",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unbound",
+    "textEdit": Object {
+      "newText": "unbound",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "textEdit": Object {
+      "newText": "unless",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 1`] = `
+Array [
+  Object {
+    "detail": "helper",
+    "kind": 3,
+    "label": "boo",
+    "textEdit": Object {
+      "newText": "boo",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "action",
+    "textEdit": Object {
+      "newText": "action",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "textEdit": Object {
+      "newText": "component",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember 1.13.0",
+    "kind": 3,
+    "label": "concat",
+    "textEdit": Object {
+      "newText": "concat",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.13.0",
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "get",
+    "textEdit": Object {
+      "newText": "get",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember 3.12.0",
+    "kind": 3,
+    "label": "fn",
+    "textEdit": Object {
+      "newText": "fn",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "3.12.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "hash",
+    "textEdit": Object {
+      "newText": "hash",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "has-block",
+    "textEdit": Object {
+      "newText": "has-block",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "textEdit": Object {
+      "newText": "if",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "loc",
+    "textEdit": Object {
+      "newText": "loc",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "mut",
+    "textEdit": Object {
+      "newText": "mut",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "query-params",
+    "textEdit": Object {
+      "newText": "query-params",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unbound",
+    "textEdit": Object {
+      "newText": "unbound",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "textEdit": Object {
+      "newText": "unless",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+]
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for modifier #4 <Foo {{ 1`] = `
+Array [
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "on",
+    "textEdit": Object {
+      "newText": "on",
+      "range": Object {
+        "end": Object {
+          "character": 7,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 7,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "ModifierPath",
+    ],
+  },
+  Object {
+    "detail": "modifier",
+    "kind": 3,
+    "label": "boo",
+    "textEdit": Object {
+      "newText": "boo",
+      "range": Object {
+        "end": Object {
+          "character": 7,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 7,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "modifier",
+    "kind": 2,
+    "label": "action",
+    "textEdit": Object {
+      "newText": "action",
+      "range": Object {
+        "end": Object {
+          "character": 7,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 7,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Autocomplete works in LinkTo components for @route argument able to autocomplete basic routes 1`] = `
+Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "foo.bar.baz",
+    "textEdit": Object {
+      "newText": "foo.bar.baz",
+      "range": Object {
+        "end": Object {
+          "character": 16,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 16,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Completion request returns all angle-bracket in a element expression 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "AnotherAwesomeComponent",
+    "textEdit": Object {
+      "newText": "AnotherAwesomeComponent",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "MyAwesomeComponent",
+    "textEdit": Object {
+      "newText": "MyAwesomeComponent",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 1,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Completion request returns all components and helpers when requesting completion items in a handlebars expression 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "another-awesome-component",
+    "textEdit": Object {
+      "newText": "another-awesome-component",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "my-awesome-component",
+    "textEdit": Object {
+      "newText": "my-awesome-component",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "nested/nested-component",
+    "textEdit": Object {
+      "newText": "nested/nested-component",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "helper",
+    "kind": 3,
+    "label": "some-helper",
+    "textEdit": Object {
+      "newText": "some-helper",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "action",
+    "textEdit": Object {
+      "newText": "action",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "textEdit": Object {
+      "newText": "component",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember 1.13.0",
+    "kind": 3,
+    "label": "concat",
+    "textEdit": Object {
+      "newText": "concat",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.13.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "debugger",
+    "textEdit": Object {
+      "newText": "debugger",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "get",
+    "textEdit": Object {
+      "newText": "get",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember 3.12.0",
+    "kind": 3,
+    "label": "fn",
+    "textEdit": Object {
+      "newText": "fn",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "3.12.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "textEdit": Object {
+      "newText": "if",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "input",
+    "textEdit": Object {
+      "newText": "input",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "link-to",
+    "textEdit": Object {
+      "newText": "link-to",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "loc",
+    "textEdit": Object {
+      "newText": "loc",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "log",
+    "textEdit": Object {
+      "newText": "log",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "mount",
+    "textEdit": Object {
+      "newText": "mount",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "outlet",
+    "textEdit": Object {
+      "newText": "outlet",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "yield",
+    "textEdit": Object {
+      "newText": "yield",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "else",
+    "textEdit": Object {
+      "newText": "else",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "render",
+    "textEdit": Object {
+      "newText": "render",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "textarea",
+    "textEdit": Object {
+      "newText": "textarea",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unbound",
+    "textEdit": Object {
+      "newText": "unbound",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "textEdit": Object {
+      "newText": "unless",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+]
+`;
+
+exports[`integration Completion request returns all routes when requesting completion items in a block link-to 1`] = `
+Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "angle-completion",
+    "textEdit": Object {
+      "newText": "angle-completion",
+      "range": Object {
+        "end": Object {
+          "character": 12,
+          "line": 3,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 3,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "definition",
+    "textEdit": Object {
+      "newText": "definition",
+      "range": Object {
+        "end": Object {
+          "character": 12,
+          "line": 3,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 3,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "test-route",
+    "textEdit": Object {
+      "newText": "test-route",
+      "range": Object {
+        "end": Object {
+          "character": 12,
+          "line": 3,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 3,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "nested.nested-route",
+    "textEdit": Object {
+      "newText": "nested.nested-route",
+      "range": Object {
+        "end": Object {
+          "character": 12,
+          "line": 3,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 3,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Completion request returns all routes when requesting completion items in an inline link-to 1`] = `
+Array [
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "angle-completion",
+    "textEdit": Object {
+      "newText": "angle-completion",
+      "range": Object {
+        "end": Object {
+          "character": 23,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 23,
+          "line": 2,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "definition",
+    "textEdit": Object {
+      "newText": "definition",
+      "range": Object {
+        "end": Object {
+          "character": 23,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 23,
+          "line": 2,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "test-route",
+    "textEdit": Object {
+      "newText": "test-route",
+      "range": Object {
+        "end": Object {
+          "character": 23,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 23,
+          "line": 2,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "nested.nested-route",
+    "textEdit": Object {
+      "newText": "nested.nested-route",
+      "range": Object {
+        "end": Object {
+          "character": 23,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 23,
+          "line": 2,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a belongsTo relationship 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/models/model-a.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a component in a template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/components/my-awesome-component.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a hasMany relationship 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/models/model-b.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a helper in a template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/helpers/some-helper.js",
+  },
+]
+`;
+
+exports[`integration Definition request returns the definition information for a transform 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "file:///path-to-tests/fixtures/full-project/app/transforms/custom-transform.js",
+  },
+]
+`;
+
+exports[`integration GlimmerNative able to provide glimmer-native component 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Hello",
+    "textEdit": Object {
+      "newText": "Hello",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Button",
+    "textEdit": Object {
+      "newText": "Button",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "ListView",
+    "textEdit": Object {
+      "newText": "ListView",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration GlimmerX able to provide list of locally defined components 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "App",
+    "textEdit": Object {
+      "newText": "App",
+      "range": Object {
+        "end": Object {
+          "character": 20,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 20,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Button",
+    "textEdit": Object {
+      "newText": "Button",
+      "range": Object {
+        "end": Object {
+          "character": 20,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 20,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Ball",
+    "textEdit": Object {
+      "newText": "Ball",
+      "range": Object {
+        "end": Object {
+          "character": 20,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 20,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Border",
+    "textEdit": Object {
+      "newText": "Border",
+      "range": Object {
+        "end": Object {
+          "character": 20,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 20,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Bus",
+    "textEdit": Object {
+      "newText": "Bus",
+      "range": Object {
+        "end": Object {
+          "character": 20,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 20,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Table",
+    "textEdit": Object {
+      "newText": "Table",
+      "range": Object {
+        "end": Object {
+          "character": 20,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 20,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to component from typescripted inline template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/templates/components/darling.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to local template-only component 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/darling.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to local template-only component in module 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/darling/index.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to local template-only component in pod-like 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/darling/template.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases go to local template-only component in templates dir 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/templates/components/darling.hbs",
+  },
+]
+`;
+
+exports[`integration Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/templates/foo/bar/baz.hbs",
+  },
+]
+`;
+
+exports[`integration Initialize request returns an initialize request 1`] = `
+Object {
+  "capabilities": Object {
+    "completionProvider": Object {
+      "resolveProvider": true,
+      "triggerCharacters": Array [
+        ".",
+        "::",
+        "=",
+        "/",
+        "{{",
+        "(",
+        "<",
+        "@",
+        "this.",
+      ],
+    },
+    "definitionProvider": true,
+    "documentSymbolProvider": true,
+    "executeCommandProvider": Object {
+      "commands": Array [
+        "els:registerProjectPath",
+      ],
+    },
+    "textDocumentSync": 1,
+  },
+}
+`;
