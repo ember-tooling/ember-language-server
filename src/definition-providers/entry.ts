@@ -14,7 +14,7 @@ export default class DefinitionProvider {
     this.script = new ScriptDefinietionProvider(server);
   }
 
-  handle(params: TextDocumentPositionParams): Definition | null {
+  async handle(params: TextDocumentPositionParams): Promise<Definition | null> {
     let uri = params.textDocument.uri;
     // this.server.setStatusText('Running');
     const project = this.server.projectRoots.projectForUri(uri);
@@ -26,9 +26,9 @@ export default class DefinitionProvider {
     let extension = getExtension(params.textDocument);
 
     if (extension === '.hbs') {
-      return this.template.handle(params, project);
+      return await this.template.handle(params, project);
     } else if (extension === '.js' || extension === '.ts') {
-      return this.script.handle(params, project);
+      return await this.script.handle(params, project);
     } else {
       return null;
     }

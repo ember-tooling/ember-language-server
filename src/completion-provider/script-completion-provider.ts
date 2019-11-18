@@ -26,7 +26,7 @@ const mListTransforms = memoize(listTransforms, { length: 1, maxAge: 60000 });
 
 export default class ScriptCompletionProvider {
   constructor(private server: Server) {}
-  provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
+  async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
     log('provideCompletions');
     if (!['.js', '.ts'].includes(getExtension(params.textDocument) as string)) {
       return [];
@@ -124,6 +124,20 @@ export default class ScriptCompletionProvider {
     } catch (e) {
       log('error', e);
     }
+
+    const addonResults = await Promise.all(
+      project.providers.completionProviders.map((fn) => {
+        return fn(root, { focusPath, completions, type: 'script' });
+      })
+    );
+
+    addonResults.forEach((result: CompletionItem[]) => {
+      if (Array.isArray(result)) {
+        result.forEach((item) => {
+          completions.push(item);
+        });
+      }
+    });
 
     return filter(uniqBy(completions, 'label'), textPrefix, {
       key: 'label',

@@ -133,11 +133,13 @@ export default class Server {
     // here be dragons
   }
 
-  private onCompletion(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] {
+  private async onCompletion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> {
     const completionItems = [];
 
-    const templateCompletions = this.templateCompletionProvider.provideCompletions(textDocumentPosition);
-    const scriptCompletions = this.scriptCompletionProvider.provideCompletions(textDocumentPosition);
+    const [templateCompletions, scriptCompletions] = await Promise.all([
+      this.templateCompletionProvider.provideCompletions(textDocumentPosition),
+      this.scriptCompletionProvider.provideCompletions(textDocumentPosition)
+    ]);
     completionItems.push(...templateCompletions, ...scriptCompletions);
     // this.setStatusText('Running');
     return completionItems;

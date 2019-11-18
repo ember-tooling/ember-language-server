@@ -128,7 +128,7 @@ export default class ScriptDefinietionProvider {
     }
     return pathsToLocations.apply(null, guessedPaths);
   }
-  handle(params: TextDocumentPositionParams, project: any): Definition | null {
+  async handle(params: TextDocumentPositionParams, project: any): Promise<Definition | null> {
     const uri = params.textDocument.uri;
     const { root } = project;
     const document = this.server.documents.get(uri);

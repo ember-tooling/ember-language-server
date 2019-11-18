@@ -144,7 +144,7 @@ export default class TemplateCompletionProvider {
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
-  provideCompletions(params: TextDocumentPositionParams): CompletionItem[] {
+  async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
     log('provideCompletions');
     const ext = getExtension(params.textDocument);
 
@@ -285,6 +285,20 @@ export default class TemplateCompletionProvider {
     } catch (e) {
       log('error', e);
     }
+
+    const addonResults = await Promise.all(
+      project.providers.completionProviders.map((fn) => {
+        return fn(root, { focusPath, completions, type: 'template' });
+      })
+    );
+
+    addonResults.forEach((result: CompletionItem[]) => {
+      if (Array.isArray(result)) {
+        result.forEach((item) => {
+          completions.push(item);
+        });
+      }
+    });
 
     const textPrefix = getTextPrefix(focusPath, normalPlaceholder);
     const endCharacterPosition = position.character;

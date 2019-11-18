@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-languageserver';
+import { RequestHandler, TextDocumentPositionParams, Definition, Location } from 'vscode-languageserver';
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
 import { getExtension } from './../utils/file-extension';
 
@@ -25,6 +25,7 @@ import {
 import { kebabCase } from 'lodash';
 import * as memoize from 'memoizee';
 import { preprocess } from '@glimmer/syntax';
+import { Project } from '../project-roots';
 
 const mAddonPathsForComponentTemplates = memoize(getAddonPathsForComponentTemplates, { length: 2, maxAge: 600000 });
 
@@ -37,7 +38,7 @@ function normalizeAngleTagName(tagName: string) {
 
 export default class TemplateDefinitionProvider {
   constructor(private server: Server) {}
-  handle(params: TextDocumentPositionParams, project: any): Definition | null {
+  async handle(params: TextDocumentPositionParams, project: Project): Promise<Definition | null> {
     let uri = params.textDocument.uri;
     const root = project.root;
     const document = this.server.documents.get(uri);
@@ -53,36 +54,57 @@ export default class TemplateDefinitionProvider {
     if (!focusPath) {
       return null;
     }
+
+    let definitions: Location | Location[] | null = [];
+
     // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
     if (this.maybeClassicComponentName(focusPath)) {
-      return this.provideComponentDefinition(project.root, this.extractValueForMaybeClassicComponentName(focusPath));
+      definitions = this.provideComponentDefinition(project.root, this.extractValueForMaybeClassicComponentName(focusPath));
     } else if (this.isAngleComponent(focusPath)) {
       // <FooBar />
-      return this.provideAngleBrackedComponentDefinition(root, focusPath);
+      definitions = this.provideAngleBrackedComponentDefinition(root, focusPath);
       // {{#foo-bar}} {{/foo-bar}}
     } else if (this.isComponentWithBlock(focusPath)) {
-      return this.provideBlockComponentDefinition(root, focusPath);
-
+      definitions = this.provideBlockComponentDefinition(root, focusPath);
       // {{action "fooBar"}}, (action "fooBar"), (action this.fooBar), this.someProperty
     } else if (this.isActionName(focusPath) || this.isLocalProperty(focusPath)) {
-      return this.providePropertyDefinition(root, focusPath, uri);
-
+      definitions = this.providePropertyDefinition(root, focusPath, uri);
       // {{foo-bar}}
     } else if (this.isComponentOrHelperName(focusPath)) {
-      return this.provideMustacheDefinition(root, focusPath);
-
+      definitions = this.provideMustacheDefinition(root, focusPath);
       // <FooBar @somePropertyToFindUsage="" />
     } else if (isLinkComponentRouteTarget(focusPath)) {
       // <LinkTo @route="name" />
-      return this.provideRouteDefinition(project.root, focusPath.node.chars);
+      definitions = this.provideRouteDefinition(project.root, focusPath.node.chars);
     } else if (this.isAnglePropertyAttribute(focusPath)) {
-      return this.provideAngleBracketComponentAttributeUsage(root, focusPath);
-
+      definitions = this.provideAngleBracketComponentAttributeUsage(root, focusPath);
       // {{hello propertyUsageToFind=someValue}}
     } else if (this.isHashPairKey(focusPath)) {
-      return this.provideHashPropertyUsage(project.root, focusPath);
+      definitions = this.provideHashPropertyUsage(project.root, focusPath);
     } else if (isLinkToTarget(focusPath)) {
-      return this.provideRouteDefinition(project.root, focusPath.node.original);
+      definitions = this.provideRouteDefinition(project.root, focusPath.node.original);
+    }
+
+    if (definitions === null) {
+      definitions = [];
+    }
+
+    const addonResults = await Promise.all(
+      project.providers.definitionProviders.map((fn) => {
+        return fn(root, { focusPath, type: 'template', definitions });
+      })
+    );
+
+    addonResults.forEach((result: Definition[]) => {
+      if (Array.isArray(result)) {
+        result.forEach((item) => {
+          (definitions as Location[]).push(pathsToLocations.apply(null, [item])[0]);
+        });
+      }
+    });
+
+    if ((definitions as Location[]).length) {
+      return definitions;
     }
 
     return null;

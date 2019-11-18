@@ -2,7 +2,7 @@ import * as memoize from 'memoizee';
 import * as walkSync from 'walk-sync';
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
+import { CompletionItem, CompletionItemKind, Definition } from 'vscode-languageserver';
 
 export const isModuleUnificationApp = memoize(isMuApp, {
   length: 1,
@@ -233,6 +233,55 @@ export function getPackageJSON(file: string) {
   }
 }
 
+type ThenableHandler = (arg0: string, arg1: any) => Promise<any[]>;
+
+export interface ProjectProviders {
+  definitionProviders: ThenableHandler[];
+  referencesProviders: ThenableHandler[];
+  completionProviders: ThenableHandler[];
+  resolveProviders: ThenableHandler[];
+}
+
+interface ExtensionCapabilities {
+  definitionProvider: undefined | true | false;
+  referencesProvider:
+    | undefined
+    | {
+        components: true | false;
+      };
+  completionProvider:
+    | undefined
+    | {
+        resolveProvider: true | false;
+      };
+}
+
+interface NormalizedCapabilities {
+  definitionProvider: true | false;
+  referencesProvider: true | false;
+  completionProvider: true | false;
+  resolveProvider: true | false;
+}
+
+function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabilities {
+  return {
+    definitionProvider: raw.definitionProvider === true,
+    referencesProvider: typeof raw.referencesProvider === 'object' && raw.referencesProvider.components === true,
+    completionProvider: typeof raw.completionProvider === 'object' || raw.completionProvider === true,
+    resolveProvider: typeof raw.completionProvider === 'object' && raw.completionProvider.resolveProvider === true
+  };
+}
+
+export function extensionCapabilities(info: any): ExtensionCapabilities {
+  return info['ember-language-server'].capabilities;
+}
+export function languageServerHandler(info: any): string {
+  return info['ember-language-server'].entry;
+}
+export function hasEmberLanguageServerExtension(info: any) {
+  return 'ember-language-server' in info;
+}
+
 export function isEmberAddon(info: any) {
   return info.keywords && info.keywords.includes('ember-addon');
 }
@@ -254,6 +303,61 @@ export function isTemplatePath(filePath: string) {
 
 export function hasAddonFolderInPath(name: string) {
   return name.includes(path.sep + 'addon' + path.sep);
+}
+
+interface HandlerObject {
+  handler: {
+    onReference: undefined | Promise<any[] | null>;
+    onComplete: undefined | Promise<any[] | null>;
+    onDefinition: undefined | Promise<Definition | null>;
+    onResolve: undefined | Promise<any[] | null>;
+  };
+  packageRoot: string;
+  packageJSON: any;
+  capabilities: NormalizedCapabilities;
+}
+
+export function collectProjectProviders(root: string): ProjectProviders {
+  const roots = [].concat(getProjectAddonsRoots(root) as any, getProjectInRepoAddonsRoots(root) as any).filter((pathItem: any) => typeof pathItem === 'string');
+  const meta: HandlerObject[] = [];
+  roots.forEach((packagePath: string) => {
+    const info = getPackageJSON(packagePath);
+    if (hasEmberLanguageServerExtension(info)) {
+      const handlerPath = languageServerHandler(info);
+      meta.push({
+        handler: require(path.join(packagePath, handlerPath)),
+        packageRoot: packagePath,
+        packageJSON: info,
+        capabilities: normalizeCapabilities(extensionCapabilities(info))
+      });
+    }
+  });
+
+  const result = {
+    definitionProviders: [],
+    referencesProviders: [],
+    completionProviders: [],
+    resolveProviders: []
+  };
+
+  // onReference, onComplete, onDefinition, onResolve
+
+  meta.forEach((handlerObject) => {
+    if (handlerObject.capabilities.completionProvider && typeof handlerObject.handler.onComplete === 'function') {
+      result.completionProviders.push(handlerObject.handler.onComplete);
+    }
+    if (handlerObject.capabilities.referencesProvider && typeof handlerObject.handler.onReference === 'function') {
+      result.completionProviders.push(handlerObject.handler.onReference);
+    }
+    if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
+      result.completionProviders.push(handlerObject.handler.onDefinition);
+    }
+    if (handlerObject.capabilities.resolveProvider && typeof handlerObject.handler.onResolve === 'function') {
+      result.completionProviders.push(handlerObject.handler.onResolve);
+    }
+  });
+
+  return result;
 }
 
 export function getProjectAddonsInfo(root: string) {
