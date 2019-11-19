@@ -13,7 +13,6 @@ import {
   createConnection,
   IConnection,
   TextDocuments,
-  TextDocument,
   InitializeResult,
   InitializeParams,
   DocumentSymbolParams,
@@ -22,8 +21,7 @@ import {
   CompletionItem,
   StreamMessageReader,
   StreamMessageWriter,
-  CancellationToken,
-  Position,
+  ReferenceParams,
   Location
 } from 'vscode-languageserver';
 
@@ -142,13 +140,8 @@ export default class Server {
     // here be dragons
   }
 
-  private async onReference(
-    document: TextDocument,
-    position: Position,
-    options: { includeDeclaration: boolean },
-    token: CancellationToken
-  ): Promise<Location[]> {
-    return await this.referenceProvider.provideReferences(document, position, options, token);
+  private async onReference(params: ReferenceParams): Promise<Location[]> {
+    return await this.referenceProvider.provideReferences(params);
   }
 
   private async onCompletion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> {

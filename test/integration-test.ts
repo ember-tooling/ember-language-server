@@ -725,8 +725,7 @@ describe('integration', function() {
                 'langserver.js': `
                   module.exports.onReference = function(root) { 
                     let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.hbs");
-                    return [];
-                    // return [ { url: filePath, range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } } } ];
+                    return [ { uri: 'file://' + filePath.split(':').pop(), range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } } } ];
                   }
                 `
               },

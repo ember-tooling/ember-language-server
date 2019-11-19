@@ -244,7 +244,8 @@ export interface ProjectProviders {
 
 interface ExtensionCapabilities {
   definitionProvider: undefined | true | false;
-  referencesProvider:
+  referenceProvider:
+    | true
     | undefined
     | {
         components: true | false;
@@ -266,7 +267,7 @@ interface NormalizedCapabilities {
 function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabilities {
   return {
     definitionProvider: raw.definitionProvider === true,
-    referencesProvider: typeof raw.referencesProvider === 'object' && raw.referencesProvider.components === true,
+    referencesProvider: raw.referenceProvider === true || (typeof raw.referenceProvider === 'object' && raw.referenceProvider.components === true),
     completionProvider: typeof raw.completionProvider === 'object' || raw.completionProvider === true,
     resolveProvider: typeof raw.completionProvider === 'object' && raw.completionProvider.resolveProvider === true
   };

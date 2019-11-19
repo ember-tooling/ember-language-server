@@ -83,6 +83,24 @@ Array [
 ]
 `;
 
+exports[`integration Able to provide API:Reference support dummy addon reference:template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/hello/index.hbs",
+  },
+]
+`;
+
 exports[`integration Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
 Array [
   Object {
