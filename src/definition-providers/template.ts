@@ -91,6 +91,7 @@ export default class TemplateDefinitionProvider {
         type: 'template',
         textDocument: params.textDocument,
         position: params.position,
+        results: definitions,
         server: this.server
       })),
       ...(await queryELSAddonsAPI(project.providers.resolveProviders, root, {
@@ -98,6 +99,7 @@ export default class TemplateDefinitionProvider {
         type: 'template',
         textDocument: params.textDocument,
         position: params.position,
+        results: definitions,
         server: this.server
       }))
     ];

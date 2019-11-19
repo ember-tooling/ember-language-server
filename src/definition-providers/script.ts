@@ -185,6 +185,7 @@ export default class ScriptDefinietionProvider {
         type: 'template',
         textDocument: params.textDocument,
         position: params.position,
+        results,
         server: this.server
       })),
       ...(await queryELSAddonsAPI(project.providers.resolveProviders, root, {
@@ -192,6 +193,7 @@ export default class ScriptDefinietionProvider {
         type: 'template',
         textDocument: params.textDocument,
         position: params.position,
+        results,
         server: this.server
       }))
     ];

@@ -9,7 +9,6 @@ export class ReferenceProvider {
     if (!project) {
       return [];
     }
-
     const addonResults = await queryELSAddonsAPI(project.providers.referencesProviders, project.root, {
       textDocument,
       position,

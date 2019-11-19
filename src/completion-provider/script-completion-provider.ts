@@ -131,6 +131,7 @@ export default class ScriptCompletionProvider {
       textDocument: params.textDocument,
       position: params.position,
       server: this.server,
+      results: completions,
       type: 'script'
     });
 

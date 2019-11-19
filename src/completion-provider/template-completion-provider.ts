@@ -290,7 +290,7 @@ export default class TemplateCompletionProvider {
       focusPath,
       textDocument: params.textDocument,
       position: params.position,
-      completions,
+      results: completions,
       server: this.server,
       type: 'template'
     });
