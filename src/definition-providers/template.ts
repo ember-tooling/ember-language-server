@@ -54,7 +54,7 @@ export default class TemplateDefinitionProvider {
       return null;
     }
 
-    let definitions: Location | Location[] | null = [];
+    let definitions: Location[] = [];
 
     // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
     if (this.maybeClassicComponentName(focusPath)) {
@@ -84,32 +84,21 @@ export default class TemplateDefinitionProvider {
       definitions = this.provideRouteDefinition(project.root, focusPath.node.original);
     }
 
-    if (definitions === null) {
-      definitions = [];
-    }
-
     const addonResults = await Promise.all(
       project.providers.definitionProviders.map((fn) => {
         return fn(root, { focusPath, type: 'template', definitions });
       })
     );
 
-    addonResults.forEach((result: Definition[]) => {
-      if (Array.isArray(result)) {
-        result.forEach((item) => {
-          const fixedPath = ((item as unknown) as string).split(':').pop();
-          const locations = pathsToLocations(fixedPath as string);
-          // console.error('locations', JSON.stringify(locations));
-          (definitions as Location[]).push(locations[0]);
-        });
-      }
+    addonResults.forEach((result: string[]) => {
+      result.forEach((item) => {
+        const fixedPath = item.split(':').pop();
+        const locations = pathsToLocations(fixedPath as string);
+        definitions.push(locations[0]);
+      });
     });
 
-    if ((definitions as Location[]).length) {
-      return definitions;
-    }
-
-    return null;
+    return definitions || null;
   }
   looksLikeClassicComponentName(name: string) {
     return name.length && !name.includes('.') && !name.includes(' ') && name === name.toLowerCase();
@@ -136,7 +125,7 @@ export default class TemplateDefinitionProvider {
       return false;
     }
   }
-  provideRouteDefinition(root: string, routeName: string) {
+  provideRouteDefinition(root: string, routeName: string): Location[] {
     const routeParts = routeName.split('.');
     const lastRoutePart = routeParts.pop();
     const routePaths = isModuleUnificationApp(root)
@@ -183,14 +172,14 @@ export default class TemplateDefinitionProvider {
     }
     return paths;
   }
-  provideLikelyComponentTemplatePath(root: string, rawComponentName: string) {
+  provideLikelyComponentTemplatePath(root: string, rawComponentName: string): Location[] {
     let paths = this._provideLikelyRawComponentTemplatePaths(root, rawComponentName);
     return pathsToLocations.apply(null, paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths);
   }
   provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
     return this.provideLikelyComponentTemplatePath(root, focusPath.node.tag);
   }
-  provideBlockComponentDefinition(root: string, focusPath: ASTPath): null | Definition {
+  provideBlockComponentDefinition(root: string, focusPath: ASTPath): Location[] {
     let maybeComponentName = focusPath.node.path.original;
     let paths: string[] = getPathsForComponentTemplates(root, maybeComponentName).filter(fs.existsSync);
     if (!paths.length) {
@@ -201,10 +190,10 @@ export default class TemplateDefinitionProvider {
     // mAddonPathsForComponentTemplates
     return pathsToLocationsWithPosition(paths, '{{yield');
   }
-  providePropertyDefinition(root: string, focusPath: ASTPath, uri: string): null | Definition {
+  providePropertyDefinition(root: string, focusPath: ASTPath, uri: string): Location[] {
     let maybeComponentName = getComponentNameFromURI(root, uri);
     if (!maybeComponentName) {
-      return null;
+      return [];
     }
     let paths: string[] = getPathsForComponentScripts(root, maybeComponentName).filter(fs.existsSync);
     if (!paths.length) {
@@ -215,7 +204,7 @@ export default class TemplateDefinitionProvider {
     const text = focusPath.node.original;
     return pathsToLocationsWithPosition(paths, text.replace('this.', '').split('.')[0]);
   }
-  provideComponentDefinition(root: string, maybeComponentName: string) {
+  provideComponentDefinition(root: string, maybeComponentName: string): Location[] {
     let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map((pathParts: any) => {
       return path.join.apply(path, pathParts.filter((part: any) => !!part));
     });
@@ -234,7 +223,7 @@ export default class TemplateDefinitionProvider {
     const maybeComponentName = focusPath.node.type === 'ElementNode' ? normalizeAngleTagName(focusPath.node.tag) : focusPath.node.original;
     return this.provideComponentDefinition(root, maybeComponentName);
   }
-  provideHashPropertyUsage(root: string, focusPath: ASTPath): null | Definition {
+  provideHashPropertyUsage(root: string, focusPath: ASTPath): Location[] {
     let parentPath = focusPath.parentPath;
     if (parentPath && parentPath.parent && parentPath.parent.path) {
       const maybeComponentName = parentPath.parent.path.original;
@@ -251,9 +240,9 @@ export default class TemplateDefinitionProvider {
         return pathsToLocationsWithPosition(finalPaths, '@' + focusPath.node.key);
       }
     }
-    return null;
+    return [];
   }
-  provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath): null | Definition {
+  provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath): Location[] {
     const maybeComponentName = normalizeAngleTagName(focusPath.parent.tag);
 
     let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);

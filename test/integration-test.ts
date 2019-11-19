@@ -631,7 +631,7 @@ describe('integration', function() {
               lib: {
                 'langserver.js': `
                   module.exports.onDefinition = function(root) { 
-                    let filePath = require("path").join(__dirname, "./../../../app/components/hello.hbs");
+                    let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.hbs");
                     return [ filePath ];
                   }
                 `
@@ -662,6 +662,51 @@ describe('integration', function() {
         },
         'app/components/hello/index.hbs',
         { line: 0, character: 3 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+
+    it('support dummy addon definition:script', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': `
+                  module.exports.onDefinition = function(root) { 
+                    let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.js");
+                    return [ filePath ];
+                  }
+                `
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    definitionProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.js': 'var n = "foo";'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.js',
+        { line: 0, character: 10 }
       );
       expect(result).toMatchSnapshot();
     });

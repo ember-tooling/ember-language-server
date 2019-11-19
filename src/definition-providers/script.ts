@@ -1,7 +1,7 @@
 import * as path from 'path';
 import Server from './../server';
 import ASTPath from './../glimmer-utils';
-import { TextDocumentPositionParams, Definition } from 'vscode-languageserver';
+import { TextDocumentPositionParams, Definition, Location } from 'vscode-languageserver';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { toPosition } from './../estree-utils';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../utils/definition-helpers';
@@ -16,6 +16,7 @@ import {
   isTemplateElement
 } from './../utils/ast-helpers';
 import { isModuleUnificationApp, podModulePrefixForRoot } from './../utils/layout-helpers';
+import { Project } from '../project-roots';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
@@ -128,7 +129,7 @@ export default class ScriptDefinietionProvider {
     }
     return pathsToLocations.apply(null, guessedPaths);
   }
-  async handle(params: TextDocumentPositionParams, project: any): Promise<Definition | null> {
+  async handle(params: TextDocumentPositionParams, project: Project): Promise<Definition | null> {
     const uri = params.textDocument.uri;
     const { root } = project;
     const document = this.server.documents.get(uri);
@@ -147,30 +148,50 @@ export default class ScriptDefinietionProvider {
       return null;
     }
 
+    let results: Location[] = [];
+
     if (isTemplateElement(astPath)) {
-      return this.server.definitionProvider.template.handle(params, project);
+      let templateResults = await this.server.definitionProvider.template.handle(params, project);
+      if (Array.isArray(templateResults)) {
+        results = templateResults;
+      }
     } else if (isModelReference(astPath)) {
       const modelName = astPath.node.value;
-      return this.guessPathsForType(root, 'Model', modelName);
+      results = this.guessPathsForType(root, 'Model', modelName);
     } else if (isTransformReference(astPath)) {
       const transformName = astPath.node.value;
-      return this.guessPathsForType(root, 'Transform', transformName);
+      results = this.guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
-      return this.guessPathForImport(root, uri, astPath.node.value);
+      results = this.guessPathForImport(root, uri, astPath.node.value);
     } else if (isServiceInjection(astPath)) {
       let serviceName = astPath.node.name;
       let args = astPath.parent.value.arguments;
       if (args.length && args[0].type === 'StringLiteral') {
         serviceName = args[0].value;
       }
-      return this.guessPathsForType(root, 'Service', kebabCase(serviceName));
+      results = this.guessPathsForType(root, 'Service', kebabCase(serviceName));
     } else if (isNamedServiceInjection(astPath)) {
       let serviceName = astPath.node.value;
-      return this.guessPathsForType(root, 'Service', kebabCase(serviceName));
+      results = this.guessPathsForType(root, 'Service', kebabCase(serviceName));
     } else if (isRouteLookup(astPath)) {
       let routePath = astPath.node.value;
-      return this.server.definitionProvider.template.provideRouteDefinition(root, routePath);
+      results = this.server.definitionProvider.template.provideRouteDefinition(root, routePath);
     }
-    return null;
+
+    const addonResults = await Promise.all(
+      project.providers.definitionProviders.map((fn) => {
+        return fn(root, { focusPath: astPath, type: 'template', definitions: results });
+      })
+    );
+
+    addonResults.forEach((result: string[]) => {
+      result.forEach((item) => {
+        const fixedPath = item.split(':').pop();
+        const locations = pathsToLocations(fixedPath as string);
+        results.push(locations[0]);
+      });
+    });
+
+    return results || null;
   }
 }
