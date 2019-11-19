@@ -90,13 +90,15 @@ export default class TemplateDefinitionProvider {
         focusPath,
         type: 'template',
         textDocument: params.textDocument,
-        position: params.position
+        position: params.position,
+        server: this.server
       })),
       ...(await queryELSAddonsAPI(project.providers.resolveProviders, root, {
         focusPath,
         type: 'template',
         textDocument: params.textDocument,
-        position: params.position
+        position: params.position,
+        server: this.server
       }))
     ];
 

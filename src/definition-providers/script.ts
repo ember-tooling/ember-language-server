@@ -184,13 +184,15 @@ export default class ScriptDefinietionProvider {
         focusPath: astPath,
         type: 'template',
         textDocument: params.textDocument,
-        position: params.position
+        position: params.position,
+        server: this.server
       })),
       ...(await queryELSAddonsAPI(project.providers.resolveProviders, root, {
         focusPath: astPath,
         type: 'template',
         textDocument: params.textDocument,
-        position: params.position
+        position: params.position,
+        server: this.server
       }))
     ];
 

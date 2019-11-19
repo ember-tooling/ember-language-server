@@ -130,6 +130,7 @@ export default class ScriptCompletionProvider {
       completions,
       textDocument: params.textDocument,
       position: params.position,
+      server: this.server,
       type: 'script'
     });
 

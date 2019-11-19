@@ -291,6 +291,7 @@ export default class TemplateCompletionProvider {
       textDocument: params.textDocument,
       position: params.position,
       completions,
+      server: this.server,
       type: 'template'
     });
     const textPrefix = getTextPrefix(focusPath, normalPlaceholder);
