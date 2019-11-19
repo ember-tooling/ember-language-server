@@ -4,7 +4,8 @@ import * as path from 'path';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { log } from './utils/logger';
 import * as walkSync from 'walk-sync';
-import { isGlimmerNativeProject, isGlimmerXProject, ProjectProviders, collectProjectProviders } from './utils/layout-helpers';
+import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
+import { ProjectProviders, collectProjectProviders } from './utils/addon-api';
 
 export class Project {
   providers!: ProjectProviders;

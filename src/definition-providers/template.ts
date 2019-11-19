@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { RequestHandler, TextDocumentPositionParams, Definition, Location } from 'vscode-languageserver';
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
 import { getExtension } from './../utils/file-extension';
+import { queryELSAddonsAPI } from './../utils/addon-api';
 
 import { isLinkToTarget, isLinkComponentRouteTarget } from './../utils/ast-helpers';
 
@@ -84,21 +85,14 @@ export default class TemplateDefinitionProvider {
       definitions = this.provideRouteDefinition(project.root, focusPath.node.original);
     }
 
-    const addonResults = await Promise.all(
-      project.providers.definitionProviders.map((fn) => {
-        return fn(root, { focusPath, type: 'template', definitions });
-      })
-    );
-
-    addonResults.forEach((result: string[]) => {
-      result.forEach((item) => {
-        const fixedPath = item.split(':').pop();
-        const locations = pathsToLocations(fixedPath as string);
-        definitions.push(locations[0]);
-      });
+    const addonResults = await queryELSAddonsAPI(project.providers.definitionProviders, root, {
+      focusPath,
+      type: 'template',
+      textDocument: params.textDocument,
+      position: params.position
     });
 
-    return definitions || null;
+    return [...definitions, ...addonResults];
   }
   looksLikeClassicComponentName(name: string) {
     return name.length && !name.includes('.') && !name.includes(' ') && name === name.toLowerCase();

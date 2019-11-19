@@ -1,5 +1,7 @@
 import { Location, ReferenceParams } from 'vscode-languageserver';
 import Server from '../server';
+import { queryELSAddonsAPI } from './../utils/addon-api';
+
 export class ReferenceProvider {
   constructor(private server: Server) {}
   async provideReferences({ textDocument, position }: ReferenceParams): Promise<Location[]> {
@@ -7,19 +9,11 @@ export class ReferenceProvider {
     if (!project) {
       return [];
     }
-    const addonResults = await Promise.all(
-      project.providers.referencesProviders.map((fn: any) => {
-        return fn(project.root, { textDocument, position });
-      })
-    );
-    const results: Location[] = [];
-    addonResults.forEach((locations: Location[]) => {
-      if (locations.length) {
-        locations.forEach((loc) => {
-          results.push(loc);
-        });
-      }
+
+    const addonResults = await queryELSAddonsAPI(project.providers.referencesProviders, project.root, {
+      textDocument,
+      position
     });
-    return results;
+    return addonResults;
   }
 }

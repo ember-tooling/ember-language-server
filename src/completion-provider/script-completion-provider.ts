@@ -1,5 +1,5 @@
 import { CompletionItem, TextDocumentPositionParams } from 'vscode-languageserver';
-
+import { queryELSAddonsAPI } from './../utils/addon-api';
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
@@ -125,21 +125,15 @@ export default class ScriptCompletionProvider {
       log('error', e);
     }
 
-    const addonResults = await Promise.all(
-      project.providers.completionProviders.map((fn) => {
-        return fn(root, { focusPath, completions, type: 'script' });
-      })
-    );
-
-    addonResults.forEach((result: CompletionItem[]) => {
-      if (Array.isArray(result)) {
-        result.forEach((item) => {
-          completions.push(item);
-        });
-      }
+    const addonResults = await queryELSAddonsAPI(project.providers.completionProviders, root, {
+      focusPath,
+      completions,
+      textDocument: params.textDocument,
+      position: params.position,
+      type: 'script'
     });
 
-    return filter(uniqBy(completions, 'label'), textPrefix, {
+    return filter(uniqBy([...completions, ...addonResults], 'label'), textPrefix, {
       key: 'label',
       maxResults: 40
     });

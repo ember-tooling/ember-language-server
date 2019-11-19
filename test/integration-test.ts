@@ -633,7 +633,19 @@ describe('integration', function() {
                 'langserver.js': `
                   module.exports.onDefinition = function(root) { 
                     let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.hbs");
-                    return [ filePath ];
+                    return [ {
+                      "range": {
+                        "end": {
+                          "character": 0,
+                          "line": 0,
+                        },
+                        "start": {
+                          "character": 0,
+                          "line": 0,
+                        }
+                      },
+                      "uri": "file://" + filePath.split(':').pop()
+                    } ];
                   }
                 `
               },
@@ -678,7 +690,19 @@ describe('integration', function() {
                 'langserver.js': `
                   module.exports.onDefinition = function(root) { 
                     let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.js");
-                    return [ filePath ];
+                    return [ {
+                      "range": {
+                        "end": {
+                          "character": 0,
+                          "line": 0,
+                        },
+                        "start": {
+                          "character": 0,
+                          "line": 0,
+                        }
+                      },
+                      "uri": "file://" + filePath.split(':').pop()
+                    } ]; 
                   }
                 `
               },
