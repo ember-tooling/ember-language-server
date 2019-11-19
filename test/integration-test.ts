@@ -10,7 +10,8 @@ import {
   CompletionRequest,
   DefinitionRequest,
   ExecuteCommandRequest,
-  Definition
+  Definition,
+  ReferencesRequest
 } from 'vscode-languageserver-protocol';
 
 function startServer() {
@@ -707,6 +708,54 @@ describe('integration', function() {
         },
         'app/components/hello/index.js',
         { line: 0, character: 10 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Able to provide API:Reference', () => {
+    it('support dummy addon reference:template', async () => {
+      const result = await getResult(
+        ReferencesRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': `
+                  module.exports.onReference = function(root) { 
+                    let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.hbs");
+                    return [];
+                    // return [ { url: filePath, range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } } } ];
+                  }
+                `
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    referenceProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 3 }
       );
       expect(result).toMatchSnapshot();
     });

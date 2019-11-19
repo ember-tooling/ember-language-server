@@ -2157,6 +2157,7 @@ Object {
         "els:registerProjectPath",
       ],
     },
+    "referencesProvider": true,
     "textDocumentSync": 1,
   },
 }
