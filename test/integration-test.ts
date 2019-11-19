@@ -734,7 +734,7 @@ describe('integration', function() {
                 'ember-language-server': {
                   entry: './lib/langserver',
                   capabilities: {
-                    referenceProvider: true
+                    referencesProvider: true
                   }
                 }
               })
