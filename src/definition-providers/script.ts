@@ -179,12 +179,20 @@ export default class ScriptDefinietionProvider {
       results = this.server.definitionProvider.template.provideRouteDefinition(root, routePath);
     }
 
-    const addonResults = await queryELSAddonsAPI(project.providers.definitionProviders, root, {
-      focusPath: astPath,
-      type: 'template',
-      textDocument: params.textDocument,
-      position: params.position
-    });
+    const addonResults = [
+      ...(await queryELSAddonsAPI(project.providers.definitionProviders, root, {
+        focusPath: astPath,
+        type: 'template',
+        textDocument: params.textDocument,
+        position: params.position
+      })),
+      ...(await queryELSAddonsAPI(project.providers.resolveProviders, root, {
+        focusPath: astPath,
+        type: 'template',
+        textDocument: params.textDocument,
+        position: params.position
+      }))
+    ];
 
     return [...results, ...addonResults];
   }

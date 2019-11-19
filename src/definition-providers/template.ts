@@ -85,12 +85,20 @@ export default class TemplateDefinitionProvider {
       definitions = this.provideRouteDefinition(project.root, focusPath.node.original);
     }
 
-    const addonResults = await queryELSAddonsAPI(project.providers.definitionProviders, root, {
-      focusPath,
-      type: 'template',
-      textDocument: params.textDocument,
-      position: params.position
-    });
+    const addonResults = [
+      ...(await queryELSAddonsAPI(project.providers.definitionProviders, root, {
+        focusPath,
+        type: 'template',
+        textDocument: params.textDocument,
+        position: params.position
+      })),
+      ...(await queryELSAddonsAPI(project.providers.resolveProviders, root, {
+        focusPath,
+        type: 'template',
+        textDocument: params.textDocument,
+        position: params.position
+      }))
+    ];
 
     return [...definitions, ...addonResults];
   }
