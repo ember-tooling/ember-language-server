@@ -62,32 +62,6 @@ export async function queryELSAddonsAPIChain(callbacks: any[], root: string, par
   return lastResult;
 }
 
-export async function queryELSAddonsAPI(callbacks: any[], root: string, params: any): Promise<any[]> {
-  const results: any[] = [];
-  const addonResults = await Promise.all(
-    callbacks.map(async (fn) => {
-      try {
-        const result = await fn(root, params);
-        return result;
-      } catch (e) {
-        log('ELSAddonsAPIError', fn, e.toString(), root, params);
-        return [];
-      }
-    })
-  );
-
-  addonResults.forEach((result) => {
-    if (Array.isArray(result)) {
-      result.forEach((item) => {
-        if (item) {
-          results.push(item);
-        }
-      });
-    }
-  });
-  return results;
-}
-
 export function collectProjectProviders(root: string): ProjectProviders {
   const roots = [].concat(getProjectAddonsRoots(root) as any, getProjectInRepoAddonsRoots(root) as any).filter((pathItem: any) => typeof pathItem === 'string');
   const dagMap: DAGMap<HandlerObject> = new DAGMap();
