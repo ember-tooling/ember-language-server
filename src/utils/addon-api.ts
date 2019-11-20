@@ -5,6 +5,8 @@ import { log } from './logger';
 import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
+
+const ADDON_CONFIG_KEY = 'ember-language-server';
 interface BaseAPIParams {
   server: Server;
   textDocument: TextDocumentIdentifier;
@@ -30,7 +32,6 @@ export interface AddonAPI {
   onReference: undefined | ReferenceResolveFunction;
   onComplete: undefined | CompletionResolveFunction;
   onDefinition: undefined | DefinitionResolveFunction;
-  onResolve: undefined | DefinitionResolveFunction;
 }
 
 interface HandlerObject {
@@ -38,7 +39,6 @@ interface HandlerObject {
     onReference: undefined | Promise<any[] | null>;
     onComplete: undefined | Promise<any[] | null>;
     onDefinition: undefined | Promise<Definition | null>;
-    onResolve: undefined | Promise<any[] | null>;
   };
   packageRoot: string;
   packageJSON: any;
@@ -83,11 +83,10 @@ export function collectProjectProviders(root: string): ProjectProviders {
   const result = {
     definitionProviders: [],
     referencesProviders: [],
-    completionProviders: [],
-    resolveProviders: []
+    completionProviders: []
   };
 
-  // onReference, onComplete, onDefinition, onResolve
+  // onReference, onComplete, onDefinition
 
   dagMap.each((_, handlerObject) => {
     if (handlerObject === undefined) {
@@ -102,9 +101,6 @@ export function collectProjectProviders(root: string): ProjectProviders {
     if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
       result.definitionProviders.push(handlerObject.handler.onDefinition);
     }
-    if (handlerObject.capabilities.resolveProvider && typeof handlerObject.handler.onResolve === 'function') {
-      result.resolveProviders.push(handlerObject.handler.onResolve);
-    }
   });
 
   return result;
@@ -116,7 +112,6 @@ export interface ProjectProviders {
   definitionProviders: ThenableHandler[];
   referencesProviders: ThenableHandler[];
   completionProviders: ThenableHandler[];
-  resolveProviders: ThenableHandler[];
 }
 
 interface ExtensionCapabilities {
@@ -127,35 +122,29 @@ interface ExtensionCapabilities {
     | {
         components: true | false;
       };
-  completionProvider:
-    | undefined
-    | {
-        resolveProvider: true | false;
-      };
+  completionProvider: true | undefined;
 }
 
 interface NormalizedCapabilities {
   definitionProvider: true | false;
   referencesProvider: true | false;
   completionProvider: true | false;
-  resolveProvider: true | false;
 }
 
 function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabilities {
   return {
     definitionProvider: raw.definitionProvider === true,
     referencesProvider: raw.referencesProvider === true || (typeof raw.referencesProvider === 'object' && raw.referencesProvider.components === true),
-    completionProvider: typeof raw.completionProvider === 'object' || raw.completionProvider === true,
-    resolveProvider: typeof raw.completionProvider === 'object' && raw.completionProvider.resolveProvider === true
+    completionProvider: typeof raw.completionProvider === 'object' || raw.completionProvider === true
   };
 }
 
 export function extensionCapabilities(info: any): ExtensionCapabilities {
-  return info['ember-language-server'].capabilities;
+  return info[ADDON_CONFIG_KEY].capabilities;
 }
 export function languageServerHandler(info: any): string {
-  return info['ember-language-server'].entry;
+  return info[ADDON_CONFIG_KEY].entry;
 }
 export function hasEmberLanguageServerExtension(info: any) {
-  return 'ember-language-server' in info;
+  return ADDON_CONFIG_KEY in info;
 }
