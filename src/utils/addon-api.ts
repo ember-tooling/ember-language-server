@@ -1,7 +1,30 @@
-import { Definition } from 'vscode-languageserver';
+import { Definition, Location, TextDocumentIdentifier, Position, CompletionItem } from 'vscode-languageserver';
 import { getProjectAddonsRoots, getPackageJSON, getProjectInRepoAddonsRoots } from './layout-helpers';
 import * as path from 'path';
 import { log } from './logger';
+import Server from '../server';
+import ASTPath from './../glimmer-utils';
+interface BaseAPIParams {
+  server: Server;
+  textDocument: TextDocumentIdentifier;
+  position: Position;
+}
+interface ReferenceFunctionParams extends BaseAPIParams {}
+interface CompletionFunctionParams extends BaseAPIParams {
+  results: CompletionItem[];
+  focusPath: ASTPath;
+  type: 'script' | 'template';
+}
+interface DefinitionFunctionParams extends CompletionFunctionParams {}
+type ReferenceResolveFunction = (root: string, params: ReferenceFunctionParams) => Promise<Location[]>;
+type CompletionResolveFunction = (root: string, params: CompletionFunctionParams) => Promise<CompletionItem[]>;
+type DefinitionResolveFunction = (root: string, params: DefinitionFunctionParams) => Promise<Location[]>;
+export interface AddonAPI {
+  onReference: undefined | ReferenceResolveFunction;
+  onComplete: undefined | CompletionResolveFunction;
+  onDefinition: undefined | DefinitionResolveFunction;
+  onResolve: undefined | DefinitionResolveFunction;
+}
 
 interface HandlerObject {
   handler: {
