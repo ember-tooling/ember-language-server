@@ -127,7 +127,6 @@ export default class ScriptCompletionProvider {
 
     const addonResults = await queryELSAddonsAPI(project.providers.completionProviders, root, {
       focusPath,
-      completions,
       textDocument: params.textDocument,
       position: params.position,
       server: this.server,
