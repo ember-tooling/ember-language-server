@@ -9,13 +9,17 @@ interface BaseAPIParams {
   textDocument: TextDocumentIdentifier;
   position: Position;
 }
-interface ReferenceFunctionParams extends BaseAPIParams {}
-interface CompletionFunctionParams extends BaseAPIParams {
-  results: CompletionItem[];
+interface ExtendedAPIParams {
   focusPath: ASTPath;
   type: 'script' | 'template';
 }
-interface DefinitionFunctionParams extends CompletionFunctionParams {}
+interface ReferenceFunctionParams extends BaseAPIParams {}
+interface CompletionFunctionParams extends ExtendedAPIParams {
+  results: CompletionItem[];
+}
+interface DefinitionFunctionParams extends ExtendedAPIParams {
+  results: Location[];
+}
 type ReferenceResolveFunction = (root: string, params: ReferenceFunctionParams) => Promise<Location[]>;
 type CompletionResolveFunction = (root: string, params: CompletionFunctionParams) => Promise<CompletionItem[]>;
 type DefinitionResolveFunction = (root: string, params: DefinitionFunctionParams) => Promise<Location[]>;
