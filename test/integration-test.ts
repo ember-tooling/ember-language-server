@@ -621,6 +621,84 @@ describe('integration', function() {
     });
   });
 
+  describe('API:Chain', () => {
+    it('support addon ordering', async () => {
+      const addon1Name = 'addon1';
+      const addon2Name = 'addon2';
+      const addon3Name = 'addon3';
+      const addon4Name = 'addon4';
+
+      const config = {
+        entry: './lib/langserver',
+        capabilities: {
+          completionProvider: true
+        }
+      };
+
+      function makePackage(name, addonConfig) {
+        let pack = {
+          name,
+          'ember-language-server': config
+        };
+
+        if (addonConfig) {
+          pack['ember-addon'] = addonConfig;
+        }
+        return JSON.stringify(pack);
+      }
+
+      function makeAddon(name, addonConfig = undefined) {
+        return {
+          lib: {
+            'langserver.js': `
+            function onComplete(root, { type, results }) {
+              if (type !== "template") { return results; };
+              results.forEach((item)=>{
+                item.label = item.label + '_' + "${name}" + '_';
+              });
+              return results;
+            };
+            module.exports.onComplete = onComplete;    
+            `
+          },
+          'package.json': makePackage(name, addonConfig)
+        };
+      }
+
+      const addon1 = makeAddon(addon1Name);
+      const addon2 = makeAddon(addon2Name, { before: addon3Name });
+      const addon3 = makeAddon(addon3Name, { after: addon4Name });
+      const addon4 = makeAddon(addon4Name, { after: addon1Name });
+
+      const fileStructure = {
+        node_modules: {
+          addon1,
+          addon2,
+          addon3,
+          addon4
+        },
+        'package.json': JSON.stringify({
+          dependencies: {
+            [addon1Name]: '*',
+            [addon2Name]: '*',
+            [addon3Name]: '*',
+            [addon4Name]: '*'
+          }
+        }),
+        app: {
+          components: {
+            dory: {
+              'index.hbs': '{{this.a}}'
+            }
+          }
+        }
+      };
+
+      const result = await getResult(CompletionRequest.type, connection, fileStructure, 'app/components/dory/index.hbs', { line: 0, character: 8 });
+      expect(result).toMatchSnapshot();
+    });
+  });
+
   describe('Able to provide API:Definition', () => {
     it('support dummy addon definition:template', async () => {
       const result = await getResult(

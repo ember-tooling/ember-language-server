@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { RequestHandler, TextDocumentPositionParams, Definition, Location } from 'vscode-languageserver';
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
 import { getExtension } from './../utils/file-extension';
-import { queryELSAddonsAPI } from './../utils/addon-api';
+import { queryELSAddonsAPIChain } from './../utils/addon-api';
 
 import { isLinkToTarget, isLinkComponentRouteTarget } from './../utils/ast-helpers';
 
@@ -85,26 +85,16 @@ export default class TemplateDefinitionProvider {
       definitions = this.provideRouteDefinition(project.root, focusPath.node.original);
     }
 
-    const addonResults = [
-      ...(await queryELSAddonsAPI(project.providers.definitionProviders, root, {
-        focusPath,
-        type: 'template',
-        textDocument: params.textDocument,
-        position: params.position,
-        results: definitions,
-        server: this.server
-      })),
-      ...(await queryELSAddonsAPI(project.providers.resolveProviders, root, {
-        focusPath,
-        type: 'template',
-        textDocument: params.textDocument,
-        position: params.position,
-        results: definitions,
-        server: this.server
-      }))
-    ];
+    const addonResults = await queryELSAddonsAPIChain(project.providers.definitionProviders, root, {
+      focusPath,
+      type: 'template',
+      textDocument: params.textDocument,
+      position: params.position,
+      results: definitions,
+      server: this.server
+    });
 
-    return [...definitions, ...addonResults];
+    return addonResults;
   }
   looksLikeClassicComponentName(name: string) {
     return name.length && !name.includes('.') && !name.includes(' ') && name === name.toLowerCase();

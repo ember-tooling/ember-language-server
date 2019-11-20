@@ -15,7 +15,7 @@ import {
   isNamedServiceInjection,
   isTemplateElement
 } from './../utils/ast-helpers';
-import { queryELSAddonsAPI } from './../utils/addon-api';
+import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import { isModuleUnificationApp, podModulePrefixForRoot } from './../utils/layout-helpers';
 import { Project } from '../project-roots';
 
@@ -179,25 +179,15 @@ export default class ScriptDefinietionProvider {
       results = this.server.definitionProvider.template.provideRouteDefinition(root, routePath);
     }
 
-    const addonResults = [
-      ...(await queryELSAddonsAPI(project.providers.definitionProviders, root, {
-        focusPath: astPath,
-        type: 'template',
-        textDocument: params.textDocument,
-        position: params.position,
-        results,
-        server: this.server
-      })),
-      ...(await queryELSAddonsAPI(project.providers.resolveProviders, root, {
-        focusPath: astPath,
-        type: 'template',
-        textDocument: params.textDocument,
-        position: params.position,
-        results,
-        server: this.server
-      }))
-    ];
+    const addonResults = await queryELSAddonsAPIChain(project.providers.definitionProviders, root, {
+      focusPath: astPath,
+      type: 'template',
+      textDocument: params.textDocument,
+      position: params.position,
+      results,
+      server: this.server
+    });
 
-    return [...results, ...addonResults];
+    return addonResults;
   }
 }

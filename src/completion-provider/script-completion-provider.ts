@@ -1,5 +1,5 @@
 import { CompletionItem, TextDocumentPositionParams } from 'vscode-languageserver';
-import { queryELSAddonsAPI } from './../utils/addon-api';
+import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
@@ -125,7 +125,7 @@ export default class ScriptCompletionProvider {
       log('error', e);
     }
 
-    const addonResults = await queryELSAddonsAPI(project.providers.completionProviders, root, {
+    const addonResults = await queryELSAddonsAPIChain(project.providers.completionProviders, root, {
       focusPath,
       textDocument: params.textDocument,
       position: params.position,
@@ -134,7 +134,7 @@ export default class ScriptCompletionProvider {
       type: 'script'
     });
 
-    return filter(uniqBy([...completions, ...addonResults], 'label'), textPrefix, {
+    return filter(uniqBy(addonResults, 'label'), textPrefix, {
       key: 'label',
       maxResults: 40
     });

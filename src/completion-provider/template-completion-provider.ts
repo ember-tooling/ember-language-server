@@ -4,7 +4,7 @@ import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
-import { queryELSAddonsAPI } from './../utils/addon-api';
+import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import { preprocess } from '@glimmer/syntax';
 import { uniqBy, startCase, camelCase } from 'lodash';
 
@@ -286,7 +286,7 @@ export default class TemplateCompletionProvider {
       log('error', e);
     }
 
-    const addonResults = await queryELSAddonsAPI(project.providers.completionProviders, root, {
+    const addonResults = await queryELSAddonsAPIChain(project.providers.completionProviders, root, {
       focusPath,
       textDocument: params.textDocument,
       position: params.position,
@@ -299,7 +299,7 @@ export default class TemplateCompletionProvider {
     if (textPrefix.length) {
       position.character -= textPrefix.length;
     }
-    return filter([...completions, ...addonResults], textPrefix, {
+    return filter(addonResults, textPrefix, {
       key: 'label',
       maxResults: 40
     }).map((el) => {

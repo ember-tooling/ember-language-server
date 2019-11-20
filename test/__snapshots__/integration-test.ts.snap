@@ -1,21 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`integration Able to provide API:Completion support dummy addon completion:script 1`] = `
+exports[`integration API:Chain support addon ordering 1`] = `
 Array [
   Object {
-    "label": "name",
-  },
-]
-`;
-
-exports[`integration Able to provide API:Completion support dummy addon completion:template 1`] = `
-Array [
-  Object {
-    "detail": "n = undefined",
+    "detail": "a = undefined",
     "kind": 10,
-    "label": "this.n",
+    "label": "this.a_addon2__addon1__addon4__addon3_",
     "textEdit": Object {
-      "newText": "this.n",
+      "newText": "this.a_addon2__addon1__addon4__addon3_",
       "range": Object {
         "end": Object {
           "character": 8,
@@ -28,6 +20,19 @@ Array [
       },
     },
   },
+]
+`;
+
+exports[`integration Able to provide API:Completion support dummy addon completion:script 1`] = `
+Array [
+  Object {
+    "label": "name",
+  },
+]
+`;
+
+exports[`integration Able to provide API:Completion support dummy addon completion:template 1`] = `
+Array [
   Object {
     "label": "this.name",
     "textEdit": Object {

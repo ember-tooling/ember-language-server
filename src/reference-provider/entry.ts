@@ -1,6 +1,6 @@
 import { Location, ReferenceParams } from 'vscode-languageserver';
 import Server from '../server';
-import { queryELSAddonsAPI } from './../utils/addon-api';
+import { queryELSAddonsAPIChain } from './../utils/addon-api';
 
 export class ReferenceProvider {
   constructor(private server: Server) {}
@@ -9,9 +9,10 @@ export class ReferenceProvider {
     if (!project) {
       return [];
     }
-    const addonResults = await queryELSAddonsAPI(project.providers.referencesProviders, project.root, {
+    const addonResults = await queryELSAddonsAPIChain(project.providers.referencesProviders, project.root, {
       textDocument,
       position,
+      results: [],
       server: this.server
     });
     return addonResults;

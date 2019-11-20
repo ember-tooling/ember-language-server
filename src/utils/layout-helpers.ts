@@ -59,8 +59,9 @@ export function getPodModulePrefix(root: string): string | null {
 export function resolvePackageRoot(root: string, addonName: string, packagesFolder = 'node_modules') {
   const roots = root.split(path.sep);
   while (roots.length) {
-    const maybePath = path.join(roots.join(path.sep), packagesFolder, addonName);
-    const linkedPath = path.join(roots.join(path.sep), addonName);
+    const prefix = roots.join(path.sep);
+    const maybePath = path.join(prefix, packagesFolder, addonName);
+    const linkedPath = path.join(prefix, addonName);
     if (fs.existsSync(path.join(maybePath, 'package.json'))) {
       return maybePath;
     } else if (fs.existsSync(path.join(linkedPath, 'package.json'))) {

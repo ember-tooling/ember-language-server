@@ -4,6 +4,7 @@ import * as path from 'path';
 import { log } from './logger';
 import Server from '../server';
 import ASTPath from './../glimmer-utils';
+import DAGMap from 'dag-map';
 interface BaseAPIParams {
   server: Server;
   textDocument: TextDocumentIdentifier;
@@ -13,7 +14,9 @@ interface ExtendedAPIParams {
   focusPath: ASTPath;
   type: 'script' | 'template';
 }
-interface ReferenceFunctionParams extends BaseAPIParams {}
+interface ReferenceFunctionParams extends BaseAPIParams {
+  results: Location[];
+}
 interface CompletionFunctionParams extends ExtendedAPIParams {
   results: CompletionItem[];
 }
@@ -42,6 +45,23 @@ interface HandlerObject {
   capabilities: NormalizedCapabilities;
 }
 
+export async function queryELSAddonsAPIChain(callbacks: any[], root: string, params: any): Promise<any[]> {
+  let lastResult = params.results || [];
+  for (let callback of callbacks) {
+    try {
+      let tempResult = await callback(root, Object.assign({}, params, { results: JSON.parse(JSON.stringify(lastResult)) }));
+      // API must return array
+      if (Array.isArray(tempResult)) {
+        lastResult = tempResult;
+      }
+    } catch (e) {
+      console.log(e);
+      log('ELSAddonsAPIError', callback, e.toString(), root, params);
+    }
+  }
+  return lastResult;
+}
+
 export async function queryELSAddonsAPI(callbacks: any[], root: string, params: any): Promise<any[]> {
   const results: any[] = [];
   const addonResults = await Promise.all(
@@ -50,7 +70,7 @@ export async function queryELSAddonsAPI(callbacks: any[], root: string, params: 
         const result = await fn(root, params);
         return result;
       } catch (e) {
-        log('cllELSAddonsAPI', e.toString(), root, params);
+        log('ELSAddonsAPIError', fn, e.toString(), root, params);
         return [];
       }
     })
@@ -70,17 +90,19 @@ export async function queryELSAddonsAPI(callbacks: any[], root: string, params: 
 
 export function collectProjectProviders(root: string): ProjectProviders {
   const roots = [].concat(getProjectAddonsRoots(root) as any, getProjectInRepoAddonsRoots(root) as any).filter((pathItem: any) => typeof pathItem === 'string');
-  const meta: HandlerObject[] = [];
+  const dagMap: DAGMap<HandlerObject> = new DAGMap();
   roots.forEach((packagePath: string) => {
     const info = getPackageJSON(packagePath);
     if (hasEmberLanguageServerExtension(info)) {
       const handlerPath = languageServerHandler(info);
-      meta.push({
+      const addonInfo = info['ember-addon'] || {};
+      const addon: HandlerObject = {
         handler: require(path.join(packagePath, handlerPath)),
         packageRoot: packagePath,
         packageJSON: info,
         capabilities: normalizeCapabilities(extensionCapabilities(info))
-      });
+      };
+      dagMap.add(info.name || packagePath, addon, addonInfo.before, addonInfo.after);
     }
   });
 
@@ -93,7 +115,10 @@ export function collectProjectProviders(root: string): ProjectProviders {
 
   // onReference, onComplete, onDefinition, onResolve
 
-  meta.forEach((handlerObject) => {
+  dagMap.each((_, handlerObject) => {
+    if (handlerObject === undefined) {
+      return;
+    }
     if (handlerObject.capabilities.completionProvider && typeof handlerObject.handler.onComplete === 'function') {
       result.completionProviders.push(handlerObject.handler.onComplete);
     }
