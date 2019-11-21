@@ -440,7 +440,9 @@ Array [
     "kind": 3,
     "label": "component",
     "textEdit": Object {
-      "newText": "component}}{{/component}}",
+      "newText": "component}}
+  
+{{/component}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -464,7 +466,9 @@ Array [
     "kind": 3,
     "label": "each",
     "textEdit": Object {
-      "newText": "each}}{{/each}}",
+      "newText": "each}}
+  
+{{/each}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -485,7 +489,9 @@ Array [
     "kind": 3,
     "label": "each-in",
     "textEdit": Object {
-      "newText": "each-in}}{{/each-in}}",
+      "newText": "each-in}}
+  
+{{/each-in}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -507,7 +513,9 @@ Array [
     "kind": 3,
     "label": "in-element",
     "textEdit": Object {
-      "newText": "in-element}}{{/in-element}}",
+      "newText": "in-element}}
+  
+{{/in-element}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -528,7 +536,9 @@ Array [
     "kind": 3,
     "label": "let",
     "textEdit": Object {
-      "newText": "let}}{{/let}}",
+      "newText": "let}}
+  
+{{/let}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -549,7 +559,9 @@ Array [
     "kind": 3,
     "label": "if",
     "textEdit": Object {
-      "newText": "if}}{{/if}}",
+      "newText": "if}}
+  
+{{/if}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -572,7 +584,9 @@ Array [
     "kind": 3,
     "label": "unless",
     "textEdit": Object {
-      "newText": "unless}}{{/unless}}",
+      "newText": "unless}}
+  
+{{/unless}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -595,7 +609,9 @@ Array [
     "kind": 3,
     "label": "with",
     "textEdit": Object {
-      "newText": "with}}{{/with}}",
+      "newText": "with}}
+  
+{{/with}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -616,7 +632,9 @@ Array [
     "kind": 7,
     "label": "darling",
     "textEdit": Object {
-      "newText": "darling}}{{/darling}}",
+      "newText": "darling}}
+  
+{{/darling}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -634,7 +652,9 @@ Array [
     "kind": 7,
     "label": "hello",
     "textEdit": Object {
-      "newText": "hello}}{{/hello}}",
+      "newText": "hello}}
+  
+{{/hello}}",
       "range": Object {
         "end": Object {
           "character": 3,

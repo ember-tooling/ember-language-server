@@ -105,13 +105,21 @@ export default class TemplateCompletionProvider {
       key: 'label',
       maxResults: 40
     }).map((el: CompletionItem) => {
+      if (el.textEdit) {
+        return el;
+      }
       let endPosition = {
         line: position.line,
         character: endCharacterPosition
       };
       const shouldFixContent = normalPlaceholder.includes('}}{{');
       el.textEdit = {
-        newText: shouldFixContent ? normalPlaceholder.split(PLACEHOLDER).join(el.label) : el.label,
+        newText: shouldFixContent
+          ? normalPlaceholder
+              .split(PLACEHOLDER)
+              .join(el.label)
+              .replace('}}{{', '}}\n  \n{{')
+          : el.label,
         range: {
           start: position,
           end: endPosition
