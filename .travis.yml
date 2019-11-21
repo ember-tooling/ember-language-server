@@ -11,6 +11,8 @@ before_install:
       sleep 3;
     fi
 
+cache: yarn
+
 script:
   - yarn compile
   - yarn lint
