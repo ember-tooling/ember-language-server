@@ -1005,7 +1005,7 @@ describe('integration', function() {
         { line: 1, character: 3 }
       );
 
-      expect(result.filter(({ kind }) => kind === 7)).toMatchSnapshot();
+      expect(result).toMatchSnapshot();
     });
 
     it('autocomplete information for modifier #4 <Foo {{', async () => {

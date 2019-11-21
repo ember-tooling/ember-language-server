@@ -47,9 +47,9 @@ export default class TemplateCompletionProvider {
       PLACEHOLDER + '}} />',
       PLACEHOLDER + '"}}',
       PLACEHOLDER + '}}',
-      PLACEHOLDER + '}} {{/' + PLACEHOLDER + '}}',
+      PLACEHOLDER + '}}{{/' + PLACEHOLDER + '}}',
       // {{#}} -> {{# + P}}{{/P + }}
-      PLACEHOLDER + '}} {{/' + PLACEHOLDER,
+      PLACEHOLDER + '}}{{/' + PLACEHOLDER,
       PLACEHOLDER + ')}}',
       PLACEHOLDER + '))}}',
       PLACEHOLDER + ')))}}'
@@ -109,7 +109,7 @@ export default class TemplateCompletionProvider {
         line: position.line,
         character: endCharacterPosition
       };
-      const shouldFixContent = normalPlaceholder.includes('}} {{');
+      const shouldFixContent = normalPlaceholder.includes('}}{{');
       el.textEdit = {
         newText: shouldFixContent ? normalPlaceholder.split(PLACEHOLDER).join(el.label) : el.label,
         range: {

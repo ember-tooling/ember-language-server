@@ -31,7 +31,7 @@ import {
   mGetProjectAddonsInfo
 } from '../../utils/layout-helpers';
 
-function toAngleBrackedName(name: string) {
+export function toAngleBrackedName(name: string) {
   return name
     .split('/')
     .map((part: string) => {
@@ -195,8 +195,8 @@ export default class TemplateCompletionProvider {
         // {{#foo-bar?}} {{/foo-bar}}
         log('isBlockPath');
         const candidates = this.getBlockPathCandidates(root, uri, originalText);
-        completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberBlockItems);
+        completions.push(...uniqBy(candidates, 'label'));
       } else if (isSubExpressionPath(focusPath)) {
         // {{foo-bar name=(subexpr? )}}
         log('isSubExpressionPath');
