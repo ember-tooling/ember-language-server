@@ -3,15 +3,15 @@ import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-l
 import Server from './../server';
 import { getExtension } from './../utils/file-extension';
 import TemplateDefinitionProvider from './template';
-import ScriptDefinietionProvider from './script';
+import ScriptDefinitionProvider from './script';
 
 export default class DefinitionProvider {
   public template!: TemplateDefinitionProvider;
-  public script!: ScriptDefinietionProvider;
+  public script!: ScriptDefinitionProvider;
 
   constructor(private server: Server) {
     this.template = new TemplateDefinitionProvider(server);
-    this.script = new ScriptDefinietionProvider(server);
+    this.script = new ScriptDefinitionProvider(server);
   }
 
   async handle(params: TextDocumentPositionParams): Promise<Definition | null> {

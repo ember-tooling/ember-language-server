@@ -6,7 +6,7 @@ import { toPosition } from './../estree-utils';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import { Project } from '../project-roots';
 
-export default class ScriptDefinietionProvider {
+export default class ScriptDefinitionProvider {
   constructor(private server: Server) {}
   async handle(params: TextDocumentPositionParams, project: Project): Promise<Definition | null> {
     const uri = params.textDocument.uri;

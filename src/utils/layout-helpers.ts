@@ -22,6 +22,14 @@ export const isAddonRoot = memoize(isProjectAddonRoot, {
   maxAge: 600000
 });
 
+interface PackageInfo {
+  keywords?: string[];
+  'ember-language-server'?: {};
+  'ember-addon'?: {
+    version?: number;
+  };
+}
+
 export function isMuApp(root: string) {
   return fs.existsSync(path.join(root, 'src', 'ui'));
 }
@@ -37,14 +45,14 @@ export function safeWalkSync(filePath: string | false, opts: any) {
 }
 
 export function getPodModulePrefix(root: string): string | null {
-  let podModulePrefix: any = '';
+  let podModulePrefix: string = '';
   // log('listPodsComponents');
   try {
     const appConfig = require(path.join(root, 'config', 'environment.js'));
     // log('appConfig', appConfig);
     podModulePrefix = appConfig('development').podModulePrefix || '';
     if (podModulePrefix.includes('/')) {
-      podModulePrefix = podModulePrefix.split('/').pop();
+      podModulePrefix = podModulePrefix.split('/').pop() as string;
     }
   } catch (e) {
     // log('catch', e);
@@ -234,18 +242,18 @@ export function getPackageJSON(file: string) {
   }
 }
 
-export function isEmberAddon(info: any) {
+export function isEmberAddon(info: PackageInfo) {
   return info.keywords && info.keywords.includes('ember-addon');
 }
 
-function addonVersion(info: any) {
+function addonVersion(info: PackageInfo) {
   if (!isEmberAddon(info)) {
     return null;
   }
   return isEmberAddonV2(info) ? 2 : 1;
 }
 
-function isEmberAddonV2(info: any) {
+function isEmberAddonV2(info: PackageInfo) {
   return info['ember-addon'] && info['ember-addon'].version === 2;
 }
 
@@ -258,7 +266,9 @@ export function hasAddonFolderInPath(name: string) {
 }
 
 export function getProjectAddonsInfo(root: string) {
-  const roots = [].concat(getProjectAddonsRoots(root) as any, getProjectInRepoAddonsRoots(root) as any).filter((pathItem: any) => typeof pathItem === 'string');
+  const roots = ([] as string[])
+    .concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root) as any)
+    .filter((pathItem: any) => typeof pathItem === 'string');
   // log('roots', roots);
   const meta: any = [];
   roots.forEach((packagePath: string) => {

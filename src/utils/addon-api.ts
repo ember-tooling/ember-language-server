@@ -6,7 +6,7 @@ import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
 
-import CoreScriptDefinietionProvider from './../builtin-addons/core/script-definition-provider';
+import CoreScriptDefinitionProvider from './../builtin-addons/core/script-definition-provider';
 import CoreTemplateDefinitionProvider from './../builtin-addons/core/template-definition-provider';
 import ScriptCompletionProvider from './../builtin-addons/core/script-completion-provider';
 import TemplateCompletionProvider from './../builtin-addons/core/template-completion-provider';
@@ -68,7 +68,7 @@ export async function queryELSAddonsAPIChain(callbacks: any[], root: string, par
 }
 
 export function initBuiltinProviders(): ProjectProviders {
-  const scriptDefinition = new CoreScriptDefinietionProvider();
+  const scriptDefinition = new CoreScriptDefinitionProvider();
   const templateDefinition = new CoreTemplateDefinitionProvider();
   const scriptCompletion = new ScriptCompletionProvider();
   const templateCompletion = new TemplateCompletionProvider();

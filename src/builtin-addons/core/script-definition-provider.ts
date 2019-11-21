@@ -74,7 +74,7 @@ class PathResolvers {
   }
 }
 
-export default class CoreScriptDefinietionProvider {
+export default class CoreScriptDefinitionProvider {
   private resolvers!: PathResolvers;
   constructor() {
     this.resolvers = new PathResolvers();
