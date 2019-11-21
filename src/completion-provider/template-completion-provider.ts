@@ -47,9 +47,9 @@ export default class TemplateCompletionProvider {
       PLACEHOLDER + '}} />',
       PLACEHOLDER + '"}}',
       PLACEHOLDER + '}}',
-      PLACEHOLDER + '}} {{/' + PLACEHOLDER + '}}',
+      PLACEHOLDER + '}}{{/' + PLACEHOLDER + '}}',
       // {{#}} -> {{# + P}}{{/P + }}
-      PLACEHOLDER + '}} {{/' + PLACEHOLDER,
+      PLACEHOLDER + '}}{{/' + PLACEHOLDER,
       PLACEHOLDER + ')}}',
       PLACEHOLDER + '))}}',
       PLACEHOLDER + ')))}}'
@@ -104,13 +104,14 @@ export default class TemplateCompletionProvider {
     return filter(addonResults, textPrefix, {
       key: 'label',
       maxResults: 40
-    }).map((el) => {
+    }).map((el: CompletionItem) => {
       let endPosition = {
         line: position.line,
         character: endCharacterPosition
       };
+      const shouldFixContent = normalPlaceholder.includes('}}{{');
       el.textEdit = {
-        newText: el.label,
+        newText: shouldFixContent ? normalPlaceholder.split(PLACEHOLDER).join(el.label) : el.label,
         range: {
           start: position,
           end: endPosition

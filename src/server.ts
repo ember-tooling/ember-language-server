@@ -76,6 +76,7 @@ export default class Server {
     this.connection.onExecuteCommand(this.onExecute.bind(this));
     this.connection.onReferences(this.onReference.bind(this));
     this.connection.telemetry.logEvent({ connected: true });
+    // this.displayInfoMessage('Ember Language Server [activated]');
     // 'els.showStatusBarText'
 
     // let params: ExecuteCommandParams = {
@@ -86,6 +87,20 @@ export default class Server {
 
     // this.connection.client.sendRequest()
     // this.connection.onEx
+  }
+
+  /**
+   * Custom Notifications
+   */
+
+  displayInfoMessage(msg: string): void {
+    this.connection.sendNotification('$/displayInfo', msg);
+  }
+  displayWarningMessage(msg: string): void {
+    this.connection.sendNotification('$/displayWarning', msg);
+  }
+  displayErrorMessage(msg: string): void {
+    this.connection.sendNotification('$/displayError', msg);
   }
 
   onExecute(params: string[]) {

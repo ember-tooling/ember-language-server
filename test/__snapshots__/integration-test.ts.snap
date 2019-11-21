@@ -436,11 +436,187 @@ Array [
 exports[`integration Autocomplete works for broken templates autocomplete information for component #3 {{# 1`] = `
 Array [
   Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "textEdit": Object {
+      "newText": "component}}{{/component}}",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "each",
+    "textEdit": Object {
+      "newText": "each}}{{/each}}",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "each-in",
+    "textEdit": Object {
+      "newText": "each-in}}{{/each-in}}",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "in-element",
+    "textEdit": Object {
+      "newText": "in-element}}{{/in-element}}",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "let",
+    "textEdit": Object {
+      "newText": "let}}{{/let}}",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "textEdit": Object {
+      "newText": "if}}{{/if}}",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "textEdit": Object {
+      "newText": "unless}}{{/unless}}",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "with",
+    "textEdit": Object {
+      "newText": "with}}{{/with}}",
+      "range": Object {
+        "end": Object {
+          "character": 3,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 3,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+    ],
+  },
+  Object {
     "detail": "component",
     "kind": 7,
     "label": "darling",
     "textEdit": Object {
-      "newText": "darling",
+      "newText": "darling}}{{/darling}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -458,7 +634,7 @@ Array [
     "kind": 7,
     "label": "hello",
     "textEdit": Object {
-      "newText": "hello",
+      "newText": "hello}}{{/hello}}",
       "range": Object {
         "end": Object {
           "character": 3,
