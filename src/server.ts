@@ -147,11 +147,16 @@ export default class Server {
   private async onCompletion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> {
     const completionItems = [];
 
-    const [templateCompletions, scriptCompletions] = await Promise.all([
-      this.templateCompletionProvider.provideCompletions(textDocumentPosition),
-      this.scriptCompletionProvider.provideCompletions(textDocumentPosition)
-    ]);
-    completionItems.push(...templateCompletions, ...scriptCompletions);
+    try {
+      const [templateCompletions, scriptCompletions] = await Promise.all([
+        await this.templateCompletionProvider.provideCompletions(textDocumentPosition),
+        await this.scriptCompletionProvider.provideCompletions(textDocumentPosition)
+      ]);
+      completionItems.push(...templateCompletions, ...scriptCompletions);
+    } catch (e) {
+      log('onCompletion', textDocumentPosition, e, e.toString());
+    }
+
     // this.setStatusText('Running');
     return completionItems;
   }
