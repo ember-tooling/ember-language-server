@@ -104,7 +104,7 @@ export default class TemplateCompletionProvider {
     return filter(addonResults, textPrefix, {
       key: 'label',
       maxResults: 40
-    }).map((el) => {
+    }).map((el: CompletionItem) => {
       let endPosition = {
         line: position.line,
         character: endCharacterPosition
