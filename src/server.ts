@@ -20,7 +20,9 @@ import {
   TextDocumentPositionParams,
   CompletionItem,
   StreamMessageReader,
-  StreamMessageWriter
+  StreamMessageWriter,
+  ReferenceParams,
+  Location
 } from 'vscode-languageserver';
 
 import ProjectRoots from './project-roots';
@@ -29,6 +31,7 @@ import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
+import { ReferenceProvider } from './reference-provider/entry';
 import { log } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
@@ -56,6 +59,8 @@ export default class Server {
 
   templateLinter: TemplateLinter = new TemplateLinter(this);
 
+  referenceProvider: ReferenceProvider = new ReferenceProvider(this);
+
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
@@ -69,6 +74,7 @@ export default class Server {
     this.connection.onDefinition(this.definitionProvider.handler);
     this.connection.onCompletion(this.onCompletion.bind(this));
     this.connection.onExecuteCommand(this.onExecute.bind(this));
+    this.connection.onReferences(this.onReference.bind(this));
     this.connection.telemetry.logEvent({ connected: true });
     // 'els.showStatusBarText'
 
@@ -116,6 +122,7 @@ export default class Server {
           commands: ['els:registerProjectPath']
         },
         documentSymbolProvider: true,
+        referencesProvider: true,
         completionProvider: {
           resolveProvider: true,
           triggerCharacters: ['.', '::', '=', '/', '{{', '(', '<', '@', 'this.']
@@ -133,12 +140,23 @@ export default class Server {
     // here be dragons
   }
 
-  private onCompletion(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] {
+  private async onReference(params: ReferenceParams): Promise<Location[]> {
+    return await this.referenceProvider.provideReferences(params);
+  }
+
+  private async onCompletion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> {
     const completionItems = [];
 
-    const templateCompletions = this.templateCompletionProvider.provideCompletions(textDocumentPosition);
-    const scriptCompletions = this.scriptCompletionProvider.provideCompletions(textDocumentPosition);
-    completionItems.push(...templateCompletions, ...scriptCompletions);
+    try {
+      const [templateCompletions, scriptCompletions] = await Promise.all([
+        await this.templateCompletionProvider.provideCompletions(textDocumentPosition),
+        await this.scriptCompletionProvider.provideCompletions(textDocumentPosition)
+      ]);
+      completionItems.push(...templateCompletions, ...scriptCompletions);
+    } catch (e) {
+      log('onCompletion', textDocumentPosition, e, e.toString());
+    }
+
     // this.setStatusText('Running');
     return completionItems;
   }

@@ -5,9 +5,15 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { log } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
+import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 
 export class Project {
-  constructor(public readonly root: string) {}
+  providers!: ProjectProviders;
+  builtinProviders!: ProjectProviders;
+  constructor(public readonly root: string) {
+    this.providers = collectProjectProviders(root);
+    this.builtinProviders = initBuiltinProviders();
+  }
 }
 
 export default class ProjectRoots {
@@ -43,7 +49,6 @@ export default class ProjectRoots {
 
   onProjectAdd(path: string) {
     log(`Ember CLI project added at ${path}`);
-
     this.projects.set(path, new Project(path));
   }
 

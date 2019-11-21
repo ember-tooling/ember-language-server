@@ -1,5 +1,111 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`integration API:Chain support addon ordering 1`] = `
+Array [
+  Object {
+    "detail": "a = undefined",
+    "kind": 10,
+    "label": "this.a_addon2__addon1__addon4__addon3_",
+    "textEdit": Object {
+      "newText": "this.a_addon2__addon1__addon4__addon3_",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Able to provide API:Completion support dummy addon completion:script 1`] = `
+Array [
+  Object {
+    "label": "name",
+  },
+]
+`;
+
+exports[`integration Able to provide API:Completion support dummy addon completion:template 1`] = `
+Array [
+  Object {
+    "label": "this.name",
+    "textEdit": Object {
+      "newText": "this.name",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration Able to provide API:Definition support dummy addon definition:script 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/hello/index.js",
+  },
+]
+`;
+
+exports[`integration Able to provide API:Definition support dummy addon definition:template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/hello/index.hbs",
+  },
+]
+`;
+
+exports[`integration Able to provide API:Reference support dummy addon reference:template 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/app/components/hello/index.hbs",
+  },
+]
+`;
+
 exports[`integration Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
 Array [
   Object {
@@ -2074,6 +2180,7 @@ Object {
         "els:registerProjectPath",
       ],
     },
+    "referencesProvider": true,
     "textDocumentSync": 1,
   },
 }

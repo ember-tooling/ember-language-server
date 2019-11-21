@@ -10,7 +10,8 @@ import {
   CompletionRequest,
   DefinitionRequest,
   ExecuteCommandRequest,
-  Definition
+  Definition,
+  ReferencesRequest
 } from 'vscode-languageserver-protocol';
 
 function startServer() {
@@ -82,6 +83,9 @@ function normalizeUri(objects: Definition, base?: string) {
   }
 
   return objects.map((object) => {
+    if (object === null) {
+      return object;
+    }
     if (object.uri) {
       const { uri } = object;
       object.uri = replaceDynamicUriPart(uri);
@@ -530,6 +534,329 @@ describe('integration', function() {
         },
         'app/components/foo.hbs',
         { line: 0, character: 18 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Able to provide API:Completion', () => {
+    it('support dummy addon completion:template', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js':
+                  'module.exports.onComplete = function(root, { type }) { if (type !== "template") { return null }; return [{label: "this.name"}]; }'
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    completionProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this.n}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 8 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+    it('support dummy addon completion:script', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': 'module.exports.onComplete = function(root, { type }) { if (type !== "script") { return null }; return [{label: "name"}]; }'
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    completionProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.js': 'var a = "na"'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.js',
+        { line: 0, character: 11 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('API:Chain', () => {
+    it('support addon ordering', async () => {
+      const addon1Name = 'addon1';
+      const addon2Name = 'addon2';
+      const addon3Name = 'addon3';
+      const addon4Name = 'addon4';
+
+      const config = {
+        entry: './lib/langserver',
+        capabilities: {
+          completionProvider: true
+        }
+      };
+
+      function makePackage(name, addonConfig) {
+        let pack = {
+          name,
+          'ember-language-server': config
+        };
+
+        if (addonConfig) {
+          pack['ember-addon'] = addonConfig;
+        }
+        return JSON.stringify(pack);
+      }
+
+      function makeAddon(name, addonConfig = undefined) {
+        return {
+          lib: {
+            'langserver.js': `
+            function onComplete(root, { type, results }) {
+              if (type !== "template") { return results; };
+              results.forEach((item)=>{
+                item.label = item.label + '_' + "${name}" + '_';
+              });
+              return results;
+            };
+            module.exports.onComplete = onComplete;    
+            `
+          },
+          'package.json': makePackage(name, addonConfig)
+        };
+      }
+
+      const addon1 = makeAddon(addon1Name);
+      const addon2 = makeAddon(addon2Name, { before: addon3Name });
+      const addon3 = makeAddon(addon3Name, { after: addon4Name });
+      const addon4 = makeAddon(addon4Name, { after: addon1Name });
+
+      const fileStructure = {
+        node_modules: {
+          addon1,
+          addon2,
+          addon3,
+          addon4
+        },
+        'package.json': JSON.stringify({
+          dependencies: {
+            [addon1Name]: '*',
+            [addon2Name]: '*',
+            [addon3Name]: '*',
+            [addon4Name]: '*'
+          }
+        }),
+        app: {
+          components: {
+            dory: {
+              'index.hbs': '{{this.a}}'
+            }
+          }
+        }
+      };
+
+      const result = await getResult(CompletionRequest.type, connection, fileStructure, 'app/components/dory/index.hbs', { line: 0, character: 8 });
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Able to provide API:Definition', () => {
+    it('support dummy addon definition:template', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': `
+                  module.exports.onDefinition = function(root) { 
+                    let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.hbs");
+                    return [ {
+                      "range": {
+                        "end": {
+                          "character": 0,
+                          "line": 0,
+                        },
+                        "start": {
+                          "character": 0,
+                          "line": 0,
+                        }
+                      },
+                      "uri": "file://" + filePath.split(':').pop()
+                    } ];
+                  }
+                `
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    definitionProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 3 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+
+    it('support dummy addon definition:script', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': `
+                  module.exports.onDefinition = function(root) { 
+                    let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.js");
+                    return [ {
+                      "range": {
+                        "end": {
+                          "character": 0,
+                          "line": 0,
+                        },
+                        "start": {
+                          "character": 0,
+                          "line": 0,
+                        }
+                      },
+                      "uri": "file://" + filePath.split(':').pop()
+                    } ]; 
+                  }
+                `
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    definitionProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.js': 'var n = "foo";'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.js',
+        { line: 0, character: 10 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('Able to provide API:Reference', () => {
+    it('support dummy addon reference:template', async () => {
+      const result = await getResult(
+        ReferencesRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': `
+                  module.exports.onReference = function(root) { 
+                    let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.hbs");
+                    return [ { uri: 'file://' + filePath.split(':').pop(), range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } } } ];
+                  }
+                `
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    referencesProvider: true
+                  }
+                }
+              })
+            }
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*'
+            }
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 3 }
       );
       expect(result).toMatchSnapshot();
     });
