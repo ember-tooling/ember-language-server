@@ -48,6 +48,8 @@ export default class TemplateCompletionProvider {
       PLACEHOLDER + '"}}',
       PLACEHOLDER + '}}',
       PLACEHOLDER + '}} {{/' + PLACEHOLDER + '}}',
+      // {{#}} -> {{# + P}}{{/P + }}
+      PLACEHOLDER + '}} {{/' + PLACEHOLDER,
       PLACEHOLDER + ')}}',
       PLACEHOLDER + '))}}',
       PLACEHOLDER + ')))}}'
