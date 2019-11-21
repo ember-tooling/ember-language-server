@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
-type UsableIn = 'BlockPath' | 'MustachePath' | 'SubExpressionPath';
+type UsableIn = 'BlockPath' | 'MustachePath' | 'SubExpressionPath' | 'ModifierPath';
 
 const HelperItem = CompletionItemKind.Function;
 const ComponentItem = CompletionItemKind.Class;
@@ -24,9 +24,13 @@ const emberCompletionItems: EmberCompletionItem[] = [
   new EmberCompletionItem('debugger', HelperItem, ['MustachePath']),
   new EmberCompletionItem('each', HelperItem, ['BlockPath']),
   new EmberCompletionItem('each-in', HelperItem, ['BlockPath'], '2.1.0'),
+  new EmberCompletionItem('in-element', HelperItem, ['BlockPath']),
+  new EmberCompletionItem('let', HelperItem, ['BlockPath']),
+  new EmberCompletionItem('on', HelperItem, ['ModifierPath']),
   new EmberCompletionItem('get', HelperItem, ['MustachePath', 'SubExpressionPath'], '2.1.0'),
   new EmberCompletionItem('fn', HelperItem, ['MustachePath', 'SubExpressionPath'], '3.12.0'),
   new EmberCompletionItem('hash', HelperItem, ['SubExpressionPath']),
+  new EmberCompletionItem('has-block', HelperItem, ['SubExpressionPath']),
   new EmberCompletionItem('if', HelperItem, ['BlockPath', 'MustachePath', 'SubExpressionPath']),
   new EmberCompletionItem('input', ComponentItem, ['MustachePath']),
   new EmberCompletionItem('link-to', ComponentItem, ['MustachePath']),
@@ -35,7 +39,8 @@ const emberCompletionItems: EmberCompletionItem[] = [
   new EmberCompletionItem('mount', HelperItem, ['MustachePath']),
   new EmberCompletionItem('mut', HelperItem, ['SubExpressionPath']),
   new EmberCompletionItem('outlet', HelperItem, ['MustachePath']),
-  new EmberCompletionItem('partial', HelperItem, ['MustachePath']),
+  new EmberCompletionItem('yield', HelperItem, ['MustachePath']),
+  new EmberCompletionItem('else', HelperItem, ['MustachePath']),
   new EmberCompletionItem('query-params', HelperItem, ['SubExpressionPath']),
   new EmberCompletionItem('render', HelperItem, ['MustachePath']),
   new EmberCompletionItem('textarea', ComponentItem, ['MustachePath']),
@@ -51,3 +56,4 @@ function filterConfigs(type: UsableIn): EmberCompletionItem[] {
 export const emberBlockItems: CompletionItem[] = filterConfigs('BlockPath');
 export const emberMustacheItems: CompletionItem[] = filterConfigs('MustachePath');
 export const emberSubExpressionItems: CompletionItem[] = filterConfigs('SubExpressionPath');
+export const emberModifierItems: CompletionItem[] = filterConfigs('ModifierPath');

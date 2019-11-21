@@ -633,6 +633,27 @@ Array [
   Object {
     "detail": "Ember",
     "kind": 3,
+    "label": "has-block",
+    "textEdit": Object {
+      "newText": "has-block",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
     "label": "if",
     "textEdit": Object {
       "newText": "if",
@@ -924,6 +945,27 @@ Array [
   Object {
     "detail": "Ember",
     "kind": 3,
+    "label": "has-block",
+    "textEdit": Object {
+      "newText": "has-block",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
     "label": "if",
     "textEdit": Object {
       "newText": "if",
@@ -1058,6 +1100,27 @@ Array [
 
 exports[`integration Autocomplete works for broken templates autocomplete information for modifier #4 <Foo {{ 1`] = `
 Array [
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "on",
+    "textEdit": Object {
+      "newText": "on",
+      "range": Object {
+        "end": Object {
+          "character": 7,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 7,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "ModifierPath",
+    ],
+  },
   Object {
     "detail": "modifier",
     "kind": 3,
@@ -1524,9 +1587,30 @@ Array [
   Object {
     "detail": "Ember",
     "kind": 3,
-    "label": "partial",
+    "label": "yield",
     "textEdit": Object {
-      "newText": "partial",
+      "newText": "yield",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "else",
+    "textEdit": Object {
+      "newText": "else",
       "range": Object {
         "end": Object {
           "character": 2,
