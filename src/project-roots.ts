@@ -5,12 +5,14 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { log } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
-import { ProjectProviders, collectProjectProviders } from './utils/addon-api';
+import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 
 export class Project {
   providers!: ProjectProviders;
+  builtinProviders!: ProjectProviders;
   constructor(public readonly root: string) {
     this.providers = collectProjectProviders(root);
+    this.builtinProviders = initBuiltinProviders();
   }
 }
 

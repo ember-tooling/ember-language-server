@@ -6,23 +6,29 @@ import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
 
+import CoreScriptDefinietionProvider from './../builtin-addons/core/script-definition-provider';
+import CoreTemplateDefinitionProvider from './../builtin-addons/core/template-definition-provider';
+import ScriptCompletionProvider from './../builtin-addons/core/script-completion-provider';
+import TemplateCompletionProvider from './../builtin-addons/core/template-completion-provider';
+
 const ADDON_CONFIG_KEY = 'ember-language-server';
 interface BaseAPIParams {
   server: Server;
   textDocument: TextDocumentIdentifier;
   position: Position;
 }
-interface ExtendedAPIParams {
+interface ExtendedAPIParams extends BaseAPIParams {
   focusPath: ASTPath;
+  originalText?: string;
   type: 'script' | 'template';
 }
-interface ReferenceFunctionParams extends BaseAPIParams {
+export interface ReferenceFunctionParams extends BaseAPIParams {
   results: Location[];
 }
-interface CompletionFunctionParams extends ExtendedAPIParams {
+export interface CompletionFunctionParams extends ExtendedAPIParams {
   results: CompletionItem[];
 }
-interface DefinitionFunctionParams extends ExtendedAPIParams {
+export interface DefinitionFunctionParams extends ExtendedAPIParams {
   results: Location[];
 }
 type ReferenceResolveFunction = (root: string, params: ReferenceFunctionParams) => Promise<Location[]>;
@@ -55,11 +61,22 @@ export async function queryELSAddonsAPIChain(callbacks: any[], root: string, par
         lastResult = tempResult;
       }
     } catch (e) {
-      console.log(e);
       log('ELSAddonsAPIError', callback, e.toString(), root, params);
     }
   }
   return lastResult;
+}
+
+export function initBuiltinProviders(): ProjectProviders {
+  const scriptDefinition = new CoreScriptDefinietionProvider();
+  const templateDefinition = new CoreTemplateDefinitionProvider();
+  const scriptCompletion = new ScriptCompletionProvider();
+  const templateCompletion = new TemplateCompletionProvider();
+  return {
+    definitionProviders: [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)],
+    referencesProviders: [],
+    completionProviders: [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)]
+  };
 }
 
 export function collectProjectProviders(root: string): ProjectProviders {
