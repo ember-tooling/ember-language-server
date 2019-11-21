@@ -109,8 +109,9 @@ export default class TemplateCompletionProvider {
         line: position.line,
         character: endCharacterPosition
       };
+      const shouldFixContent = normalPlaceholder.includes('}} {{');
       el.textEdit = {
-        newText: el.label,
+        newText: shouldFixContent ? normalPlaceholder.split(PLACEHOLDER).join(el.label) : el.label,
         range: {
           start: position,
           end: endPosition

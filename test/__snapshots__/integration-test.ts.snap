@@ -440,7 +440,7 @@ Array [
     "kind": 7,
     "label": "darling",
     "textEdit": Object {
-      "newText": "darling",
+      "newText": "darling}} {{/darling}}",
       "range": Object {
         "end": Object {
           "character": 3,
@@ -458,7 +458,7 @@ Array [
     "kind": 7,
     "label": "hello",
     "textEdit": Object {
-      "newText": "hello",
+      "newText": "hello}} {{/hello}}",
       "range": Object {
         "end": Object {
           "character": 3,
