@@ -82,6 +82,7 @@
     "lint": "eslint ./src/**/*.ts",
     "prepublish": "yarn clean && yarn compile",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "watch": "tsc --watch -p ."
   }
 }
