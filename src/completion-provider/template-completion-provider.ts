@@ -104,7 +104,8 @@ export default class TemplateCompletionProvider {
     return filter(addonResults, textPrefix, {
       key: 'label',
       maxResults: 40
-    }).map((el: CompletionItem) => {
+    }).map((rawEl: CompletionItem) => {
+      const el = Object.assign({}, rawEl);
       if (el.textEdit) {
         return el;
       }
