@@ -88,9 +88,17 @@ export default class TemplateLinter {
     }
 
     try {
-      const nodePath = Files.resolveGlobalNodePath();
+      let nodePath = Files.resolveGlobalNodePath();
       if (!nodePath) {
         return;
+      }
+      // vs-code-online fix (we don't have global path, but it returned)
+      if (!fs.existsSync(nodePath)) {
+        // easy fix case
+        nodePath = 'node_modules';
+        if (!fs.existsSync(path.join(project.root, nodePath))) {
+          return;
+        }
       }
       const linterPath = await (Files.resolveModulePath(project.root, 'ember-template-lint', nodePath, () => {}) as Promise<any>);
       if (!linterPath) {
