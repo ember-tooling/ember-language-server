@@ -29,3 +29,7 @@ All features currently only work in Ember CLI application that use the default c
 
 * VSCode: [Unstable Ember Language Server](https://github.com/lifeart/vscode-ember)
 * Neo (Vim): [coc-ember](https://github.com/NullVoxPopuli/coc-ember)
+
+## Addons
+
+* [a11y-addon](https://github.com/lifeart/els-a11y-addon)
