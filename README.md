@@ -32,4 +32,4 @@ All features currently only work in Ember CLI application that use the default c
 
 ## Addons
 
-* [a11y-addon](https://github.com/lifeart/els-a11y-addon)
+* [els-a11y-addon](https://github.com/lifeart/els-a11y-addon) - Ember Language Server a11y addon.
