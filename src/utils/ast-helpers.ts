@@ -234,7 +234,7 @@ export function isInlineLinkToTarget(path: ASTPath): boolean {
   if (!hasNodeType(parent, 'MustacheStatement')) {
     return false;
   }
-  return parent.params[1] === node && parent.path.original === 'link-to';
+  return parent.params[1] === node && parent.path && parent.path.original === 'link-to';
 }
 
 export function isBlockLinkToTarget(path: ASTPath): boolean {
@@ -246,7 +246,7 @@ export function isBlockLinkToTarget(path: ASTPath): boolean {
   if (!isBlock(parent)) {
     return false;
   }
-  return parent.params[0] === node && parent.path.original === 'link-to';
+  return parent.params[0] === node && parent.path && parent.path.original === 'link-to';
 }
 
 export function isImportPathDeclaration(path: ASTPath): boolean {
