@@ -8,7 +8,8 @@ import {
   isModelReference,
   isNamedServiceInjection,
   isTransformReference,
-  isComputedPropertyArgument
+  isComputedPropertyArgument,
+  closestScriptNodeParent
 } from '../../utils/ast-helpers';
 import { listRoutes, listModels, listServices, mGetProjectAddonsInfo, listTransforms } from '../../utils/layout-helpers';
 
@@ -57,8 +58,11 @@ export default class ScriptCompletionProvider {
         if (!focusPath.parentPath || !focusPath.parentPath.parentPath) {
           return [];
         }
-        const obj = focusPath.parentPath.parentPath.parent;
-        (obj.properties || []).forEach((property: any) => {
+        let node = closestScriptNodeParent(focusPath, 'ObjectExpression', ['ObjectProperty']) || closestScriptNodeParent(focusPath, 'ClassBody');
+        if (node === null) {
+          return [];
+        }
+        (node.properties || node.body || []).forEach((property: any) => {
           let name = null;
           if (property.key.type === 'StringLiteral') {
             name = property.key.value;

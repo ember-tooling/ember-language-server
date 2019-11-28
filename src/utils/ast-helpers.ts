@@ -18,12 +18,29 @@ function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   return true;
 }
 
+export function closestScriptNodeParent(astPath: ASTPath, type: string, ignoreParents: string[] = []): any {
+  let lookupPath: ASTPath | undefined = astPath;
+  while (lookupPath && lookupPath.parent) {
+    if (hasNodeType(lookupPath.node, type)) {
+      if (!lookupPath.parent) {
+        return lookupPath.node;
+      }
+      if (!ignoreParents.includes(lookupPath.parent.type)) {
+        return lookupPath.node;
+      }
+    } else {
+      lookupPath = lookupPath.parentPath;
+    }
+  }
+  return null;
+}
+
 export function isRouteLookup(astPath: ASTPath): boolean {
   if (!isFirstStringParamInCallExpression(astPath)) {
     return false;
   }
   let parent = astPath.parent;
-  const matches = ['transitionTo', 'intermediateTransitionTo', 'paramsFor', 'transitionToRoute'];
+  const matches = ['transitionTo', 'replaceWith', 'replaceRoute', 'modelFor', 'controllerFor', 'intermediateTransitionTo', 'paramsFor', 'transitionToRoute'];
   return expressionHasIdentifierName(parent, matches);
 }
 
@@ -67,7 +84,53 @@ export function isComputedPropertyArgument(astPath: ASTPath): boolean {
   if (!expressionHasArgument(parent, node)) {
     return false;
   }
-  if (!expressionHasIdentifierName(parent, 'computed')) {
+  if (
+    !expressionHasIdentifierName(parent, [
+      'computed',
+      'and',
+      'alias',
+      'bool',
+      'collect',
+      'deprecatingAlias',
+      'empty',
+      'equal',
+      'filter',
+      'filterBy',
+      'gt',
+      'gte',
+      'intersect',
+      'lt',
+      'lte',
+      'map',
+      'mapBy',
+      'match',
+      'max',
+      'min',
+      'none',
+      'not',
+      'notEmpty',
+      'oneWay',
+      'or',
+      'readOnly',
+      'reads',
+      'setDiff',
+      'sort',
+      'sum',
+      'union',
+      'uniq',
+      'uniqBy',
+      'notifyPropertyChange',
+      'toggleProperty',
+      'cacheFor',
+      'addObserver',
+      'removeObserver',
+      'incrementProperty',
+      'decrementDecrementProperty',
+      'set',
+      'get',
+      'getWithDefault '
+    ])
+  ) {
     return false;
   }
   const grandParent = astPath.parentPath;
