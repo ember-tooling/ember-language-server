@@ -18,12 +18,29 @@ function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   return true;
 }
 
+export function closestScriptNodeParent(astPath: ASTPath, type: string, ignoreParents: string[] = []): any {
+  let lookupPath: ASTPath | undefined = astPath;
+  while (lookupPath && lookupPath.parent) {
+    if (hasNodeType(lookupPath.node, type)) {
+      if (!lookupPath.parent) {
+        return lookupPath.node;
+      }
+      if (!ignoreParents.includes(lookupPath.parent.type)) {
+        return lookupPath.node;
+      }
+    } else {
+      lookupPath = lookupPath.parentPath;
+    }
+  }
+  return null;
+}
+
 export function isRouteLookup(astPath: ASTPath): boolean {
   if (!isFirstStringParamInCallExpression(astPath)) {
     return false;
   }
   let parent = astPath.parent;
-  const matches = ['transitionTo', 'intermediateTransitionTo', 'paramsFor', 'transitionToRoute'];
+  const matches = ['transitionTo', 'replaceWith', 'replaceRoute', 'modelFor', 'controllerFor', 'intermediateTransitionTo', 'paramsFor', 'transitionToRoute'];
   return expressionHasIdentifierName(parent, matches);
 }
 
@@ -67,14 +84,60 @@ export function isComputedPropertyArgument(astPath: ASTPath): boolean {
   if (!expressionHasArgument(parent, node)) {
     return false;
   }
-  if (!expressionHasIdentifierName(parent, 'computed')) {
+  if (
+    !expressionHasIdentifierName(parent, [
+      'computed',
+      'and',
+      'alias',
+      'bool',
+      'collect',
+      'deprecatingAlias',
+      'empty',
+      'equal',
+      'filter',
+      'filterBy',
+      'gt',
+      'gte',
+      'intersect',
+      'lt',
+      'lte',
+      'map',
+      'mapBy',
+      'match',
+      'max',
+      'min',
+      'none',
+      'not',
+      'notEmpty',
+      'oneWay',
+      'or',
+      'readOnly',
+      'reads',
+      'setDiff',
+      'sort',
+      'sum',
+      'union',
+      'uniq',
+      'uniqBy',
+      'notifyPropertyChange',
+      'toggleProperty',
+      'cacheFor',
+      'addObserver',
+      'removeObserver',
+      'incrementProperty',
+      'decrementDecrementProperty',
+      'set',
+      'get',
+      'getWithDefault '
+    ])
+  ) {
     return false;
   }
   const grandParent = astPath.parentPath;
   if (!grandParent) {
     return false;
   }
-  return hasNodeType(grandParent.parent, 'ObjectProperty');
+  return true;
 }
 
 export function isTransformReference(astPath: ASTPath): boolean {
@@ -171,7 +234,7 @@ export function isInlineLinkToTarget(path: ASTPath): boolean {
   if (!hasNodeType(parent, 'MustacheStatement')) {
     return false;
   }
-  return parent.params[1] === node && parent.path.original === 'link-to';
+  return parent.params[1] === node && parent.path && parent.path.original === 'link-to';
 }
 
 export function isBlockLinkToTarget(path: ASTPath): boolean {
@@ -183,7 +246,7 @@ export function isBlockLinkToTarget(path: ASTPath): boolean {
   if (!isBlock(parent)) {
     return false;
   }
-  return parent.params[0] === node && parent.path.original === 'link-to';
+  return parent.params[0] === node && parent.path && parent.path.original === 'link-to';
 }
 
 export function isImportPathDeclaration(path: ASTPath): boolean {

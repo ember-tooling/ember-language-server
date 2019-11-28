@@ -17,10 +17,11 @@ export default class TemplateCompletionProvider {
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
   async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
-    log('provideCompletions');
+    log('template:provideCompletions');
     const ext = getExtension(params.textDocument);
 
     if (ext !== null && !extensionsToProvideTemplateCompletions.includes(ext)) {
+      log('template:provideCompletions:unsupportedExtension', ext);
       return [];
     }
 
@@ -36,6 +37,10 @@ export default class TemplateCompletionProvider {
     const documentContent = document.getText();
     const originalText = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
     log('originalText', originalText);
+    if (originalText.trim().length === 0) {
+      log('originalText - empty');
+      return [];
+    }
     let normalPlaceholder: any = PLACEHOLDER;
     let ast: any = {};
 

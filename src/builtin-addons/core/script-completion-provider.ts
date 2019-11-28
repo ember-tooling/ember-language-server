@@ -8,7 +8,8 @@ import {
   isModelReference,
   isNamedServiceInjection,
   isTransformReference,
-  isComputedPropertyArgument
+  isComputedPropertyArgument,
+  closestScriptNodeParent
 } from '../../utils/ast-helpers';
 import { listRoutes, listModels, listServices, mGetProjectAddonsInfo, listTransforms } from '../../utils/layout-helpers';
 
@@ -24,9 +25,11 @@ export default class ScriptCompletionProvider {
     if (params.type !== 'script') {
       return params.results;
     }
+    log('script:onComplete');
     const completions: CompletionItem[] = params.results;
     try {
       if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
+        log('isStoreModelLookup || isModelReference');
         mListModels(root).forEach((model: any) => {
           completions.push(model);
         });
@@ -36,6 +39,7 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isRouteLookup(focusPath)) {
+        log('isRouteLookup');
         mListRoutes(root).forEach((model: any) => {
           completions.push(model);
         });
@@ -45,6 +49,7 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isNamedServiceInjection(focusPath)) {
+        log('isNamedServiceInjection');
         mListServices(root).forEach((model: any) => {
           completions.push(model);
         });
@@ -54,11 +59,16 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isComputedPropertyArgument(focusPath)) {
+        log('isComputedPropertyArgument');
         if (!focusPath.parentPath || !focusPath.parentPath.parentPath) {
           return [];
         }
-        const obj = focusPath.parentPath.parentPath.parent;
-        (obj.properties || []).forEach((property: any) => {
+        let node = closestScriptNodeParent(focusPath, 'ObjectExpression', ['ObjectProperty']) || closestScriptNodeParent(focusPath, 'ClassBody');
+        if (node === null) {
+          log('isComputedPropertyArgument - unable to find keys');
+          return [];
+        }
+        (node.properties || node.body || []).forEach((property: any) => {
           let name = null;
           if (property.key.type === 'StringLiteral') {
             name = property.key.value;
@@ -74,6 +84,7 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isTransformReference(focusPath)) {
+        log('isTransformReference');
         mListTransforms(root).forEach((model: any) => {
           completions.push(model);
         });
@@ -86,6 +97,8 @@ export default class ScriptCompletionProvider {
     } catch (e) {
       log('error', e);
     }
+
+    log('completions', completions);
 
     return completions;
   }
