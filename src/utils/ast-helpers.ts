@@ -137,7 +137,7 @@ export function isComputedPropertyArgument(astPath: ASTPath): boolean {
   if (!grandParent) {
     return false;
   }
-  return hasNodeType(grandParent.parent, 'ObjectProperty');
+  return true;
 }
 
 export function isTransformReference(astPath: ASTPath): boolean {
@@ -332,9 +332,6 @@ function isPathExpression(node: any): boolean {
 function expressionHasIdentifierName(exp: any, name: string | string[]) {
   const names = typeof name === 'string' ? [name] : name;
   let identifier = hasNodeType(exp.callee, 'Identifier') ? exp.callee : exp.callee.property;
-  if (hasNodeType(identifier, 'MemberExpression') && hasNodeType(identifier.object, 'ThisExpression') && hasNodeType(identifier.property, 'Identifier')) {
-    identifier = identifier.property;
-  }
   return names.includes(identifier.name);
 }
 function expressionHasArgument(exp: any, arg: any, position = -1) {
