@@ -169,7 +169,7 @@ export default class Server {
       ]);
       completionItems.push(...templateCompletions, ...scriptCompletions);
     } catch (e) {
-      log('onCompletion', textDocumentPosition, e, e.stack, e.toString());
+      log('onCompletionError', textDocumentPosition, e, e.stack, e.toString());
     }
 
     // this.setStatusText('Running');

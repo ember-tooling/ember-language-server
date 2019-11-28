@@ -25,9 +25,11 @@ export default class ScriptCompletionProvider {
     if (params.type !== 'script') {
       return params.results;
     }
+    log('script:onComplete');
     const completions: CompletionItem[] = params.results;
     try {
       if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
+        log('isStoreModelLookup || isModelReference');
         mListModels(root).forEach((model: any) => {
           completions.push(model);
         });
@@ -37,6 +39,7 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isRouteLookup(focusPath)) {
+        log('isRouteLookup');
         mListRoutes(root).forEach((model: any) => {
           completions.push(model);
         });
@@ -46,6 +49,7 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isNamedServiceInjection(focusPath)) {
+        log('isNamedServiceInjection');
         mListServices(root).forEach((model: any) => {
           completions.push(model);
         });
@@ -55,11 +59,13 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isComputedPropertyArgument(focusPath)) {
+        log('isComputedPropertyArgument');
         if (!focusPath.parentPath || !focusPath.parentPath.parentPath) {
           return [];
         }
         let node = closestScriptNodeParent(focusPath, 'ObjectExpression', ['ObjectProperty']) || closestScriptNodeParent(focusPath, 'ClassBody');
         if (node === null) {
+          log('isComputedPropertyArgument - unable to find keys');
           return [];
         }
         (node.properties || node.body || []).forEach((property: any) => {
@@ -78,6 +84,7 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isTransformReference(focusPath)) {
+        log('isTransformReference');
         mListTransforms(root).forEach((model: any) => {
           completions.push(model);
         });
@@ -90,6 +97,8 @@ export default class ScriptCompletionProvider {
     } catch (e) {
       log('error', e);
     }
+
+    log('completions', completions);
 
     return completions;
   }
