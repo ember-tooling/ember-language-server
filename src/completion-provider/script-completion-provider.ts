@@ -59,7 +59,7 @@ export default class ScriptCompletionProvider {
       type: 'script'
     });
 
-    const addonResults = await queryELSAddonsAPIChain(project.providers.completionProviders, root, {
+    const addonResults: CompletionItem[] = await queryELSAddonsAPIChain(project.providers.completionProviders, root, {
       focusPath,
       textDocument: params.textDocument,
       position: params.position,
