@@ -494,6 +494,23 @@ describe('integration', function() {
 
       expect(result).toMatchSnapshot();
     });
+    it('stable if ast broken in script document', async () => {
+      const result = await getResult(
+        DocumentSymbolRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.js': 'export default class Foo {'
+            }
+          }
+        },
+        'app/components/hello.js',
+        { line: 0, character: 1 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
   });
 
   describe('GlimmerNative', () => {

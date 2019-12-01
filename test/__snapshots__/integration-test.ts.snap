@@ -2158,6 +2158,8 @@ Array [
 
 exports[`integration DocumentSymbolProvider able to provide symbols for script document 1`] = `Array []`;
 
+exports[`integration DocumentSymbolProvider stable if ast broken in script document 1`] = `Array []`;
+
 exports[`integration GlimmerNative able to provide glimmer-native component 1`] = `
 Array [
   Object {
