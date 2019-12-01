@@ -3,7 +3,7 @@ import { parseScriptFile as parse } from 'ember-meta-explorer';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';
 
-import types from 'ast-types';
+import { visit } from 'ast-types';
 
 export default class JSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.js'];
@@ -13,7 +13,7 @@ export default class JSDocumentSymbolProvider implements DocumentSymbolProvider 
 
     let symbols: SymbolInformation[] = [];
 
-    types.visit(ast, {
+    visit(ast, {
       visitProperty(path: any) {
         let node = path.node;
 
