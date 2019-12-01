@@ -73,6 +73,7 @@ export default class Server {
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
     this.connection.onDefinition(this.definitionProvider.handler);
     this.connection.onCompletion(this.onCompletion.bind(this));
+    this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
     this.connection.onExecuteCommand(this.onExecute.bind(this));
     this.connection.onReferences(this.onReference.bind(this));
     this.connection.telemetry.logEvent({ connected: true });
@@ -159,6 +160,9 @@ export default class Server {
     return await this.referenceProvider.provideReferences(params);
   }
 
+  private async onCompletionResolve(item: CompletionItem) {
+    return item;
+  }
   private async onCompletion(textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> {
     const completionItems = [];
 
