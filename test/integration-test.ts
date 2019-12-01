@@ -9,6 +9,7 @@ import {
   InitializeRequest,
   CompletionRequest,
   DefinitionRequest,
+  DocumentSymbolRequest,
   ExecuteCommandRequest,
   Definition,
   ReferencesRequest
@@ -471,6 +472,77 @@ describe('integration', function() {
         'App.js',
         { line: 0, character: 20 }
       );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe('DocumentSymbolProvider', () => {
+    it('able to provide symbols for script document', async () => {
+      const result = await getResult(
+        DocumentSymbolRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.js': 'export default class Foo {}'
+            }
+          }
+        },
+        'app/components/hello.js',
+        { line: 0, character: 1 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+    it('able to provide symbols for template document', async () => {
+      const result = await getResult(
+        DocumentSymbolRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '{{this.foo}}'
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 1 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+    it('stable if ast broken in script document', async () => {
+      const result = await getResult(
+        DocumentSymbolRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.js': 'export default class Foo {'
+            }
+          }
+        },
+        'app/components/hello.js',
+        { line: 0, character: 1 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+    it('stable if ast broken in template document', async () => {
+      const result = await getResult(
+        DocumentSymbolRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.hbs': '{{'
+            }
+          }
+        },
+        'app/components/hello.hbs',
+        { line: 0, character: 1 }
+      );
+
       expect(result).toMatchSnapshot();
     });
   });
