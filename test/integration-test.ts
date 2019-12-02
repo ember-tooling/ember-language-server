@@ -611,6 +611,37 @@ describe('integration', function() {
     });
   });
 
+  describe('Able to load API from project itself', () => {
+    it('project custom completion:template', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          'package.json': JSON.stringify({
+            'ember-language-server': {
+              entry: './lib/langserver',
+              capabilities: {
+                completionProvider: true
+              }
+            }
+          }),
+          lib: {
+            'langserver.js': 'module.exports.onComplete = function(root, { type }) { if (type !== "template") { return null }; return [{label: "this.name"}]; }'
+          },
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this.n}}'
+              }
+            }
+          }
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 8 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
   describe('Able to provide API:Completion', () => {
     it('support dummy addon completion:template', async () => {
       const result = await getResult(

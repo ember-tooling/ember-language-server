@@ -23,6 +23,27 @@ Array [
 ]
 `;
 
+exports[`integration Able to load API from project itself project custom completion:template 1`] = `
+Array [
+  Object {
+    "label": "this.name",
+    "textEdit": Object {
+      "newText": "this.name",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
 exports[`integration Able to provide API:Completion support dummy addon completion:script 1`] = `
 Array [
   Object {
