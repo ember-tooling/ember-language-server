@@ -1,7 +1,7 @@
-import { Definition, Location, TextDocumentIdentifier, Position, CompletionItem } from 'vscode-languageserver';
+import { Location, TextDocumentIdentifier, Position, CompletionItem } from 'vscode-languageserver';
 import { getProjectAddonsRoots, getPackageJSON, getProjectInRepoAddonsRoots } from './layout-helpers';
 import * as path from 'path';
-import { log } from './logger';
+import { log, logInfo } from './logger';
 import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
@@ -42,11 +42,13 @@ export interface AddonAPI {
 
 interface HandlerObject {
   handler: {
-    onReference: undefined | Promise<any[] | null>;
-    onComplete: undefined | Promise<any[] | null>;
-    onDefinition: undefined | Promise<Definition | null>;
+    onReference: ReferenceResolveFunction;
+    onComplete: CompletionResolveFunction;
+    onDefinition: DefinitionResolveFunction;
   };
+  updateHandler: () => void;
   packageRoot: string;
+  debug: boolean;
   packageJSON: any;
   capabilities: NormalizedCapabilities;
 }
@@ -79,6 +81,11 @@ export function initBuiltinProviders(): ProjectProviders {
   };
 }
 
+function requireUncached(module: string) {
+  delete require.cache[require.resolve(module)];
+  return require(module);
+}
+
 export function collectProjectProviders(root: string): ProjectProviders {
   const roots = [root]
     .concat(getProjectAddonsRoots(root) as any, getProjectInRepoAddonsRoots(root) as any)
@@ -90,16 +97,24 @@ export function collectProjectProviders(root: string): ProjectProviders {
       const handlerPath = languageServerHandler(info);
       const addonInfo = info['ember-addon'] || {};
       const addon: HandlerObject = {
-        handler: require(path.join(packagePath, handlerPath)),
+        handler: requireUncached(path.join(packagePath, handlerPath)),
+        updateHandler() {
+          this.handler = requireUncached(path.join(packagePath, handlerPath));
+        },
         packageRoot: packagePath,
         packageJSON: info,
+        debug: isDebugModeEnabled(info),
         capabilities: normalizeCapabilities(extensionCapabilities(info))
       };
       dagMap.add(info.name || packagePath, addon, addonInfo.before, addonInfo.after);
     }
   });
 
-  const result = {
+  const result: {
+    definitionProviders: DefinitionResolveFunction[];
+    referencesProviders: ReferenceResolveFunction[];
+    completionProviders: CompletionResolveFunction[];
+  } = {
     definitionProviders: [],
     referencesProviders: [],
     completionProviders: []
@@ -111,26 +126,54 @@ export function collectProjectProviders(root: string): ProjectProviders {
     if (handlerObject === undefined) {
       return;
     }
-    if (handlerObject.capabilities.completionProvider && typeof handlerObject.handler.onComplete === 'function') {
-      result.completionProviders.push(handlerObject.handler.onComplete);
-    }
-    if (handlerObject.capabilities.referencesProvider && typeof handlerObject.handler.onReference === 'function') {
-      result.referencesProviders.push(handlerObject.handler.onReference);
-    }
-    if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
-      result.definitionProviders.push(handlerObject.handler.onDefinition);
+
+    // let's reload files in case of debug mode for each request
+    if (handlerObject.debug) {
+      logInfo(`els-addon-api: debug mode enabled for ${handlerObject.packageRoot}, for all requests resolvers will be reloaded.`);
+      result.completionProviders.push(function(root: string, params: CompletionFunctionParams) {
+        handlerObject.updateHandler();
+        if (typeof handlerObject.handler.onComplete === 'function') {
+          return handlerObject.handler.onComplete(root, params);
+        } else {
+          return params.results;
+        }
+      } as CompletionResolveFunction);
+      result.referencesProviders.push(function(root: string, params: ReferenceFunctionParams) {
+        handlerObject.updateHandler();
+        if (typeof handlerObject.handler.onReference === 'function') {
+          return handlerObject.handler.onReference(root, params);
+        } else {
+          return params.results;
+        }
+      } as ReferenceResolveFunction);
+      result.definitionProviders.push(function(root: string, params: DefinitionFunctionParams) {
+        handlerObject.updateHandler();
+        if (typeof handlerObject.handler.onDefinition === 'function') {
+          return handlerObject.handler.onDefinition(root, params);
+        } else {
+          return params.results;
+        }
+      } as DefinitionResolveFunction);
+    } else {
+      if (handlerObject.capabilities.completionProvider && typeof handlerObject.handler.onComplete === 'function') {
+        result.completionProviders.push(handlerObject.handler.onComplete);
+      }
+      if (handlerObject.capabilities.referencesProvider && typeof handlerObject.handler.onReference === 'function') {
+        result.referencesProviders.push(handlerObject.handler.onReference);
+      }
+      if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
+        result.definitionProviders.push(handlerObject.handler.onDefinition);
+      }
     }
   });
 
   return result;
 }
 
-type ThenableHandler = (arg0: string, arg1: any) => Promise<any[]>;
-
 export interface ProjectProviders {
-  definitionProviders: ThenableHandler[];
-  referencesProviders: ThenableHandler[];
-  completionProviders: ThenableHandler[];
+  definitionProviders: DefinitionResolveFunction[];
+  referencesProviders: ReferenceResolveFunction[];
+  completionProviders: CompletionResolveFunction[];
 }
 
 interface ExtensionCapabilities {
@@ -163,6 +206,9 @@ export function extensionCapabilities(info: any): ExtensionCapabilities {
 }
 export function languageServerHandler(info: any): string {
   return info[ADDON_CONFIG_KEY].entry;
+}
+export function isDebugModeEnabled(info: any): boolean {
+  return info[ADDON_CONFIG_KEY].debug === true;
 }
 export function hasEmberLanguageServerExtension(info: any) {
   return ADDON_CONFIG_KEY in info;
