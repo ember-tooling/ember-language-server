@@ -1,7 +1,7 @@
 import { Location, TextDocumentIdentifier, Position, CompletionItem } from 'vscode-languageserver';
 import { getProjectAddonsRoots, getPackageJSON, getProjectInRepoAddonsRoots } from './layout-helpers';
 import * as path from 'path';
-import { log, logInfo } from './logger';
+import { log, logInfo, logError } from './logger';
 import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
@@ -40,12 +40,13 @@ export interface AddonAPI {
   onDefinition: undefined | DefinitionResolveFunction;
 }
 
+interface PublicAddonAPI {
+  onReference?: ReferenceResolveFunction;
+  onComplete?: CompletionResolveFunction;
+  onDefinition?: DefinitionResolveFunction;
+}
 interface HandlerObject {
-  handler: {
-    onReference: ReferenceResolveFunction;
-    onComplete: CompletionResolveFunction;
-    onDefinition: DefinitionResolveFunction;
-  };
+  handler: PublicAddonAPI;
   updateHandler: () => void;
   packageRoot: string;
   debug: boolean;
@@ -63,6 +64,7 @@ export async function queryELSAddonsAPIChain(callbacks: any[], root: string, par
         lastResult = tempResult;
       }
     } catch (e) {
+      logError(e);
       log('ELSAddonsAPIError', callback, e.toString(), root, params);
     }
   }
@@ -83,7 +85,13 @@ export function initBuiltinProviders(): ProjectProviders {
 
 function requireUncached(module: string) {
   delete require.cache[require.resolve(module)];
-  return require(module);
+  let result = {};
+  try {
+    result = require(module);
+  } catch (e) {
+    logError(e);
+  }
+  return result;
 }
 
 export function collectProjectProviders(root: string): ProjectProviders {
