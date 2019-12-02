@@ -133,7 +133,7 @@ export default class Server {
     if (workspaceFolders && Array.isArray(workspaceFolders)) {
       workspaceFolders.forEach((folder) => {
         const folderPath = uriToFilePath(folder.uri);
-        if (folderPath) {
+        if (folderPath && rootPath !== folderPath) {
           this.projectRoots.findProjectsInsideRoot(folderPath);
         }
       });

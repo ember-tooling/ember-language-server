@@ -52,12 +52,12 @@ export default class ProjectRoots {
   }
 
   onProjectAdd(path: string) {
-    logInfo(`Ember CLI project added at ${path}`);
     if (this.projects.has(path)) {
       return;
     }
     try {
       this.projects.set(path, new Project(path));
+      logInfo(`Ember CLI project added at ${path}`);
     } catch (e) {
       logError(e);
     }
