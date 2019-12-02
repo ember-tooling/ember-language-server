@@ -32,7 +32,7 @@ import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 import { ReferenceProvider } from './reference-provider/entry';
-import { log } from './utils/logger';
+import { log, setConsole, logError } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -64,6 +64,9 @@ export default class Server {
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
+
+    setConsole(this.connection.console);
+
     this.documents.listen(this.connection);
 
     // Bind event handlers
@@ -173,6 +176,7 @@ export default class Server {
       ]);
       completionItems.push(...templateCompletions, ...scriptCompletions);
     } catch (e) {
+      logError(e);
       log('onCompletionError', textDocumentPosition, e, e.stack, e.toString());
     }
 

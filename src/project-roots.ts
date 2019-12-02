@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
-import { log } from './utils/logger';
+import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
@@ -39,7 +39,7 @@ export default class ProjectRoots {
             this.onProjectAdd(fullPath);
           }
         } catch (e) {
-          // ignore
+          logError(e);
         }
       } else {
         this.onProjectAdd(fullPath);
@@ -48,8 +48,12 @@ export default class ProjectRoots {
   }
 
   onProjectAdd(path: string) {
-    log(`Ember CLI project added at ${path}`);
-    this.projects.set(path, new Project(path));
+    logInfo(`Ember CLI project added at ${path}`);
+    try {
+      this.projects.set(path, new Project(path));
+    } catch (e) {
+      logError(e);
+    }
   }
 
   projectForUri(uri: string): Project | undefined {
