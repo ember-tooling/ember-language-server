@@ -21,9 +21,7 @@ export default class ProjectRoots {
 
   projects = new Map<string, Project>();
 
-  async initialize(workspaceRoot: string) {
-    this.workspaceRoot = workspaceRoot;
-
+  findProjectsInsideRoot(workspaceRoot: string) {
     const roots = walkSync(workspaceRoot, {
       directories: false,
       globs: ['**/ember-cli-build.js', '**/package.json'],
@@ -47,10 +45,19 @@ export default class ProjectRoots {
     });
   }
 
+  async initialize(workspaceRoot: string) {
+    this.workspaceRoot = workspaceRoot;
+
+    this.findProjectsInsideRoot(this.workspaceRoot);
+  }
+
   onProjectAdd(path: string) {
-    logInfo(`Ember CLI project added at ${path}`);
+    if (this.projects.has(path)) {
+      return;
+    }
     try {
       this.projects.set(path, new Project(path));
+      logInfo(`Ember CLI project added at ${path}`);
     } catch (e) {
       logError(e);
     }

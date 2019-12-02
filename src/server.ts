@@ -120,7 +120,7 @@ export default class Server {
 
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
-  private onInitialize({ rootUri, rootPath }: InitializeParams): InitializeResult {
+  private onInitialize({ rootUri, rootPath, workspaceFolders }: InitializeParams): InitializeResult {
     rootPath = rootUri ? uriToFilePath(rootUri) : rootPath;
     if (!rootPath) {
       return { capabilities: {} };
@@ -129,6 +129,15 @@ export default class Server {
     log(`Initializing Ember Language Server at ${rootPath}`);
 
     this.projectRoots.initialize(rootPath);
+
+    if (workspaceFolders && Array.isArray(workspaceFolders)) {
+      workspaceFolders.forEach((folder) => {
+        const folderPath = uriToFilePath(folder.uri);
+        if (folderPath && rootPath !== folderPath) {
+          this.projectRoots.findProjectsInsideRoot(folderPath);
+        }
+      });
+    }
 
     // this.setStatusText('Initialized');
 
