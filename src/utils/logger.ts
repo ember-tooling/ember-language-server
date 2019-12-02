@@ -1,8 +1,31 @@
 import * as fs from 'fs';
 import * as util from 'util';
 
+import { RemoteConsole } from 'vscode-languageserver';
+
 const debug = false;
 const log_file = debug ? fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' }) : null;
+let remoteConsole: RemoteConsole | null = null;
+
+export function logError(err: any) {
+  if (remoteConsole) {
+    remoteConsole.error(err.stack);
+  } else {
+    log(err, err.toString(), err.stack);
+  }
+}
+
+export function logInfo(str: string) {
+  if (remoteConsole) {
+    remoteConsole.info(str);
+  } else {
+    log(str);
+  }
+}
+
+export function setConsole(item: RemoteConsole) {
+  remoteConsole = item;
+}
 
 export function log(...args: any[]) {
   if (!debug || !log_file) {
