@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`glimmer-utils ASTPath works as expected 1`] = `
+Object {
+  "data": false,
+  "loc": SourceLocation {
+    "end": Object {
+      "column": 5,
+      "line": 4,
+    },
+    "source": undefined,
+    "start": Object {
+      "column": 2,
+      "line": 4,
+    },
+  },
+  "original": "foo",
+  "parts": Array [
+    "foo",
+  ],
+  "this": false,
+  "type": "PathExpression",
+}
+`;
