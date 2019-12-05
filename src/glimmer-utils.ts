@@ -4,7 +4,7 @@ import { containsPosition } from './estree-utils';
 type ScopeValue = [string, ASTPath, number];
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
-export function componentNameForPath(astPath: ASTPath) {
+function maybePathDeclaration(astPath: ASTPath) {
   if (isLocalScopedPathExpression(astPath)) {
     const scope = getLocalScope(astPath);
     const pathName = getLocalPathName(astPath.node);
@@ -13,10 +13,15 @@ export function componentNameForPath(astPath: ASTPath) {
       if (!declaration) {
         return;
       }
-      if (declaration[1].node.type === 'ElementNode') {
-        return declaration[1].node.tag;
-      }
+      return declaration[1];
     }
+  }
+}
+
+export function maybeComponentNameForPath(astPath: ASTPath) {
+  const declaration = maybePathDeclaration(astPath);
+  if (declaration && declaration.node.type === 'ElementNode') {
+    return declaration.node.tag;
   }
 }
 
@@ -79,6 +84,7 @@ type BlockParamDefinition = {
   type: 'BlockParam';
   name: string;
   index: number;
+  getParentPath: () => ASTPath;
 };
 
 export function maybeBlockParamDefinition(astPath: ASTPath, content: string, position: Position): BlockParamDefinition | undefined {
@@ -93,6 +99,9 @@ export function maybeBlockParamDefinition(astPath: ASTPath, content: string, pos
   return {
     type: 'BlockParam',
     name: paramName,
+    getParentPath() {
+      return astPath;
+    },
     index: node.type === 'BlockStatement' && node.program ? node.program.blockParams.indexOf(paramName) : node.blockParams.indexOf(paramName)
   };
 }
@@ -164,15 +173,28 @@ export function getLocalScope(astPath: ASTPath) {
   }
   return scopeValues;
 }
+
+class HandlebarsASTPathMeta {
+  constructor(private readonly astPath: ASTPath, private readonly position: Position, private readonly content: string) {}
+  get maybeBlockParamDefinition() {
+    return maybeBlockParamDefinition(this.astPath, this.content, this.position);
+  }
+  get maybeBlockParamDeclarationBlockPath() {
+    return maybePathDeclaration(this.astPath);
+  }
+  get localScope() {
+    return getLocalScope(this.astPath);
+  }
+}
 export default class ASTPath {
-  static toPosition(ast: any, position: Position): ASTPath | undefined {
+  static toPosition(ast: any, position: Position, content: string = ''): ASTPath | undefined {
     let path = _findFocusPath(ast, position);
     if (path) {
-      return new ASTPath(path);
+      return new ASTPath(path, path.length - 1, content, position);
     }
   }
 
-  private constructor(private readonly path: any[], private readonly index: number = path.length - 1) {}
+  private constructor(private readonly path: any[], private readonly index: number, private readonly content: string, private readonly position: Position) {}
 
   get node(): any {
     return this.path[this.index];
@@ -182,23 +204,27 @@ export default class ASTPath {
     return this.path[this.index - 1];
   }
 
-  get localScope() {
-    return getLocalScope(this);
+  metaForAstType(astType: 'handlebars'): HandlebarsASTPathMeta | null {
+    if (astType === 'handlebars') {
+      return new HandlebarsASTPathMeta(this, this.position, this.content);
+    } else {
+      return null;
+    }
   }
 
-  sourceForNode(content: string) {
-    return sourceForNode(this.node, content);
+  sourceForNode() {
+    return sourceForNode(this.node, this.content);
   }
 
-  sourceForParent(content: string) {
-    return sourceForNode(this.parent, content);
+  sourceForParent() {
+    return sourceForNode(this.parent, this.content);
   }
 
   get parentPath(): ASTPath | undefined {
     if (this.index - 1 < 0) {
       return undefined;
     }
-    return new ASTPath(this.path, this.index - 1);
+    return new ASTPath(this.path, this.index - 1, this.content, this.position);
   }
 }
 

@@ -1,7 +1,7 @@
 import { Position } from 'vscode-languageserver';
 import { preprocess } from '@glimmer/syntax';
 
-import ASTPath, { getLocalScope, componentNameForPath, sourceForNode, focusedBlockParamName, maybeBlockParamDefinition } from '../src/glimmer-utils';
+import ASTPath, { getLocalScope, maybeComponentNameForPath, sourceForNode, focusedBlockParamName, maybeBlockParamDefinition } from '../src/glimmer-utils';
 import { toPosition } from '../src/estree-utils';
 
 describe('glimmer-utils', function() {
@@ -31,7 +31,7 @@ describe('glimmer-utils', function() {
       expect(getLocalScope(astPath).map(([el, , ind]) => [el, ind])).toEqual([['item', 0], ['bar', 1], ['items', 0]]);
     });
   });
-  describe('componentNameForPath', function() {
+  describe('maybeComponentNameForPath', function() {
     it('works as expected', function() {
       const input = `
 <Component as |items|>
@@ -41,7 +41,7 @@ describe('glimmer-utils', function() {
 </Component>
         `;
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 5)));
-      expect(componentNameForPath(astPath)).toEqual('Component');
+      expect(maybeComponentNameForPath(astPath)).toEqual('Component');
     });
   });
   describe('sourceForNode', function() {

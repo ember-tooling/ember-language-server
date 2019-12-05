@@ -25,6 +25,7 @@ Object {
 
 exports[`glimmer-utils maybeBlockParamDefinition able to handle single fiew params 1`] = `
 Object {
+  "getParentPath": [Function],
   "index": 1,
   "name": "boo",
   "type": "BlockParam",
@@ -33,6 +34,7 @@ Object {
 
 exports[`glimmer-utils maybeBlockParamDefinition able to handle single param 1`] = `
 Object {
+  "getParentPath": [Function],
   "index": 0,
   "name": "items",
   "type": "BlockParam",
