@@ -60,10 +60,11 @@ export default class TemplateCompletionProvider {
       PLACEHOLDER + ')))}}'
     ];
 
+    let validText = '';
     while (cases.length) {
       normalPlaceholder = cases.shift();
       try {
-        let validText = this.getTextForGuessing(originalText, offset, normalPlaceholder);
+        validText = this.getTextForGuessing(originalText, offset, normalPlaceholder);
         ast = preprocess(validText);
         log('validText', validText);
         break;
@@ -77,7 +78,7 @@ export default class TemplateCompletionProvider {
       return [];
     }
 
-    const focusPath = ASTPath.toPosition(ast, toPosition(params.position));
+    const focusPath = ASTPath.toPosition(ast, toPosition(params.position), validText);
 
     if (!focusPath) {
       return [];

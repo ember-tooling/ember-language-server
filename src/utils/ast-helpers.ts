@@ -320,6 +320,9 @@ function isCallExpression(node: any): boolean {
 export function isLocalPathExpression(path: any): boolean {
   return isPathExpression(path.node) && path.node.this === true;
 }
+export function isScopedPathExpression(path: any): boolean {
+  return isPathExpression(path.node) && path.node.this === false && path.node.data === false;
+}
 export function isComponentArgumentName(path: any): boolean {
   return hasNodeType(path.node, 'AttrNode') && path.node.name.startsWith('@');
 }

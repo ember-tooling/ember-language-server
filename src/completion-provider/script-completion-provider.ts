@@ -35,7 +35,7 @@ export default class ScriptCompletionProvider {
       return [];
     }
 
-    const focusPath = ASTPath.toPosition(ast, toPosition(params.position));
+    const focusPath = ASTPath.toPosition(ast, toPosition(params.position), content);
 
     if (!focusPath || !project || !document) {
       return [];

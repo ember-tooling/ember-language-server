@@ -1,4 +1,4 @@
-import { CompletionItem } from 'vscode-languageserver';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 import { CompletionFunctionParams } from './../../utils/addon-api';
 import { uniqBy, startCase, camelCase } from 'lodash';
 
@@ -9,10 +9,12 @@ import { templateContextLookup } from './template-context-provider';
 import { provideComponentTemplatePaths } from './template-definition-provider';
 
 import { log } from '../../utils/logger';
+import ASTPath, { getLocalScope } from '../../glimmer-utils';
 import {
   isLinkToTarget,
   isComponentArgumentName,
   isLocalPathExpression,
+  isScopedPathExpression,
   isLinkComponentRouteTarget,
   isMustachePath,
   isBlockPath,
@@ -135,6 +137,17 @@ export default class TemplateCompletionProvider {
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
+  getScopedValues(focusPath: ASTPath) {
+    const scopedValues = getLocalScope(focusPath).map(({ name, node, path }) => {
+      const blockSource = node.type === 'ElementNode' ? `<${node.tag} as |...|>` : `{{#${path.parentPath && path.parentPath.node.path.original} as |...|}}`;
+      return {
+        label: name,
+        kind: CompletionItemKind.Variable,
+        detail: `Param from ${blockSource}`
+      };
+    });
+    return scopedValues;
+  }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     log('provideCompletions');
 
@@ -151,8 +164,9 @@ export default class TemplateCompletionProvider {
         log('isAngleComponentPath');
         // <Foo>
         const candidates = this.getAllAngleBracketComponents(root, uri);
-        log(candidates);
-        completions.push(...uniqBy(candidates, 'label'));
+        const scopedValues = this.getScopedValues(focusPath);
+        log(candidates, scopedValues);
+        completions.push(...uniqBy([...candidates, ...scopedValues], 'label'));
       } else if (isComponentArgumentName(focusPath)) {
         // <Foo @name.. />
 
@@ -189,6 +203,10 @@ export default class TemplateCompletionProvider {
         // {{foo-bar?}}
         log('isMustachePath');
         const candidates = this.getMustachePathCandidates(root, uri, originalText);
+        if (isScopedPathExpression(focusPath)) {
+          const scopedValues = this.getScopedValues(focusPath);
+          completions.push(...uniqBy(scopedValues, 'label'));
+        }
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberMustacheItems);
       } else if (isBlockPath(focusPath)) {

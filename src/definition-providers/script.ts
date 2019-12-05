@@ -21,7 +21,7 @@ export default class ScriptDefinitionProvider {
       sourceType: 'module'
     });
 
-    const astPath = ASTPath.toPosition(ast, toPosition(params.position));
+    const astPath = ASTPath.toPosition(ast, toPosition(params.position), content);
 
     if (!astPath) {
       return null;

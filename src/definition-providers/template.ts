@@ -21,7 +21,7 @@ export default class TemplateDefinitionProvider {
     const isScript = ['.ts', '.js'].includes(ext as string);
     let content = isScript ? searchAndExtractHbs(document.getText()) : document.getText();
     let ast = preprocess(content);
-    let focusPath = ASTPath.toPosition(ast, toPosition(params.position));
+    let focusPath = ASTPath.toPosition(ast, toPosition(params.position), content);
     if (!focusPath) {
       return null;
     }
