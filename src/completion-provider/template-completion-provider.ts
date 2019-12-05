@@ -49,6 +49,8 @@ export default class TemplateCompletionProvider {
       PLACEHOLDER,
       PLACEHOLDER + '"',
       PLACEHOLDER + "'",
+      // block params autocomplete
+      PLACEHOLDER + '| />',
       PLACEHOLDER + '}} />',
       PLACEHOLDER + '"}}',
       PLACEHOLDER + '}}',
