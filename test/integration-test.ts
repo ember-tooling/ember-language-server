@@ -611,6 +611,41 @@ describe('integration', function() {
     });
   });
 
+  describe('Able to provide autocomplete information for local scoped params', () => {
+    it('support tag blocks', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'foo.hbs': ['<MyComponent as |bar|>', '{{b}}', '</MyComponent>'].join('\n')
+            }
+          }
+        },
+        'app/components/foo.hbs',
+        { line: 1, character: 3 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+    it('support mustache blocks', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'foo.hbs': ['{{#my-component as |bar|}}', '{{b}}', '{{/my-component}}'].join('\n')
+            }
+          }
+        },
+        'app/components/foo.hbs',
+        { line: 1, character: 3 }
+      );
+      expect(result).toMatchSnapshot();
+    });
+  });
+
   describe('Able to load API from project itself', () => {
     it('project custom completion:template', async () => {
       const result = await getResult(

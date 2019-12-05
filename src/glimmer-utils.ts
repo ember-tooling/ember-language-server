@@ -4,7 +4,7 @@ import { containsPosition } from './estree-utils';
 type ScopeValue = [string, ASTPath, number];
 
 export function componentNameForPath(astPath: ASTPath) {
-  if (isLocalPathExpression(astPath)) {
+  if (isLocalScopedPathExpression(astPath)) {
     const scope = getLocalScope(astPath);
     const pathName = getLocalPathName(astPath.node);
     if (pathName) {
@@ -30,7 +30,7 @@ function getLocalPathName(node: any) {
   return pathName;
 }
 
-export function isLocalPathExpression(astPath: ASTPath) {
+export function isLocalScopedPathExpression(astPath: ASTPath) {
   const pathName = getLocalPathName(astPath.node);
   if (!pathName) {
     return false;

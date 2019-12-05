@@ -1,4 +1,4 @@
-import { CompletionItem } from 'vscode-languageserver';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 import { CompletionFunctionParams } from './../../utils/addon-api';
 import { uniqBy, startCase, camelCase } from 'lodash';
 
@@ -9,10 +9,12 @@ import { templateContextLookup } from './template-context-provider';
 import { provideComponentTemplatePaths } from './template-definition-provider';
 
 import { log } from '../../utils/logger';
+import { getLocalScope } from '../../glimmer-utils';
 import {
   isLinkToTarget,
   isComponentArgumentName,
   isLocalPathExpression,
+  isScopedPathExpression,
   isLinkComponentRouteTarget,
   isMustachePath,
   isBlockPath,
@@ -189,6 +191,18 @@ export default class TemplateCompletionProvider {
         // {{foo-bar?}}
         log('isMustachePath');
         const candidates = this.getMustachePathCandidates(root, uri, originalText);
+        if (isScopedPathExpression(focusPath)) {
+          const scopedValues = getLocalScope(focusPath).map(([name, fPath]) => {
+            const blockSource =
+              fPath.node.type === 'ElementNode' ? `<${fPath.node.tag} as |...|>` : `{{#${fPath.parentPath && fPath.parentPath.node.path.original} as |...|}}`;
+            return {
+              label: name,
+              kind: CompletionItemKind.Variable,
+              detail: `Param from ${blockSource}`
+            };
+          });
+          completions.push(...uniqBy(scopedValues, 'label'));
+        }
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberMustacheItems);
       } else if (isBlockPath(focusPath)) {
