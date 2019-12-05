@@ -2,6 +2,7 @@ import { Position, SourceLocation } from 'estree';
 import { containsPosition } from './estree-utils';
 
 type ScopeValue = [string, ASTPath, number];
+const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
 export function componentNameForPath(astPath: ASTPath) {
   if (isLocalScopedPathExpression(astPath)) {
@@ -42,6 +43,46 @@ export function isLocalScopedPathExpression(astPath: ASTPath) {
   } else {
     return false;
   }
+}
+
+export function sourceForNode(node: any, content: string = '') {
+  // mostly copy/pasta from ember-template-lint and tildeio/htmlbars with a few tweaks:
+  // https://github.com/tildeio/htmlbars/blob/v0.14.17/packages/htmlbars-syntax/lib/parser.js#L59-L90
+  // https://github.com/ember-template-lint/ember-template-lint/blob/v2.0.0-beta.3/lib/rules/base.js#L511
+  if (!node.loc) {
+    return;
+  }
+
+  let firstLine = node.loc.start.line - 1;
+  let lastLine = node.loc.end.line - 1;
+  let currentLine = firstLine - 1;
+  let firstColumn = node.loc.start.column;
+  let lastColumn = node.loc.end.column;
+  let string = [];
+  let source = content.match(reLines) as string[];
+  if (currentLine > source.length) {
+    return;
+  }
+  let line;
+
+  while (currentLine < lastLine) {
+    currentLine++;
+    line = source[currentLine];
+
+    if (currentLine === firstLine) {
+      if (firstLine === lastLine) {
+        string.push(line.slice(firstColumn, lastColumn));
+      } else {
+        string.push(line.slice(firstColumn));
+      }
+    } else if (currentLine === lastLine) {
+      string.push(line.slice(0, lastColumn));
+    } else {
+      string.push(line);
+    }
+  }
+
+  return string.join('');
 }
 
 export function getLocalScope(astPath: ASTPath) {

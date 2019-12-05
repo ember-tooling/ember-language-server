@@ -9,7 +9,7 @@ import { templateContextLookup } from './template-context-provider';
 import { provideComponentTemplatePaths } from './template-definition-provider';
 
 import { log } from '../../utils/logger';
-import { getLocalScope } from '../../glimmer-utils';
+import ASTPath, { getLocalScope } from '../../glimmer-utils';
 import {
   isLinkToTarget,
   isComponentArgumentName,
@@ -137,6 +137,18 @@ export default class TemplateCompletionProvider {
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
+  getScopedValues(focusPath: ASTPath) {
+    const scopedValues = getLocalScope(focusPath).map(([name, fPath]) => {
+      const blockSource =
+        fPath.node.type === 'ElementNode' ? `<${fPath.node.tag} as |...|>` : `{{#${fPath.parentPath && fPath.parentPath.node.path.original} as |...|}}`;
+      return {
+        label: name,
+        kind: CompletionItemKind.Variable,
+        detail: `Param from ${blockSource}`
+      };
+    });
+    return scopedValues;
+  }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     log('provideCompletions');
 
@@ -153,8 +165,9 @@ export default class TemplateCompletionProvider {
         log('isAngleComponentPath');
         // <Foo>
         const candidates = this.getAllAngleBracketComponents(root, uri);
-        log(candidates);
-        completions.push(...uniqBy(candidates, 'label'));
+        const scopedValues = this.getScopedValues(focusPath);
+        log(candidates, scopedValues);
+        completions.push(...uniqBy([...candidates, ...scopedValues], 'label'));
       } else if (isComponentArgumentName(focusPath)) {
         // <Foo @name.. />
 
@@ -192,15 +205,7 @@ export default class TemplateCompletionProvider {
         log('isMustachePath');
         const candidates = this.getMustachePathCandidates(root, uri, originalText);
         if (isScopedPathExpression(focusPath)) {
-          const scopedValues = getLocalScope(focusPath).map(([name, fPath]) => {
-            const blockSource =
-              fPath.node.type === 'ElementNode' ? `<${fPath.node.tag} as |...|>` : `{{#${fPath.parentPath && fPath.parentPath.node.path.original} as |...|}}`;
-            return {
-              label: name,
-              kind: CompletionItemKind.Variable,
-              detail: `Param from ${blockSource}`
-            };
-          });
+          const scopedValues = this.getScopedValues(focusPath);
           completions.push(...uniqBy(scopedValues, 'label'));
         }
         completions.push(...uniqBy(candidates, 'label'));

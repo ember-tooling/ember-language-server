@@ -309,6 +309,65 @@ Array [
 ]
 `;
 
+exports[`integration Able to provide autocomplete information for local scoped params support component name autocomplete from block params 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Foo",
+    "textEdit": Object {
+      "newText": "Foo",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 2,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Param from <MyComponent as |...|>",
+    "kind": 6,
+    "label": "boo",
+    "textEdit": Object {
+      "newText": "boo",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 2,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Param from {{#my-component as |...|}}",
+    "kind": 6,
+    "label": "bar",
+    "textEdit": Object {
+      "newText": "bar",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 2,
+        },
+      },
+    },
+  },
+]
+`;
+
 exports[`integration Able to provide autocomplete information for local scoped params support mustache blocks 1`] = `
 Array [
   Object {

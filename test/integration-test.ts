@@ -644,6 +644,22 @@ describe('integration', function() {
       );
       expect(result).toMatchSnapshot();
     });
+    it('support component name autocomplete from block params', async () => {
+      const result = await getResult(
+        CompletionRequest.type,
+        connection,
+        {
+          app: {
+            components: {
+              'foo.hbs': ['{{#my-component as |bar|}}', '<MyComponent as |boo|>', '<b />', '</MyComponent>', '{{/my-component}}'].join('\n')
+            }
+          }
+        },
+        'app/components/foo.hbs',
+        { line: 2, character: 1 }
+      );
+      expect(result).toMatchSnapshot();
+    });
   });
 
   describe('Able to load API from project itself', () => {
