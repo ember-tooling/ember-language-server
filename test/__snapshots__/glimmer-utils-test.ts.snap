@@ -24,19 +24,517 @@ Object {
 `;
 
 exports[`glimmer-utils maybeBlockParamDefinition able to handle single fiew params 1`] = `
-Object {
-  "getParentPath": [Function],
-  "index": 1,
+BlockParamDefinition {
   "name": "boo",
+  "path": ASTPath {
+    "content": "",
+    "index": 1,
+    "path": Array [
+      Object {
+        "blockParams": Array [],
+        "body": Array [
+          Object {
+            "attributes": Array [],
+            "blockParams": Array [
+              "items",
+              "boo",
+              "zoo",
+            ],
+            "children": Array [
+              Object {
+                "chars": "
+",
+                "loc": Object {
+                  "end": Object {
+                    "column": 0,
+                    "line": 2,
+                  },
+                  "source": null,
+                  "start": Object {
+                    "column": 30,
+                    "line": 1,
+                  },
+                },
+                "type": "TextNode",
+              },
+              Object {
+                "escaped": true,
+                "hash": Object {
+                  "loc": Object {
+                    "end": Object {
+                      "column": 0,
+                      "line": 1,
+                    },
+                    "source": "(synthetic)",
+                    "start": Object {
+                      "column": 0,
+                      "line": 1,
+                    },
+                  },
+                  "pairs": Array [],
+                  "type": "Hash",
+                },
+                "loc": Object {
+                  "end": Object {
+                    "column": 7,
+                    "line": 2,
+                  },
+                  "source": null,
+                  "start": Object {
+                    "column": 0,
+                    "line": 2,
+                  },
+                },
+                "params": Array [],
+                "path": Object {
+                  "data": false,
+                  "loc": SourceLocation {
+                    "end": Object {
+                      "column": 5,
+                      "line": 2,
+                    },
+                    "source": undefined,
+                    "start": Object {
+                      "column": 2,
+                      "line": 2,
+                    },
+                  },
+                  "original": "foo",
+                  "parts": Array [
+                    "foo",
+                  ],
+                  "this": false,
+                  "type": "PathExpression",
+                },
+                "strip": Object {
+                  "close": false,
+                  "open": false,
+                },
+                "type": "MustacheStatement",
+              },
+              Object {
+                "chars": "
+",
+                "loc": Object {
+                  "end": Object {
+                    "column": 0,
+                    "line": 3,
+                  },
+                  "source": null,
+                  "start": Object {
+                    "column": 7,
+                    "line": 2,
+                  },
+                },
+                "type": "TextNode",
+              },
+            ],
+            "comments": Array [],
+            "loc": Object {
+              "end": Object {
+                "column": 12,
+                "line": 3,
+              },
+              "source": null,
+              "start": Object {
+                "column": 0,
+                "line": 1,
+              },
+            },
+            "modifiers": Array [],
+            "selfClosing": false,
+            "tag": "Component",
+            "type": "ElementNode",
+          },
+        ],
+        "loc": Object {
+          "end": Object {
+            "column": 12,
+            "line": 3,
+          },
+          "source": null,
+          "start": Object {
+            "column": 0,
+            "line": 1,
+          },
+        },
+        "type": "Template",
+      },
+      Object {
+        "attributes": Array [],
+        "blockParams": Array [
+          "items",
+          "boo",
+          "zoo",
+        ],
+        "children": Array [
+          Object {
+            "chars": "
+",
+            "loc": Object {
+              "end": Object {
+                "column": 0,
+                "line": 2,
+              },
+              "source": null,
+              "start": Object {
+                "column": 30,
+                "line": 1,
+              },
+            },
+            "type": "TextNode",
+          },
+          Object {
+            "escaped": true,
+            "hash": Object {
+              "loc": Object {
+                "end": Object {
+                  "column": 0,
+                  "line": 1,
+                },
+                "source": "(synthetic)",
+                "start": Object {
+                  "column": 0,
+                  "line": 1,
+                },
+              },
+              "pairs": Array [],
+              "type": "Hash",
+            },
+            "loc": Object {
+              "end": Object {
+                "column": 7,
+                "line": 2,
+              },
+              "source": null,
+              "start": Object {
+                "column": 0,
+                "line": 2,
+              },
+            },
+            "params": Array [],
+            "path": Object {
+              "data": false,
+              "loc": SourceLocation {
+                "end": Object {
+                  "column": 5,
+                  "line": 2,
+                },
+                "source": undefined,
+                "start": Object {
+                  "column": 2,
+                  "line": 2,
+                },
+              },
+              "original": "foo",
+              "parts": Array [
+                "foo",
+              ],
+              "this": false,
+              "type": "PathExpression",
+            },
+            "strip": Object {
+              "close": false,
+              "open": false,
+            },
+            "type": "MustacheStatement",
+          },
+          Object {
+            "chars": "
+",
+            "loc": Object {
+              "end": Object {
+                "column": 0,
+                "line": 3,
+              },
+              "source": null,
+              "start": Object {
+                "column": 7,
+                "line": 2,
+              },
+            },
+            "type": "TextNode",
+          },
+        ],
+        "comments": Array [],
+        "loc": Object {
+          "end": Object {
+            "column": 12,
+            "line": 3,
+          },
+          "source": null,
+          "start": Object {
+            "column": 0,
+            "line": 1,
+          },
+        },
+        "modifiers": Array [],
+        "selfClosing": false,
+        "tag": "Component",
+        "type": "ElementNode",
+      },
+    ],
+    "position": Object {
+      "column": 22,
+      "line": 1,
+    },
+  },
   "type": "BlockParam",
 }
 `;
 
 exports[`glimmer-utils maybeBlockParamDefinition able to handle single param 1`] = `
-Object {
-  "getParentPath": [Function],
-  "index": 0,
+BlockParamDefinition {
   "name": "items",
+  "path": ASTPath {
+    "content": "",
+    "index": 1,
+    "path": Array [
+      Object {
+        "blockParams": Array [],
+        "body": Array [
+          Object {
+            "attributes": Array [],
+            "blockParams": Array [
+              "items",
+            ],
+            "children": Array [
+              Object {
+                "chars": "
+",
+                "loc": Object {
+                  "end": Object {
+                    "column": 0,
+                    "line": 2,
+                  },
+                  "source": null,
+                  "start": Object {
+                    "column": 22,
+                    "line": 1,
+                  },
+                },
+                "type": "TextNode",
+              },
+              Object {
+                "escaped": true,
+                "hash": Object {
+                  "loc": Object {
+                    "end": Object {
+                      "column": 0,
+                      "line": 1,
+                    },
+                    "source": "(synthetic)",
+                    "start": Object {
+                      "column": 0,
+                      "line": 1,
+                    },
+                  },
+                  "pairs": Array [],
+                  "type": "Hash",
+                },
+                "loc": Object {
+                  "end": Object {
+                    "column": 7,
+                    "line": 2,
+                  },
+                  "source": null,
+                  "start": Object {
+                    "column": 0,
+                    "line": 2,
+                  },
+                },
+                "params": Array [],
+                "path": Object {
+                  "data": false,
+                  "loc": SourceLocation {
+                    "end": Object {
+                      "column": 5,
+                      "line": 2,
+                    },
+                    "source": undefined,
+                    "start": Object {
+                      "column": 2,
+                      "line": 2,
+                    },
+                  },
+                  "original": "foo",
+                  "parts": Array [
+                    "foo",
+                  ],
+                  "this": false,
+                  "type": "PathExpression",
+                },
+                "strip": Object {
+                  "close": false,
+                  "open": false,
+                },
+                "type": "MustacheStatement",
+              },
+              Object {
+                "chars": "
+",
+                "loc": Object {
+                  "end": Object {
+                    "column": 0,
+                    "line": 3,
+                  },
+                  "source": null,
+                  "start": Object {
+                    "column": 7,
+                    "line": 2,
+                  },
+                },
+                "type": "TextNode",
+              },
+            ],
+            "comments": Array [],
+            "loc": Object {
+              "end": Object {
+                "column": 12,
+                "line": 3,
+              },
+              "source": null,
+              "start": Object {
+                "column": 0,
+                "line": 1,
+              },
+            },
+            "modifiers": Array [],
+            "selfClosing": false,
+            "tag": "Component",
+            "type": "ElementNode",
+          },
+        ],
+        "loc": Object {
+          "end": Object {
+            "column": 12,
+            "line": 3,
+          },
+          "source": null,
+          "start": Object {
+            "column": 0,
+            "line": 1,
+          },
+        },
+        "type": "Template",
+      },
+      Object {
+        "attributes": Array [],
+        "blockParams": Array [
+          "items",
+        ],
+        "children": Array [
+          Object {
+            "chars": "
+",
+            "loc": Object {
+              "end": Object {
+                "column": 0,
+                "line": 2,
+              },
+              "source": null,
+              "start": Object {
+                "column": 22,
+                "line": 1,
+              },
+            },
+            "type": "TextNode",
+          },
+          Object {
+            "escaped": true,
+            "hash": Object {
+              "loc": Object {
+                "end": Object {
+                  "column": 0,
+                  "line": 1,
+                },
+                "source": "(synthetic)",
+                "start": Object {
+                  "column": 0,
+                  "line": 1,
+                },
+              },
+              "pairs": Array [],
+              "type": "Hash",
+            },
+            "loc": Object {
+              "end": Object {
+                "column": 7,
+                "line": 2,
+              },
+              "source": null,
+              "start": Object {
+                "column": 0,
+                "line": 2,
+              },
+            },
+            "params": Array [],
+            "path": Object {
+              "data": false,
+              "loc": SourceLocation {
+                "end": Object {
+                  "column": 5,
+                  "line": 2,
+                },
+                "source": undefined,
+                "start": Object {
+                  "column": 2,
+                  "line": 2,
+                },
+              },
+              "original": "foo",
+              "parts": Array [
+                "foo",
+              ],
+              "this": false,
+              "type": "PathExpression",
+            },
+            "strip": Object {
+              "close": false,
+              "open": false,
+            },
+            "type": "MustacheStatement",
+          },
+          Object {
+            "chars": "
+",
+            "loc": Object {
+              "end": Object {
+                "column": 0,
+                "line": 3,
+              },
+              "source": null,
+              "start": Object {
+                "column": 7,
+                "line": 2,
+              },
+            },
+            "type": "TextNode",
+          },
+        ],
+        "comments": Array [],
+        "loc": Object {
+          "end": Object {
+            "column": 12,
+            "line": 3,
+          },
+          "source": null,
+          "start": Object {
+            "column": 0,
+            "line": 1,
+          },
+        },
+        "modifiers": Array [],
+        "selfClosing": false,
+        "tag": "Component",
+        "type": "ElementNode",
+      },
+    ],
+    "position": Object {
+      "column": 16,
+      "line": 1,
+    },
+  },
   "type": "BlockParam",
 }
 `;

@@ -138,9 +138,8 @@ export default class TemplateCompletionProvider {
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
   getScopedValues(focusPath: ASTPath) {
-    const scopedValues = getLocalScope(focusPath).map(([name, fPath]) => {
-      const blockSource =
-        fPath.node.type === 'ElementNode' ? `<${fPath.node.tag} as |...|>` : `{{#${fPath.parentPath && fPath.parentPath.node.path.original} as |...|}}`;
+    const scopedValues = getLocalScope(focusPath).map(({ name, node, path }) => {
+      const blockSource = node.type === 'ElementNode' ? `<${node.tag} as |...|>` : `{{#${path.parentPath && path.parentPath.node.path.original} as |...|}}`;
       return {
         label: name,
         kind: CompletionItemKind.Variable,

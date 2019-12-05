@@ -28,7 +28,7 @@ describe('glimmer-utils', function() {
 </Component>
         `;
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 5)));
-      expect(getLocalScope(astPath).map(([el, , ind]) => [el, ind])).toEqual([['item', 0], ['bar', 1], ['items', 0]]);
+      expect(getLocalScope(astPath).map(({ name, index }) => [name, index])).toEqual([['item', 0], ['bar', 1], ['items', 0]]);
     });
   });
   describe('maybeComponentNameForPath', function() {

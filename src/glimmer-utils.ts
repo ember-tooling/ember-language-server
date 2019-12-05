@@ -1,7 +1,6 @@
 import { Position, SourceLocation } from 'estree';
 import { containsPosition } from './estree-utils';
 
-type ScopeValue = [string, ASTPath, number];
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
 function maybePathDeclaration(astPath: ASTPath) {
@@ -9,11 +8,11 @@ function maybePathDeclaration(astPath: ASTPath) {
     const scope = getLocalScope(astPath);
     const pathName = getLocalPathName(astPath.node);
     if (pathName) {
-      let declaration = scope.find(([name]) => name === pathName);
+      let declaration = scope.find(({ name }) => name === pathName);
       if (!declaration) {
         return;
       }
-      return declaration[1];
+      return declaration.path;
     }
   }
 }
@@ -42,7 +41,7 @@ export function isLocalScopedPathExpression(astPath: ASTPath) {
     return false;
   }
   const scope = getLocalScope(astPath);
-  const declarations = scope.filter(([name]) => name === pathName);
+  const declarations = scope.filter(({ name }) => name === pathName);
   if (declarations.length) {
     return true;
   } else {
@@ -80,12 +79,30 @@ export function focusedBlockParamName(content: string, position: Position) {
   return '';
 }
 
-type BlockParamDefinition = {
-  type: 'BlockParam';
-  name: string;
-  index: number;
-  getParentPath: () => ASTPath;
-};
+class BlockParamDefinition {
+  public type = 'BlockParam';
+  public name: string;
+  public path: ASTPath;
+  constructor(name: string, path: ASTPath) {
+    this.name = name;
+    this.path = path;
+  }
+  get node() {
+    return this.path.node;
+  }
+  get index(): number {
+    let node = this.path.node;
+    if (node.type === 'BlockStatement' && node.program) {
+      return node.program.blockParams.indexOf(this.name);
+    } else if (node.type === 'Block') {
+      return node.blockParams.indexOf(this.name);
+    } else if (node.type === 'ElementNode') {
+      return node.blockParams.indexOf(this.name);
+    } else {
+      return -1;
+    }
+  }
+}
 
 export function maybeBlockParamDefinition(astPath: ASTPath, content: string, position: Position): BlockParamDefinition | undefined {
   if (!isBlockParamDefinition(astPath, content, position)) {
@@ -95,20 +112,12 @@ export function maybeBlockParamDefinition(astPath: ASTPath, content: string, pos
   if (paramName === '') {
     return;
   }
-  const node = astPath.node;
-  return {
-    type: 'BlockParam',
-    name: paramName,
-    getParentPath() {
-      return astPath;
-    },
-    index: node.type === 'BlockStatement' && node.program ? node.program.blockParams.indexOf(paramName) : node.blockParams.indexOf(paramName)
-  };
+  return new BlockParamDefinition(paramName, astPath);
 }
 
 export function isBlockParamDefinition(astPath: ASTPath, content: string, position: Position) {
   const node = astPath.node;
-  if (node.type !== 'BlockStatement' && node.type !== 'ElementNode') {
+  if (node.type !== 'Block' && node.type !== 'BlockStatement' && node.type !== 'ElementNode') {
     return;
   }
   let source = content.match(reLines) as string[];
@@ -159,14 +168,14 @@ export function sourceForNode(node: any, content: string = '') {
 }
 
 export function getLocalScope(astPath: ASTPath) {
-  const scopeValues: ScopeValue[] = [];
+  const scopeValues: BlockParamDefinition[] = [];
   let cursor: ASTPath | undefined = astPath.parentPath;
   while (cursor) {
     const node = cursor.node;
     if (node && (node.type === 'ElementNode' || node.type === 'Block')) {
       const params = node.blockParams;
       params.forEach((param: string) => {
-        scopeValues.push([param, cursor as ASTPath, params.indexOf(param)]);
+        scopeValues.push(new BlockParamDefinition(param, cursor as ASTPath));
       });
     }
     cursor = cursor.parentPath;
@@ -204,7 +213,7 @@ export default class ASTPath {
     return this.path[this.index - 1];
   }
 
-  metaForAstType(astType: 'handlebars'): HandlebarsASTPathMeta | null {
+  metaForType(astType: 'handlebars'): HandlebarsASTPathMeta | null {
     if (astType === 'handlebars') {
       return new HandlebarsASTPathMeta(this, this.position, this.content);
     } else {
