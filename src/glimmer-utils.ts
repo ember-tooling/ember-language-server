@@ -45,11 +45,75 @@ export function isLocalScopedPathExpression(astPath: ASTPath) {
   }
 }
 
+export function focusedBlockParamName(content: string, position: Position) {
+  let source = content.match(reLines) as string[];
+  let focusedLine = source[position.line - 1];
+  let paramName = '';
+  if (typeof focusedLine !== 'string') {
+    return paramName;
+  }
+  let definitionStartIndex = focusedLine.indexOf('|');
+  let definitionEndIndex = focusedLine.lastIndexOf('|');
+  let column = position.column;
+  if (definitionEndIndex >= column && definitionStartIndex <= column) {
+    let lineParts = focusedLine.split('|');
+    let localColIndex = lineParts[0].length + 1;
+    let targetPart = lineParts[1];
+    let targets = targetPart.split(' ');
+    for (let i = 0; i < targets.length; i++) {
+      let startIndex = localColIndex;
+      let endIndex = startIndex + targets[i].length;
+      if (column >= startIndex && column <= endIndex) {
+        paramName = targets[i].trim();
+        break;
+      } else {
+        localColIndex = endIndex + 1;
+      }
+    }
+    return paramName;
+  }
+  return '';
+}
+
+type BlockParamDefinition = {
+  type: 'BlockParam';
+  name: string;
+  index: number;
+};
+
+export function maybeBlockParamDefinition(astPath: ASTPath, content: string, position: Position): BlockParamDefinition | undefined {
+  if (!isBlockParamDefinition(astPath, content, position)) {
+    return;
+  }
+  let paramName = focusedBlockParamName(content, position);
+  if (paramName === '') {
+    return;
+  }
+  const node = astPath.node;
+  return {
+    type: 'BlockParam',
+    name: paramName,
+    index: node.type === 'BlockStatement' && node.program ? node.program.blockParams.indexOf(paramName) : node.blockParams.indexOf(paramName)
+  };
+}
+
+export function isBlockParamDefinition(astPath: ASTPath, content: string, position: Position) {
+  const node = astPath.node;
+  if (node.type !== 'BlockStatement' && node.type !== 'ElementNode') {
+    return;
+  }
+  let source = content.match(reLines) as string[];
+  let focusedLine = source[position.line - 1];
+  if (focusedLine.lastIndexOf('|') > position.column && focusedLine.indexOf('|') < position.column) {
+    return true;
+  }
+}
+
 export function sourceForNode(node: any, content: string = '') {
   // mostly copy/pasta from ember-template-lint and tildeio/htmlbars with a few tweaks:
   // https://github.com/tildeio/htmlbars/blob/v0.14.17/packages/htmlbars-syntax/lib/parser.js#L59-L90
   // https://github.com/ember-template-lint/ember-template-lint/blob/v2.0.0-beta.3/lib/rules/base.js#L511
-  if (!node.loc) {
+  if (!node || !node.loc) {
     return;
   }
 
@@ -116,6 +180,18 @@ export default class ASTPath {
 
   get parent(): any | undefined {
     return this.path[this.index - 1];
+  }
+
+  get localScope() {
+    return getLocalScope(this);
+  }
+
+  sourceForNode(content: string) {
+    return sourceForNode(this.node, content);
+  }
+
+  sourceForParent(content: string) {
+    return sourceForNode(this.parent, content);
   }
 
   get parentPath(): ASTPath | undefined {
