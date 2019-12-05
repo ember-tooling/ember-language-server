@@ -137,7 +137,16 @@ export default class TemplateCompletionProvider {
   }
 }
 
-function getTextPrefix({ node }: ASTPath, normalPlaceholder: string): string {
+function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
+  let node = astPath.node;
+  // handle block params autocomplete case
+  if (node.type === 'ElementNode' || node.type === 'BlockStatement') {
+    const meta = astPath.metaForType('handlebars');
+    const maybeBlockDefenition = meta && meta.maybeBlockParamDefinition;
+    if (maybeBlockDefenition) {
+      node = maybeBlockDefenition;
+    }
+  }
   let target = node.original || node.tag || node.name || node.chars || '';
   return target.replace(normalPlaceholder, '').replace(PLACEHOLDER, '');
 }
