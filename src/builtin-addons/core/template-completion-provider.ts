@@ -14,10 +14,12 @@ import {
   isLinkToTarget,
   isComponentArgumentName,
   isLocalPathExpression,
+  isArgumentPathExpression,
   isScopedPathExpression,
   isLinkComponentRouteTarget,
   isMustachePath,
   isBlockPath,
+  isPathExpression,
   isSubExpressionPath,
   isAngleComponentPath,
   isModifierPath
@@ -72,6 +74,10 @@ function mListMURouteLevelComponents(projectRoot: string, fileURI: string) {
   return [];
 }
 
+function isArgumentName(name: string) {
+  return name.startsWith('@');
+}
+
 export default class TemplateCompletionProvider {
   constructor() {}
   getAllAngleBracketComponents(root: string, uri: string) {
@@ -95,13 +101,12 @@ export default class TemplateCompletionProvider {
       'label'
     );
   }
-  getPathExpressionCandidates(root: string, uri: string, originalText: string) {
+  getLocalPathExpressionCandidates(root: string, uri: string, originalText: string) {
     let candidates: CompletionItem[] = [...mTemplateContextLookup(root, uri, originalText)];
     return candidates;
   }
-  getMustachePathCandidates(root: string, uri: string, originalText: string) {
+  getMustachePathCandidates(root: string) {
     let candidates: CompletionItem[] = [
-      ...mTemplateContextLookup(root, uri, originalText),
       ...mListComponents(root),
       ...mListMUComponents(root),
       ...mListPodsComponents(root),
@@ -112,9 +117,8 @@ export default class TemplateCompletionProvider {
     ];
     return candidates;
   }
-  getBlockPathCandidates(root: string, uri: string, originalText: string) {
+  getBlockPathCandidates(root: string) {
     let candidates: CompletionItem[] = [
-      ...mTemplateContextLookup(root, uri, originalText),
       ...mListComponents(root),
       ...mListMUComponents(root),
       ...mListPodsComponents(root),
@@ -124,18 +128,14 @@ export default class TemplateCompletionProvider {
     ];
     return candidates;
   }
-  getSubExpressionPathCandidates(root: string, uri: string, originalText: string) {
+  getSubExpressionPathCandidates(root: string) {
     let candidates: CompletionItem[] = [
-      ...mTemplateContextLookup(root, uri, originalText),
       ...mListHelpers(root),
       ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
         return detail === 'helper';
       })
     ];
     return candidates;
-  }
-  getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
-    return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
   getScopedValues(focusPath: ASTPath) {
     const scopedValues = getLocalScope(focusPath).map(({ name, node, path }) => {
@@ -173,20 +173,20 @@ export default class TemplateCompletionProvider {
         const maybeComponentName = focusPath.parent.tag;
         const isValidComponent =
           !['Input', 'Textarea', 'LinkTo'].includes(maybeComponentName) &&
-          !maybeComponentName.startsWith('@') &&
+          !isArgumentName(maybeComponentName) &&
           !maybeComponentName.startsWith(':') &&
           !maybeComponentName.includes('.');
         if (isValidComponent) {
           const tpls: any[] = provideComponentTemplatePaths(root, maybeComponentName);
           const existingTpls = tpls.filter(fs.existsSync);
           if (existingTpls.length) {
-            const existingAttributes = focusPath.parent.attributes.map((attr: any) => attr.name).filter((name: string) => name.startsWith('@'));
+            const existingAttributes = focusPath.parent.attributes.map((attr: any) => attr.name).filter((name: string) => isArgumentName(name));
             const content = fs.readFileSync(existingTpls[0], 'utf8');
-            let candidates = this.getPathExpressionCandidates(root, tpls[0], content);
+            let candidates = this.getLocalPathExpressionCandidates(root, tpls[0], content);
             let preResults: CompletionItem[] = [];
             candidates.forEach((obj: CompletionItem) => {
               const name = obj.label.split('.')[0];
-              if (name.startsWith('@') && !existingAttributes.includes(name)) {
+              if (isArgumentName(name) && !existingAttributes.includes(name)) {
                 preResults.push({
                   label: name,
                   detail: obj.detail,
@@ -199,34 +199,54 @@ export default class TemplateCompletionProvider {
             }
           }
         }
+      } else if (isLocalPathExpression(focusPath)) {
+        // {{foo-bar this.na?}}
+        log('isLocalPathExpression');
+        const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText).filter((el) => {
+          return el.label.startsWith('this.');
+        });
+        completions.push(...uniqBy(candidates, 'label'));
+      } else if (isArgumentPathExpression(focusPath)) {
+        // {{@ite..}}
+        const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText).filter((el) => {
+          return isArgumentName(el.label);
+        });
+        completions.push(...uniqBy(candidates, 'label'));
       } else if (isMustachePath(focusPath)) {
         // {{foo-bar?}}
         log('isMustachePath');
-        const candidates = this.getMustachePathCandidates(root, uri, originalText);
+        const candidates = this.getMustachePathCandidates(root);
+        const localCandidates = this.getLocalPathExpressionCandidates(root, uri, originalText);
         if (isScopedPathExpression(focusPath)) {
           const scopedValues = this.getScopedValues(focusPath);
           completions.push(...uniqBy(scopedValues, 'label'));
         }
+        completions.push(...uniqBy(localCandidates, 'label'));
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberMustacheItems);
       } else if (isBlockPath(focusPath)) {
         // {{#foo-bar?}} {{/foo-bar}}
         log('isBlockPath');
-        const candidates = this.getBlockPathCandidates(root, uri, originalText);
+        const candidates = this.getBlockPathCandidates(root);
+        if (isScopedPathExpression(focusPath)) {
+          const scopedValues = this.getScopedValues(focusPath);
+          completions.push(...uniqBy(scopedValues, 'label'));
+        }
         completions.push(...emberBlockItems);
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isSubExpressionPath(focusPath)) {
         // {{foo-bar name=(subexpr? )}}
         log('isSubExpressionPath');
-        const candidates = this.getSubExpressionPathCandidates(root, uri, originalText);
+        const candidates = this.getSubExpressionPathCandidates(root);
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
-      } else if (isLocalPathExpression(focusPath)) {
-        // {{foo-bar this.na?}}
-        log('isLocalPathExpression');
-        const candidates = this.getPathExpressionCandidates(root, uri, originalText);
+      } else if (isPathExpression(focusPath)) {
+        if (isScopedPathExpression(focusPath)) {
+          const scopedValues = this.getScopedValues(focusPath);
+          completions.push(...uniqBy(scopedValues, 'label'));
+        }
+        const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText);
         completions.push(...uniqBy(candidates, 'label'));
-        completions.push(...emberMustacheItems);
       } else if (isLinkToTarget(focusPath)) {
         // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
         log('isLinkToTarget');

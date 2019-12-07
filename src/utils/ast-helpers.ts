@@ -320,6 +320,9 @@ function isCallExpression(node: any): boolean {
 export function isLocalPathExpression(path: any): boolean {
   return isPathExpression(path.node) && path.node.this === true;
 }
+export function isArgumentPathExpression(path: any): boolean {
+  return isPathExpression(path.node) && path.node.data === true;
+}
 export function isScopedPathExpression(path: any): boolean {
   return isPathExpression(path.node) && path.node.this === false && path.node.data === false;
 }
@@ -329,7 +332,7 @@ export function isComponentArgumentName(path: any): boolean {
 export function isLinkComponentRouteTarget(path: any): boolean {
   return hasNodeType(path.node, 'TextNode') && hasNodeType(path.parent, 'AttrNode') && path.parent.name === '@route';
 }
-function isPathExpression(node: any): boolean {
+export function isPathExpression(node: any): boolean {
   return hasNodeType(node, 'PathExpression');
 }
 function expressionHasIdentifierName(exp: any, name: string | string[]) {
