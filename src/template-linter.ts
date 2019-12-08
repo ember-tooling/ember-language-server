@@ -60,7 +60,7 @@ export default class TemplateLinter {
 
     const diagnostics: Diagnostic[] = errors.map((error: TemplateLinterError) => toDiagnostic(source, error));
 
-    this.server.connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+    return diagnostics;
   }
 
   private getLinterConfig(uri: string): { configPath: string } | undefined {
