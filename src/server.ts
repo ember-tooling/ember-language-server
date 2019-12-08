@@ -14,6 +14,7 @@ import {
   IConnection,
   TextDocuments,
   InitializeResult,
+  Diagnostic,
   InitializeParams,
   DocumentSymbolParams,
   SymbolInformation,
@@ -159,9 +160,33 @@ export default class Server {
     };
   }
 
-  private onDidChangeContent(change: any) {
+  linters: any[] = [];
+
+  private async onDidChangeContent(change: any) {
     // this.setStatusText('did-change');
-    this.templateLinter.lint(change.document);
+
+    let lintResults = await this.templateLinter.lint(change.document);
+    const results: Diagnostic[] = [];
+    if (Array.isArray(lintResults)) {
+      lintResults.forEach((result) => {
+        results.push(result);
+      });
+    }
+    for (let linter of this.linters) {
+      try {
+        let tempResult = await linter(change.document);
+        // API must return array
+        if (Array.isArray(tempResult)) {
+          tempResult.forEach((el) => {
+            results.push(el as Diagnostic);
+          });
+        }
+      } catch (e) {
+        logError(e);
+      }
+    }
+
+    this.connection.sendDiagnostics({ uri: change.document.uri, diagnostics: results });
   }
 
   private onDidChangeWatchedFiles() {
