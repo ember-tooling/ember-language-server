@@ -342,14 +342,14 @@ export function listPodsComponents(root: string): CompletionItem[] {
   if (podModulePrefix === null) {
     return [];
   }
-  // log('listComponents');
-  const jsPaths = safeWalkSync(path.join(root, 'app', podModulePrefix, 'components'), {
+  const entryPath = path.join(root, 'app', podModulePrefix, 'components');
+  const jsPaths = safeWalkSync(entryPath, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   });
 
   const items = jsPaths.map((filePath: string) => {
-    addToRegistry(pureComponentName(filePath), [filePath]);
+    addToRegistry(pureComponentName(filePath), [path.join(entryPath, filePath)]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -362,13 +362,14 @@ export function listPodsComponents(root: string): CompletionItem[] {
 }
 
 export function listMUComponents(root: string): CompletionItem[] {
-  const jsPaths = safeWalkSync(path.join(root, 'src', 'ui', 'components'), {
+  const entryPath = path.join(root, 'src', 'ui', 'components');
+  const jsPaths = safeWalkSync(entryPath, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   });
 
   const items = jsPaths.map((filePath: string) => {
-    addToRegistry(pureComponentName(filePath), [filePath]);
+    addToRegistry(pureComponentName(filePath), [path.join(entryPath, filePath)]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -391,20 +392,29 @@ export function builtinModifiers(): CompletionItem[] {
 
 export function listComponents(root: string): CompletionItem[] {
   // log('listComponents');
-  const jsPaths = safeWalkSync(path.join(root, 'app', 'components'), {
+  const scriptEntry = path.join(root, 'app', 'components');
+  const templateEntry = path.join(root, 'app', 'templates', 'components');
+  const jsPaths = safeWalkSync(scriptEntry, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   });
 
-  const hbsPaths = safeWalkSync(path.join(root, 'app', 'templates', 'components'), {
+  jsPaths.forEach((p) => {
+    addToRegistry(pureComponentName(p), [path.join(scriptEntry, p)]);
+  });
+
+  const hbsPaths = safeWalkSync(templateEntry, {
     directories: false,
     globs: ['**/*.hbs']
+  });
+
+  hbsPaths.forEach((p) => {
+    addToRegistry(pureComponentName(p), [path.join(templateEntry, p)]);
   });
 
   const paths = [...jsPaths, ...hbsPaths];
 
   const items = paths.map((filePath: string) => {
-    addToRegistry(pureComponentName(filePath), [filePath]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -422,13 +432,14 @@ function listCollection(
   kindType: CompletionItemKind,
   detail: 'transform' | 'service' | 'model' | 'helper' | 'modifier'
 ) {
-  const paths = safeWalkSync(path.join(root, prefix, collectionName), {
+  const entry = path.join(root, prefix, collectionName);
+  const paths = safeWalkSync(entry, {
     directories: false,
     globs: ['**/*.{js,ts}']
   });
 
   const items = paths.map((filePath: string) => {
-    addToRegistry(pureComponentName(filePath), [filePath]);
+    addToRegistry(pureComponentName(filePath), [path.join(entry, filePath)]);
     return {
       kind: kindType,
       label: pureComponentName(filePath),
@@ -461,12 +472,14 @@ export function listTransforms(root: string): CompletionItem[] {
 
 export function listRoutes(root: string): CompletionItem[] {
   // log('listRoutes');
-  const paths = safeWalkSync(path.join(root, 'app', 'routes'), {
+  const scriptEntry = path.join(root, 'app', 'routes');
+  const templateEntry = path.join(root, 'app', 'templates');
+  const paths = safeWalkSync(scriptEntry, {
     directories: false,
     globs: ['**/*.{js,ts}']
   });
 
-  const templatePaths = safeWalkSync(path.join(root, 'app', 'templates'), {
+  const templatePaths = safeWalkSync(templateEntry, {
     directories: false,
     globs: ['**/*.hbs']
   }).filter((name: string) => {
@@ -476,7 +489,11 @@ export function listRoutes(root: string): CompletionItem[] {
 
   const items = [...templatePaths, ...paths].map((filePath: string) => {
     const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
-    addToRegistry(pureComponentName(label), [filePath]);
+    if (filePath.endsWith('.hbs')) {
+      addToRegistry(label, [path.join(templateEntry, filePath)]);
+    } else {
+      addToRegistry(label, [path.join(scriptEntry, filePath)]);
+    }
     return {
       kind: CompletionItemKind.File,
       label,
