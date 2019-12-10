@@ -59,14 +59,22 @@ export default class Server {
     }
   }
   getRegistry(rawRoot: string) {
-    const root = path.normalize(path.resolve(rawRoot));
+    const root = path.resolve(rawRoot);
     const registry = getGlobalRegistry();
     const registryForRoot: any = {};
     Object.keys(registry).forEach((key: REGISTRY_KIND) => {
       registryForRoot[key] = {};
-      Object.entries(registry[key]).forEach(([itemName, paths]) => {
-        registryForRoot[key][itemName] = paths.filter((p: string) => p.startsWith(root));
-      });
+      for (let [itemName, paths] of registry[key].entries()) {
+        const items: string[] = [];
+        paths.forEach((normalizedPath) => {
+          if (normalizedPath.startsWith(root)) {
+            items.push(normalizedPath);
+          }
+        });
+        if (items.length) {
+          registryForRoot[key][itemName] = items;
+        }
+      }
     });
     return registryForRoot;
   }
