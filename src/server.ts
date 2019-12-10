@@ -37,6 +37,7 @@ import { log, setConsole, logError } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
+import { getGlobalRegistry, addToRegistry, REGISTRY_KIND } from './utils/layout-helpers';
 
 export default class Server {
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
@@ -50,6 +51,24 @@ export default class Server {
   documents: TextDocuments = new TextDocuments();
 
   projectRoots: ProjectRoots = new ProjectRoots();
+  addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
+    if (Array.isArray(fullPath)) {
+      addToRegistry(normalizedName, kind, fullPath);
+    } else {
+      addToRegistry(normalizedName, kind, [fullPath]);
+    }
+  }
+  getRegistry(root: string) {
+    const registry = getGlobalRegistry();
+    const registryForRoot: any = {};
+    Object.keys(registry).forEach((key: REGISTRY_KIND) => {
+      registryForRoot[key] = {};
+      Object.entries(registry[key]).forEach(([itemName, paths]) => {
+        registryForRoot[key][itemName] = paths.filter((p: string) => p.startsWith(root));
+      });
+    });
+    return registryForRoot;
+  }
 
   documentSymbolProviders: DocumentSymbolProvider[] = [new JSDocumentSymbolProvider(), new HBSDocumentSymbolProvider()];
 

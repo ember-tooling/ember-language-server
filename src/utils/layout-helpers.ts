@@ -6,7 +6,7 @@ import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 type GLOBAL_REGISTRY_ITEM = Map<string, Set<string>>;
-type REGISTRY_KIND = 'transform' | 'helper' | 'component' | 'routePath' | 'model' | 'service' | 'modifier';
+export type REGISTRY_KIND = 'transform' | 'helper' | 'component' | 'routePath' | 'model' | 'service' | 'modifier';
 
 const GLOBAL_REGISTRY: {
   transform: GLOBAL_REGISTRY_ITEM;
@@ -30,7 +30,7 @@ export function getGlobalRegistry() {
   return GLOBAL_REGISTRY;
 }
 
-function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
+export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
   if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
     GLOBAL_REGISTRY[kind].set(normalizedName, new Set());
   }
