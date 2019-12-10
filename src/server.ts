@@ -58,7 +58,8 @@ export default class Server {
       addToRegistry(normalizedName, kind, [fullPath]);
     }
   }
-  getRegistry(root: string) {
+  getRegistry(rawRoot: string) {
+    const root = path.normalize(path.resolve(rawRoot));
     const registry = getGlobalRegistry();
     const registryForRoot: any = {};
     Object.keys(registry).forEach((key: REGISTRY_KIND) => {
