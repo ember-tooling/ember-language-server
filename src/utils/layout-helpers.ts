@@ -5,18 +5,37 @@ import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
-const GLOBAL_REGISTRY: Map<string, Set<string>> = new Map();
+type GLOBAL_REGISTRY_ITEM = Map<string, Set<string>>;
+type REGISTRY_KIND = 'transform' | 'helper' | 'component' | 'routePath' | 'model' | 'service' | 'modifier';
+
+const GLOBAL_REGISTRY: {
+  transform: GLOBAL_REGISTRY_ITEM;
+  helper: GLOBAL_REGISTRY_ITEM;
+  component: GLOBAL_REGISTRY_ITEM;
+  routePath: GLOBAL_REGISTRY_ITEM;
+  model: GLOBAL_REGISTRY_ITEM;
+  service: GLOBAL_REGISTRY_ITEM;
+  modifier: GLOBAL_REGISTRY_ITEM;
+} = {
+  transform: new Map(),
+  helper: new Map(),
+  component: new Map(),
+  routePath: new Map(),
+  model: new Map(),
+  service: new Map(),
+  modifier: new Map()
+};
 
 export function getGlobalRegistry() {
   return GLOBAL_REGISTRY;
 }
 
-function addToRegistry(normalizedName: string, files: string[]) {
-  if (!GLOBAL_REGISTRY.has(normalizedName)) {
-    GLOBAL_REGISTRY.set(normalizedName, new Set());
+function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
+  if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
+    GLOBAL_REGISTRY[kind].set(normalizedName, new Set());
   }
-  if (GLOBAL_REGISTRY.has(normalizedName)) {
-    const regItem = GLOBAL_REGISTRY.get(normalizedName);
+  if (GLOBAL_REGISTRY[kind].has(normalizedName)) {
+    const regItem = GLOBAL_REGISTRY[kind].get(normalizedName);
     if (regItem) {
       files.forEach((file) => {
         regItem.add(file);
@@ -349,7 +368,7 @@ export function listPodsComponents(root: string): CompletionItem[] {
   });
 
   const items = jsPaths.map((filePath: string) => {
-    addToRegistry(pureComponentName(filePath), [path.join(entryPath, filePath)]);
+    addToRegistry(pureComponentName(filePath), 'component', [path.join(entryPath, filePath)]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -369,7 +388,7 @@ export function listMUComponents(root: string): CompletionItem[] {
   });
 
   const items = jsPaths.map((filePath: string) => {
-    addToRegistry(pureComponentName(filePath), [path.join(entryPath, filePath)]);
+    addToRegistry(pureComponentName(filePath), 'component', [path.join(entryPath, filePath)]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -400,7 +419,7 @@ export function listComponents(root: string): CompletionItem[] {
   });
 
   jsPaths.forEach((p) => {
-    addToRegistry(pureComponentName(p), [path.join(scriptEntry, p)]);
+    addToRegistry(pureComponentName(p), 'component', [path.join(scriptEntry, p)]);
   });
 
   const hbsPaths = safeWalkSync(templateEntry, {
@@ -409,7 +428,7 @@ export function listComponents(root: string): CompletionItem[] {
   });
 
   hbsPaths.forEach((p) => {
-    addToRegistry(pureComponentName(p), [path.join(templateEntry, p)]);
+    addToRegistry(pureComponentName(p), 'component', [path.join(templateEntry, p)]);
   });
 
   const paths = [...jsPaths, ...hbsPaths];
@@ -439,7 +458,7 @@ function listCollection(
   });
 
   const items = paths.map((filePath: string) => {
-    addToRegistry(pureComponentName(filePath), [path.join(entry, filePath)]);
+    addToRegistry(pureComponentName(filePath), detail, [path.join(entry, filePath)]);
     return {
       kind: kindType,
       label: pureComponentName(filePath),
@@ -490,9 +509,9 @@ export function listRoutes(root: string): CompletionItem[] {
   const items = [...templatePaths, ...paths].map((filePath: string) => {
     const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
     if (filePath.endsWith('.hbs')) {
-      addToRegistry(label, [path.join(templateEntry, filePath)]);
+      addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
     } else {
-      addToRegistry(label, [path.join(scriptEntry, filePath)]);
+      addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
     }
     return {
       kind: CompletionItemKind.File,
