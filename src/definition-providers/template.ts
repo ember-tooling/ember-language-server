@@ -7,7 +7,6 @@ import Server from './../server';
 import ASTPath from './../glimmer-utils';
 import { preprocess } from '@glimmer/syntax';
 import { Project } from '../project-roots';
-
 export default class TemplateDefinitionProvider {
   constructor(private server: Server) {}
   async handle(params: TextDocumentPositionParams, project: Project): Promise<Definition | null> {

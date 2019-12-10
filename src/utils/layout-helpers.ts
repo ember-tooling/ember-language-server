@@ -4,6 +4,46 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
+// const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
+type GLOBAL_REGISTRY_ITEM = Map<string, Set<string>>;
+export type REGISTRY_KIND = 'transform' | 'helper' | 'component' | 'routePath' | 'model' | 'service' | 'modifier';
+
+const GLOBAL_REGISTRY: {
+  transform: GLOBAL_REGISTRY_ITEM;
+  helper: GLOBAL_REGISTRY_ITEM;
+  component: GLOBAL_REGISTRY_ITEM;
+  routePath: GLOBAL_REGISTRY_ITEM;
+  model: GLOBAL_REGISTRY_ITEM;
+  service: GLOBAL_REGISTRY_ITEM;
+  modifier: GLOBAL_REGISTRY_ITEM;
+} = {
+  transform: new Map(),
+  helper: new Map(),
+  component: new Map(),
+  routePath: new Map(),
+  model: new Map(),
+  service: new Map(),
+  modifier: new Map()
+};
+
+export function getGlobalRegistry() {
+  return GLOBAL_REGISTRY;
+}
+
+export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
+  if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
+    GLOBAL_REGISTRY[kind].set(normalizedName, new Set());
+  }
+  if (GLOBAL_REGISTRY[kind].has(normalizedName)) {
+    const regItem = GLOBAL_REGISTRY[kind].get(normalizedName);
+    if (regItem) {
+      files.forEach((file) => {
+        regItem.add(file);
+      });
+    }
+  }
+}
+
 export const isModuleUnificationApp = memoize(isMuApp, {
   length: 1,
   maxAge: 60000
@@ -159,43 +199,27 @@ export function listGlimmerNativeComponents(root: string) {
   }
 }
 
-export function isGlimmerNativeProject(root: string) {
-  const pack = getPackageJSON(root);
-  if (pack.dependencies && pack.dependencies['glimmer-native']) {
+function hasDep(pack: any, depName: string) {
+  if (pack.dependencies && pack.dependencies[depName]) {
     return true;
   }
-  if (pack.devDependencies && pack.devDependencies['glimmer-native']) {
+  if (pack.devDependencies && pack.devDependencies[depName]) {
     return true;
   }
-  if (pack.peerDependencies && pack.peerDependencies['glimmer-native']) {
+  if (pack.peerDependencies && pack.peerDependencies[depName]) {
     return true;
   }
   return false;
 }
 
+export function isGlimmerNativeProject(root: string) {
+  const pack = getPackageJSON(root);
+  return hasDep(pack, 'glimmer-native');
+}
+
 export function isGlimmerXProject(root: string) {
   const pack = getPackageJSON(root);
-  if (pack.dependencies && pack.dependencies['@glimmerx/core']) {
-    return true;
-  }
-  if (pack.devDependencies && pack.devDependencies['@glimmerx/core']) {
-    return true;
-  }
-  if (pack.peerDependencies && pack.peerDependencies['@glimmerx/core']) {
-    return true;
-  }
-
-  if (pack.dependencies && pack.dependencies['glimmer-lite-core']) {
-    return true;
-  }
-  if (pack.devDependencies && pack.devDependencies['glimmer-lite-core']) {
-    return true;
-  }
-  if (pack.peerDependencies && pack.peerDependencies['glimmer-lite-core']) {
-    return true;
-  }
-
-  return false;
+  return hasDep(pack, '@glimmerx/core') || hasDep(pack, 'glimmer-lite-core');
 }
 
 export function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
@@ -337,13 +361,14 @@ export function listPodsComponents(root: string): CompletionItem[] {
   if (podModulePrefix === null) {
     return [];
   }
-  // log('listComponents');
-  const jsPaths = safeWalkSync(path.join(root, 'app', podModulePrefix, 'components'), {
+  const entryPath = path.join(root, 'app', podModulePrefix, 'components');
+  const jsPaths = safeWalkSync(entryPath, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   });
 
   const items = jsPaths.map((filePath: string) => {
+    addToRegistry(pureComponentName(filePath), 'component', [path.join(entryPath, filePath)]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -356,12 +381,14 @@ export function listPodsComponents(root: string): CompletionItem[] {
 }
 
 export function listMUComponents(root: string): CompletionItem[] {
-  const jsPaths = safeWalkSync(path.join(root, 'src', 'ui', 'components'), {
+  const entryPath = path.join(root, 'src', 'ui', 'components');
+  const jsPaths = safeWalkSync(entryPath, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   });
 
   const items = jsPaths.map((filePath: string) => {
+    addToRegistry(pureComponentName(filePath), 'component', [path.join(entryPath, filePath)]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -384,14 +411,24 @@ export function builtinModifiers(): CompletionItem[] {
 
 export function listComponents(root: string): CompletionItem[] {
   // log('listComponents');
-  const jsPaths = safeWalkSync(path.join(root, 'app', 'components'), {
+  const scriptEntry = path.join(root, 'app', 'components');
+  const templateEntry = path.join(root, 'app', 'templates', 'components');
+  const jsPaths = safeWalkSync(scriptEntry, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']
   });
 
-  const hbsPaths = safeWalkSync(path.join(root, 'app', 'templates', 'components'), {
+  jsPaths.forEach((p) => {
+    addToRegistry(pureComponentName(p), 'component', [path.join(scriptEntry, p)]);
+  });
+
+  const hbsPaths = safeWalkSync(templateEntry, {
     directories: false,
     globs: ['**/*.hbs']
+  });
+
+  hbsPaths.forEach((p) => {
+    addToRegistry(pureComponentName(p), 'component', [path.join(templateEntry, p)]);
   });
 
   const paths = [...jsPaths, ...hbsPaths];
@@ -414,12 +451,14 @@ function listCollection(
   kindType: CompletionItemKind,
   detail: 'transform' | 'service' | 'model' | 'helper' | 'modifier'
 ) {
-  const paths = safeWalkSync(path.join(root, prefix, collectionName), {
+  const entry = path.join(root, prefix, collectionName);
+  const paths = safeWalkSync(entry, {
     directories: false,
     globs: ['**/*.{js,ts}']
   });
 
   const items = paths.map((filePath: string) => {
+    addToRegistry(pureComponentName(filePath), detail, [path.join(entry, filePath)]);
     return {
       kind: kindType,
       label: pureComponentName(filePath),
@@ -452,12 +491,14 @@ export function listTransforms(root: string): CompletionItem[] {
 
 export function listRoutes(root: string): CompletionItem[] {
   // log('listRoutes');
-  const paths = safeWalkSync(path.join(root, 'app', 'routes'), {
+  const scriptEntry = path.join(root, 'app', 'routes');
+  const templateEntry = path.join(root, 'app', 'templates');
+  const paths = safeWalkSync(scriptEntry, {
     directories: false,
     globs: ['**/*.{js,ts}']
   });
 
-  const templatePaths = safeWalkSync(path.join(root, 'app', 'templates'), {
+  const templatePaths = safeWalkSync(templateEntry, {
     directories: false,
     globs: ['**/*.hbs']
   }).filter((name: string) => {
@@ -467,6 +508,11 @@ export function listRoutes(root: string): CompletionItem[] {
 
   const items = [...templatePaths, ...paths].map((filePath: string) => {
     const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+    if (filePath.endsWith('.hbs')) {
+      addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
+    } else {
+      addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
+    }
     return {
       kind: CompletionItemKind.File,
       label,
