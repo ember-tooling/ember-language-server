@@ -52,10 +52,13 @@ export default class Server {
 
   projectRoots: ProjectRoots = new ProjectRoots();
   addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
-    if (Array.isArray(fullPath)) {
-      addToRegistry(normalizedName, kind, fullPath);
+    let rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
+    let purePaths = rawPaths.filter((p) => path.isAbsolute(p));
+    if (purePaths.length) {
+      addToRegistry(normalizedName, kind, purePaths);
+      return true;
     } else {
-      addToRegistry(normalizedName, kind, [fullPath]);
+      return false;
     }
   }
   getRegistry(rawRoot: string) {
