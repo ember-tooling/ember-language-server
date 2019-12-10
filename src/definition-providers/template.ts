@@ -7,7 +7,7 @@ import Server from './../server';
 import ASTPath from './../glimmer-utils';
 import { preprocess } from '@glimmer/syntax';
 import { Project } from '../project-roots';
-
+import { getGlobalRegistry } from './../utils/layout-helpers';
 export default class TemplateDefinitionProvider {
   constructor(private server: Server) {}
   async handle(params: TextDocumentPositionParams, project: Project): Promise<Definition | null> {
@@ -44,6 +44,7 @@ export default class TemplateDefinitionProvider {
       server: this.server
     });
 
+    console.log('getGlobalRegistry', getGlobalRegistry());
     return addonResults;
   }
 

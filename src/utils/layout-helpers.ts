@@ -4,6 +4,27 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
+// const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
+const GLOBAL_REGISTRY: Map<string, Set<string>> = new Map();
+
+export function getGlobalRegistry() {
+  return GLOBAL_REGISTRY;
+}
+
+function addToRegistry(normalizedName: string, files: string[]) {
+  if (!GLOBAL_REGISTRY.has(normalizedName)) {
+    GLOBAL_REGISTRY.set(normalizedName, new Set());
+  }
+  if (GLOBAL_REGISTRY.has(normalizedName)) {
+    const regItem = GLOBAL_REGISTRY.get(normalizedName);
+    if (regItem) {
+      files.forEach((file) => {
+        regItem.add(file);
+      });
+    }
+  }
+}
+
 export const isModuleUnificationApp = memoize(isMuApp, {
   length: 1,
   maxAge: 60000
@@ -159,43 +180,27 @@ export function listGlimmerNativeComponents(root: string) {
   }
 }
 
-export function isGlimmerNativeProject(root: string) {
-  const pack = getPackageJSON(root);
-  if (pack.dependencies && pack.dependencies['glimmer-native']) {
+function hasDep(pack: any, depName: string) {
+  if (pack.dependencies && pack.dependencies[depName]) {
     return true;
   }
-  if (pack.devDependencies && pack.devDependencies['glimmer-native']) {
+  if (pack.devDependencies && pack.devDependencies[depName]) {
     return true;
   }
-  if (pack.peerDependencies && pack.peerDependencies['glimmer-native']) {
+  if (pack.peerDependencies && pack.peerDependencies[depName]) {
     return true;
   }
   return false;
 }
 
+export function isGlimmerNativeProject(root: string) {
+  const pack = getPackageJSON(root);
+  return hasDep(pack, 'glimmer-native');
+}
+
 export function isGlimmerXProject(root: string) {
   const pack = getPackageJSON(root);
-  if (pack.dependencies && pack.dependencies['@glimmerx/core']) {
-    return true;
-  }
-  if (pack.devDependencies && pack.devDependencies['@glimmerx/core']) {
-    return true;
-  }
-  if (pack.peerDependencies && pack.peerDependencies['@glimmerx/core']) {
-    return true;
-  }
-
-  if (pack.dependencies && pack.dependencies['glimmer-lite-core']) {
-    return true;
-  }
-  if (pack.devDependencies && pack.devDependencies['glimmer-lite-core']) {
-    return true;
-  }
-  if (pack.peerDependencies && pack.peerDependencies['glimmer-lite-core']) {
-    return true;
-  }
-
-  return false;
+  return hasDep(pack, '@glimmerx/core') || hasDep(pack, 'glimmer-lite-core');
 }
 
 export function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
@@ -344,6 +349,7 @@ export function listPodsComponents(root: string): CompletionItem[] {
   });
 
   const items = jsPaths.map((filePath: string) => {
+    addToRegistry(pureComponentName(filePath), [filePath]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -362,6 +368,7 @@ export function listMUComponents(root: string): CompletionItem[] {
   });
 
   const items = jsPaths.map((filePath: string) => {
+    addToRegistry(pureComponentName(filePath), [filePath]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -397,6 +404,7 @@ export function listComponents(root: string): CompletionItem[] {
   const paths = [...jsPaths, ...hbsPaths];
 
   const items = paths.map((filePath: string) => {
+    addToRegistry(pureComponentName(filePath), [filePath]);
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -420,6 +428,7 @@ function listCollection(
   });
 
   const items = paths.map((filePath: string) => {
+    addToRegistry(pureComponentName(filePath), [filePath]);
     return {
       kind: kindType,
       label: pureComponentName(filePath),
@@ -467,6 +476,7 @@ export function listRoutes(root: string): CompletionItem[] {
 
   const items = [...templatePaths, ...paths].map((filePath: string) => {
     const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+    addToRegistry(pureComponentName(label), [filePath]);
     return {
       kind: CompletionItemKind.File,
       label,
