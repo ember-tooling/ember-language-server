@@ -50,7 +50,7 @@ export default class Server {
   // supports full document sync only
   documents: TextDocuments = new TextDocuments();
 
-  projectRoots: ProjectRoots = new ProjectRoots();
+  projectRoots: ProjectRoots = new ProjectRoots(this);
   addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
     let rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
     let purePaths = rawPaths.filter((p) => path.isAbsolute(p));

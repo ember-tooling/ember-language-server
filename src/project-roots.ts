@@ -6,17 +6,20 @@ import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
+import Server from './server';
 
 export class Project {
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
-  constructor(public readonly root: string) {
+  constructor(public readonly root: string, server: Server) {
     this.providers = collectProjectProviders(root);
     this.builtinProviders = initBuiltinProviders();
+    this.providers.initFunctions.forEach((initFn) => initFn(server));
   }
 }
 
 export default class ProjectRoots {
+  constructor(private server: Server) {}
   workspaceRoot: string;
 
   projects = new Map<string, Project>();
@@ -56,7 +59,7 @@ export default class ProjectRoots {
       return;
     }
     try {
-      this.projects.set(path, new Project(path));
+      this.projects.set(path, new Project(path, this.server));
       logInfo(`Ember CLI project added at ${path}`);
     } catch (e) {
       logError(e);
