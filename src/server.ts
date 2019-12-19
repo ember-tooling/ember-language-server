@@ -39,6 +39,10 @@ import ScriptCompletionProvider from './completion-provider/script-completion-pr
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { getGlobalRegistry, addToRegistry, REGISTRY_KIND } from './utils/layout-helpers';
 
+interface Executors {
+  [key: string]: (server: Server, command: string, args: any[]) => any;
+}
+
 export default class Server {
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
   // also supports stdio via command line flag
@@ -146,12 +150,8 @@ export default class Server {
         this.projectRoots.onProjectAdd(params[1]);
       }
     } else {
-      if (params.command === 'els.executeInEmberCLI') {
-        let cmd = params.arguments[0];
-        if (cmd === undefined) {
-          return;
-        }
-        this.connection.window.showInformationMessage('Executing: ' + cmd);
+      if (params.command in this.executors) {
+        return this.executors[params.command](this, params.command, params.arguments);
       }
     }
     return params;
@@ -203,6 +203,7 @@ export default class Server {
   }
 
   linters: any[] = [];
+  executors: Executors = {};
 
   private async onDidChangeContent(change: any) {
     // this.setStatusText('did-change');
