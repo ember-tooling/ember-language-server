@@ -2678,7 +2678,7 @@ Object {
     "executeCommandProvider": Object {
       "commands": Array [
         "els:registerProjectPath",
-        "els.executeInEmberCLI"
+        "els.executeInEmberCLI",
       ],
     },
     "referencesProvider": true,
