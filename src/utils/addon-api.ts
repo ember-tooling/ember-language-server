@@ -228,7 +228,7 @@ function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabiliti
 }
 
 export function extensionCapabilities(info: any): ExtensionCapabilities {
-  return info[ADDON_CONFIG_KEY].capabilities;
+  return info[ADDON_CONFIG_KEY].capabilities || {};
 }
 export function languageServerHandler(info: any): string {
   return info[ADDON_CONFIG_KEY].entry;
