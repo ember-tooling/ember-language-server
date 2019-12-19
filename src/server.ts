@@ -144,7 +144,7 @@ export default class Server {
     if (params[0] === 'els:registerProjectPath') {
       this.projectRoots.onProjectAdd(params[1]);
     } else if (params[0] === 'els.runInEmberCLI') {
-      console.log(params);
+      this.connection.window.showInformationMessage('runInEmberCLI' + params.join('.'));
     }
     return params;
   }
