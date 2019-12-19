@@ -5,11 +5,11 @@ import { log, logInfo, logError } from './logger';
 import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
-
 import CoreScriptDefinitionProvider from './../builtin-addons/core/script-definition-provider';
 import CoreTemplateDefinitionProvider from './../builtin-addons/core/template-definition-provider';
 import ScriptCompletionProvider from './../builtin-addons/core/script-completion-provider';
 import TemplateCompletionProvider from './../builtin-addons/core/template-completion-provider';
+import { Project } from '../project-roots';
 
 const ADDON_CONFIG_KEY = 'ember-language-server';
 interface BaseAPIParams {
@@ -34,16 +34,19 @@ export interface DefinitionFunctionParams extends ExtendedAPIParams {
 type ReferenceResolveFunction = (root: string, params: ReferenceFunctionParams) => Promise<Location[]>;
 type CompletionResolveFunction = (root: string, params: CompletionFunctionParams) => Promise<CompletionItem[]>;
 type DefinitionResolveFunction = (root: string, params: DefinitionFunctionParams) => Promise<Location[]>;
+type InitFunction = (server: Server, project: Project) => any;
 export interface AddonAPI {
   onReference: undefined | ReferenceResolveFunction;
   onComplete: undefined | CompletionResolveFunction;
   onDefinition: undefined | DefinitionResolveFunction;
+  onInit: undefined | InitFunction;
 }
 
 interface PublicAddonAPI {
   onReference?: ReferenceResolveFunction;
   onComplete?: CompletionResolveFunction;
   onDefinition?: DefinitionResolveFunction;
+  onInit?: InitFunction;
 }
 interface HandlerObject {
   handler: PublicAddonAPI;
@@ -79,6 +82,7 @@ export function initBuiltinProviders(): ProjectProviders {
   return {
     definitionProviders: [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)],
     referencesProviders: [],
+    initFunctions: [],
     completionProviders: [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)]
   };
 }
@@ -122,10 +126,12 @@ export function collectProjectProviders(root: string): ProjectProviders {
     definitionProviders: DefinitionResolveFunction[];
     referencesProviders: ReferenceResolveFunction[];
     completionProviders: CompletionResolveFunction[];
+    initFunctions: InitFunction[];
   } = {
     definitionProviders: [],
     referencesProviders: [],
-    completionProviders: []
+    completionProviders: [],
+    initFunctions: []
   };
 
   // onReference, onComplete, onDefinition
@@ -162,6 +168,14 @@ export function collectProjectProviders(root: string): ProjectProviders {
           return params.results;
         }
       } as DefinitionResolveFunction);
+      result.initFunctions.push(function(server: Server, project: Project) {
+        handlerObject.updateHandler();
+        if (typeof handlerObject.handler.onInit === 'function') {
+          return handlerObject.handler.onInit(server, project);
+        } else {
+          return;
+        }
+      } as InitFunction);
     } else {
       if (handlerObject.capabilities.completionProvider && typeof handlerObject.handler.onComplete === 'function') {
         result.completionProviders.push(handlerObject.handler.onComplete);
@@ -171,6 +185,9 @@ export function collectProjectProviders(root: string): ProjectProviders {
       }
       if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
         result.definitionProviders.push(handlerObject.handler.onDefinition);
+      }
+      if (typeof handlerObject.handler.onInit === 'function') {
+        result.initFunctions.push(handlerObject.handler.onInit);
       }
     }
   });
@@ -182,6 +199,7 @@ export interface ProjectProviders {
   definitionProviders: DefinitionResolveFunction[];
   referencesProviders: ReferenceResolveFunction[];
   completionProviders: CompletionResolveFunction[];
+  initFunctions: InitFunction[];
 }
 
 interface ExtensionCapabilities {
@@ -210,7 +228,7 @@ function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabiliti
 }
 
 export function extensionCapabilities(info: any): ExtensionCapabilities {
-  return info[ADDON_CONFIG_KEY].capabilities;
+  return info[ADDON_CONFIG_KEY].capabilities || {};
 }
 export function languageServerHandler(info: any): string {
   return info[ADDON_CONFIG_KEY].entry;

@@ -26,14 +26,14 @@ import {
   Location
 } from 'vscode-languageserver';
 
-import ProjectRoots from './project-roots';
+import ProjectRoots, { Executors } from './project-roots';
 import DefinitionProvider from './definition-providers/entry';
 import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 import { ReferenceProvider } from './reference-provider/entry';
-import { log, setConsole, logError } from './utils/logger';
+import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -50,7 +50,7 @@ export default class Server {
   // supports full document sync only
   documents: TextDocuments = new TextDocuments();
 
-  projectRoots: ProjectRoots = new ProjectRoots();
+  projectRoots: ProjectRoots = new ProjectRoots(this);
   addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
     let rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
     let purePaths = rawPaths.filter((p) => path.isAbsolute(p));
@@ -112,6 +112,7 @@ export default class Server {
     this.connection.onExecuteCommand(this.onExecute.bind(this));
     this.connection.onReferences(this.onReference.bind(this));
     this.connection.telemetry.logEvent({ connected: true });
+
     // this.displayInfoMessage('Ember Language Server [activated]');
     // 'els.showStatusBarText'
 
@@ -139,9 +140,30 @@ export default class Server {
     this.connection.sendNotification('$/displayError', msg);
   }
 
-  onExecute(params: string[]) {
-    if (params[0] === 'els:registerProjectPath') {
-      this.projectRoots.onProjectAdd(params[1]);
+  async onExecute(params: string[] | any) {
+    if (Array.isArray(params)) {
+      if (params[0] === 'els:registerProjectPath') {
+        this.projectRoots.onProjectAdd(params[1]);
+      }
+    } else {
+      if (params.command in this.executors) {
+        return this.executors[params.command](this, params.command, params.arguments);
+      } else {
+        let [uri, ...args] = params.arguments;
+        logInfo(JSON.stringify(params));
+        try {
+          const project = this.projectRoots.projectForPath(uri);
+          let result = null;
+          if (project) {
+            if (params.command in project.executors) {
+              result = project.executors[params.command](this, params.command, args);
+            }
+          }
+          return result;
+        } catch (e) {
+          logError(e);
+        }
+      }
     }
     return params;
   }
@@ -179,7 +201,7 @@ export default class Server {
         textDocumentSync: this.documents.syncKind,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath']
+          commands: ['els:registerProjectPath', 'els.executeInEmberCLI']
         },
         documentSymbolProvider: true,
         referencesProvider: true,
@@ -192,6 +214,7 @@ export default class Server {
   }
 
   linters: any[] = [];
+  executors: Executors = {};
 
   private async onDidChangeContent(change: any) {
     // this.setStatusText('did-change');
