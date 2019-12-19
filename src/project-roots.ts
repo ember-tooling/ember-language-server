@@ -8,13 +8,18 @@ import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helper
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
 
+export interface Executors {
+  [key: string]: (server: Server, command: string, args: any[]) => any;
+}
+
 export class Project {
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
+  executors: Executors = {};
   constructor(public readonly root: string, server: Server) {
     this.providers = collectProjectProviders(root);
     this.builtinProviders = initBuiltinProviders();
-    this.providers.initFunctions.forEach((initFn) => initFn(server));
+    this.providers.initFunctions.forEach((initFn) => initFn(server, this));
   }
 }
 

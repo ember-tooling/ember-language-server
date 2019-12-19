@@ -26,7 +26,7 @@ import {
   Location
 } from 'vscode-languageserver';
 
-import ProjectRoots from './project-roots';
+import ProjectRoots, { Executors } from './project-roots';
 import DefinitionProvider from './definition-providers/entry';
 import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
@@ -38,10 +38,6 @@ import TemplateCompletionProvider from './completion-provider/template-completio
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { getGlobalRegistry, addToRegistry, REGISTRY_KIND } from './utils/layout-helpers';
-
-interface Executors {
-  [key: string]: (server: Server, command: string, args: any[]) => any;
-}
 
 export default class Server {
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
@@ -152,6 +148,18 @@ export default class Server {
     } else {
       if (params.command in this.executors) {
         return this.executors[params.command](this, params.command, params.arguments);
+      } else {
+        let [uri, ...args] = params.arguments;
+        try {
+          const project = this.projectRoots.projectForUri(uri);
+          if (project) {
+            if (params.command in project.executors) {
+              project.executors[params.command](this, params.command, args);
+            }
+          }
+        } catch (e) {
+          logError(e);
+        }
       }
     }
     return params;

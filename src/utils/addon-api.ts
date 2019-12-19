@@ -5,11 +5,11 @@ import { log, logInfo, logError } from './logger';
 import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
-
 import CoreScriptDefinitionProvider from './../builtin-addons/core/script-definition-provider';
 import CoreTemplateDefinitionProvider from './../builtin-addons/core/template-definition-provider';
 import ScriptCompletionProvider from './../builtin-addons/core/script-completion-provider';
 import TemplateCompletionProvider from './../builtin-addons/core/template-completion-provider';
+import { Project } from '../project-roots';
 
 const ADDON_CONFIG_KEY = 'ember-language-server';
 interface BaseAPIParams {
@@ -34,7 +34,7 @@ export interface DefinitionFunctionParams extends ExtendedAPIParams {
 type ReferenceResolveFunction = (root: string, params: ReferenceFunctionParams) => Promise<Location[]>;
 type CompletionResolveFunction = (root: string, params: CompletionFunctionParams) => Promise<CompletionItem[]>;
 type DefinitionResolveFunction = (root: string, params: DefinitionFunctionParams) => Promise<Location[]>;
-type InitFunction = (server: Server) => any;
+type InitFunction = (server: Server, project: Project) => any;
 export interface AddonAPI {
   onReference: undefined | ReferenceResolveFunction;
   onComplete: undefined | CompletionResolveFunction;
