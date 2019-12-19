@@ -112,6 +112,7 @@ export default class Server {
     this.connection.onExecuteCommand(this.onExecute.bind(this));
     this.connection.onReferences(this.onReference.bind(this));
     this.connection.telemetry.logEvent({ connected: true });
+
     // this.displayInfoMessage('Ember Language Server [activated]');
     // 'els.showStatusBarText'
 
@@ -142,6 +143,8 @@ export default class Server {
   onExecute(params: string[]) {
     if (params[0] === 'els:registerProjectPath') {
       this.projectRoots.onProjectAdd(params[1]);
+    } else if (params[0] === 'els.runInEmberCLI') {
+      console.log(params);
     }
     return params;
   }
@@ -179,7 +182,7 @@ export default class Server {
         textDocumentSync: this.documents.syncKind,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath']
+          commands: ['els:registerProjectPath', 'els.runInEmberCLI']
         },
         documentSymbolProvider: true,
         referencesProvider: true,
