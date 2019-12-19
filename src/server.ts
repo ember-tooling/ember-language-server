@@ -33,7 +33,7 @@ import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 import { ReferenceProvider } from './reference-provider/entry';
-import { log, setConsole, logError } from './utils/logger';
+import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
@@ -150,6 +150,7 @@ export default class Server {
         return this.executors[params.command](this, params.command, params.arguments);
       } else {
         let [uri, ...args] = params.arguments;
+        logInfo(params);
         try {
           const project = this.projectRoots.projectForUri(uri);
           if (project) {
