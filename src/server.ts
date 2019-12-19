@@ -150,7 +150,7 @@ export default class Server {
         return this.executors[params.command](this, params.command, params.arguments);
       } else {
         let [uri, ...args] = params.arguments;
-        logInfo(params);
+        logInfo(JSON.stringify(params));
         try {
           const project = this.projectRoots.projectForUri(uri);
           if (project) {
