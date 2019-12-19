@@ -140,11 +140,19 @@ export default class Server {
     this.connection.sendNotification('$/displayError', msg);
   }
 
-  onExecute(params: string[]) {
-    if (params[0] === 'els:registerProjectPath') {
-      this.projectRoots.onProjectAdd(params[1]);
-    } else if (params[0] === 'els.runInEmberCLI') {
-      this.connection.window.showInformationMessage('runInEmberCLI' + params.join('.'));
+  async onExecute(params: string[] | any) {
+    if (Array.isArray(params)) {
+      if (params[0] === 'els:registerProjectPath') {
+        this.projectRoots.onProjectAdd(params[1]);
+      }
+    } else {
+      if (params.command === 'els.executeInEmberCLI') {
+        let cmd = params.arguments[0];
+        if (cmd === undefined) {
+          return;
+        }
+        this.connection.window.showInformationMessage('Executing: ' + cmd);
+      }
     }
     return params;
   }
@@ -182,7 +190,7 @@ export default class Server {
         textDocumentSync: this.documents.syncKind,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath', 'els.runInEmberCLI']
+          commands: ['els:registerProjectPath', 'els.executeInEmberCLI']
         },
         documentSymbolProvider: true,
         referencesProvider: true,
