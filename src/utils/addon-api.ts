@@ -168,10 +168,10 @@ export function collectProjectProviders(root: string): ProjectProviders {
           return params.results;
         }
       } as DefinitionResolveFunction);
-      result.initFunctions.push(function(server: Server) {
+      result.initFunctions.push(function(server: Server, project: Project) {
         handlerObject.updateHandler();
         if (typeof handlerObject.handler.onInit === 'function') {
-          return handlerObject.handler.onInit(server);
+          return handlerObject.handler.onInit(server, project);
         } else {
           return;
         }
