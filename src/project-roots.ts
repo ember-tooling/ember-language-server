@@ -16,9 +16,11 @@ export class Project {
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
   executors: Executors = {};
-  constructor(public readonly root: string, server: Server) {
+  constructor(public readonly root: string) {
     this.providers = collectProjectProviders(root);
     this.builtinProviders = initBuiltinProviders();
+  }
+  init(server: Server) {
     this.providers.initFunctions.forEach((initFn) => initFn(server, this));
   }
 }
@@ -64,7 +66,9 @@ export default class ProjectRoots {
       return;
     }
     try {
-      this.projects.set(path, new Project(path, this.server));
+      const project = new Project(path);
+      this.projects.set(path, project);
+      project.init(this.server);
       logInfo(`Ember CLI project added at ${path}`);
     } catch (e) {
       logError(e);
@@ -75,9 +79,11 @@ export default class ProjectRoots {
     let path = uriToFilePath(uri);
 
     if (!path) return;
+    return this.projectForPath(path);
+  }
 
+  projectForPath(path: string): Project | undefined {
     let root = (Array.from(this.projects.keys()) || []).filter((root) => path!.indexOf(root) === 0).reduce((a, b) => (a.length > b.length ? a : b), '');
-
     return this.projects.get(root);
   }
 }
