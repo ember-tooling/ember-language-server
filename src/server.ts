@@ -153,11 +153,13 @@ export default class Server {
         logInfo(JSON.stringify(params));
         try {
           const project = this.projectRoots.projectForPath(uri);
+          let result = null;
           if (project) {
             if (params.command in project.executors) {
-              project.executors[params.command](this, params.command, args);
+              result = project.executors[params.command](this, params.command, args);
             }
           }
+          return result;
         } catch (e) {
           logError(e);
         }
