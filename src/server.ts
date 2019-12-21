@@ -263,7 +263,20 @@ export default class Server {
     this.connection.sendDiagnostics({ uri: change.document.uri, diagnostics: results });
   }
 
-  private onDidChangeWatchedFiles() {
+  private onDidChangeWatchedFiles(items: any) {
+    console.log(items);
+    // /**
+    //  * Interested in create events.
+    //  */
+    // const Create = 1;
+    // /**
+    //  * Interested in change events
+    //  */
+    // const Change = 2;
+    // /**
+    //  * Interested in delete events
+    //  */
+    // const Delete = 4;
     // here be dragons
   }
 
