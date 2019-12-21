@@ -88,7 +88,7 @@ export function initBuiltinProviders(): ProjectProviders {
   return {
     definitionProviders: [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)],
     referencesProviders: [],
-    initFunctions: [],
+    initFunctions: [templateCompletion.initRegistry.bind(this)],
     info: [],
     completionProviders: [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)]
   };

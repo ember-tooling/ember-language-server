@@ -2683,6 +2683,12 @@ Object {
     },
     "referencesProvider": true,
     "textDocumentSync": 1,
+    "workspace": Object {
+      "workspaceFolders": Object {
+        "changeNotifications": true,
+        "supported": true,
+      },
+    },
   },
 }
 `;

@@ -10,6 +10,8 @@ import { provideComponentTemplatePaths } from './template-definition-provider';
 
 import { log } from '../../utils/logger';
 import ASTPath, { getLocalScope } from '../../glimmer-utils';
+import Server from '../../server';
+import { Project } from '../../project-roots';
 import {
   isLinkToTarget,
   isComponentArgumentName,
@@ -80,6 +82,13 @@ function isArgumentName(name: string) {
 
 export default class TemplateCompletionProvider {
   constructor() {}
+  async initRegistry(_: Server, project: Project) {
+    mListHelpers(project.root);
+    mListModifiers(project.root);
+    mListRoutes(project.root);
+    mListComponents(project.root);
+    mGetProjectAddonsInfo(project.root);
+  }
   getAllAngleBracketComponents(root: string, uri: string) {
     const items: CompletionItem[] = [];
     return uniqBy(

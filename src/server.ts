@@ -21,6 +21,7 @@ import {
   TextDocumentPositionParams,
   CompletionItem,
   StreamMessageReader,
+  WorkspaceFoldersChangeEvent,
   StreamMessageWriter,
   ReferenceParams,
   Location,
@@ -93,7 +94,9 @@ export default class Server {
   templateLinter: TemplateLinter = new TemplateLinter(this);
 
   referenceProvider: ReferenceProvider = new ReferenceProvider(this);
-
+  private onInitilized() {
+    this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
+  }
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
@@ -104,6 +107,7 @@ export default class Server {
 
     // Bind event handlers
     this.connection.onInitialize(this.onInitialize.bind(this));
+    this.connection.onInitialized(this.onInitilized.bind(this));
     this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
@@ -173,6 +177,13 @@ export default class Server {
     this.connection.listen();
   }
 
+  private onDidChangeWorkspaceFolders(event: WorkspaceFoldersChangeEvent) {
+    if (event.added.length) {
+      event.added.forEach((folder) => {
+        this.projectRoots.findProjectsInsideRoot(folder.uri);
+      });
+    }
+  }
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
   private onInitialize({ rootUri, rootPath, workspaceFolders }: InitializeParams): InitializeResult {
@@ -206,6 +217,12 @@ export default class Server {
         },
         documentSymbolProvider: true,
         referencesProvider: true,
+        workspace: {
+          workspaceFolders: {
+            supported: true,
+            changeNotifications: true
+          }
+        },
         completionProvider: {
           resolveProvider: true,
           triggerCharacters: ['.', '::', '=', '/', '{{', '(', '<', '@', 'this.']
