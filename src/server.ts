@@ -265,7 +265,12 @@ export default class Server {
   }
 
   private onDidChangeWatchedFiles(items: DidChangeWatchedFilesParams) {
-    console.log(items.changes);
+    items.changes.forEach((change) => {
+      let project = this.projectRoots.projectForUri(change.uri);
+      if (project) {
+        project.trackChange(change.uri, change.type);
+      }
+    });
     // /**
     //  * The file got created.
     //  */
