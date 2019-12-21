@@ -84,8 +84,8 @@ export default class ProjectRoots {
     try {
       const project = new Project(path);
       this.projects.set(path, project);
-      project.init(this.server);
       logInfo(`Ember CLI project added at ${path}`);
+      project.init(this.server);
     } catch (e) {
       logError(e);
     }
