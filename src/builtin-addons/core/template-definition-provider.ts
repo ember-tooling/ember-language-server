@@ -30,14 +30,18 @@ function normalizeAngleTagName(tagName: string) {
     .join('/');
 }
 
+export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', name: string, root: string): string[] {
+  const absRoot = path.resolve(root);
+  const registry = getGlobalRegistry();
+  const bucket: any = registry[type].get(name) || new Set();
+  return Array.from(bucket).filter((el: string) => absRoot.includes(el) && fs.existsSync(el)) as string[];
+}
+
 export function provideComponentTemplatePaths(root: string, rawComponentName: string) {
   const maybeComponentName = normalizeAngleTagName(rawComponentName);
-  const registry = getGlobalRegistry();
-  if (registry.component.has(maybeComponentName)) {
-    const items = registry.component.get(maybeComponentName);
-    const results = (Array.from(items as any) as string[]).filter((el) => {
-      return el.endsWith('.hbs') && el.includes(root) && fs.existsSync(el);
-    });
+  const items = getPathsFromRegistry('component', maybeComponentName, root);
+  if (items.length) {
+    const results = items.filter((el) => el.endsWith('.hbs'));
     if (results.length) {
       return results;
     }
@@ -154,8 +158,10 @@ export default class TemplateDefinitionProvider {
   }
   _provideLikelyRawComponentTemplatePaths(root: string, rawComponentName: string) {
     const maybeComponentName = normalizeAngleTagName(rawComponentName);
-    let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
-
+    let paths = getPathsFromRegistry('component', maybeComponentName, root);
+    if (!paths.length) {
+      paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
+    }
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
