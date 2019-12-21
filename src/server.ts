@@ -11,6 +11,7 @@ import {
   IPCMessageReader,
   IPCMessageWriter,
   createConnection,
+  DidChangeWatchedFilesParams,
   IConnection,
   TextDocuments,
   InitializeResult,
@@ -263,8 +264,25 @@ export default class Server {
     this.connection.sendDiagnostics({ uri: change.document.uri, diagnostics: results });
   }
 
-  private onDidChangeWatchedFiles() {
-    // here be dragons
+  private onDidChangeWatchedFiles(items: DidChangeWatchedFilesParams) {
+    items.changes.forEach((change) => {
+      let project = this.projectRoots.projectForUri(change.uri);
+      if (project) {
+        project.trackChange(change.uri, change.type);
+      }
+    });
+    // /**
+    //  * The file got created.
+    //  */
+    // const Created = 1;
+    // /**
+    //  * The file got changed.
+    //  */
+    // const Changed = 2;
+    // /**
+    //  * The file got deleted.
+    //  */
+    // const Deleted = 3;
   }
 
   private async onReference(params: ReferenceParams): Promise<Location[]> {

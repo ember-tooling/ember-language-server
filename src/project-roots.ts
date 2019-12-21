@@ -7,10 +7,11 @@ import * as walkSync from 'walk-sync';
 import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
-import { TextDocument, Diagnostic } from 'vscode-languageserver';
+import { TextDocument, Diagnostic, FileChangeType } from 'vscode-languageserver';
 
 export type Eexcutor = (server: Server, command: string, args: any[]) => any;
 export type Linter = (document: TextDocument) => Diagnostic[];
+export type Watcher = (uri: string, change: FileChangeType) => any;
 export interface Executors {
   [key: string]: Eexcutor;
 }
@@ -19,12 +20,41 @@ export class Project {
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
   executors: Executors = {};
+  watchers: Watcher[] = [];
   linters: Linter[] = [];
+  files: Map<string, { version: number }> = new Map();
+  trackChange(uri: string, change: FileChangeType) {
+    // prevent leaks
+    if (this.files.size > 10000) {
+      logError('too many files for project ' + this.root);
+      this.files.clear();
+    }
+    const rawPath = uriToFilePath(uri);
+    if (!rawPath) {
+      return;
+    }
+    const filePath = path.resolve(rawPath);
+    if (change === 3) {
+      this.files.delete(filePath);
+    } else {
+      if (!this.files.has(filePath)) {
+        this.files.set(filePath, { version: 0 });
+      }
+      let file = this.files.get(filePath);
+      if (file) {
+        file.version++;
+      }
+    }
+    this.watchers.forEach((cb) => cb(uri, change));
+  }
   addCommandExecutor(key: string, cb: Eexcutor) {
     this.executors[key] = cb;
   }
   addLinter(cb: Linter) {
     this.linters.push(cb);
+  }
+  addWatcher(cb: Watcher) {
+    this.watchers.push(cb);
   }
   constructor(public readonly root: string) {
     this.providers = collectProjectProviders(root);
