@@ -89,6 +89,7 @@ export function initBuiltinProviders(): ProjectProviders {
     definitionProviders: [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)],
     referencesProviders: [],
     initFunctions: [],
+    info: [],
     completionProviders: [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)]
   };
 }
@@ -133,11 +134,13 @@ export function collectProjectProviders(root: string): ProjectProviders {
     referencesProviders: ReferenceResolveFunction[];
     completionProviders: CompletionResolveFunction[];
     initFunctions: InitFunction[];
+    info: string[];
   } = {
     definitionProviders: [],
     referencesProviders: [],
     completionProviders: [],
-    initFunctions: []
+    initFunctions: [],
+    info: []
   };
 
   // onReference, onComplete, onDefinition
@@ -149,6 +152,7 @@ export function collectProjectProviders(root: string): ProjectProviders {
 
     // let's reload files in case of debug mode for each request
     if (handlerObject.debug) {
+      result.info.push('addon-in-debug-mode: ' + _);
       logInfo(`els-addon-api: debug mode enabled for ${handlerObject.packageRoot}, for all requests resolvers will be reloaded.`);
       result.completionProviders.push(function(root: string, params: CompletionFunctionParams) {
         handlerObject.updateHandler();
@@ -183,6 +187,7 @@ export function collectProjectProviders(root: string): ProjectProviders {
         }
       } as InitFunction);
     } else {
+      result.info.push('addon: ' + _);
       if (handlerObject.capabilities.completionProvider && typeof handlerObject.handler.onComplete === 'function') {
         result.completionProviders.push(handlerObject.handler.onComplete);
       }
@@ -206,6 +211,7 @@ export interface ProjectProviders {
   referencesProviders: ReferenceResolveFunction[];
   completionProviders: CompletionResolveFunction[];
   initFunctions: InitFunction[];
+  info: string[];
 }
 
 interface ExtensionCapabilities {

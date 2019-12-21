@@ -32,6 +32,12 @@ export class Project {
   }
   init(server: Server) {
     this.providers.initFunctions.forEach((initFn) => initFn(server, this));
+    if (this.providers.info.length) {
+      logInfo('--------------------');
+      logInfo('loded addons:');
+      logInfo('    ' + this.providers.info.join('\n'));
+      logInfo('--------------------');
+    }
   }
 }
 
