@@ -5,6 +5,7 @@ import { Definition, Location } from 'vscode-languageserver';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { isLinkToTarget, isLinkComponentRouteTarget } from './../../utils/ast-helpers';
 import ASTPath from './../../glimmer-utils';
+import { getGlobalRegistry } from './../../utils/layout-helpers';
 
 import { isTemplatePath, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../../utils/layout-helpers';
 
@@ -31,6 +32,17 @@ function normalizeAngleTagName(tagName: string) {
 
 export function provideComponentTemplatePaths(root: string, rawComponentName: string) {
   const maybeComponentName = normalizeAngleTagName(rawComponentName);
+  const registry = getGlobalRegistry();
+  if (registry.component.has(maybeComponentName)) {
+    const items = registry.component.get(maybeComponentName);
+    const results = (Array.from(items as any) as string[]).filter((el) => {
+      return el.endsWith('.hbs') && el.includes(root) && fs.existsSync(el);
+    });
+    if (results.length) {
+      return results;
+    }
+  }
+
   let paths = [...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
 
   if (!paths.length) {
