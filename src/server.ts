@@ -23,10 +23,11 @@ import {
   StreamMessageReader,
   StreamMessageWriter,
   ReferenceParams,
-  Location
+  Location,
+  TextDocument
 } from 'vscode-languageserver';
 
-import ProjectRoots, { Executors } from './project-roots';
+import ProjectRoots, { Project, Executors } from './project-roots';
 import DefinitionProvider from './definition-providers/entry';
 import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
@@ -213,7 +214,6 @@ export default class Server {
     };
   }
 
-  linters: any[] = [];
   executors: Executors = {};
 
   private async onDidChangeContent(change: any) {
@@ -226,17 +226,20 @@ export default class Server {
         results.push(result);
       });
     }
-    for (let linter of this.linters) {
-      try {
-        let tempResult = await linter(change.document);
-        // API must return array
-        if (Array.isArray(tempResult)) {
-          tempResult.forEach((el) => {
-            results.push(el as Diagnostic);
-          });
+    const project: Project | undefined = this.projectRoots.projectForUri(change.document.uri);
+    if (project) {
+      for (let linter of project.linters) {
+        try {
+          let tempResults = await linter(change.document as TextDocument);
+          // API must return array
+          if (Array.isArray(tempResults)) {
+            tempResults.forEach((el) => {
+              results.push(el as Diagnostic);
+            });
+          }
+        } catch (e) {
+          logError(e);
         }
-      } catch (e) {
-        logError(e);
       }
     }
 

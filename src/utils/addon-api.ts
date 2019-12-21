@@ -1,5 +1,12 @@
 import { Location, TextDocumentIdentifier, Position, CompletionItem } from 'vscode-languageserver';
-import { getProjectAddonsRoots, getPackageJSON, getProjectInRepoAddonsRoots } from './layout-helpers';
+import {
+  getProjectAddonsRoots,
+  getPackageJSON,
+  getProjectInRepoAddonsRoots,
+  PackageInfo,
+  ADDON_CONFIG_KEY,
+  hasEmberLanguageServerExtension
+} from './layout-helpers';
 import * as path from 'path';
 import { log, logInfo, logError } from './logger';
 import Server from '../server';
@@ -11,7 +18,6 @@ import ScriptCompletionProvider from './../builtin-addons/core/script-completion
 import TemplateCompletionProvider from './../builtin-addons/core/template-completion-provider';
 import { Project } from '../project-roots';
 
-const ADDON_CONFIG_KEY = 'ember-language-server';
 interface BaseAPIParams {
   server: Server;
   textDocument: TextDocumentIdentifier;
@@ -53,7 +59,7 @@ interface HandlerObject {
   updateHandler: () => void;
   packageRoot: string;
   debug: boolean;
-  packageJSON: any;
+  packageJSON: PackageInfo;
   capabilities: NormalizedCapabilities;
 }
 
@@ -235,7 +241,4 @@ export function languageServerHandler(info: any): string {
 }
 export function isDebugModeEnabled(info: any): boolean {
   return info[ADDON_CONFIG_KEY].debug === true;
-}
-export function hasEmberLanguageServerExtension(info: any) {
-  return ADDON_CONFIG_KEY in info;
 }
