@@ -7,21 +7,40 @@ import * as walkSync from 'walk-sync';
 import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
+import { TextDocument, Diagnostic } from 'vscode-languageserver';
 
+export type Eexcutor = (server: Server, command: string, args: any[]) => any;
+export type Linter = (document: TextDocument) => Diagnostic[];
 export interface Executors {
-  [key: string]: (server: Server, command: string, args: any[]) => any;
+  [key: string]: Eexcutor;
 }
 
 export class Project {
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
   executors: Executors = {};
+  linters: Linter[] = [];
+  addCommandExecutor(key: string, cb: Eexcutor) {
+    this.executors[key] = cb;
+  }
+  addLinter(cb: Linter) {
+    this.linters.push(cb);
+  }
   constructor(public readonly root: string) {
     this.providers = collectProjectProviders(root);
     this.builtinProviders = initBuiltinProviders();
   }
   init(server: Server) {
+    this.builtinProviders.initFunctions.forEach((initFn) => initFn(server, this));
     this.providers.initFunctions.forEach((initFn) => initFn(server, this));
+    if (this.providers.info.length) {
+      logInfo('--------------------');
+      logInfo('loded language server addons:');
+      this.providers.info.forEach((addonName) => {
+        logInfo('    ' + addonName);
+      });
+      logInfo('--------------------');
+    }
   }
 }
 
@@ -68,8 +87,8 @@ export default class ProjectRoots {
     try {
       const project = new Project(path);
       this.projects.set(path, project);
-      project.init(this.server);
       logInfo(`Ember CLI project added at ${path}`);
+      project.init(this.server);
     } catch (e) {
       logError(e);
     }

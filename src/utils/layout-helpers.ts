@@ -8,6 +8,8 @@ import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 type GLOBAL_REGISTRY_ITEM = Map<string, Set<string>>;
 export type REGISTRY_KIND = 'transform' | 'helper' | 'component' | 'routePath' | 'model' | 'service' | 'modifier';
 
+export const ADDON_CONFIG_KEY = 'ember-language-server';
+
 const GLOBAL_REGISTRY: {
   transform: GLOBAL_REGISTRY_ITEM;
   helper: GLOBAL_REGISTRY_ITEM;
@@ -28,6 +30,10 @@ const GLOBAL_REGISTRY: {
 
 export function getGlobalRegistry() {
   return GLOBAL_REGISTRY;
+}
+
+export function hasEmberLanguageServerExtension(info: PackageInfo) {
+  return info[ADDON_CONFIG_KEY] !== undefined;
 }
 
 export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
@@ -62,11 +68,17 @@ export const isAddonRoot = memoize(isProjectAddonRoot, {
   maxAge: 600000
 });
 
-interface PackageInfo {
+export interface PackageInfo {
   keywords?: string[];
+  name?: string;
   'ember-language-server'?: {};
+  peerDependencies?: {};
+  devDependencies?: {};
+  dependencies?: {};
   'ember-addon'?: {
     version?: number;
+    before?: string | string[];
+    after?: string | string[];
   };
 }
 
@@ -223,7 +235,6 @@ export function isGlimmerXProject(root: string) {
 }
 
 export function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
-  // log('getProjectAddonsInfo', root);
   const pack = getPackageJSON(root);
   if (resolvedItems.length) {
     if (!isEmberAddon(pack)) {
@@ -245,6 +256,11 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
     });
   const recursiveRoots: string[] = resolvedItems.slice(0);
   roots.forEach((rootItem: string) => {
+    let packInfo = getPackageJSON(rootItem);
+    // we don't need to go deeper if package itself not an ember-addon or els-extension
+    if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
+      return;
+    }
     if (!recursiveRoots.includes(rootItem)) {
       recursiveRoots.push(rootItem);
       getProjectAddonsRoots(rootItem, recursiveRoots, packageFolderName).forEach((item: string) => {
@@ -257,7 +273,7 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
   return recursiveRoots;
 }
 
-export function getPackageJSON(file: string) {
+export function getPackageJSON(file: string): PackageInfo {
   try {
     const result = JSON.parse(fs.readFileSync(path.join(file, 'package.json'), 'utf8'));
     return result;

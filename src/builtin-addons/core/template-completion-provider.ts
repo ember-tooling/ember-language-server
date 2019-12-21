@@ -8,8 +8,10 @@ import { emberBlockItems, emberMustacheItems, emberSubExpressionItems, emberModi
 import { templateContextLookup } from './template-context-provider';
 import { provideComponentTemplatePaths } from './template-definition-provider';
 
-import { log } from '../../utils/logger';
+import { log, logInfo, logError } from '../../utils/logger';
 import ASTPath, { getLocalScope } from '../../glimmer-utils';
+import Server from '../../server';
+import { Project } from '../../project-roots';
 import {
   isLinkToTarget,
   isComponentArgumentName,
@@ -80,6 +82,19 @@ function isArgumentName(name: string) {
 
 export default class TemplateCompletionProvider {
   constructor() {}
+  async initRegistry(_: Server, project: Project) {
+    try {
+      let initStartTime = Date.now();
+      mListHelpers(project.root);
+      mListModifiers(project.root);
+      mListRoutes(project.root);
+      mListComponents(project.root);
+      mGetProjectAddonsInfo(project.root);
+      logInfo(project.root + ': registry initialized in ' + (Date.now() - initStartTime) + 'ms');
+    } catch (e) {
+      logError(e);
+    }
+  }
   getAllAngleBracketComponents(root: string, uri: string) {
     const items: CompletionItem[] = [];
     return uniqBy(

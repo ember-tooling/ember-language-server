@@ -21,12 +21,14 @@ import {
   TextDocumentPositionParams,
   CompletionItem,
   StreamMessageReader,
+  WorkspaceFoldersChangeEvent,
   StreamMessageWriter,
   ReferenceParams,
-  Location
+  Location,
+  TextDocument
 } from 'vscode-languageserver';
 
-import ProjectRoots, { Executors } from './project-roots';
+import ProjectRoots, { Project, Executors } from './project-roots';
 import DefinitionProvider from './definition-providers/entry';
 import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
@@ -92,7 +94,9 @@ export default class Server {
   templateLinter: TemplateLinter = new TemplateLinter(this);
 
   referenceProvider: ReferenceProvider = new ReferenceProvider(this);
-
+  private onInitilized() {
+    this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
+  }
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
@@ -103,6 +107,7 @@ export default class Server {
 
     // Bind event handlers
     this.connection.onInitialize(this.onInitialize.bind(this));
+    this.connection.onInitialized(this.onInitilized.bind(this));
     this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
@@ -172,6 +177,13 @@ export default class Server {
     this.connection.listen();
   }
 
+  private onDidChangeWorkspaceFolders(event: WorkspaceFoldersChangeEvent) {
+    if (event.added.length) {
+      event.added.forEach((folder) => {
+        this.projectRoots.findProjectsInsideRoot(folder.uri);
+      });
+    }
+  }
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
   private onInitialize({ rootUri, rootPath, workspaceFolders }: InitializeParams): InitializeResult {
@@ -205,6 +217,12 @@ export default class Server {
         },
         documentSymbolProvider: true,
         referencesProvider: true,
+        workspace: {
+          workspaceFolders: {
+            supported: true,
+            changeNotifications: true
+          }
+        },
         completionProvider: {
           resolveProvider: true,
           triggerCharacters: ['.', '::', '=', '/', '{{', '(', '<', '@', 'this.']
@@ -213,7 +231,6 @@ export default class Server {
     };
   }
 
-  linters: any[] = [];
   executors: Executors = {};
 
   private async onDidChangeContent(change: any) {
@@ -226,17 +243,20 @@ export default class Server {
         results.push(result);
       });
     }
-    for (let linter of this.linters) {
-      try {
-        let tempResult = await linter(change.document);
-        // API must return array
-        if (Array.isArray(tempResult)) {
-          tempResult.forEach((el) => {
-            results.push(el as Diagnostic);
-          });
+    const project: Project | undefined = this.projectRoots.projectForUri(change.document.uri);
+    if (project) {
+      for (let linter of project.linters) {
+        try {
+          let tempResults = await linter(change.document as TextDocument);
+          // API must return array
+          if (Array.isArray(tempResults)) {
+            tempResults.forEach((el) => {
+              results.push(el as Diagnostic);
+            });
+          }
+        } catch (e) {
+          logError(e);
         }
-      } catch (e) {
-        logError(e);
       }
     }
 

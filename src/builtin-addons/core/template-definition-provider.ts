@@ -5,6 +5,7 @@ import { Definition, Location } from 'vscode-languageserver';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { isLinkToTarget, isLinkComponentRouteTarget } from './../../utils/ast-helpers';
 import ASTPath from './../../glimmer-utils';
+import { getGlobalRegistry } from './../../utils/layout-helpers';
 
 import { isTemplatePath, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../../utils/layout-helpers';
 
@@ -29,8 +30,23 @@ function normalizeAngleTagName(tagName: string) {
     .join('/');
 }
 
+export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', name: string, root: string): string[] {
+  const absRoot = path.normalize(root);
+  const registry = getGlobalRegistry();
+  const bucket: any = registry[type].get(name) || new Set();
+  return Array.from(bucket).filter((el: string) => path.normalize(el).includes(absRoot) && fs.existsSync(el)) as string[];
+}
+
 export function provideComponentTemplatePaths(root: string, rawComponentName: string) {
   const maybeComponentName = normalizeAngleTagName(rawComponentName);
+  const items = getPathsFromRegistry('component', maybeComponentName, root);
+  if (items.length) {
+    const results = items.filter((el) => el.endsWith('.hbs'));
+    if (results.length) {
+      return results;
+    }
+  }
+
   let paths = [...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
 
   if (!paths.length) {
@@ -142,8 +158,10 @@ export default class TemplateDefinitionProvider {
   }
   _provideLikelyRawComponentTemplatePaths(root: string, rawComponentName: string) {
     const maybeComponentName = normalizeAngleTagName(rawComponentName);
-    let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
-
+    let paths = getPathsFromRegistry('component', maybeComponentName, root);
+    if (!paths.length) {
+      paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
+    }
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
