@@ -31,6 +31,7 @@ export class Project {
     this.builtinProviders = initBuiltinProviders();
   }
   init(server: Server) {
+    this.builtinProviders.initFunctions.forEach((initFn) => initFn(server, this));
     this.providers.initFunctions.forEach((initFn) => initFn(server, this));
     if (this.providers.info.length) {
       logInfo('--------------------');
