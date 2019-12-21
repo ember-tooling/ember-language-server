@@ -12,7 +12,6 @@ import { log, logInfo, logError } from '../../utils/logger';
 import ASTPath, { getLocalScope } from '../../glimmer-utils';
 import Server from '../../server';
 import { Project } from '../../project-roots';
-import { getGlobalRegistry } from '../../utils/layout-helpers';
 import {
   isLinkToTarget,
   isComponentArgumentName,
@@ -91,7 +90,6 @@ export default class TemplateCompletionProvider {
       mListRoutes(project.root);
       mListComponents(project.root);
       mGetProjectAddonsInfo(project.root);
-      console.log(getGlobalRegistry());
       logInfo(project.root + ': registry initialized in ' + (Date.now() - initStartTime) + 'ms');
     } catch (e) {
       logError(e);

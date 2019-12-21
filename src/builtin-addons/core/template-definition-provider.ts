@@ -31,10 +31,10 @@ function normalizeAngleTagName(tagName: string) {
 }
 
 export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', name: string, root: string): string[] {
-  const absRoot = path.resolve(root);
+  const absRoot = path.normalize(root);
   const registry = getGlobalRegistry();
   const bucket: any = registry[type].get(name) || new Set();
-  return Array.from(bucket).filter((el: string) => absRoot.includes(el) && fs.existsSync(el)) as string[];
+  return Array.from(bucket).filter((el: string) => path.normalize(el).includes(absRoot) && fs.existsSync(el)) as string[];
 }
 
 export function provideComponentTemplatePaths(root: string, rawComponentName: string) {
