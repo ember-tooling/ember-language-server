@@ -35,7 +35,9 @@ export class Project {
     if (this.providers.info.length) {
       logInfo('--------------------');
       logInfo('loded addons:');
-      logInfo('    ' + this.providers.info.join('\n'));
+      this.providers.info.forEach((addonName) => {
+        logInfo('    ' + addonName);
+      });
       logInfo('--------------------');
     }
   }
