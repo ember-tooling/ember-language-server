@@ -53,8 +53,8 @@ export class ClassicPathMatcher {
       return null;
     }
     return {
-      type: results[0],
-      name: results[1]
+      type: results[0][0],
+      name: results[0][1]
     };
   }
 }
