@@ -35,17 +35,17 @@ describe('normalizeToAngleBracketComponent', () => {
     expect(normalizeToAngleBracketComponent('foo/bar')).toEqual('Foo::Bar');
     expect(normalizeToAngleBracketComponent('foo/bar-baz')).toEqual('Foo::BarBaz');
     expect(normalizeToAngleBracketComponent('foo-bar')).toEqual('FooBar');
-    expect(normalizeToAngleBracketComponent('foo-bar/baz')).toEqual('FooBar/Baz');
-    expect(normalizeToAngleBracketComponent('foo-bar/baz-boo')).toEqual('FooBar/BazBoo');
+    expect(normalizeToAngleBracketComponent('foo-bar/baz')).toEqual('FooBar::Baz');
+    expect(normalizeToAngleBracketComponent('foo-bar/baz-boo')).toEqual('FooBar::BazBoo');
     expect(normalizeToAngleBracketComponent('tables/i18n-models-table')).toEqual('Tables::I18nModelsTable');
   });
   it('able to convert angle brackets to angle brackets', () => {
     expect(normalizeToAngleBracketComponent('Foo')).toEqual('Foo');
     expect(normalizeToAngleBracketComponent('FooBar')).toEqual('FooBar');
-    expect(normalizeToAngleBracketComponent('FooBar/Baz')).toEqual('FooBar/Baz');
+    expect(normalizeToAngleBracketComponent('FooBar::Baz')).toEqual('FooBar::Baz');
     expect(normalizeToAngleBracketComponent('Foo::BarBaz')).toEqual('Foo::BarBaz');
     expect(normalizeToAngleBracketComponent('Foo::Bar')).toEqual('Foo::Bar');
-    expect(normalizeToAngleBracketComponent('FooBar/BazBoo')).toEqual('FooBar/BazBoo');
+    expect(normalizeToAngleBracketComponent('FooBar::BazBoo')).toEqual('FooBar::BazBoo');
     expect(normalizeToAngleBracketComponent('Tables::I18nModelsTable')).toEqual('Tables::I18nModelsTable');
   });
 });
