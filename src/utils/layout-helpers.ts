@@ -28,6 +28,10 @@ const GLOBAL_REGISTRY: {
   modifier: new Map()
 };
 
+export function normalizeRoutePath(name: string) {
+  return name.split('/').join('.');
+}
+
 export function getGlobalRegistry() {
   return GLOBAL_REGISTRY;
 }
@@ -36,7 +40,30 @@ export function hasEmberLanguageServerExtension(info: PackageInfo) {
   return info[ADDON_CONFIG_KEY] !== undefined;
 }
 
+export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
+  if (!(kind in GLOBAL_REGISTRY)) {
+    return;
+  }
+  if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
+    return;
+  }
+  if (GLOBAL_REGISTRY[kind].has(normalizedName)) {
+    const regItem = GLOBAL_REGISTRY[kind].get(normalizedName);
+    if (regItem) {
+      files.forEach((file) => {
+        regItem.delete(file);
+      });
+      if (regItem.size === 0) {
+        GLOBAL_REGISTRY[kind].delete(normalizedName);
+      }
+    }
+  }
+}
+
 export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
+  if (!(kind in GLOBAL_REGISTRY)) {
+    return;
+  }
   if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
     GLOBAL_REGISTRY[kind].set(normalizedName, new Set());
   }
