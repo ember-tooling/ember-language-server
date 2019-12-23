@@ -40,8 +40,7 @@ import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
-import { getGlobalRegistry, addToRegistry, REGISTRY_KIND } from './utils/layout-helpers';
-
+import { getGlobalRegistry, addToRegistry, REGISTRY_KIND, normalizeRoutePath } from './utils/layout-helpers';
 export default class Server {
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
   // also supports stdio via command line flag
@@ -97,6 +96,22 @@ export default class Server {
   referenceProvider: ReferenceProvider = new ReferenceProvider(this);
   private onInitilized() {
     this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
+    this.executors['els.getRelatedFiles'] = async (_, __, [filePath]) => {
+      const fullPath = path.resolve(filePath);
+      const project = this.projectRoots.projectForPath(filePath);
+      if (project) {
+        const item = project.matchPathToType(fullPath);
+        if (item) {
+          if (['template', 'controller', 'route'].includes(item.type)) {
+            item.type = 'routePath';
+            item.name = normalizeRoutePath(item.name);
+          }
+          return this.getRegistry(project.root)[item.type][item.name] || [];
+        }
+      }
+
+      return [];
+    };
   }
   constructor() {
     // Make the text document manager listen on the connection
@@ -214,7 +229,7 @@ export default class Server {
         textDocumentSync: this.documents.syncKind,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath', 'els.executeInEmberCLI']
+          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles']
         },
         documentSymbolProvider: true,
         referencesProvider: true,

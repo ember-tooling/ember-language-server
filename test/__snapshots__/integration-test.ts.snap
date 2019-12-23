@@ -2147,6 +2147,24 @@ Array [
   Object {
     "detail": "route",
     "kind": 17,
+    "label": "application",
+    "textEdit": Object {
+      "newText": "application",
+      "range": Object {
+        "end": Object {
+          "character": 12,
+          "line": 3,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 3,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
     "label": "definition",
     "textEdit": Object {
       "newText": "definition",
@@ -2209,6 +2227,24 @@ Array [
     "label": "angle-completion",
     "textEdit": Object {
       "newText": "angle-completion",
+      "range": Object {
+        "end": Object {
+          "character": 23,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 23,
+          "line": 2,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "application",
+    "textEdit": Object {
+      "newText": "application",
       "range": Object {
         "end": Object {
           "character": 23,
@@ -2679,6 +2715,7 @@ Object {
       "commands": Array [
         "els:registerProjectPath",
         "els.executeInEmberCLI",
+        "els.getRelatedFiles",
       ],
     },
     "referencesProvider": true,
