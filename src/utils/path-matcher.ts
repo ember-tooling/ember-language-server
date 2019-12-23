@@ -1,5 +1,4 @@
 import * as path from 'path';
-
 export class ClassicPathMatcher {
   keys: {
     [key: string]: string[];
@@ -58,5 +57,26 @@ export class ClassicPathMatcher {
       type: results[0][0],
       name: results[0][1]
     };
+  }
+}
+
+export class PodMatcher extends ClassicPathMatcher {
+  podPrefix = 'app/pods/';
+  keys = {
+    helper: ['/helper'],
+    service: ['/service'],
+    modifier: ['/modifier'],
+    controller: ['/controller'],
+    route: ['/route'],
+    template: ['/template'],
+    component: ['/component'],
+    model: ['/model'],
+    transform: ['/transform'],
+    adapter: ['/adapter'],
+    serializer: ['/serializer']
+  };
+  rightPartFromFirstMatch(_: string, fileName: string, extName: string, str: string) {
+    const fullName = str.slice(str.indexOf(this.podPrefix) + this.podPrefix.length, str.length).slice(0, -(extName.length + fileName.length));
+    return fullName;
   }
 }
