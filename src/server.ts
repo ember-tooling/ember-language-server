@@ -104,7 +104,7 @@ export default class Server {
       if (project) {
         const item = project.matchPathToType(fullPath);
         if (item) {
-          return (this.getRegistry(project.root)[item.name] || []).map((fPath: string) => URI.file(fPath));
+          return (this.getRegistry(project.root)[item.type][item.name] || []).map((fPath: string) => URI.file(fPath));
         }
       }
 
