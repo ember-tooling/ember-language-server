@@ -97,6 +97,18 @@ export default class Server {
   referenceProvider: ReferenceProvider = new ReferenceProvider(this);
   private onInitilized() {
     this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
+    this.executors['els.getRelatedFiles'] = async (_, __, [filePath]) => {
+      const fullPath = path.resolve(filePath);
+      const project = this.projectRoots.projectForPath(filePath);
+      if (project) {
+        const item = project.matchPathToType(fullPath);
+        if (item) {
+          return this.getRegistry(project.root)[item.name] || [];
+        }
+      }
+
+      return [];
+    };
   }
   constructor() {
     // Make the text document manager listen on the connection
@@ -214,7 +226,7 @@ export default class Server {
         textDocumentSync: this.documents.syncKind,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath', 'els.executeInEmberCLI']
+          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles']
         },
         documentSymbolProvider: true,
         referencesProvider: true,
