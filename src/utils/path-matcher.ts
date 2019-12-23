@@ -20,10 +20,10 @@ export class ClassicPathMatcher {
     const keys = this.keys[key] as string[];
     for (let i = 0; i < keys.length; i++) {
       let searchStr = keys[i];
-      if (str.charAt(0) === '!') {
-        matched = !searchStr.includes(str.replace('!', ''));
+      if (searchStr.charAt(0) === '!') {
+        matched = !str.includes(searchStr.replace('!', ''));
       } else {
-        matched = searchStr.includes(str);
+        matched = str.includes(searchStr);
       }
     }
     return matched;
