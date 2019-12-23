@@ -34,10 +34,8 @@ export class ClassicPathMatcher {
       if (['component', 'template', 'index'].includes(fileName)) {
         return fullName.replace(`/${fileName}${extName}`, '');
       }
-      return fullName;
     }
-
-    return fullName;
+    return fullName.slice(0, -extName.length);
   }
   metaFromPath(rawAbsPath: string) {
     let absPath = rawAbsPath.split(path.sep).join('/');
