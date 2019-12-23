@@ -557,7 +557,7 @@ export function listRoutes(root: string): CompletionItem[] {
 
   let items: any[] = [];
   items = items.concat(
-    templatePaths.forEach((filePath) => {
+    templatePaths.map((filePath) => {
       const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
       addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
       return {
@@ -569,7 +569,7 @@ export function listRoutes(root: string): CompletionItem[] {
   );
 
   items = items.concat(
-    paths.forEach((filePath) => {
+    paths.map((filePath) => {
       const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
       addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
       return {
@@ -580,17 +580,10 @@ export function listRoutes(root: string): CompletionItem[] {
     })
   );
 
-  items = items.concat(
-    controllers.forEach((filePath) => {
-      const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
-      addToRegistry(label, 'routePath', [path.join(controllersEntry, filePath)]);
-      return {
-        kind: CompletionItemKind.File,
-        label,
-        detail: 'route'
-      };
-    })
-  );
+  controllers.forEach((filePath) => {
+    const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+    addToRegistry(label, 'routePath', [path.join(controllersEntry, filePath)]);
+  });
 
   return items;
 }
