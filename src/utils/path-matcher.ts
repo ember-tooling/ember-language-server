@@ -25,6 +25,9 @@ export class ClassicPathMatcher {
       } else {
         matched = str.includes(searchStr);
       }
+      if (!matched) {
+        return false;
+      }
     }
     return matched;
   }
