@@ -9,7 +9,6 @@ describe('PodMatcher', () => {
     expect(m('foo/bar/app/pods/foo/component.ts')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/pods/foo/component.js')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/pods/foo/component.hbs')).toEqual({ type: 'component', name: 'foo' });
-    expect(m('foo/bar/app/pods/foo/component.hbs')).toEqual({ type: 'component', name: 'foo' });
   });
   it('routes', () => {
     expect(m('foo/bar/app/pods/foo/route.ts')).toEqual({ type: 'route', name: 'foo' });
@@ -66,7 +65,6 @@ describe('PodMatcher :customPrefix', () => {
   it('components', () => {
     expect(m('foo/bar/app/foo/component.ts')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/foo/component.js')).toEqual({ type: 'component', name: 'foo' });
-    expect(m('foo/bar/app/foo/component.hbs')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/foo/component.hbs')).toEqual({ type: 'component', name: 'foo' });
   });
   it('routes', () => {
