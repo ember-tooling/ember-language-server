@@ -88,7 +88,7 @@ export class Project {
     this.builtinProviders = initBuiltinProviders();
     const maybePrefix = getPodModulePrefix(root);
     if (maybePrefix) {
-      this.podModulePrefix = maybePrefix;
+      this.podModulePrefix = 'app/' + maybePrefix;
     }
     this.classicMatcher = new ClassicPathMatcher();
     this.podMatcher = new PodMatcher();
