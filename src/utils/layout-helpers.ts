@@ -3,6 +3,7 @@ import * as walkSync from 'walk-sync';
 import * as fs from 'fs';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
+import { Project } from '../project-roots';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 type GLOBAL_REGISTRY_ITEM = Map<string, Set<string>>;
@@ -485,6 +486,26 @@ export function listComponents(root: string): CompletionItem[] {
   });
 
   return items;
+}
+
+export function findTestsForProject(project: Project) {
+  const entry = path.resolve(path.join(project.root, 'tests'));
+  const paths = safeWalkSync(entry, {
+    directories: false,
+    globs: ['**/*.{js,ts}']
+  });
+
+  paths.forEach((filePath: string) => {
+    const fullPath = path.join(entry, filePath);
+    const item = project.matchPathToType(fullPath);
+    if (item) {
+      if (['controller', 'route', 'template'].includes(item.type)) {
+        item.type = 'routePath';
+        item.name = normalizeRoutePath(item.name);
+      }
+      addToRegistry(item.name, item.type as any, [fullPath]);
+    }
+  });
 }
 
 function listCollection(

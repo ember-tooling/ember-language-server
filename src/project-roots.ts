@@ -11,6 +11,7 @@ import {
   addToRegistry,
   removeFromRegistry,
   normalizeRoutePath,
+  findTestsForProject,
   REGISTRY_KIND
 } from './utils/layout-helpers';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
@@ -95,6 +96,7 @@ export class Project {
   }
   init(server: Server) {
     this.builtinProviders.initFunctions.forEach((initFn) => initFn(server, this));
+    findTestsForProject(this);
     this.providers.initFunctions.forEach((initFn) => initFn(server, this));
     if (this.providers.info.length) {
       logInfo('--------------------');

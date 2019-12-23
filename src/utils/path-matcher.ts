@@ -32,11 +32,14 @@ export class ClassicPathMatcher {
     return matched;
   }
   rightPartFromFirstMatch(type: string, fileName: string, extName: string, str: string, strToMatch: string) {
-    const fullName = str.slice(str.indexOf(strToMatch) + strToMatch.length, str.length).slice(0, -extName.length);
+    let fullName = str.slice(str.indexOf(strToMatch) + strToMatch.length, str.length).slice(0, -extName.length);
     if (type === 'component') {
-      if (['component', 'template', 'index'].includes(fileName)) {
-        return fullName.replace(`/${fileName}`, '');
+      if (['component', 'template', 'index', 'index-test'].includes(fileName)) {
+        fullName = fullName.replace(`/${fileName}`, '');
       }
+    }
+    if (str.includes('/tests/') && fullName.endsWith('-test')) {
+      fullName = fullName.replace('-test', '');
     }
     return fullName;
   }

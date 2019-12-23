@@ -132,14 +132,18 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/components/foo.js')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo.hbs')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/templates/components/foo.hbs')).toEqual({ type: 'component', name: 'foo' });
+    expect(m('foo/bar/tests/integration/components/cart-widgget/item-test.js')).toEqual({ type: 'component', name: 'cart-widgget/item' });
+    expect(m('foo/bar/tests/integration/components/cart-widgget/index-test.js')).toEqual({ type: 'component', name: 'cart-widgget' });
   });
   it('routes', () => {
     expect(m('foo/bar/app/routes/foo/index.ts')).toEqual({ type: 'route', name: 'foo/index' });
     expect(m('foo/bar/app/routes/foo.ts')).toEqual({ type: 'route', name: 'foo' });
+    expect(m('foo/bar/tests/unit/routes/cart-widgget/index-test.js')).toEqual({ type: 'route', name: 'cart-widgget/index' });
   });
   it('controllers', () => {
     expect(m('foo/bar/app/controllers/foo/index.ts')).toEqual({ type: 'controller', name: 'foo/index' });
     expect(m('foo/bar/app/controllers/foo.ts')).toEqual({ type: 'controller', name: 'foo' });
+    expect(m('foo/bar/tests/unit/controllers/cart-widgget/index-test.js')).toEqual({ type: 'controller', name: 'cart-widgget/index' });
   });
   it('templates', () => {
     expect(m('foo/bar/app/templates/foo/index.hbs')).toEqual({ type: 'template', name: 'foo/index' });
@@ -149,10 +153,12 @@ describe('ClassicPathMatcher', () => {
   it('helpers', () => {
     expect(m('foo/bar/app/helpers/foo.js')).toEqual({ type: 'helper', name: 'foo' });
     expect(m('foo/bar/app/helpers/foo-bar.js')).toEqual({ type: 'helper', name: 'foo-bar' });
+    expect(m('foo/bar/tests/integration/helpers/foo-bar-test.js')).toEqual({ type: 'helper', name: 'foo-bar' });
   });
   it('modifiers', () => {
     expect(m('foo/bar/app/modifiers/foo.js')).toEqual({ type: 'modifier', name: 'foo' });
     expect(m('foo/bar/app/modifiers/foo-bar.js')).toEqual({ type: 'modifier', name: 'foo-bar' });
+    expect(m('foo/bar/tests/integration/modifiers/foo-bar-test.js')).toEqual({ type: 'modifier', name: 'foo-bar' });
   });
   it('models', () => {
     expect(m('foo/bar/app/models/foo.js')).toEqual({ type: 'model', name: 'foo' });
@@ -173,5 +179,6 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/services/foo.js')).toEqual({ type: 'service', name: 'foo' });
     expect(m('foo/bar/app/services/foo-bar.js')).toEqual({ type: 'service', name: 'foo-bar' });
     expect(m('foo/bar/app/services/foo-bar/baz.js')).toEqual({ type: 'service', name: 'foo-bar/baz' });
+    expect(m('foo/bar/tests/unit/services/foo-bar-test.js')).toEqual({ type: 'service', name: 'foo-bar' });
   });
 });
