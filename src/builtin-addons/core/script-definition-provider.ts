@@ -2,7 +2,6 @@ import * as path from 'path';
 import { Definition, Location } from 'vscode-languageserver';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../../utils/definition-helpers';
-import { kebabCase } from 'lodash';
 import {
   isRouteLookup,
   isTransformReference,
@@ -12,6 +11,7 @@ import {
   isNamedServiceInjection,
   isTemplateElement
 } from './../../utils/ast-helpers';
+import { normalizeServiceName } from '../../utils/normalizers';
 import { isModuleUnificationApp, podModulePrefixForRoot } from './../../utils/layout-helpers';
 import { provideRouteDefinition } from './template-definition-provider';
 type ItemType = 'Model' | 'Transform' | 'Service';
@@ -162,10 +162,10 @@ export default class CoreScriptDefinitionProvider {
       if (args.length && args[0].type === 'StringLiteral') {
         serviceName = args[0].value;
       }
-      definitions = this.guessPathsForType(root, 'Service', kebabCase(serviceName));
+      definitions = this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
     } else if (isNamedServiceInjection(astPath)) {
       let serviceName = astPath.node.value;
-      definitions = this.guessPathsForType(root, 'Service', kebabCase(serviceName));
+      definitions = this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
     } else if (isRouteLookup(astPath)) {
       let routePath = astPath.node.value;
       definitions = provideRouteDefinition(root, routePath);

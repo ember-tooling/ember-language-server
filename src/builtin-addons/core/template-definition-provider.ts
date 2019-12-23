@@ -6,7 +6,7 @@ import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { isLinkToTarget, isLinkComponentRouteTarget } from './../../utils/ast-helpers';
 import ASTPath from './../../glimmer-utils';
 import { getGlobalRegistry } from './../../utils/layout-helpers';
-
+import { normalizeToClassicComponent } from '../../utils/normalizers';
 import { isTemplatePath, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../../utils/layout-helpers';
 
 import {
@@ -18,17 +18,9 @@ import {
   pathsToLocations
 } from './../../utils/definition-helpers';
 
-import { kebabCase } from 'lodash';
 import * as memoize from 'memoizee';
 
 const mAddonPathsForComponentTemplates = memoize(getAddonPathsForComponentTemplates, { length: 2, maxAge: 600000 });
-
-function normalizeAngleTagName(tagName: string) {
-  return tagName
-    .split('::')
-    .map((item: string) => kebabCase(item))
-    .join('/');
-}
 
 export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', name: string, root: string): string[] {
   const absRoot = path.normalize(root);
@@ -38,7 +30,7 @@ export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', 
 }
 
 export function provideComponentTemplatePaths(root: string, rawComponentName: string) {
-  const maybeComponentName = normalizeAngleTagName(rawComponentName);
+  const maybeComponentName = normalizeToClassicComponent(rawComponentName);
   const items = getPathsFromRegistry('component', maybeComponentName, root);
   if (items.length) {
     const results = items.filter((el) => el.endsWith('.hbs'));
@@ -157,7 +149,7 @@ export default class TemplateDefinitionProvider {
     return provideComponentTemplatePaths(root, rawComponentName);
   }
   _provideLikelyRawComponentTemplatePaths(root: string, rawComponentName: string) {
-    const maybeComponentName = normalizeAngleTagName(rawComponentName);
+    const maybeComponentName = normalizeToClassicComponent(rawComponentName);
     let paths = getPathsFromRegistry('component', maybeComponentName, root);
     if (!paths.length) {
       paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
@@ -215,7 +207,7 @@ export default class TemplateDefinitionProvider {
     return pathsToLocations.apply(null, paths.length > 1 ? paths.filter(isTemplatePath) : paths);
   }
   provideMustacheDefinition(root: string, focusPath: ASTPath) {
-    const maybeComponentName = focusPath.node.type === 'ElementNode' ? normalizeAngleTagName(focusPath.node.tag) : focusPath.node.original;
+    const maybeComponentName = focusPath.node.type === 'ElementNode' ? normalizeToClassicComponent(focusPath.node.tag) : focusPath.node.original;
     return this.provideComponentDefinition(root, maybeComponentName);
   }
   provideHashPropertyUsage(root: string, focusPath: ASTPath): Location[] {
@@ -238,7 +230,7 @@ export default class TemplateDefinitionProvider {
     return [];
   }
   provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath): Location[] {
-    const maybeComponentName = normalizeAngleTagName(focusPath.parent.tag);
+    const maybeComponentName = normalizeToClassicComponent(focusPath.parent.tag);
 
     let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
 

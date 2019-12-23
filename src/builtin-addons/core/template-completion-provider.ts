@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 import { CompletionFunctionParams } from './../../utils/addon-api';
-import { uniqBy, startCase, camelCase } from 'lodash';
+import { uniqBy } from 'lodash';
 
 import * as memoize from 'memoizee';
 import * as fs from 'fs';
@@ -37,16 +37,7 @@ import {
   mGetProjectAddonsInfo
 } from '../../utils/layout-helpers';
 
-export function toAngleBrackedName(name: string) {
-  return name
-    .split('/')
-    .map((part: string) => {
-      return startCase(camelCase(part))
-        .split(' ')
-        .join('');
-    })
-    .join('::');
-}
+import { normalizeToAngleBracketComponent } from '../../utils/normalizers';
 
 const mTemplateContextLookup = memoize(templateContextLookup, {
   length: 3,
@@ -110,7 +101,7 @@ export default class TemplateCompletionProvider {
         )
         .map((item: any) => {
           return Object.assign({}, item, {
-            label: toAngleBrackedName(item.label)
+            label: normalizeToAngleBracketComponent(item.label)
           });
         }),
       'label'
