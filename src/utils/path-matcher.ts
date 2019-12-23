@@ -45,7 +45,7 @@ export class ClassicPathMatcher {
     const extName = path.extname(absPath);
     const fileName = path.basename(absPath, extName);
     const results: [string, string][] = [];
-    Object.keys(this.keys).forEach((propName) => {
+    Object.keys(this.keys).forEach((propName: string) => {
       if (this.matchKey(propName, absPath)) {
         results.push([propName, this.rightPartFromFirstMatch(propName, fileName, extName, absPath, this.keys[propName][0])]);
       }
