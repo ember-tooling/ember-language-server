@@ -536,6 +536,7 @@ export function listRoutes(root: string): CompletionItem[] {
   // log('listRoutes');
   const scriptEntry = path.join(root, 'app', 'routes');
   const templateEntry = path.join(root, 'app', 'templates');
+  const controllersEntry = path.join(root, 'app', 'controllers');
   const paths = safeWalkSync(scriptEntry, {
     directories: false,
     globs: ['**/*.{js,ts}']
@@ -545,23 +546,51 @@ export function listRoutes(root: string): CompletionItem[] {
     directories: false,
     globs: ['**/*.hbs']
   }).filter((name: string) => {
-    const skipEndings = ['-loading', '-error', '/loading', '/error', 'index', 'application'];
+    const skipEndings = ['-loading', '-error', '/loading', '/error'];
     return !name.startsWith('components/') && skipEndings.filter((ending: string) => name.endsWith(ending + '.hbs')).length === 0;
   });
 
-  const items = [...templatePaths, ...paths].map((filePath: string) => {
-    const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
-    if (filePath.endsWith('.hbs')) {
-      addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
-    } else {
-      addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
-    }
-    return {
-      kind: CompletionItemKind.File,
-      label,
-      detail: 'route'
-    };
+  const controllers = safeWalkSync(controllersEntry, {
+    directories: false,
+    globs: ['**/*.{js,ts}']
   });
+
+  let items: any[] = [];
+  items = items.concat(
+    templatePaths.forEach((filePath) => {
+      const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+      addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
+      return {
+        kind: CompletionItemKind.File,
+        label,
+        detail: 'route'
+      };
+    })
+  );
+
+  items = items.concat(
+    paths.forEach((filePath) => {
+      const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+      addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
+      return {
+        kind: CompletionItemKind.File,
+        label,
+        detail: 'route'
+      };
+    })
+  );
+
+  items = items.concat(
+    controllers.forEach((filePath) => {
+      const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+      addToRegistry(label, 'routePath', [path.join(controllersEntry, filePath)]);
+      return {
+        kind: CompletionItemKind.File,
+        label,
+        detail: 'route'
+      };
+    })
+  );
 
   return items;
 }
