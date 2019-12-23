@@ -4,11 +4,19 @@ import * as path from 'path';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
-import { isGlimmerNativeProject, isGlimmerXProject } from './utils/layout-helpers';
+import {
+  isGlimmerNativeProject,
+  isGlimmerXProject,
+  getPodModulePrefix,
+  addToRegistry,
+  removeFromRegistry,
+  normalizeRoutePath,
+  REGISTRY_KIND
+} from './utils/layout-helpers';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
 import { TextDocument, Diagnostic, FileChangeType } from 'vscode-languageserver';
-
+import { PodMatcher, ClassicPathMatcher } from './utils/path-matcher';
 export type Eexcutor = (server: Server, command: string, args: any[]) => any;
 export type Linter = (document: TextDocument) => Diagnostic[];
 export type Watcher = (uri: string, change: FileChangeType) => any;
@@ -17,12 +25,18 @@ export interface Executors {
 }
 
 export class Project {
+  private classicMatcher!: ClassicPathMatcher;
+  private podMatcher!: PodMatcher;
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
   executors: Executors = {};
   watchers: Watcher[] = [];
   linters: Linter[] = [];
   files: Map<string, { version: number }> = new Map();
+  podModulePrefix: string = '';
+  matchPathToType(filePath: string) {
+    return this.classicMatcher.metaFromPath(filePath) || this.podMatcher.metaFromPath(filePath);
+  }
   trackChange(uri: string, change: FileChangeType) {
     // prevent leaks
     if (this.files.size > 10000) {
@@ -34,9 +48,22 @@ export class Project {
       return;
     }
     const filePath = path.resolve(rawPath);
+    const item = this.matchPathToType(filePath);
+    if (item) {
+      if (['template', 'controller', 'route'].includes(item.type)) {
+        item.type = 'routePath';
+        item.name = normalizeRoutePath(item.name);
+      }
+    }
     if (change === 3) {
       this.files.delete(filePath);
+      if (item) {
+        removeFromRegistry(item.name, item.type as REGISTRY_KIND, [filePath]);
+      }
     } else {
+      if (item) {
+        addToRegistry(item.name, item.type as REGISTRY_KIND, [filePath]);
+      }
       if (!this.files.has(filePath)) {
         this.files.set(filePath, { version: 0 });
       }
@@ -59,6 +86,12 @@ export class Project {
   constructor(public readonly root: string) {
     this.providers = collectProjectProviders(root);
     this.builtinProviders = initBuiltinProviders();
+    const maybePrefix = getPodModulePrefix(root);
+    if (maybePrefix) {
+      this.podModulePrefix = maybePrefix;
+    }
+    this.classicMatcher = new ClassicPathMatcher();
+    this.podMatcher = new PodMatcher();
   }
   init(server: Server) {
     this.builtinProviders.initFunctions.forEach((initFn) => initFn(server, this));
