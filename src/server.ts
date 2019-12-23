@@ -6,6 +6,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
+import { URI } from 'vscode-uri';
 
 import {
   IPCMessageReader,
@@ -103,7 +104,7 @@ export default class Server {
       if (project) {
         const item = project.matchPathToType(fullPath);
         if (item) {
-          return this.getRegistry(project.root)[item.name] || [];
+          return (this.getRegistry(project.root)[item.name] || []).map((fPath: string) => URI.file(fPath));
         }
       }
 
