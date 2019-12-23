@@ -69,17 +69,17 @@ export class PodMatcher extends ClassicPathMatcher {
   }
   podPrefix = 'app/pods';
   keys = {
-    helper: ['/helper'],
-    service: ['/service'],
-    modifier: ['/modifier'],
-    controller: ['/controller'],
-    route: ['/route'],
-    template: ['/template'],
-    component: ['/component'],
-    model: ['/model'],
-    transform: ['/transform'],
-    adapter: ['/adapter'],
-    serializer: ['/serializer']
+    helper: ['/helper.'],
+    service: ['/service.'],
+    modifier: ['/modifier.'],
+    controller: ['/controller.'],
+    route: ['/route.'],
+    template: ['/template.'],
+    component: ['/component.'],
+    model: ['/model.'],
+    transform: ['/transform.'],
+    adapter: ['/adapter.'],
+    serializer: ['/serializer.']
   };
   rightPartFromFirstMatch(_: string, fileName: string, extName: string, str: string) {
     const fullName = str.slice(str.indexOf(this.podPrefix) + this.podPrefix.length + 1, str.length).slice(0, -(1 + extName.length + fileName.length));
