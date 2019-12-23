@@ -8,7 +8,8 @@ export class ClassicPathMatcher {
     service: ['/services/'],
     modifier: ['/modifiers/'],
     controller: ['/controllers/'],
-    template: ['/templates/', '!/templates/components'],
+    route: ['/routes/'],
+    template: ['/templates/', '!/templates/components/'],
     component: ['/components/'],
     model: ['/models/'],
     transform: ['/transforms/'],
@@ -21,7 +22,7 @@ export class ClassicPathMatcher {
     for (let i = 0; i < keys.length; i++) {
       let searchStr = keys[i];
       if (searchStr.charAt(0) === '!') {
-        matched = !str.includes(searchStr.replace('!', ''));
+        matched = str.includes(searchStr.replace('!', '')) === false;
       } else {
         matched = str.includes(searchStr);
       }
