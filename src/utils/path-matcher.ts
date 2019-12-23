@@ -82,7 +82,7 @@ export class PodMatcher extends ClassicPathMatcher {
     serializer: ['/serializer']
   };
   rightPartFromFirstMatch(_: string, fileName: string, extName: string, str: string) {
-    const fullName = str.slice(str.indexOf(this.podPrefix) + this.podPrefix.length, str.length).slice(0, -(1 + extName.length + fileName.length));
+    const fullName = str.slice(str.indexOf(this.podPrefix) + this.podPrefix.length + 1, str.length).slice(0, -(1 + extName.length + fileName.length));
     return fullName;
   }
 }
