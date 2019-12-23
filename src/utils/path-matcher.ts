@@ -29,13 +29,13 @@ export class ClassicPathMatcher {
     return matched;
   }
   rightPartFromFirstMatch(type: string, fileName: string, extName: string, str: string, strToMatch: string) {
-    const fullName = str.slice(str.indexOf(strToMatch) + strToMatch.length, str.length);
+    const fullName = str.slice(str.indexOf(strToMatch) + strToMatch.length, str.length).slice(0, -extName.length);
     if (type === 'component') {
       if (['component', 'template', 'index'].includes(fileName)) {
-        return fullName.replace(`/${fileName}${extName}`, '');
+        return fullName.replace(`/${fileName}`, '');
       }
     }
-    return fullName.slice(0, -extName.length);
+    return fullName;
   }
   metaFromPath(rawAbsPath: string) {
     let absPath = rawAbsPath.split(path.sep).join('/');
