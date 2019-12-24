@@ -164,6 +164,7 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/models/foo.js')).toEqual({ type: 'model', name: 'foo' });
     expect(m('foo/bar/app/models/foo-bar.js')).toEqual({ type: 'model', name: 'foo-bar' });
     expect(m('foo/bar/app/models/foo-bar/baz.js')).toEqual({ type: 'model', name: 'foo-bar/baz' });
+    expect(m('foo/bar/tests/unit/models/foo-bar-test.js')).toEqual({ type: 'model', name: 'foo-bar' });
   });
   it('serializers', () => {
     expect(m('foo/bar/app/serializers/foo.js')).toEqual({ type: 'serializer', name: 'foo' });

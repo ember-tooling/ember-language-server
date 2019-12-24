@@ -1,7 +1,9 @@
 import { CompletionItem } from 'vscode-languageserver';
 import { CompletionFunctionParams } from '../../utils/addon-api';
 import * as memoize from 'memoizee';
-import { log } from '../../utils/logger';
+import { log, logError, logInfo } from '../../utils/logger';
+import Server from '../../server';
+import { Project } from '../../project-roots';
 import {
   isStoreModelLookup,
   isRouteLookup,
@@ -20,6 +22,16 @@ const mListTransforms = memoize(listTransforms, { length: 1, maxAge: 60000 });
 
 export default class ScriptCompletionProvider {
   constructor() {}
+  async initRegistry(_: Server, project: Project) {
+    try {
+      let initStartTime = Date.now();
+      mListModels(project.root);
+      mListServices(project.root);
+      logInfo(project.root + ': script registry initialized in ' + (Date.now() - initStartTime) + 'ms');
+    } catch (e) {
+      logError(e);
+    }
+  }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     const focusPath = params.focusPath;
     if (params.type !== 'script') {
