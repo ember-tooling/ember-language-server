@@ -15,7 +15,12 @@ export class ClassicPathMatcher {
     adapter: ['/adapters/'],
     serializer: ['/serializers/']
   };
+  ignores = ['/tmp/', '/dist/', '/.git/'];
   matchKey(key: string, str: string) {
+    let isIgnored = this.ignores.find((el) => str.includes(el));
+    if (isIgnored) {
+      return false;
+    }
     let matched = false;
     const keys = this.keys[key] as string[];
     for (let i = 0; i < keys.length; i++) {
