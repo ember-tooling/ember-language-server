@@ -123,6 +123,11 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/pods/foo/transform.js')).toEqual(null);
     expect(m('foo/bar/app/pods/foo/service.js')).toEqual(null);
   });
+  it('ignores', () => {
+    expect(m('foo/bar/tmp/app/components/foo/index.ts')).toEqual(null);
+    expect(m('foo/bar/dist/app/components/foo/index.ts')).toEqual(null);
+    expect(m('foo/bar/.git/app/components/foo/index.ts')).toEqual(null);
+  });
   it('components', () => {
     expect(m('foo/bar/app/components/foo/index.ts')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo/index.js')).toEqual({ type: 'component', name: 'foo' });
