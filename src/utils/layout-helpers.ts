@@ -457,6 +457,24 @@ export function listComponents(root: string): CompletionItem[] {
   // log('listComponents');
   const scriptEntry = path.join(root, 'app', 'components');
   const templateEntry = path.join(root, 'app', 'templates', 'components');
+  const addonComponents = path.join(root, 'addon', 'components');
+  const addonTemplates = path.join(root, 'addon', 'templates', 'components');
+  const addonComponentsPaths = safeWalkSync(addonComponents, {
+    directories: false,
+    globs: ['**/*.{js,ts,hbs}']
+  });
+  const addonTemplatesPaths = safeWalkSync(addonTemplates, {
+    directories: false,
+    globs: ['**/*.{js,ts,hbs}']
+  });
+
+  addonComponentsPaths.forEach((p) => {
+    addToRegistry(pureComponentName(p), 'component', [path.join(addonComponents, p)]);
+  });
+  addonTemplatesPaths.forEach((p) => {
+    addToRegistry(pureComponentName(p), 'component', [path.join(addonTemplates, p)]);
+  });
+
   const jsPaths = safeWalkSync(scriptEntry, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}']

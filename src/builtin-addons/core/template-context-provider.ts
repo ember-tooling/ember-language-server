@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
-import { isModuleUnificationApp, podModulePrefixForRoot, pureComponentName } from '../../utils/layout-helpers';
+import { isModuleUnificationApp, podModulePrefixForRoot, pureComponentName, getGlobalRegistry } from '../../utils/layout-helpers';
 
 import { log } from '../../utils/logger';
 
@@ -35,6 +35,15 @@ export function templateContextLookup(root: string, rawCurrentFilePath: string, 
 
 function findComponentScripts(root: string, componentName: string) {
   const possibleLocations = [];
+  const registry = getGlobalRegistry();
+  if (registry.component.has(componentName)) {
+    const els: string[] = Array.from((registry.component.get(componentName) as any).values());
+    els.forEach((el) => {
+      if (el.includes(root)) {
+        possibleLocations.push([el]);
+      }
+    });
+  }
   if (isModuleUnificationApp(root)) {
     possibleLocations.push([root, 'src', 'ui', 'components', componentName, 'component.js']);
     possibleLocations.push([root, 'src', 'ui', 'components', componentName, 'component.ts']);
@@ -57,11 +66,12 @@ function findComponentScripts(root: string, componentName: string) {
 function componentsContextData(root: string, componentName: string, templateContent: string): CompletionItem[] {
   const maybeScripts = findComponentScripts(root, componentName);
   const existingScripts = maybeScripts.filter(fs.existsSync);
+  const hasAddonScript = existingScripts.find((el) => el.includes('addon'));
   const infoItems: any[] = [];
 
   if (existingScripts.length) {
     try {
-      const filePath = existingScripts.pop();
+      const filePath = hasAddonScript ? hasAddonScript : existingScripts.pop();
       const fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
       const jsMeta = processJSFile(fileContent, filePath);
       log('jsMeta', jsMeta);
