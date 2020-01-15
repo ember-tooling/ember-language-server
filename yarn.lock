@@ -4585,10 +4585,15 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vscode-jsonrpc@^3.6.0, vscode-jsonrpc@^3.6.1:
+vscode-jsonrpc@^3.6.0:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-3.6.1.tgz#3f9b8f902077da27f1ffd37c7317a77bd4696a49"
   integrity sha512-+Eb+Dxf2kC2h079msx61hkblxAKE0S2j78+8QpnigLAO2aIIjkCwTIH34etBrU8E8VItRinec7YEwULx9at5bQ==
+
+vscode-jsonrpc@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-5.0.0.tgz#445be9fb404e2793a91b9c0cef3c52dec3e02b89"
+  integrity sha512-QeAniC/xTWauVQgyNgEqNJ0Qm/Jw8QySGRQhRFPwb8c4FPp9k6QNgJp0ayXWws5qhdaHkiXkGPlzjOPZFQQKLw==
 
 vscode-languageserver-protocol@^3.7.0, vscode-languageserver-protocol@^3.7.1:
   version "3.7.1"
