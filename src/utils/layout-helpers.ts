@@ -395,6 +395,8 @@ export function pureComponentName(relativePath: string) {
     return relativePath.replace(`/helper${ext}`, '');
   } else if (relativePath.endsWith(`/index${ext}`)) {
     return relativePath.replace(`/index${ext}`, '');
+  } else if (relativePath.endsWith(`/styles${ext}`)) {
+    return relativePath.replace(`/styles${ext}`, '');
   } else {
     return relativePath.replace(ext, '');
   }
@@ -408,7 +410,7 @@ export function listPodsComponents(root: string): CompletionItem[] {
   const entryPath = path.join(root, 'app', podModulePrefix, 'components');
   const jsPaths = safeWalkSync(entryPath, {
     directories: false,
-    globs: ['**/*.{js,ts,hbs}']
+    globs: ['**/*.{js,ts,hbs,css,less,scss}']
   });
 
   const items = jsPaths.map((filePath: string) => {
@@ -477,7 +479,7 @@ export function listComponents(root: string): CompletionItem[] {
 
   const jsPaths = safeWalkSync(scriptEntry, {
     directories: false,
-    globs: ['**/*.{js,ts,hbs}']
+    globs: ['**/*.{js,ts,hbs,css,less,scss}']
   });
 
   jsPaths.forEach((p) => {
