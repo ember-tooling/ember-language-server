@@ -39,7 +39,7 @@ export class ClassicPathMatcher {
   rightPartFromFirstMatch(type: string, fileName: string, extName: string, str: string, strToMatch: string) {
     let fullName = str.slice(str.indexOf(strToMatch) + strToMatch.length, str.length).slice(0, -extName.length);
     if (type === 'component') {
-      if (['component', 'template', 'index', 'index-test', 'style', 'styles'].includes(fileName)) {
+      if (['component', 'template', 'index', 'index-test', 'styles'].includes(fileName)) {
         fullName = fullName.replace(`/${fileName}`, '');
       }
     }

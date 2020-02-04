@@ -134,6 +134,11 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/components/foo/index.hbs')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo/component.js')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo/template.hbs')).toEqual({ type: 'component', name: 'foo' });
+
+    expect(m('frontend/app/components/audio-player/styles.css')).toEqual({ type: 'component', name: 'audio-player' });
+    expect(m('frontend/app/components/audio-player/styles.scss')).toEqual({ type: 'component', name: 'audio-player' });
+    expect(m('frontend/app/components/audio-player/styles.less')).toEqual({ type: 'component', name: 'audio-player' });
+
     expect(m('foo/bar/app/components/foo.js')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo.hbs')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/templates/components/foo.hbs')).toEqual({ type: 'component', name: 'foo' });
