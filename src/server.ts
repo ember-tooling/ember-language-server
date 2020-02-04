@@ -284,6 +284,14 @@ export default class Server {
       let project = this.projectRoots.projectForUri(change.uri);
       if (project) {
         project.trackChange(change.uri, change.type);
+      } else {
+        if (change.type === 1 && change.uri.endsWith('ember-cli-build.js')) {
+          const rawPath = uriToFilePath(change.uri);
+          if (rawPath) {
+            const filePath = path.dirname(path.resolve(rawPath));
+            this.projectRoots.findProjectsInsideRoot(filePath);
+          }
+        }
       }
     });
     // /**
