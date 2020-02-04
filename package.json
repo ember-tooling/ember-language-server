@@ -52,7 +52,7 @@
     "lerna-changelog": "^0.8.2",
     "lint-staged": "^10.0.3",
     "prettier": "^1.18.2",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^25.1.0",
     "typescript": "^3.6.4",
     "vscode-jsonrpc": "^4.0.0",
     "vscode-languageserver-protocol": "^3.14.1"
