@@ -285,7 +285,7 @@ export default class Server {
       if (project) {
         project.trackChange(change.uri, change.type);
       } else {
-        if (change.uri.endsWith('ember-cli-build.js')) {
+        if (change.type === 1 && change.uri.endsWith('ember-cli-build.js')) {
           const rawPath = uriToFilePath(change.uri);
           if (rawPath) {
             const filePath = path.dirname(path.resolve(rawPath));
