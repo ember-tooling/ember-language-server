@@ -42,6 +42,7 @@ import ScriptCompletionProvider from './completion-provider/script-completion-pr
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { getGlobalRegistry, addToRegistry, REGISTRY_KIND, normalizeRoutePath } from './utils/layout-helpers';
 export default class Server {
+  initializers: any[] = [];
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
   // also supports stdio via command line flag
   connection: IConnection = process.argv.includes('--stdio')
@@ -115,6 +116,8 @@ export default class Server {
 
       return [];
     };
+    this.initializers.forEach((cb: any) => cb());
+    this.initializers = [];
   }
   constructor() {
     // Make the text document manager listen on the connection
@@ -213,16 +216,17 @@ export default class Server {
 
     log(`Initializing Ember Language Server at ${rootPath}`);
 
-    this.projectRoots.initialize(rootPath);
-
-    if (workspaceFolders && Array.isArray(workspaceFolders)) {
-      workspaceFolders.forEach((folder) => {
-        const folderPath = uriToFilePath(folder.uri);
-        if (folderPath && rootPath !== folderPath) {
-          this.projectRoots.findProjectsInsideRoot(folderPath);
-        }
-      });
-    }
+    this.initializers.push(() => {
+      this.projectRoots.initialize(rootPath as string);
+      if (workspaceFolders && Array.isArray(workspaceFolders)) {
+        workspaceFolders.forEach((folder) => {
+          const folderPath = uriToFilePath(folder.uri);
+          if (folderPath && rootPath !== folderPath) {
+            this.projectRoots.findProjectsInsideRoot(folderPath);
+          }
+        });
+      }
+    });
 
     // this.setStatusText('Initialized');
 
