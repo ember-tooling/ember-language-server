@@ -124,9 +124,6 @@ export default class Server {
 
       return [];
     };
-    if (!this.lazyInit) {
-      this.executeInitializers();
-    }
   }
   constructor() {
     // Make the text document manager listen on the connection
@@ -240,6 +237,9 @@ export default class Server {
       }
     });
 
+    if (!this.lazyInit) {
+      this.executeInitializers();
+    }
     // this.setStatusText('Initialized');
 
     return {
