@@ -51,7 +51,6 @@ export default class Server {
   // Create a simple text document manager. The text document manager
   // supports full document sync only
   documents: TextDocuments = new TextDocuments();
-
   projectRoots: ProjectRoots = new ProjectRoots(this);
   addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
     let rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
@@ -96,6 +95,10 @@ export default class Server {
   referenceProvider: ReferenceProvider = new ReferenceProvider(this);
   private onInitilized() {
     this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
+
+    this.executors['els.setConfig'] = async (_, __, [config]) => {
+      this.projectRoots.setLocalAddons(config.local.addons);
+    };
     this.executors['els.getRelatedFiles'] = async (_, __, [filePath]) => {
       const fullPath = path.resolve(filePath);
       const project = this.projectRoots.projectForPath(filePath);
@@ -229,7 +232,7 @@ export default class Server {
         textDocumentSync: this.documents.syncKind,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles']
+          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles', 'els.setConfig']
         },
         documentSymbolProvider: true,
         referencesProvider: true,

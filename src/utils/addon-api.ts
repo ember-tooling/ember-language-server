@@ -105,8 +105,9 @@ function requireUncached(module: string) {
   return result;
 }
 
-export function collectProjectProviders(root: string): ProjectProviders {
-  const roots = [root]
+export function collectProjectProviders(root: string, addons: string[]): ProjectProviders {
+  const roots = addons
+    .concat([root])
     .concat(getProjectAddonsRoots(root) as any, getProjectInRepoAddonsRoots(root) as any)
     .filter((pathItem: any) => typeof pathItem === 'string');
   const dagMap: DAGMap<HandlerObject> = new DAGMap();

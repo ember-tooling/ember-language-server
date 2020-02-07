@@ -4,6 +4,7 @@ import * as path from 'path';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
+import * as fs from 'fs';
 import {
   isGlimmerNativeProject,
   isGlimmerXProject,
@@ -12,7 +13,8 @@ import {
   removeFromRegistry,
   normalizeRoutePath,
   findTestsForProject,
-  REGISTRY_KIND
+  REGISTRY_KIND,
+  isELSAddonRoot
 } from './utils/layout-helpers';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
@@ -84,8 +86,8 @@ export class Project {
   addWatcher(cb: Watcher) {
     this.watchers.push(cb);
   }
-  constructor(public readonly root: string) {
-    this.providers = collectProjectProviders(root);
+  constructor(public readonly root: string, addons: string[]) {
+    this.providers = collectProjectProviders(root, addons);
     this.builtinProviders = initBuiltinProviders();
     const maybePrefix = getPodModulePrefix(root);
     if (maybePrefix) {
@@ -114,6 +116,19 @@ export default class ProjectRoots {
   workspaceRoot: string;
 
   projects = new Map<string, Project>();
+
+  localAddons: string[] = [];
+
+  setLocalAddons(paths: string[]) {
+    paths.forEach((element: string) => {
+      const addonPath = path.resolve(element);
+      if (fs.existsSync(addonPath) && isELSAddonRoot(addonPath)) {
+        if (!this.localAddons.includes(addonPath)) {
+          this.localAddons.push(addonPath);
+        }
+      }
+    });
+  }
 
   findProjectsInsideRoot(workspaceRoot: string) {
     const roots = walkSync(workspaceRoot, {
@@ -150,7 +165,7 @@ export default class ProjectRoots {
       return;
     }
     try {
-      const project = new Project(path);
+      const project = new Project(path, this.localAddons);
       this.projects.set(path, project);
       logInfo(`Ember CLI project added at ${path}`);
       project.init(this.server);
