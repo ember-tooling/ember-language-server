@@ -166,6 +166,11 @@ export function isProjectAddonRoot(root: string) {
   return isEmberAddon(pack) && hasIndexJs;
 }
 
+export function isELSAddonRoot(root: string) {
+  const pack = getPackageJSON(root);
+  return hasEmberLanguageServerExtension(pack);
+}
+
 export function getProjectInRepoAddonsRoots(root: string) {
   const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
   const addons = safeWalkSync(path.join(root, prefix), {
