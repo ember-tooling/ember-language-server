@@ -43,6 +43,7 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { getGlobalRegistry, addToRegistry, REGISTRY_KIND, normalizeRoutePath } from './utils/layout-helpers';
 export default class Server {
   initializers: any[] = [];
+  lazyInit: boolean = false;
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
   // also supports stdio via command line flag
   connection: IConnection = process.argv.includes('--stdio')
@@ -94,11 +95,18 @@ export default class Server {
   templateLinter: TemplateLinter = new TemplateLinter(this);
 
   referenceProvider: ReferenceProvider = new ReferenceProvider(this);
+  executeInitializers() {
+    this.initializers.forEach((cb: any) => cb());
+    this.initializers = [];
+  }
   private onInitilized() {
     this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
 
     this.executors['els.setConfig'] = async (_, __, [config]) => {
       this.projectRoots.setLocalAddons(config.local.addons);
+      if (this.lazyInit) {
+        this.executeInitializers();
+      }
     };
     this.executors['els.getRelatedFiles'] = async (_, __, [filePath]) => {
       const fullPath = path.resolve(filePath);
@@ -116,8 +124,9 @@ export default class Server {
 
       return [];
     };
-    this.initializers.forEach((cb: any) => cb());
-    this.initializers = [];
+    if (!this.lazyInit) {
+      this.executeInitializers();
+    }
   }
   constructor() {
     // Make the text document manager listen on the connection
@@ -208,12 +217,15 @@ export default class Server {
   }
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
-  private onInitialize({ rootUri, rootPath, workspaceFolders }: InitializeParams): InitializeResult {
+  private onInitialize({ rootUri, rootPath, workspaceFolders, initializationOptions }: InitializeParams): InitializeResult {
     rootPath = rootUri ? uriToFilePath(rootUri) : rootPath;
     if (!rootPath) {
       return { capabilities: {} };
     }
-
+    if (initializationOptions && initializationOptions.editor && initializationOptions.editor === 'vscode') {
+      logInfo('lazy init enabled, waiting for config from VSCode');
+      this.lazyInit = true;
+    }
     log(`Initializing Ember Language Server at ${rootPath}`);
 
     this.initializers.push(() => {
