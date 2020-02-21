@@ -9,6 +9,7 @@ export function toDiagnostic(source: string, error: TemplateLinterError): Diagno
     severity: DiagnosticSeverity.Error,
     range: toRange(source, error),
     message: toMessage(error),
+    code: error.rule,
     source: error.rule ? 'ember-template-lint' : 'glimmer-engine'
   };
 }
