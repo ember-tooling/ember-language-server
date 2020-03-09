@@ -111,6 +111,16 @@ export default class Server {
         this.executeInitializers();
       }
     };
+    this.executors['els.reloadProject'] = async (_, __, [projectPath]) => {
+      if (projectPath) {
+        const project = this.projectRoots.projectForPath(projectPath);
+        if (project) {
+          this.projectRoots.reloadProject(project.root);
+        }
+      } else {
+        this.projectRoots.reloadProjects();
+      }
+    };
     this.executors['els.getRelatedFiles'] = async (_, __, [filePath]) => {
       const fullPath = path.resolve(filePath);
       const project = this.projectRoots.projectForPath(filePath);
@@ -251,7 +261,7 @@ export default class Server {
         textDocumentSync: TextDocumentSyncKind.Full,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles', 'els.setConfig']
+          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles', 'els.setConfig', 'els.reloadProject']
         },
         documentSymbolProvider: true,
         referencesProvider: true,

@@ -21,6 +21,7 @@ import Server from './server';
 import { TextDocument, Diagnostic, FileChangeType } from 'vscode-languageserver';
 import { PodMatcher, ClassicPathMatcher } from './utils/path-matcher';
 export type Eexcutor = (server: Server, command: string, args: any[]) => any;
+export type Destructor = (project: Project) => any;
 export type Linter = (document: TextDocument) => Diagnostic[];
 export type Watcher = (uri: string, change: FileChangeType) => any;
 export interface Executors {
@@ -34,6 +35,7 @@ export class Project {
   builtinProviders!: ProjectProviders;
   executors: Executors = {};
   watchers: Watcher[] = [];
+  destructors: Destructor[] = [];
   linters: Linter[] = [];
   files: Map<string, { version: number }> = new Map();
   podModulePrefix: string = '';
@@ -96,6 +98,14 @@ export class Project {
     this.classicMatcher = new ClassicPathMatcher();
     this.podMatcher = new PodMatcher();
   }
+  unload() {
+    this.destructors.forEach((fn) => {
+      fn(this);
+    });
+    logInfo('--------------------');
+    logInfo(`Ember-cli Project: ${this.root} unloaded`);
+    logInfo('--------------------');
+  }
   init(server: Server) {
     this.builtinProviders.initFunctions.forEach((initFn) => initFn(server, this));
     findTestsForProject(this);
@@ -118,6 +128,18 @@ export default class ProjectRoots {
   projects = new Map<string, Project>();
 
   localAddons: string[] = [];
+
+  reloadProjects() {
+    Array.from(this.projects).forEach(([_, project]) => {
+      project.unload();
+      this.reloadProject(_);
+    });
+  }
+
+  reloadProject(projectRoot: string) {
+    this.projects.delete(projectRoot);
+    this.onProjectAdd(projectRoot);
+  }
 
   setLocalAddons(paths: string[]) {
     paths.forEach((element: string) => {
