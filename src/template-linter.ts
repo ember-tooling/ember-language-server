@@ -2,8 +2,9 @@ import { Diagnostic, Files, TextDocument } from 'vscode-languageserver';
 import { getExtension } from './utils/file-extension';
 import { toDiagnostic } from './utils/diagnostic';
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
-import { log } from './utils/logger';
-
+import { uriToFilePath } from 'vscode-languageserver/lib/files';
+import { log, logError } from './utils/logger';
+import * as findUp from 'find-up';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -23,6 +24,13 @@ export interface TemplateLinterError {
 
 const extensionsToLint: string[] = ['.hbs', '.js', '.ts'];
 
+function setCwd(cwd: string) {
+  try {
+    process.chdir(cwd);
+  } catch (err) {
+    logError(`chdir: ${err.toString()}`);
+  }
+}
 export default class TemplateLinter {
   private _linterCache = new Map<Project, any>();
 
@@ -35,59 +43,55 @@ export default class TemplateLinter {
       return;
     }
 
-    const config = this.getLinterConfig(textDocument.uri);
+    const cwd = process.cwd();
+    const project = this.server.projectRoots.projectForUri(textDocument.uri);
 
-    if (!config) {
-      return;
-    }
-
-    const TemplateLinter = await this.getLinter(textDocument.uri);
-
-    let linter = null;
-    try {
-      linter = new TemplateLinter(config);
-    } catch (e) {
+    if (!project) {
       return;
     }
 
     const documentContent = textDocument.getText();
     const source = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
+    if (!source.trim().length) {
+      return;
+    }
+
+    const TemplateLinter = await this.getLinter(project);
+
+    let linter = null;
+    try {
+      setCwd(project.root);
+      linter = new TemplateLinter();
+    } catch (e) {
+      setCwd(cwd);
+      return;
+    }
 
     const errors = linter.verify({
       source,
-      moduleId: textDocument.uri
+      moduleId: uriToFilePath(textDocument.uri),
+      filePath: uriToFilePath(textDocument.uri)
     });
+
+    setCwd(cwd);
 
     const diagnostics: Diagnostic[] = errors.map((error: TemplateLinterError) => toDiagnostic(source, error));
 
     return diagnostics;
   }
-
-  private getLinterConfig(uri: string): { configPath: string } | undefined {
-    const project = this.server.projectRoots.projectForUri(uri);
-    if (!project) {
-      return;
-    }
-
-    const configPath = path.join(project.root, '.template-lintrc.js');
-    if (!fs.existsSync(configPath)) {
-      return;
-    }
-
-    return { configPath };
+  private templateLintConfig(cwd: string) {
+    return findUp.sync('.template-lintrc.js', { cwd });
   }
-
-  private async getLinter(uri: string) {
-    const project = this.server.projectRoots.projectForUri(uri);
-    if (!project) {
-      return;
-    }
-
+  private async getLinter(project: Project) {
     if (this._linterCache.has(project)) {
       return this._linterCache.get(project);
     }
 
     try {
+      // don't resolve template-lint (due to resolution error) if no linter config found;
+      if (!this.templateLintConfig(project.root)) {
+        return;
+      }
       let nodePath = Files.resolveGlobalNodePath();
       if (!nodePath) {
         return;

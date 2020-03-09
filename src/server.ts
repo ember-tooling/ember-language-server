@@ -7,6 +7,8 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
+import { TextDocument } from 'vscode-languageserver-textdocument';
+
 import {
   IPCMessageReader,
   IPCMessageWriter,
@@ -23,10 +25,10 @@ import {
   CompletionItem,
   StreamMessageReader,
   WorkspaceFoldersChangeEvent,
+  TextDocumentSyncKind,
   StreamMessageWriter,
   ReferenceParams,
-  Location,
-  TextDocument
+  Location
 } from 'vscode-languageserver';
 
 import ProjectRoots, { Project, Executors } from './project-roots';
@@ -41,6 +43,7 @@ import TemplateCompletionProvider from './completion-provider/template-completio
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { getGlobalRegistry, addToRegistry, REGISTRY_KIND, normalizeRoutePath } from './utils/layout-helpers';
+
 export default class Server {
   initializers: any[] = [];
   lazyInit: boolean = false;
@@ -52,7 +55,7 @@ export default class Server {
 
   // Create a simple text document manager. The text document manager
   // supports full document sync only
-  documents: TextDocuments = new TextDocuments();
+  documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
   projectRoots: ProjectRoots = new ProjectRoots(this);
   addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
     let rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
@@ -245,7 +248,7 @@ export default class Server {
     return {
       capabilities: {
         // Tell the client that the server works in FULL text document sync mode
-        textDocumentSync: this.documents.syncKind,
+        textDocumentSync: TextDocumentSyncKind.Full,
         definitionProvider: true,
         executeCommandProvider: {
           commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles', 'els.setConfig']
