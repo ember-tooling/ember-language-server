@@ -103,7 +103,7 @@ export class Project {
       fn(this);
     });
     logInfo('--------------------');
-    logInfo(`Ember-cli Project: ${this.root} unloaded`);
+    logInfo(`Ember CLI project: ${this.root} unloaded`);
     logInfo('--------------------');
   }
   init(server: Server) {
