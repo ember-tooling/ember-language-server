@@ -72,7 +72,7 @@ export default class TemplateCompletionProvider {
 function listComponents(root: string): CompletionItem[] {
   const jsPaths = walkSync(join(root, 'app', 'components'), {
     directories: false,
-    globs: ['**/*.js']
+    globs: ['**/*.js', '**/*.hbs']
   });
   const hbsPaths = walkSync(join(root, 'app', 'templates', 'components'), {
     directories: false,
