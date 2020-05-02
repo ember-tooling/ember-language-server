@@ -9,7 +9,7 @@ import { toPosition } from './estree-utils';
 import Server from './server';
 import ASTPath from './glimmer-utils';
 import { getExtension } from './utils/file-extension';
-import URI from 'vscode-uri';
+import { URI } from 'vscode-uri';
 
 const { preprocess } = require('@glimmer/syntax');
 
