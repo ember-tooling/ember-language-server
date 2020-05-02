@@ -129,11 +129,15 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/.git/app/components/foo/index.ts')).toEqual(null);
   });
   it('components', () => {
+    expect(m('foo/bar/app/components/routes/foo/index.ts')).toEqual({ type: 'component', name: 'routes/foo' });
+    expect(m('foo/bar/app/components/route/foo/index.ts')).toEqual({ type: 'component', name: 'route/foo' });
     expect(m('foo/bar/app/components/foo/index.ts')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo/index.js')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo/index.hbs')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo/component.js')).toEqual({ type: 'component', name: 'foo' });
     expect(m('foo/bar/app/components/foo/template.hbs')).toEqual({ type: 'component', name: 'foo' });
+    expect(m('repos/brn/frontend/tests/integration/components/login-form/input/component-test.js')).toEqual({ type: 'component', name: 'login-form/input' });
+    expect(m('repos/brn/frontend/tests/integration/components/login-form/component-test.js')).toEqual({ type: 'component', name: 'login-form' });
 
     expect(m('frontend/app/components/audio-player/styles.css')).toEqual({ type: 'component', name: 'audio-player' });
     expect(m('frontend/app/components/audio-player/styles.scss')).toEqual({ type: 'component', name: 'audio-player' });
