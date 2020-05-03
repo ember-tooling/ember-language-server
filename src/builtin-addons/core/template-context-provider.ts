@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 
-import { isModuleUnificationApp, podModulePrefixForRoot, pureComponentName, getGlobalRegistry } from '../../utils/layout-helpers';
-
+import { isModuleUnificationApp, podModulePrefixForRoot, pureComponentName } from '../../utils/layout-helpers';
+import { getGlobalRegistry } from '../../utils/registry-api';
 import { log } from '../../utils/logger';
 
 import { extractComponentInformationFromMeta, processJSFile, processTemplate } from 'ember-meta-explorer';

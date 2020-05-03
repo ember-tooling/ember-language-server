@@ -42,7 +42,8 @@ import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
-import { getGlobalRegistry, addToRegistry, Usage, REGISTRY_KIND, normalizeRoutePath, findRelatedFiles } from './utils/layout-helpers';
+import { getGlobalRegistry, addToRegistry, REGISTRY_KIND, normalizeMatchNaming } from './utils/registry-api';
+import { Usage, findRelatedFiles } from './utils/usages-api';
 
 export default class Server {
   initializers: any[] = [];
@@ -130,11 +131,8 @@ export default class Server {
       if (project) {
         const item = project.matchPathToType(fullPath);
         if (item) {
-          if (['template', 'controller', 'route'].includes(item.type)) {
-            item.type = 'routePath';
-            item.name = normalizeRoutePath(item.name);
-          }
-          return this.getRegistry(project.root)[item.type][item.name] || [];
+          let normalizedItem = normalizeMatchNaming(item);
+          return this.getRegistry(project.root)[normalizedItem.type][normalizedItem.name] || [];
         }
       }
 
