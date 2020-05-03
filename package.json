@@ -81,7 +81,7 @@
   "scripts": {
     "changelog": "lerna-changelog",
     "clean": "rimraf lib/",
-    "compile": "tsc -p .",
+    "compile": "tsc --skipLibCheck -p .",
     "lint": "eslint ./src/**/*.ts",
     "prepublish": "yarn clean && yarn compile",
     "test": "jest",
