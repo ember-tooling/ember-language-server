@@ -1,4 +1,4 @@
-import { addToRegistry, getRegistryForRoot, removeFromRegistry } from '../../src/utils/registry-api';
+import { addToRegistry, getRegistryForRoot, normalizeMatchNaming, removeFromRegistry } from '../../src/utils/registry-api';
 import { findRelatedFiles } from '../../src/utils/usages-api';
 import { createTempDir } from 'broccoli-test-helper';
 import * as path from 'path';
@@ -15,6 +15,8 @@ function createFile(name: string, content: string): string {
   });
   return path.join(dir.path(), name);
 }
+
+const knownRegistryKeys = ['transform', 'helper', 'component', 'routePath', 'model', 'service', 'modifier'];
 
 describe('addToRegistry - it able to add different kinds to registry', () => {
   let files = [];
@@ -37,5 +39,39 @@ describe('addToRegistry - it able to add different kinds to registry', () => {
     expect(getRegistryForRoot(path.resolve(dir.path()))['component']['foo-bar'].length).toBe(1);
     removeFromRegistry('foo-bar', 'component', [files[2]]);
     expect(getRegistryForRoot(path.resolve(dir.path()))['component']['foo-bar']).toBe(undefined);
+  });
+  it('skip addition for unknown keys', () => {
+    knownRegistryKeys.forEach((key) => {
+      const fakeKey = `${key}-fake`;
+      const file = createFile(`${fakeKey}.js`, '');
+      addToRegistry('foo-bar', fakeKey as any, [file]);
+      expect(getRegistryForRoot(path.resolve(dir.path()))[fakeKey]).toBe(undefined);
+    });
+  });
+});
+
+describe('normalizeMatchNaming - must normalize naming from mater to registry format', () => {
+  it('normalize special keys', () => {
+    expect(normalizeMatchNaming({ type: 'route', name: 'foo/bar' })).toEqual({
+      type: 'routePath',
+      name: 'foo.bar'
+    });
+    expect(normalizeMatchNaming({ type: 'controller', name: 'foo/bar' })).toEqual({
+      type: 'routePath',
+      name: 'foo.bar'
+    });
+    expect(normalizeMatchNaming({ type: 'template', name: 'foo/bar' })).toEqual({
+      type: 'routePath',
+      name: 'foo.bar'
+    });
+  });
+  it('skip normalization for other keys', () => {
+    const name = 'foo-bar';
+    knownRegistryKeys.forEach((keyName) => {
+      expect(normalizeMatchNaming({ name, type: keyName })).toEqual({
+        name,
+        type: keyName
+      });
+    });
   });
 });
