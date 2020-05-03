@@ -68,7 +68,7 @@ describe('normalizeMatchNaming - must normalize naming from mater to registry fo
   it('skip normalization for other keys', () => {
     const name = 'foo-bar';
     knownRegistryKeys.forEach((keyName) => {
-      expect(normalizeMatchNaming({ name, type: keyName })).toEqual({
+      expect(normalizeMatchNaming({ name, type: keyName as any })).toEqual({
         name,
         type: keyName
       });
