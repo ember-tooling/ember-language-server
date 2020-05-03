@@ -42,7 +42,7 @@ import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { uriToFilePath } from 'vscode-languageserver/lib/files';
-import { getGlobalRegistry, addToRegistry, REGISTRY_KIND, normalizeRoutePath } from './utils/layout-helpers';
+import { getGlobalRegistry, addToRegistry, Usage, REGISTRY_KIND, normalizeRoutePath, findRelatedFiles } from './utils/layout-helpers';
 
 export default class Server {
   initializers: any[] = [];
@@ -66,6 +66,9 @@ export default class Server {
     } else {
       return false;
     }
+  }
+  getUsages(normalizedToken: string): Usage[] {
+    return findRelatedFiles(normalizedToken);
   }
   getRegistry(rawRoot: string) {
     const root = path.resolve(rawRoot);
@@ -132,6 +135,31 @@ export default class Server {
             item.name = normalizeRoutePath(item.name);
           }
           return this.getRegistry(project.root)[item.type][item.name] || [];
+        }
+      }
+
+      return [];
+    };
+    this.executors['els.getKindUsages'] = async (_, __, [filePath]) => {
+      const fullPath = path.resolve(filePath);
+      const project = this.projectRoots.projectForPath(filePath);
+      if (project) {
+        const item = project.matchPathToType(fullPath);
+        if (item) {
+          return {
+            name: item.name,
+            path: filePath,
+            type: item.type,
+            usages: this.getUsages(item.name).map((usage) => {
+              if (usage.type === 'routePath') {
+                return {
+                  ...usage,
+                  type: 'template'
+                };
+              }
+              return usage;
+            })
+          };
         }
       }
 
@@ -261,7 +289,7 @@ export default class Server {
         textDocumentSync: TextDocumentSyncKind.Full,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles', 'els.setConfig', 'els.reloadProject']
+          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles', 'els.getKindUsages', 'els.setConfig', 'els.reloadProject']
         },
         documentSymbolProvider: true,
         referencesProvider: true,

@@ -4,6 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 import { Project } from '../project-roots';
+import { preprocess, traverse } from '@glimmer/syntax';
+import { normalizeToClassicComponent } from './normalizers';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 type GLOBAL_REGISTRY_ITEM = Map<string, Set<string>>;
@@ -53,11 +55,112 @@ export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, 
     if (regItem) {
       files.forEach((file) => {
         regItem.delete(file);
+        if (file.endsWith('.hbs')) {
+          updateTemplateTokens(kind as UsageType, normalizedName, null);
+        }
       });
       if (regItem.size === 0) {
         GLOBAL_REGISTRY[kind].delete(normalizedName);
       }
     }
+  }
+}
+
+interface TemplateTokenMeta {
+  source: string;
+  tokens: string[];
+}
+
+const TEMPLATE_TOKENS: {
+  component: {
+    [key: string]: TemplateTokenMeta;
+  };
+  routePath: {
+    [key: string]: TemplateTokenMeta;
+  };
+} = {
+  component: {},
+  routePath: {}
+};
+
+function extractTokensFromTemplate(template: string): string[] {
+  if (template === '') {
+    return [];
+  }
+  const ast = preprocess(template);
+  const results: string[] = [];
+  const ignored = ['if', 'else', 'unless', 'let', 'each'];
+  traverse(ast, {
+    ElementNode(node: any) {
+      if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
+        results.push(normalizeToClassicComponent(node.tag));
+      }
+    },
+    ElementModifierStatement(node: any) {
+      if (node.path && node.path.type === 'PathExpression' && node.path.original && !ignored.includes(node.path.original)) {
+        results.push(node.path.original);
+      }
+    },
+    BlockStatement(node: any) {
+      if (node.path && node.path.type === 'PathExpression' && node.path.original && !ignored.includes(node.path.original)) {
+        results.push(node.path.original);
+      }
+    },
+    SubExpression(node: any) {
+      if (node.path && node.path.type === 'PathExpression' && node.path.original && !ignored.includes(node.path.original)) {
+        results.push(node.path.original);
+      }
+    },
+    MustacheStatement(node: any) {
+      if (node.path && node.path.type === 'PathExpression' && node.path.original && !ignored.includes(node.path.original)) {
+        results.push(node.path.original);
+      }
+    }
+  });
+  return Array.from(new Set(results));
+}
+
+type UsageType = 'component' | 'routePath';
+
+export interface Usage {
+  name: string;
+  path: string;
+  type: UsageType;
+  usages: Usage[];
+}
+
+export function findRelatedFiles(token: string): Usage[] {
+  const results: Usage[] = [];
+  Object.keys(TEMPLATE_TOKENS).forEach((kindName) => {
+    const components = TEMPLATE_TOKENS[kindName as UsageType];
+    Object.keys(components).forEach((normalizedComponentName: string) => {
+      if (components[normalizedComponentName].tokens.includes(token)) {
+        results.push({
+          name: normalizedComponentName,
+          path: components[normalizedComponentName].source,
+          type: kindName as UsageType,
+          usages: []
+        });
+      }
+    });
+  });
+
+  return results;
+}
+
+function updateTemplateTokens(kind: UsageType, normalizedName: string, file: string | null) {
+  if (file === null) {
+    delete TEMPLATE_TOKENS[kind][normalizedName];
+    return;
+  }
+  try {
+    const tokens = extractTokensFromTemplate(fs.readFileSync(file, 'utf8'));
+    TEMPLATE_TOKENS[kind][normalizedName] = {
+      source: file,
+      tokens
+    };
+  } catch (e) {
+    //
   }
 }
 
@@ -73,6 +176,9 @@ export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files
     if (regItem) {
       files.forEach((file) => {
         regItem.add(file);
+        if ((kind === 'component' || kind === 'routePath') && file.endsWith('.hbs')) {
+          updateTemplateTokens(kind, normalizedName, file);
+        }
       });
     }
   }

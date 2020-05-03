@@ -2716,6 +2716,7 @@ Object {
         "els:registerProjectPath",
         "els.executeInEmberCLI",
         "els.getRelatedFiles",
+        "els.getKindUsages",
         "els.setConfig",
         "els.reloadProject",
       ],
