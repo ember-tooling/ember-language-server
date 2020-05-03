@@ -5,27 +5,18 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import * as fs from 'fs';
-import {
-  isGlimmerNativeProject,
-  isGlimmerXProject,
-  getPodModulePrefix,
-  addToRegistry,
-  removeFromRegistry,
-  normalizeRoutePath,
-  findTestsForProject,
-  REGISTRY_KIND,
-  isELSAddonRoot
-} from './utils/layout-helpers';
+import { isGlimmerNativeProject, isGlimmerXProject, getPodModulePrefix, findTestsForProject, isELSAddonRoot } from './utils/layout-helpers';
+import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem } from './utils/registry-api';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
 import { TextDocument, Diagnostic, FileChangeType } from 'vscode-languageserver';
 import { PodMatcher, ClassicPathMatcher } from './utils/path-matcher';
-export type Eexcutor = (server: Server, command: string, args: any[]) => any;
+export type Executor = (server: Server, command: string, args: any[]) => any;
 export type Destructor = (project: Project) => any;
 export type Linter = (document: TextDocument) => Diagnostic[];
 export type Watcher = (uri: string, change: FileChangeType) => any;
 export interface Executors {
-  [key: string]: Eexcutor;
+  [key: string]: Executor;
 }
 
 export class Project {
@@ -53,21 +44,19 @@ export class Project {
       return;
     }
     const filePath = path.resolve(rawPath);
-    const item = this.matchPathToType(filePath);
+    let item = this.matchPathToType(filePath);
+    let normalizedItem: undefined | NormalizedRegistryItem = undefined;
     if (item) {
-      if (['template', 'controller', 'route'].includes(item.type)) {
-        item.type = 'routePath';
-        item.name = normalizeRoutePath(item.name);
-      }
+      normalizedItem = normalizeMatchNaming(item) as NormalizedRegistryItem;
     }
     if (change === 3) {
       this.files.delete(filePath);
-      if (item) {
-        removeFromRegistry(item.name, item.type as REGISTRY_KIND, [filePath]);
+      if (normalizedItem) {
+        removeFromRegistry(normalizedItem.name, normalizedItem.type, [filePath]);
       }
     } else {
-      if (item) {
-        addToRegistry(item.name, item.type as REGISTRY_KIND, [filePath]);
+      if (normalizedItem) {
+        addToRegistry(normalizedItem.name, normalizedItem.type, [filePath]);
       }
       if (!this.files.has(filePath)) {
         this.files.set(filePath, { version: 0 });
@@ -79,7 +68,7 @@ export class Project {
     }
     this.watchers.forEach((cb) => cb(uri, change));
   }
-  addCommandExecutor(key: string, cb: Eexcutor) {
+  addCommandExecutor(key: string, cb: Executor) {
     this.executors[key] = cb;
   }
   addLinter(cb: Linter) {

@@ -1,4 +1,23 @@
 import * as path from 'path';
+
+export type MatchResultType =
+  | 'helper'
+  | 'service'
+  | 'route'
+  | 'controller'
+  | 'modifier'
+  | 'template'
+  | 'component'
+  | 'model'
+  | 'transform'
+  | 'adapter'
+  | 'serializer';
+
+export interface MatchResult {
+  type: MatchResultType;
+  name: string;
+}
+
 export class ClassicPathMatcher {
   keys: {
     [key: string]: string[];
@@ -48,7 +67,7 @@ export class ClassicPathMatcher {
     }
     return fullName;
   }
-  metaFromPath(rawAbsPath: string) {
+  metaFromPath(rawAbsPath: string): MatchResult | null {
     let absPath = rawAbsPath.split(path.sep).join('/');
     const extName = path.extname(absPath);
     const fileName = path.basename(absPath, extName);
@@ -62,7 +81,7 @@ export class ClassicPathMatcher {
       return null;
     }
     return {
-      type: results[0][0],
+      type: results[0][0] as MatchResultType,
       name: results[0][1]
     };
   }

@@ -5,7 +5,7 @@ import { Definition, Location } from 'vscode-languageserver';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { isLinkToTarget, isLinkComponentRouteTarget } from './../../utils/ast-helpers';
 import ASTPath from './../../glimmer-utils';
-import { getGlobalRegistry } from './../../utils/layout-helpers';
+import { getGlobalRegistry } from './../../utils/registry-api';
 import { normalizeToClassicComponent } from '../../utils/normalizers';
 import { isTemplatePath, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../../utils/layout-helpers';
 

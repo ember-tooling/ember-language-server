@@ -4,184 +4,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 import { Project } from '../project-roots';
-import { preprocess, traverse } from '@glimmer/syntax';
-import { normalizeToClassicComponent } from './normalizers';
+import { addToRegistry, normalizeMatchNaming } from './registry-api';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
-type GLOBAL_REGISTRY_ITEM = Map<string, Set<string>>;
-export type REGISTRY_KIND = 'transform' | 'helper' | 'component' | 'routePath' | 'model' | 'service' | 'modifier';
 
 export const ADDON_CONFIG_KEY = 'ember-language-server';
-
-const GLOBAL_REGISTRY: {
-  transform: GLOBAL_REGISTRY_ITEM;
-  helper: GLOBAL_REGISTRY_ITEM;
-  component: GLOBAL_REGISTRY_ITEM;
-  routePath: GLOBAL_REGISTRY_ITEM;
-  model: GLOBAL_REGISTRY_ITEM;
-  service: GLOBAL_REGISTRY_ITEM;
-  modifier: GLOBAL_REGISTRY_ITEM;
-} = {
-  transform: new Map(),
-  helper: new Map(),
-  component: new Map(),
-  routePath: new Map(),
-  model: new Map(),
-  service: new Map(),
-  modifier: new Map()
-};
 
 export function normalizeRoutePath(name: string) {
   return name.split('/').join('.');
 }
 
-export function getGlobalRegistry() {
-  return GLOBAL_REGISTRY;
-}
-
 export function hasEmberLanguageServerExtension(info: PackageInfo) {
   return info[ADDON_CONFIG_KEY] !== undefined;
-}
-
-export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
-  if (!(kind in GLOBAL_REGISTRY)) {
-    return;
-  }
-  if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
-    return;
-  }
-  if (GLOBAL_REGISTRY[kind].has(normalizedName)) {
-    const regItem = GLOBAL_REGISTRY[kind].get(normalizedName);
-    if (regItem) {
-      files.forEach((file) => {
-        regItem.delete(file);
-        if (file.endsWith('.hbs')) {
-          updateTemplateTokens(kind as UsageType, normalizedName, null);
-        }
-      });
-      if (regItem.size === 0) {
-        GLOBAL_REGISTRY[kind].delete(normalizedName);
-      }
-    }
-  }
-}
-
-interface TemplateTokenMeta {
-  source: string;
-  tokens: string[];
-}
-
-const TEMPLATE_TOKENS: {
-  component: {
-    [key: string]: TemplateTokenMeta;
-  };
-  routePath: {
-    [key: string]: TemplateTokenMeta;
-  };
-} = {
-  component: {},
-  routePath: {}
-};
-
-function extractTokensFromTemplate(template: string): string[] {
-  if (template === '') {
-    return [];
-  }
-  const ast = preprocess(template);
-  const results: string[] = [];
-  const ignored = ['if', 'else', 'unless', 'let', 'each'];
-  traverse(ast, {
-    ElementNode(node: any) {
-      if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
-        results.push(normalizeToClassicComponent(node.tag));
-      }
-    },
-    ElementModifierStatement(node: any) {
-      if (node.path && node.path.type === 'PathExpression' && node.path.original && !ignored.includes(node.path.original)) {
-        results.push(node.path.original);
-      }
-    },
-    BlockStatement(node: any) {
-      if (node.path && node.path.type === 'PathExpression' && node.path.original && !ignored.includes(node.path.original)) {
-        results.push(node.path.original);
-      }
-    },
-    SubExpression(node: any) {
-      if (node.path && node.path.type === 'PathExpression' && node.path.original && !ignored.includes(node.path.original)) {
-        results.push(node.path.original);
-      }
-    },
-    MustacheStatement(node: any) {
-      if (node.path && node.path.type === 'PathExpression' && node.path.original && !ignored.includes(node.path.original)) {
-        results.push(node.path.original);
-      }
-    }
-  });
-  return Array.from(new Set(results));
-}
-
-type UsageType = 'component' | 'routePath';
-
-export interface Usage {
-  name: string;
-  path: string;
-  type: UsageType;
-  usages: Usage[];
-}
-
-export function findRelatedFiles(token: string): Usage[] {
-  const results: Usage[] = [];
-  Object.keys(TEMPLATE_TOKENS).forEach((kindName) => {
-    const components = TEMPLATE_TOKENS[kindName as UsageType];
-    Object.keys(components).forEach((normalizedComponentName: string) => {
-      if (components[normalizedComponentName].tokens.includes(token)) {
-        results.push({
-          name: normalizedComponentName,
-          path: components[normalizedComponentName].source,
-          type: kindName as UsageType,
-          usages: []
-        });
-      }
-    });
-  });
-
-  return results;
-}
-
-function updateTemplateTokens(kind: UsageType, normalizedName: string, file: string | null) {
-  if (file === null) {
-    delete TEMPLATE_TOKENS[kind][normalizedName];
-    return;
-  }
-  try {
-    const tokens = extractTokensFromTemplate(fs.readFileSync(file, 'utf8'));
-    TEMPLATE_TOKENS[kind][normalizedName] = {
-      source: file,
-      tokens
-    };
-  } catch (e) {
-    //
-  }
-}
-
-export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
-  if (!(kind in GLOBAL_REGISTRY)) {
-    return;
-  }
-  if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
-    GLOBAL_REGISTRY[kind].set(normalizedName, new Set());
-  }
-  if (GLOBAL_REGISTRY[kind].has(normalizedName)) {
-    const regItem = GLOBAL_REGISTRY[kind].get(normalizedName);
-    if (regItem) {
-      files.forEach((file) => {
-        regItem.add(file);
-        if ((kind === 'component' || kind === 'routePath') && file.endsWith('.hbs')) {
-          updateTemplateTokens(kind, normalizedName, file);
-        }
-      });
-    }
-  }
 }
 
 export const isModuleUnificationApp = memoize(isMuApp, {
@@ -630,11 +464,8 @@ export function findTestsForProject(project: Project) {
     const fullPath = path.join(entry, filePath);
     const item = project.matchPathToType(fullPath);
     if (item) {
-      if (['controller', 'route', 'template'].includes(item.type)) {
-        item.type = 'routePath';
-        item.name = normalizeRoutePath(item.name);
-      }
-      addToRegistry(item.name, item.type as any, [fullPath]);
+      const normalizedItem = normalizeMatchNaming(item);
+      addToRegistry(normalizedItem.name, normalizedItem.type, [fullPath]);
     }
   });
 }
