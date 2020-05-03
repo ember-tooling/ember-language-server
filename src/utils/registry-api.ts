@@ -65,6 +65,26 @@ export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, 
   }
 }
 
+export function getRegistryForRoot(root: string) {
+  const registryForRoot: any = {};
+  const registry = getGlobalRegistry();
+  Object.keys(registry).forEach((key: REGISTRY_KIND) => {
+    registryForRoot[key] = {};
+    for (let [itemName, paths] of registry[key].entries()) {
+      const items: string[] = [];
+      paths.forEach((normalizedPath) => {
+        if (normalizedPath.startsWith(root)) {
+          items.push(normalizedPath);
+        }
+      });
+      if (items.length) {
+        registryForRoot[key][itemName] = items;
+      }
+    }
+  });
+  return registryForRoot;
+}
+
 export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
   if (!(kind in GLOBAL_REGISTRY)) {
     return;
