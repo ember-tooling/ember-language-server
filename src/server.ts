@@ -19,6 +19,9 @@ import {
   InitializeResult,
   Diagnostic,
   InitializeParams,
+  CodeActionParams,
+  Command,
+  CodeAction,
   DocumentSymbolParams,
   SymbolInformation,
   TextDocumentPositionParams,
@@ -38,6 +41,7 @@ import DocumentSymbolProvider from './symbols/document-symbol-provider';
 import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 import { ReferenceProvider } from './reference-provider/entry';
+import { CodeActionProvider } from './code-action-provider/entry';
 import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
@@ -85,6 +89,7 @@ export default class Server {
   templateLinter: TemplateLinter = new TemplateLinter(this);
 
   referenceProvider: ReferenceProvider = new ReferenceProvider(this);
+  codeActionProvider: CodeActionProvider = new CodeActionProvider(this);
   executeInitializers() {
     this.initializers.forEach((cb: any) => cb());
     this.initializers = [];
@@ -147,6 +152,15 @@ export default class Server {
       return [];
     };
   }
+  private async onCodeAction(params: CodeActionParams): Promise<(Command | CodeAction)[] | undefined | null> {
+    try {
+      const results = await this.codeActionProvider.provideCodeActions(params);
+      return results;
+    } catch (e) {
+      logError(e);
+      return null;
+    }
+  }
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
@@ -166,19 +180,8 @@ export default class Server {
     this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
     this.connection.onExecuteCommand(this.onExecute.bind(this));
     this.connection.onReferences(this.onReference.bind(this));
+    this.connection.onCodeAction(this.onCodeAction.bind(this));
     this.connection.telemetry.logEvent({ connected: true });
-
-    // this.displayInfoMessage('Ember Language Server [activated]');
-    // 'els.showStatusBarText'
-
-    // let params: ExecuteCommandParams = {
-    // command,
-    // arguments: args
-    // };
-    // return client.sendRequest(ExecuteCommandRequest.type, params)
-
-    // this.connection.client.sendRequest()
-    // this.connection.onEx
   }
 
   /**
@@ -205,13 +208,12 @@ export default class Server {
         return this.executors[params.command](this, params.command, params.arguments);
       } else {
         let [uri, ...args] = params.arguments;
-        logInfo(JSON.stringify(params));
         try {
           const project = this.projectRoots.projectForPath(uri);
           let result = null;
           if (project) {
             if (params.command in project.executors) {
-              result = project.executors[params.command](this, params.command, args);
+              result = await project.executors[params.command](this, uri, args);
             }
           }
           return result;
@@ -270,9 +272,18 @@ export default class Server {
         textDocumentSync: TextDocumentSyncKind.Full,
         definitionProvider: true,
         executeCommandProvider: {
-          commands: ['els:registerProjectPath', 'els.executeInEmberCLI', 'els.getRelatedFiles', 'els.getKindUsages', 'els.setConfig', 'els.reloadProject']
+          commands: [
+            'els:registerProjectPath',
+            'els.extractSourceCodeToComponent',
+            'els.executeInEmberCLI',
+            'els.getRelatedFiles',
+            'els.getKindUsages',
+            'els.setConfig',
+            'els.reloadProject'
+          ]
         },
         documentSymbolProvider: true,
+        codeActionProvider: true,
         referencesProvider: true,
         workspace: {
           workspaceFolders: {

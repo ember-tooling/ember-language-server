@@ -1,4 +1,4 @@
-import { Location, TextDocumentIdentifier, Position, CompletionItem } from 'vscode-languageserver';
+import { Location, TextDocumentIdentifier, Command, CodeActionParams, CodeAction, Position, CompletionItem } from 'vscode-languageserver';
 import {
   getProjectAddonsRoots,
   getPackageJSON,
@@ -37,9 +37,14 @@ export interface CompletionFunctionParams extends ExtendedAPIParams {
 export interface DefinitionFunctionParams extends ExtendedAPIParams {
   results: Location[];
 }
+export interface CodeActionFunctionParams extends CodeActionParams {
+  results: (Command | CodeAction)[];
+}
+
 type ReferenceResolveFunction = (root: string, params: ReferenceFunctionParams) => Promise<Location[]>;
 type CompletionResolveFunction = (root: string, params: CompletionFunctionParams) => Promise<CompletionItem[]>;
 type DefinitionResolveFunction = (root: string, params: DefinitionFunctionParams) => Promise<Location[]>;
+type CodeActionResolveFunction = (root: string, params: CodeActionParams) => Promise<(Command | CodeAction)[] | undefined | null>;
 type InitFunction = (server: Server, project: Project) => any;
 export interface AddonAPI {
   onReference: undefined | ReferenceResolveFunction;
@@ -52,6 +57,7 @@ interface PublicAddonAPI {
   onReference?: ReferenceResolveFunction;
   onComplete?: CompletionResolveFunction;
   onDefinition?: DefinitionResolveFunction;
+  onCodeAction?: CodeActionResolveFunction;
   onInit?: InitFunction;
 }
 interface HandlerObject {
@@ -88,6 +94,7 @@ export function initBuiltinProviders(): ProjectProviders {
   return {
     definitionProviders: [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)],
     referencesProviders: [],
+    codeActionProviders: [],
     initFunctions: [templateCompletion.initRegistry.bind(templateCompletion), scriptCompletion.initRegistry.bind(scriptCompletion)],
     info: [],
     completionProviders: [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)]
@@ -134,12 +141,14 @@ export function collectProjectProviders(root: string, addons: string[]): Project
     definitionProviders: DefinitionResolveFunction[];
     referencesProviders: ReferenceResolveFunction[];
     completionProviders: CompletionResolveFunction[];
+    codeActionProviders: CodeActionResolveFunction[];
     initFunctions: InitFunction[];
     info: string[];
   } = {
     definitionProviders: [],
     referencesProviders: [],
     completionProviders: [],
+    codeActionProviders: [],
     initFunctions: [],
     info: []
   };
@@ -187,6 +196,14 @@ export function collectProjectProviders(root: string, addons: string[]): Project
           return;
         }
       } as InitFunction);
+      result.codeActionProviders.push(function(root: string, params: CodeActionFunctionParams) {
+        handlerObject.updateHandler();
+        if (typeof handlerObject.handler.onCodeAction === 'function') {
+          return handlerObject.handler.onCodeAction(root, params);
+        } else {
+          return;
+        }
+      } as CodeActionResolveFunction);
     } else {
       result.info.push('addon: ' + _);
       if (handlerObject.capabilities.completionProvider && typeof handlerObject.handler.onComplete === 'function') {
@@ -197,6 +214,9 @@ export function collectProjectProviders(root: string, addons: string[]): Project
       }
       if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
         result.definitionProviders.push(handlerObject.handler.onDefinition);
+      }
+      if (handlerObject.capabilities.codeActionProvider && typeof handlerObject.handler.onCodeAction === 'function') {
+        result.codeActionProviders.push(handlerObject.handler.onCodeAction);
       }
       if (typeof handlerObject.handler.onInit === 'function') {
         result.initFunctions.push(handlerObject.handler.onInit);
@@ -211,12 +231,14 @@ export interface ProjectProviders {
   definitionProviders: DefinitionResolveFunction[];
   referencesProviders: ReferenceResolveFunction[];
   completionProviders: CompletionResolveFunction[];
+  codeActionProviders: CodeActionResolveFunction[];
   initFunctions: InitFunction[];
   info: string[];
 }
 
 interface ExtensionCapabilities {
   definitionProvider: undefined | true | false;
+  codeActionProvider: undefined | true | false;
   referencesProvider:
     | true
     | undefined
@@ -230,11 +252,13 @@ interface NormalizedCapabilities {
   definitionProvider: true | false;
   referencesProvider: true | false;
   completionProvider: true | false;
+  codeActionProvider: true | false;
 }
 
 function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabilities {
   return {
     definitionProvider: raw.definitionProvider === true,
+    codeActionProvider: raw.codeActionProvider === true,
     referencesProvider: raw.referencesProvider === true || (typeof raw.referencesProvider === 'object' && raw.referencesProvider.components === true),
     completionProvider: typeof raw.completionProvider === 'object' || raw.completionProvider === true
   };

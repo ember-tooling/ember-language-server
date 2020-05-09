@@ -1,4 +1,4 @@
-import { CompletionItem, TextDocumentPositionParams } from 'vscode-languageserver';
+import { CompletionItem, TextDocumentPositionParams, Position, TextDocumentIdentifier } from 'vscode-languageserver';
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
@@ -8,6 +8,8 @@ import { preprocess } from '@glimmer/syntax';
 import { getExtension } from '../utils/file-extension';
 import { log } from '../utils/logger';
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
+import { TextDocument } from 'vscode-languageserver-textdocument';
+import { Position as EsTreePosition } from 'estree';
 
 const extensionsToProvideTemplateCompletions = ['.hbs', '.js', '.ts'];
 const PLACEHOLDER = 'ELSCompletionDummy';
@@ -16,32 +18,40 @@ export default class TemplateCompletionProvider {
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
-  async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
-    log('template:provideCompletions');
-    const ext = getExtension(params.textDocument);
-
-    if (ext !== null && !extensionsToProvideTemplateCompletions.includes(ext)) {
-      log('template:provideCompletions:unsupportedExtension', ext);
-      return [];
-    }
-
-    const uri = params.textDocument.uri;
-    const project = this.server.projectRoots.projectForUri(uri);
-    const document = this.server.documents.get(uri);
-    if (!project || !document) {
-      return [];
-    }
-    const { root } = project;
-    const offset = document.offsetAt(params.position);
-    const position = document.positionAt(offset);
+  getRoots(doc: TextDocumentIdentifier) {
+    const project = this.server.projectRoots.projectForUri(doc.uri);
+    const document = this.server.documents.get(doc.uri);
+    return {
+      project,
+      document
+    };
+  }
+  getAST(textContent: string) {
+    return preprocess(textContent);
+  }
+  createFocusPath(ast: any, position: EsTreePosition, validText: string) {
+    return ASTPath.toPosition(ast, position, validText);
+  }
+  getFocusPath(
+    document: TextDocument,
+    position: Position,
+    placeholder = PLACEHOLDER
+  ): null | {
+    focusPath: ASTPath;
+    originalText: string;
+    normalPlaceholder: string;
+    ast: any;
+  } {
     const documentContent = document.getText();
+    const ext = getExtension(document);
     const originalText = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
     log('originalText', originalText);
     if (originalText.trim().length === 0) {
       log('originalText - empty');
-      return [];
+      return null;
     }
-    let normalPlaceholder: any = PLACEHOLDER;
+    const offset = document.offsetAt(position);
+    let normalPlaceholder: any = placeholder;
     let ast: any = {};
 
     const cases = [
@@ -67,7 +77,7 @@ export default class TemplateCompletionProvider {
       normalPlaceholder = cases.shift();
       try {
         validText = this.getTextForGuessing(originalText, offset, normalPlaceholder);
-        ast = preprocess(validText);
+        ast = this.getAST(validText);
         log('validText', validText);
         break;
       } catch (e) {
@@ -77,14 +87,44 @@ export default class TemplateCompletionProvider {
     }
     log('ast must exists');
     if (ast === null) {
-      return [];
+      return null;
     }
 
-    const focusPath = ASTPath.toPosition(ast, toPosition(params.position), validText);
-
+    const focusPath = this.createFocusPath(ast, toPosition(position), validText);
     if (!focusPath) {
+      return null;
+    }
+    return {
+      ast,
+      focusPath,
+      originalText,
+      normalPlaceholder
+    };
+  }
+  async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
+    log('template:provideCompletions');
+    const ext = getExtension(params.textDocument);
+
+    if (ext !== null && !extensionsToProvideTemplateCompletions.includes(ext)) {
+      log('template:provideCompletions:unsupportedExtension', ext);
       return [];
     }
+
+    const position = params.position;
+    const { project, document } = this.getRoots(params.textDocument);
+
+    if (!project || !document) {
+      return [];
+    }
+
+    const { root } = project;
+    const results = this.getFocusPath(document, position, PLACEHOLDER);
+    if (!results) {
+      return [];
+    }
+    const focusPath = results.focusPath;
+    const originalText = results.originalText;
+    const normalPlaceholder = results.normalPlaceholder;
 
     const completions: CompletionItem[] = await queryELSAddonsAPIChain(project.builtinProviders.completionProviders, root, {
       focusPath,
@@ -107,6 +147,7 @@ export default class TemplateCompletionProvider {
     const textPrefix = getTextPrefix(focusPath, normalPlaceholder);
     const endCharacterPosition = position.character;
     if (textPrefix.length) {
+      // eslint-disable-next-line
       position.character -= textPrefix.length;
     }
     return filter(addonResults, textPrefix, {
