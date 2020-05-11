@@ -28,6 +28,7 @@ export class Project {
   watchers: Watcher[] = [];
   destructors: Destructor[] = [];
   linters: Linter[] = [];
+  initIssues: Error[] = [];
   files: Map<string, { version: number }> = new Map();
   podModulePrefix: string = '';
   matchPathToType(filePath: string) {
@@ -88,17 +89,42 @@ export class Project {
     this.podMatcher = new PodMatcher();
   }
   unload() {
+    this.initIssues = [];
     this.destructors.forEach((fn) => {
-      fn(this);
+      try {
+        fn(this);
+      } catch (e) {
+        logError(e);
+      }
     });
     logInfo('--------------------');
     logInfo(`Ember CLI project: ${this.root} unloaded`);
     logInfo('--------------------');
   }
   init(server: Server) {
-    this.builtinProviders.initFunctions.forEach((initFn) => initFn(server, this));
+    this.builtinProviders.initFunctions.forEach((initFn) => {
+      try {
+        let initResult = initFn(server, this);
+        if (typeof initResult === 'function') {
+          this.destructors.push(initResult);
+        }
+      } catch (e) {
+        logError(e);
+        this.initIssues.push(e);
+      }
+    });
     findTestsForProject(this);
-    this.providers.initFunctions.forEach((initFn) => initFn(server, this));
+    this.providers.initFunctions.forEach((initFn) => {
+      try {
+        let initResult = initFn(server, this);
+        if (typeof initResult === 'function') {
+          this.destructors.push(initResult);
+        }
+      } catch (e) {
+        logError(e);
+        this.initIssues.push(e);
+      }
+    });
     if (this.providers.info.length) {
       logInfo('--------------------');
       logInfo('loded language server addons:');
@@ -119,15 +145,22 @@ export default class ProjectRoots {
   localAddons: string[] = [];
 
   reloadProjects() {
-    Array.from(this.projects).forEach(([_, project]) => {
-      project.unload();
-      this.reloadProject(_);
+    Array.from(this.projects).forEach(([root]) => {
+      this.reloadProject(root);
     });
   }
 
   reloadProject(projectRoot: string) {
-    this.projects.delete(projectRoot);
+    this.removeProject(projectRoot);
     this.onProjectAdd(projectRoot);
+  }
+
+  removeProject(projectRoot: string) {
+    const project = this.projectForPath(projectRoot);
+    if (project) {
+      project.unload();
+    }
+    this.projects.delete(projectRoot);
   }
 
   setLocalAddons(paths: string[]) {
@@ -173,15 +206,20 @@ export default class ProjectRoots {
 
   onProjectAdd(path: string) {
     if (this.projects.has(path)) {
-      return;
+      return false;
     }
     try {
       const project = new Project(path, this.localAddons);
       this.projects.set(path, project);
       logInfo(`Ember CLI project added at ${path}`);
       project.init(this.server);
+      return {
+        initIssues: project.initIssues,
+        providers: project.providers
+      };
     } catch (e) {
       logError(e);
+      return false;
     }
   }
 

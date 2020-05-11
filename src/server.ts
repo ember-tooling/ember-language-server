@@ -21,6 +21,7 @@ import {
   InitializeParams,
   CodeActionParams,
   Command,
+  ClientCapabilities,
   CodeAction,
   DocumentSymbolParams,
   SymbolInformation,
@@ -94,8 +95,10 @@ export default class Server {
     this.initializers.forEach((cb: any) => cb());
     this.initializers = [];
   }
-  private onInitilized() {
-    this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
+  private onInitialized() {
+    if (this.connection.workspace && this.clientCapabilities && this.clientCapabilities.workspace && this.clientCapabilities.workspace.workspaceFolders) {
+      this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
+    }
 
     this.executors['els.setConfig'] = async (_, __, [config]) => {
       this.projectRoots.setLocalAddons(config.local.addons);
@@ -108,9 +111,21 @@ export default class Server {
         const project = this.projectRoots.projectForPath(projectPath);
         if (project) {
           this.projectRoots.reloadProject(project.root);
+          return {
+            msg: `Project reloaded`,
+            path: project.root
+          };
+        } else {
+          return {
+            msg: 'No project found',
+            path: projectPath
+          };
         }
       } else {
         this.projectRoots.reloadProjects();
+        return {
+          msg: 'Projects reloaded'
+        };
       }
     };
     this.executors['els.getRelatedFiles'] = async (_, __, [filePath]) => {
@@ -161,6 +176,7 @@ export default class Server {
       return null;
     }
   }
+  private clientCapabilities!: ClientCapabilities;
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
@@ -171,7 +187,7 @@ export default class Server {
 
     // Bind event handlers
     this.connection.onInitialize(this.onInitialize.bind(this));
-    this.connection.onInitialized(this.onInitilized.bind(this));
+    this.connection.onInitialized(this.onInitialized.bind(this));
     this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
@@ -201,11 +217,12 @@ export default class Server {
   async onExecute(params: string[] | any) {
     if (Array.isArray(params)) {
       if (params[0] === 'els:registerProjectPath') {
-        this.projectRoots.onProjectAdd(params[1]);
+        return this.projectRoots.onProjectAdd(params[1]);
       }
     } else {
       if (params.command in this.executors) {
-        return this.executors[params.command](this, params.command, params.arguments);
+        const result = await this.executors[params.command](this, params.command, params.arguments);
+        return result;
       } else {
         let [uri, ...args] = params.arguments;
         try {
@@ -238,14 +255,18 @@ export default class Server {
   }
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
-  private onInitialize({ rootUri, rootPath, workspaceFolders, initializationOptions }: InitializeParams): InitializeResult {
+  private onInitialize({ rootUri, rootPath, workspaceFolders, initializationOptions, capabilities }: InitializeParams): InitializeResult {
     rootPath = rootUri ? uriToFilePath(rootUri) : rootPath;
+    this.clientCapabilities = capabilities || {};
     if (!rootPath) {
       return { capabilities: {} };
     }
     if (initializationOptions && initializationOptions.editor && initializationOptions.editor === 'vscode') {
       logInfo('lazy init enabled, waiting for config from VSCode');
       this.lazyInit = true;
+    }
+    if (initializationOptions && initializationOptions.isELSTesting) {
+      this.onInitialized();
     }
     log(`Initializing Ember Language Server at ${rootPath}`);
 

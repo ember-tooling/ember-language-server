@@ -23,25 +23,56 @@ function startServer() {
   });
 }
 
-async function getResult(reqType, connection, files, fileToInspect, position) {
+async function reloadProjects(connection, project = undefined) {
+  const result = await connection.sendRequest(ExecuteCommandRequest.type, {
+    command: 'els.reloadProject',
+    arguments: project ? [project] : []
+  });
+  return result;
+}
+
+async function createProject(files, connection) {
   const dir = await createTempDir();
   dir.write(files);
   const normalizedPath = path
     .normalize(dir.path())
     .split(':')
     .pop();
-  const modelPath = path.join(normalizedPath, fileToInspect);
+  const result = await connection.sendRequest(ExecuteCommandRequest.type, ['els:registerProjectPath', normalizedPath]);
+  const params = {
+    rootUri: `file://${normalizedPath}`,
+    capabilities: {},
+    initializationOptions: {
+      isELSTesting: true
+    }
+  };
+  await connection.sendRequest(InitializeRequest.type as any, params);
+  return {
+    normalizedPath,
+    result,
+    destroy: async () => {
+      await dir.dispose();
+    }
+  };
+}
 
+function textDocument(modelPath, position = { line: 0, character: 0 }) {
   const params = {
     textDocument: {
       uri: `file://${modelPath}`
     },
     position
   };
-  await connection.sendRequest(ExecuteCommandRequest.type, ['els:registerProjectPath', normalizedPath]);
+  return params;
+}
+
+async function getResult(reqType, connection, files, fileToInspect, position) {
+  const { normalizedPath, destroy } = await createProject(files, connection);
+  const modelPath = path.join(normalizedPath, fileToInspect);
+  const params = textDocument(modelPath, position);
   openFile(connection, modelPath);
   let response = await connection.sendRequest(reqType, params);
-  await dir.dispose();
+  await destroy();
   return normalizeUri(response, normalizedPath);
 }
 
@@ -97,6 +128,34 @@ function normalizeUri(objects: Definition, base?: string) {
 
     return object;
   });
+}
+
+function makeProject(appFiles = {}, addons = {}) {
+  const dependencies = {};
+  const node_modules = {};
+  Object.keys(addons).forEach((name) => {
+    dependencies[name] = '*';
+    node_modules[name] = addons[name];
+  });
+  const fileStructure = Object.assign({}, appFiles, {
+    node_modules,
+    'package.json': JSON.stringify({
+      dependencies
+    })
+  });
+  return fileStructure;
+}
+
+function makeAddonPackage(name, config, addonConfig = undefined) {
+  let pack = {
+    name,
+    'ember-language-server': config
+  };
+
+  if (addonConfig) {
+    pack['ember-addon'] = addonConfig;
+  }
+  return JSON.stringify(pack);
 }
 
 describe('integration', function() {
@@ -775,6 +834,108 @@ describe('integration', function() {
     });
   });
 
+  describe('API:Destructors', () => {
+    it('support init functions without destructors', async () => {
+      const addonName = 'addon1';
+      const addonFiles = {
+        'index.js': `
+          const fs = require('fs');
+          const path = require('path');
+          module.exports.onInit = function(server, project) {
+            const p = path.join(project.root, 'node_modules', '${addonName}');
+            let name = 'tag';
+            if (fs.existsSync(path.join(p, name))) {
+              name = name + '1';
+            }
+            fs.writeFileSync(path.join(p, name),'','utf8');
+          }
+        `,
+        'package.json': makeAddonPackage(addonName, {
+          entry: './index'
+        })
+      };
+      const project = makeProject(
+        {
+          app: {
+            components: {
+              'hello.hbs': ''
+            }
+          }
+        },
+        {
+          [addonName]: addonFiles
+        }
+      );
+      const { destroy, normalizedPath } = await createProject(project, connection);
+
+      const addonPath = path.join(normalizedPath, 'node_modules', addonName);
+
+      expect(fs.existsSync(path.join(addonPath, 'tag'))).toBe(true);
+      expect(fs.existsSync(path.join(addonPath, 'tag1'))).toBe(false);
+
+      const reloadResult = await reloadProjects(connection, normalizedPath);
+
+      expect(reloadResult.msg).toBe('Project reloaded');
+      expect(reloadResult.path).toBe(normalizedPath);
+      expect(fs.existsSync(path.join(addonPath, 'tag'))).toBe(true);
+      expect(fs.existsSync(path.join(addonPath, 'tag1'))).toBe(true);
+      await destroy();
+    });
+
+    it('support init functions with destructors', async () => {
+      const addonName = 'addon1';
+      const addonFiles = {
+        'index.js': `
+          const fs = require('fs');
+          const path = require('path');
+          module.exports.onInit = function(server, project) {
+            const p = path.join(project.root, 'node_modules', '${addonName}');
+            let name = 'tag';
+            if (fs.existsSync(path.join(p, name))) {
+              name = name + '1';
+            }
+            fs.writeFileSync(path.join(p, name),'','utf8');
+            return () => {
+              fs.writeFileSync(path.join(p, name+'-removed'),'','utf8');
+            }
+          }
+        `,
+        'package.json': makeAddonPackage(addonName, {
+          entry: './index'
+        })
+      };
+      const project = makeProject(
+        {
+          app: {
+            components: {
+              'hello.hbs': ''
+            }
+          }
+        },
+        {
+          [addonName]: addonFiles
+        }
+      );
+      const { destroy, normalizedPath } = await createProject(project, connection);
+
+      const addonPath = path.join(normalizedPath, 'node_modules', addonName);
+
+      expect(fs.existsSync(path.join(addonPath, 'tag'))).toBe(true);
+      expect(fs.existsSync(path.join(addonPath, 'tag1'))).toBe(false);
+      expect(fs.existsSync(path.join(addonPath, 'tag-removed'))).toBe(false);
+      expect(fs.existsSync(path.join(addonPath, 'tag1-removed'))).toBe(false);
+
+      const reloadResult = await reloadProjects(connection, normalizedPath);
+      expect(reloadResult.msg).toBe('Project reloaded');
+      expect(reloadResult.path).toBe(normalizedPath);
+      expect(fs.existsSync(path.join(addonPath, 'tag'))).toBe(true);
+      expect(fs.existsSync(path.join(addonPath, 'tag-removed'))).toBe(true);
+      expect(fs.existsSync(path.join(addonPath, 'tag1'))).toBe(true);
+      expect(fs.existsSync(path.join(addonPath, 'tag1-removed'))).toBe(false);
+      await destroy();
+    });
+  });
+
   describe('API:Chain', () => {
     it('support addon ordering', async () => {
       const addon1Name = 'addon1';
@@ -789,19 +950,7 @@ describe('integration', function() {
         }
       };
 
-      function makePackage(name, addonConfig) {
-        let pack = {
-          name,
-          'ember-language-server': config
-        };
-
-        if (addonConfig) {
-          pack['ember-addon'] = addonConfig;
-        }
-        return JSON.stringify(pack);
-      }
-
-      function makeAddon(name, addonConfig = undefined) {
+      function makeAddon(name, config, addonConfig = undefined) {
         return {
           lib: {
             'langserver.js': `
@@ -812,43 +961,37 @@ describe('integration', function() {
               });
               return results;
             };
-            module.exports.onComplete = onComplete;    
+            module.exports.onComplete = onComplete;
             `
           },
-          'package.json': makePackage(name, addonConfig)
+          'package.json': makeAddonPackage(name, config, addonConfig)
         };
       }
 
-      const addon1 = makeAddon(addon1Name);
-      const addon2 = makeAddon(addon2Name, { before: addon3Name });
-      const addon3 = makeAddon(addon3Name, { after: addon4Name });
-      const addon4 = makeAddon(addon4Name, { after: addon1Name });
+      const addon1 = makeAddon(addon1Name, config);
+      const addon2 = makeAddon(addon2Name, config, { before: addon3Name });
+      const addon3 = makeAddon(addon3Name, config, { after: addon4Name });
+      const addon4 = makeAddon(addon4Name, config, { after: addon1Name });
 
-      const fileStructure = {
-        node_modules: {
-          addon1,
-          addon2,
-          addon3,
-          addon4
-        },
-        'package.json': JSON.stringify({
-          dependencies: {
-            [addon1Name]: '*',
-            [addon2Name]: '*',
-            [addon3Name]: '*',
-            [addon4Name]: '*'
-          }
-        }),
-        app: {
-          components: {
-            dory: {
-              'index.hbs': '{{this.a}}'
+      const project = makeProject(
+        {
+          app: {
+            components: {
+              dory: {
+                'index.hbs': '{{this.a}}'
+              }
             }
           }
+        },
+        {
+          [addon1Name]: addon1,
+          [addon2Name]: addon2,
+          [addon3Name]: addon3,
+          [addon4Name]: addon4
         }
-      };
+      );
 
-      const result = await getResult(CompletionRequest.type, connection, fileStructure, 'app/components/dory/index.hbs', { line: 0, character: 8 });
+      const result = await getResult(CompletionRequest.type, connection, project, 'app/components/dory/index.hbs', { line: 0, character: 8 });
       expect(result).toMatchSnapshot();
     });
   });
@@ -863,7 +1006,7 @@ describe('integration', function() {
             provider: {
               lib: {
                 'langserver.js': `
-                  module.exports.onDefinition = function(root) { 
+                  module.exports.onDefinition = function(root) {
                     let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.hbs");
                     return [ {
                       "range": {
@@ -920,7 +1063,7 @@ describe('integration', function() {
             provider: {
               lib: {
                 'langserver.js': `
-                  module.exports.onDefinition = function(root) { 
+                  module.exports.onDefinition = function(root) {
                     let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.js");
                     return [ {
                       "range": {
@@ -934,7 +1077,7 @@ describe('integration', function() {
                         }
                       },
                       "uri": "file://" + filePath.split(':').pop()
-                    } ]; 
+                    } ];
                   }
                 `
               },
@@ -979,7 +1122,7 @@ describe('integration', function() {
             provider: {
               lib: {
                 'langserver.js': `
-                  module.exports.onReference = function(root) { 
+                  module.exports.onReference = function(root) {
                     let filePath = require("path").join(__dirname, "./../../../app/components/hello/index.hbs");
                     return [ { uri: 'file://' + filePath.split(':').pop(), range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } } } ];
                   }
