@@ -93,11 +93,8 @@ export default class TemplateLinter {
         return;
       }
       let nodePath = Files.resolveGlobalNodePath();
-      if (!nodePath) {
-        return;
-      }
       // vs-code-online fix (we don't have global path, but it returned)
-      if (!fs.existsSync(nodePath)) {
+      if (!nodePath || !fs.existsSync(nodePath)) {
         // easy fix case
         nodePath = 'node_modules';
         if (!fs.existsSync(path.join(project.root, nodePath))) {
