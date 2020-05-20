@@ -12,10 +12,13 @@ export type MatchResultType =
   | 'transform'
   | 'adapter'
   | 'serializer';
-
+export type MatchResultScope = 'addon' | 'application';
+export type MatchResultKind = 'test' | 'script' | 'template' | 'style';
 export interface MatchResult {
   type: MatchResultType;
   name: string;
+  scope: MatchResultScope;
+  kind: MatchResultKind;
 }
 
 export class ClassicPathMatcher {
@@ -58,8 +61,11 @@ export class ClassicPathMatcher {
   rightPartFromFirstMatch(type: string, fileName: string, extName: string, str: string, strToMatch: string) {
     let fullName = str.slice(str.indexOf(strToMatch) + strToMatch.length, str.length).slice(0, -extName.length);
     if (type === 'component') {
-      if (['component', 'template', 'index', 'index-test', 'component-test', 'styles'].includes(fileName)) {
+      if (['component', 'template', 'index', 'index-test', 'component-test', 'styles', 'module'].includes(fileName)) {
         fullName = fullName.replace(`/${fileName}`, '');
+      }
+      if (fileName.endsWith('.module')) {
+        fullName = fullName.replace(`.module`, '');
       }
     }
     if (str.includes('/tests/') && fullName.endsWith('-test')) {
@@ -69,6 +75,15 @@ export class ClassicPathMatcher {
   }
   metaFromPath(rawAbsPath: string): MatchResult | null {
     let absPath = rawAbsPath.split(path.sep).join('/');
+    const isTest = absPath.includes('/tests/');
+    const isTemplate = absPath.endsWith('.hbs');
+    const isStyle = absPath.endsWith('.css') || absPath.endsWith('.less') || absPath.endsWith('.scss');
+    const kind = isStyle ? 'style' : isTemplate ? 'template' : isTest ? 'test' : 'script';
+    const isAddon = absPath.includes('/addon/');
+    const isInRepoAddon = absPath.includes('/lib/');
+    const isExternalAddon = absPath.includes('/node_modules/');
+    const isDummy = absPath.includes('/dummy');
+    const scope = isDummy || isAddon || isInRepoAddon || isExternalAddon ? 'addon' : 'application';
     const extName = path.extname(absPath);
     const fileName = path.basename(absPath, extName);
     const results: [string, string][] = [];
@@ -82,7 +97,9 @@ export class ClassicPathMatcher {
     }
     return {
       type: results[0][0] as MatchResultType,
-      name: results[0][1]
+      name: results[0][1],
+      kind,
+      scope
     };
   }
 }
