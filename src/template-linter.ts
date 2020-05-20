@@ -40,11 +40,10 @@ export default class TemplateLinter {
     const linter = new TemplateLinter(config);
 
     const source = textDocument.getText();
+    const filePath = textDocument.uri;
+    const moduleId = filePath.slice(0, -4);
 
-    const errors = linter.verify({
-      source,
-      moduleId: textDocument.uri
-    });
+    const errors = linter.verify({ source, filePath, moduleId });
 
     const diagnostics: Diagnostic[] = errors.map((error: TemplateLinterError) =>
       toDiagnostic(source, error)
