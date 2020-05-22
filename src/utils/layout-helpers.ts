@@ -36,13 +36,15 @@ export const isAddonRoot = memoize(isProjectAddonRoot, {
   maxAge: 600000,
 });
 
+type UnknownConfig = Record<string, unknown>;
+
 export interface PackageInfo {
   keywords?: string[];
   name?: string;
-  'ember-language-server'?: {};
-  peerDependencies?: {};
-  devDependencies?: {};
-  dependencies?: {};
+  'ember-language-server'?: UnknownConfig;
+  peerDependencies?: UnknownConfig;
+  devDependencies?: UnknownConfig;
+  dependencies?: UnknownConfig;
   'ember-addon'?: {
     version?: number;
     before?: string | string[];
@@ -66,9 +68,10 @@ export function safeWalkSync(filePath: string | false, opts: any) {
 }
 
 export function getPodModulePrefix(root: string): string | null {
-  let podModulePrefix: string = '';
+  let podModulePrefix = '';
   // log('listPodsComponents');
   try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const appConfig = require(path.join(root, 'config', 'environment.js'));
     // log('appConfig', appConfig);
     podModulePrefix = appConfig('development').podModulePrefix || '';

@@ -21,7 +21,6 @@ const mListServices = memoize(listServices, { length: 1, maxAge: 60000 });
 const mListTransforms = memoize(listTransforms, { length: 1, maxAge: 60000 });
 
 export default class ScriptCompletionProvider {
-  constructor() {}
   async initRegistry(_: Server, project: Project) {
     try {
       const initStartTime = Date.now();

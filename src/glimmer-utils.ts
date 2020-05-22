@@ -132,7 +132,7 @@ export function isBlockParamDefinition(astPath: ASTPath, content: string, positi
   }
 }
 
-export function sourceForNode(node: any, content: string = '') {
+export function sourceForNode(node: any, content = '') {
   // mostly copy/pasta from ember-template-lint and tildeio/htmlbars with a few tweaks:
   // https://github.com/tildeio/htmlbars/blob/v0.14.17/packages/htmlbars-syntax/lib/parser.js#L59-L90
   // https://github.com/ember-template-lint/ember-template-lint/blob/v2.0.0-beta.3/lib/rules/base.js#L511
@@ -202,7 +202,7 @@ class HandlebarsASTPathMeta {
   }
 }
 export default class ASTPath {
-  static toPosition(ast: any, position: Position, content: string = ''): ASTPath | undefined {
+  static toPosition(ast: any, position: Position, content = ''): ASTPath | undefined {
     const path = _findFocusPath(ast, position);
     if (path) {
       return new ASTPath(path, path.length - 1, content, position);

@@ -30,7 +30,7 @@ export class Project {
   linters: Linter[] = [];
   initIssues: Error[] = [];
   files: Map<string, { version: number }> = new Map();
-  podModulePrefix: string = '';
+  podModulePrefix = '';
   matchPathToType(filePath: string) {
     return this.classicMatcher.metaFromPath(filePath) || this.podMatcher.metaFromPath(filePath);
   }

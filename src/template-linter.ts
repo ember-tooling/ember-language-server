@@ -102,10 +102,13 @@ export default class TemplateLinter {
           return;
         }
       }
-      const linterPath = await (Files.resolveModulePath(project.root, 'ember-template-lint', nodePath, () => {}) as Promise<any>);
+      const linterPath = await (Files.resolveModulePath(project.root, 'ember-template-lint', nodePath, () => {
+        /* intentially empty default callback */
+      }) as Promise<any>);
       if (!linterPath) {
         return;
       }
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const linter = require(linterPath);
       this._linterCache.set(project, linter);
 

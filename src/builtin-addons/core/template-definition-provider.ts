@@ -81,7 +81,6 @@ export function provideRouteDefinition(root: string, routeName: string): Locatio
 }
 
 export default class TemplateDefinitionProvider {
-  constructor() {}
   async onDefinition(root: string, params: DefinitionFunctionParams): Promise<Definition | null> {
     const uri = params.textDocument.uri;
     const focusPath = params.focusPath;

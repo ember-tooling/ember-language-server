@@ -73,7 +73,6 @@ function isArgumentName(name: string) {
 }
 
 export default class TemplateCompletionProvider {
-  constructor() {}
   async initRegistry(_: Server, project: Project) {
     try {
       const initStartTime = Date.now();

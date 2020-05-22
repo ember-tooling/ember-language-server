@@ -52,7 +52,7 @@ import { Usage, findRelatedFiles } from './utils/usages-api';
 
 export default class Server {
   initializers: any[] = [];
-  lazyInit: boolean = false;
+  lazyInit = false;
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
   // also supports stdio via command line flag
   connection: IConnection = process.argv.includes('--stdio')
