@@ -13,7 +13,7 @@
     "url": "https://github.com/lifeart/ember-language-server.git"
   },
   "engines": {
-    "node": "*"
+    "node": ">= 10.16.3"
   },
   "main": "lib/start-server.js",
   "typings": "lib/start-server.d.ts",
@@ -87,5 +87,9 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "watch": "tsc --watch -p ."
+  },
+  "volta": {
+    "node": "10.16.3",
+    "yarn": "1.22.4"
   }
 }
