@@ -10,7 +10,7 @@ afterAll(async () => {
 });
 function createFile(name: string, content: string): string {
   dir.write({
-    [name]: content
+    [name]: content,
   });
   return path.join(dir.path(), name);
 }

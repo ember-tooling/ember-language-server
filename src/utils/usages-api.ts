@@ -15,7 +15,7 @@ const TEMPLATE_TOKENS: {
   };
 } = {
   component: {},
-  routePath: {}
+  routePath: {},
 };
 
 export type UsageType = 'component' | 'routePath';
@@ -37,7 +37,7 @@ export function findRelatedFiles(token: string): Usage[] {
           name: normalizedComponentName,
           path: components[normalizedComponentName].source,
           type: kindName as UsageType,
-          usages: []
+          usages: [],
         });
       }
     });
@@ -55,7 +55,7 @@ export function updateTemplateTokens(kind: UsageType, normalizedName: string, fi
     const tokens = extractTokensFromTemplate(fs.readFileSync(file, 'utf8'));
     TEMPLATE_TOKENS[kind][normalizedName] = {
       source: file,
-      tokens
+      tokens,
     };
   } catch (e) {
     //

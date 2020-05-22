@@ -9,20 +9,20 @@ export default class JSDocumentSymbolProvider implements DocumentSymbolProvider 
   extensions: string[] = ['.js'];
 
   process(content: string): SymbolInformation[] {
-    let symbols: SymbolInformation[] = [];
+    const symbols: SymbolInformation[] = [];
 
     try {
       const ast = parse(content);
 
       visit(ast, {
         visitProperty(path: any) {
-          let node = path.node;
+          const node = path.node;
 
-          let symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, toLSRange(node.key.loc));
+          const symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, toLSRange(node.key.loc));
           symbols.push(symbol);
 
           this.traverse(path);
-        }
+        },
       });
     } catch (e) {
       log('symbolprovider:script:error', e, e.toString(), e.stack);

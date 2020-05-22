@@ -24,7 +24,7 @@ const GLOBAL_REGISTRY: {
   routePath: new Map(),
   model: new Map(),
   service: new Map(),
-  modifier: new Map()
+  modifier: new Map(),
 };
 
 export interface NormalizedRegistryItem {
@@ -36,7 +36,7 @@ export function normalizeMatchNaming(item: MatchResult): NormalizedRegistryItem 
   if (['template', 'controller', 'route'].includes(item.type)) {
     return {
       type: 'routePath',
-      name: normalizeRoutePath(item.name)
+      name: normalizeRoutePath(item.name),
     };
   }
   return item as NormalizedRegistryItem;
@@ -70,7 +70,7 @@ export function getRegistryForRoot(root: string) {
   const registry = getGlobalRegistry();
   Object.keys(registry).forEach((key: REGISTRY_KIND) => {
     registryForRoot[key] = {};
-    for (let [itemName, paths] of registry[key].entries()) {
+    for (const [itemName, paths] of registry[key].entries()) {
       const items: string[] = [];
       paths.forEach((normalizedPath) => {
         if (normalizedPath.startsWith(root)) {

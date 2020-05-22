@@ -15,7 +15,7 @@ import {
   getPathsForComponentTemplates,
   getPathsForComponentScripts,
   pathsToLocationsWithPosition,
-  pathsToLocations
+  pathsToLocations,
 } from './../../utils/definition-helpers';
 
 import * as memoize from 'memoizee';
@@ -56,14 +56,14 @@ export function provideRouteDefinition(root: string, routeName: string): Locatio
         [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'route.ts'],
         [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.js'],
         [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'controller.ts'],
-        [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'template.hbs']
+        [root, 'src/ui/routes', ...routeParts, lastRoutePart, 'template.hbs'],
       ]
     : [
         [root, 'app', 'routes', ...routeParts, lastRoutePart + '.js'],
         [root, 'app', 'routes', ...routeParts, lastRoutePart + '.ts'],
         [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.js'],
         [root, 'app', 'controllers', ...routeParts, lastRoutePart + '.ts'],
-        [root, 'app', 'templates', ...routeParts, lastRoutePart + '.hbs']
+        [root, 'app', 'templates', ...routeParts, lastRoutePart + '.hbs'],
       ];
   const podPrefix = getPodModulePrefix(root);
   if (podPrefix) {
@@ -74,14 +74,14 @@ export function provideRouteDefinition(root: string, routeName: string): Locatio
     routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'template.hbs']);
   }
   const filteredPaths = routePaths.map((parts: string[]) => path.join.apply(null, parts)).filter(fs.existsSync);
-  return pathsToLocations.apply(null, filteredPaths);
+  return pathsToLocations(...filteredPaths);
 }
 
 export default class TemplateDefinitionProvider {
   constructor() {}
   async onDefinition(root: string, params: DefinitionFunctionParams): Promise<Definition | null> {
-    let uri = params.textDocument.uri;
-    let focusPath = params.focusPath;
+    const uri = params.textDocument.uri;
+    const focusPath = params.focusPath;
     let definitions: Location[] = params.results;
     if (params.type !== 'template') {
       return params.results;
@@ -135,7 +135,7 @@ export default class TemplateDefinitionProvider {
     return value;
   }
   maybeClassicComponentName(focusPath: ASTPath) {
-    let value = this.extractValueForMaybeClassicComponentName(focusPath);
+    const value = this.extractValueForMaybeClassicComponentName(focusPath);
     if (this.looksLikeClassicComponentName(value)) {
       return true;
     } else {
@@ -160,14 +160,15 @@ export default class TemplateDefinitionProvider {
     return paths;
   }
   provideLikelyComponentTemplatePath(root: string, rawComponentName: string): Location[] {
-    let paths = this._provideLikelyRawComponentTemplatePaths(root, rawComponentName);
-    return pathsToLocations.apply(null, paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths);
+    const paths = this._provideLikelyRawComponentTemplatePaths(root, rawComponentName);
+
+    return pathsToLocations(...(paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths));
   }
   provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
     return this.provideLikelyComponentTemplatePath(root, focusPath.node.tag);
   }
   provideBlockComponentDefinition(root: string, focusPath: ASTPath): Location[] {
-    let maybeComponentName = focusPath.node.path.original;
+    const maybeComponentName = focusPath.node.path.original;
     let paths: string[] = getPathsForComponentTemplates(root, maybeComponentName).filter(fs.existsSync);
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter((name: string) => {
@@ -177,8 +178,9 @@ export default class TemplateDefinitionProvider {
     // mAddonPathsForComponentTemplates
     return pathsToLocationsWithPosition(paths, '{{yield');
   }
+
   providePropertyDefinition(root: string, focusPath: ASTPath, uri: string): Location[] {
-    let maybeComponentName = getComponentNameFromURI(root, uri);
+    const maybeComponentName = getComponentNameFromURI(root, uri);
     if (!maybeComponentName) {
       return [];
     }
@@ -191,9 +193,10 @@ export default class TemplateDefinitionProvider {
     const text = focusPath.node.original;
     return pathsToLocationsWithPosition(paths, text.replace('this.', '').split('.')[0]);
   }
+
   provideComponentDefinition(root: string, maybeComponentName: string): Location[] {
-    let helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map((pathParts: any) => {
-      return path.join.apply(path, pathParts.filter((part: any) => !!part));
+    const helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map((pathParts: any) => {
+      return path.join(...pathParts.filter((part: any) => !!part));
     });
 
     let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName), ...helpers].filter(
@@ -204,14 +207,14 @@ export default class TemplateDefinitionProvider {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
 
-    return pathsToLocations.apply(null, paths.length > 1 ? paths.filter(isTemplatePath) : paths);
+    return pathsToLocations(...(paths.length > 1 ? paths.filter(isTemplatePath) : paths));
   }
   provideMustacheDefinition(root: string, focusPath: ASTPath) {
     const maybeComponentName = focusPath.node.type === 'ElementNode' ? normalizeToClassicComponent(focusPath.node.tag) : focusPath.node.original;
     return this.provideComponentDefinition(root, maybeComponentName);
   }
   provideHashPropertyUsage(root: string, focusPath: ASTPath): Location[] {
-    let parentPath = focusPath.parentPath;
+    const parentPath = focusPath.parentPath;
     if (parentPath && parentPath.parent && parentPath.parent.path) {
       const maybeComponentName = parentPath.parent.path.original;
       if (!maybeComponentName.includes('.') && maybeComponentName.includes('-')) {
@@ -243,7 +246,7 @@ export default class TemplateDefinitionProvider {
   }
 
   isLocalProperty(path: ASTPath) {
-    let node = path.node;
+    const node = path.node;
     if (node.type === 'PathExpression') {
       return node.this;
     }
@@ -251,12 +254,12 @@ export default class TemplateDefinitionProvider {
   }
 
   isHashPairKey(path: ASTPath) {
-    let node = path.node;
+    const node = path.node;
     return node.type === 'HashPair';
   }
 
   isAnglePropertyAttribute(path: ASTPath) {
-    let node = path.node;
+    const node = path.node;
     if (node.type === 'AttrNode') {
       if (node.name.charAt(0) === '@') {
         return true;
@@ -265,7 +268,7 @@ export default class TemplateDefinitionProvider {
   }
 
   isActionName(path: ASTPath) {
-    let node = path.node;
+    const node = path.node;
     if (!path.parent) {
       return false;
     }
@@ -289,7 +292,7 @@ export default class TemplateDefinitionProvider {
   }
 
   isComponentWithBlock(path: ASTPath) {
-    let node = path.node;
+    const node = path.node;
     return (
       node.type === 'BlockStatement' &&
       node.path.type === 'PathExpression' &&
@@ -301,7 +304,7 @@ export default class TemplateDefinitionProvider {
   }
 
   isAngleComponent(path: ASTPath) {
-    let node = path.node;
+    const node = path.node;
 
     if (node.type === 'ElementNode') {
       if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
@@ -311,7 +314,7 @@ export default class TemplateDefinitionProvider {
   }
 
   isComponentOrHelperName(path: ASTPath) {
-    let node = path.node;
+    const node = path.node;
 
     if (this.isAngleComponent(path)) {
       return true;
@@ -332,7 +335,7 @@ export default class TemplateDefinitionProvider {
       return false;
     }
 
-    let parent = path.parent;
+    const parent = path.parent;
     if (!parent || parent.path !== node || (parent.type !== 'MustacheStatement' && parent.type !== 'BlockStatement' && parent.type !== 'SubExpression')) {
       return false;
     }

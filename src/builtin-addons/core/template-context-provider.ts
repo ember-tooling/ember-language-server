@@ -21,15 +21,12 @@ function localizeName(name: string) {
 }
 
 export function templateContextLookup(root: string, rawCurrentFilePath: string, templateContent: string) {
-  const currentFilePath = rawCurrentFilePath
-    .replace('file://', '')
-    .split('\\')
-    .join('/');
+  const currentFilePath = rawCurrentFilePath.replace('file://', '').split('\\').join('/');
   const nameParts = currentFilePath.split('/components/');
   if (nameParts.length !== 2) {
     return [];
   }
-  let componentName = pureComponentName(nameParts[1].split('.')[0]);
+  const componentName = pureComponentName(nameParts[1].split('.')[0]);
   return componentsContextData(root, componentName, templateContent);
 }
 
@@ -118,7 +115,7 @@ function componentsContextData(root: string, componentName: string, templateCont
     items.push({
       kind: CompletionItemKind.Property,
       label: localizeName(name),
-      detail: propName
+      detail: propName,
     });
   });
   contextInfo.jsComputeds.forEach((propName: string) => {
@@ -126,7 +123,7 @@ function componentsContextData(root: string, componentName: string, templateCont
     items.push({
       kind: CompletionItemKind.Property,
       label: localizeName(name),
-      detail: 'ComputedProperty: ' + propName
+      detail: 'ComputedProperty: ' + propName,
     });
   });
   contextInfo.jsFunc.forEach((propName: string) => {
@@ -134,7 +131,7 @@ function componentsContextData(root: string, componentName: string, templateCont
     items.push({
       kind: CompletionItemKind.Function,
       label: localizeName(name),
-      detail: 'Function: ' + propName
+      detail: 'Function: ' + propName,
     });
   });
   contextInfo.hbsProps.forEach((propName: string) => {
@@ -142,7 +139,7 @@ function componentsContextData(root: string, componentName: string, templateCont
     items.push({
       kind: CompletionItemKind.Property,
       label: name,
-      detail: 'Template Property: ' + propName
+      detail: 'Template Property: ' + propName,
     });
   });
   // contextInfo.api.actions.forEach((propName: string) => {

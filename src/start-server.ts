@@ -1,5 +1,5 @@
 import Server from './server';
 
-let server = new Server();
+const server = new Server();
 
 server.listen();

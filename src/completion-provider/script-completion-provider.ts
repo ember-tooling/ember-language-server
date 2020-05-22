@@ -56,7 +56,7 @@ export default class ScriptCompletionProvider {
       position: params.position,
       server: this.server,
       results: [],
-      type: 'script'
+      type: 'script',
     });
 
     const addonResults: CompletionItem[] = await queryELSAddonsAPIChain(project.providers.completionProviders, root, {
@@ -65,12 +65,12 @@ export default class ScriptCompletionProvider {
       position: params.position,
       server: this.server,
       results: completions,
-      type: 'script'
+      type: 'script',
     });
 
     return filter(uniqBy(addonResults, 'label'), textPrefix, {
       key: 'label',
-      maxResults: 40
+      maxResults: 40,
     });
   }
 }

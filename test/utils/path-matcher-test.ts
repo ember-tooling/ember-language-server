@@ -159,13 +159,13 @@ describe('ClassicPathMatcher', () => {
       type: 'component',
       name: 'login-form/input',
       scope: 'application',
-      kind: 'test'
+      kind: 'test',
     });
     expect(m('repos/brn/frontend/tests/integration/components/login-form/component-test.js')).toEqual({
       type: 'component',
       name: 'login-form',
       scope: 'application',
-      kind: 'test'
+      kind: 'test',
     });
 
     expect(m('frontend/app/components/audio-player/styles.css')).toEqual({ type: 'component', name: 'audio-player', scope: 'application', kind: 'style' });
@@ -181,19 +181,19 @@ describe('ClassicPathMatcher', () => {
       type: 'component',
       name: 'foo',
       scope: 'application',
-      kind: 'template'
+      kind: 'template',
     });
     expect(m('foo/bar/tests/integration/components/cart-widgget/item-test.js')).toEqual({
       type: 'component',
       name: 'cart-widgget/item',
       scope: 'application',
-      kind: 'test'
+      kind: 'test',
     });
     expect(m('foo/bar/tests/integration/components/cart-widgget/index-test.js')).toEqual({
       type: 'component',
       name: 'cart-widgget',
       scope: 'application',
-      kind: 'test'
+      kind: 'test',
     });
   });
   it('routes', () => {
@@ -203,7 +203,7 @@ describe('ClassicPathMatcher', () => {
       type: 'route',
       name: 'cart-widgget/index',
       scope: 'application',
-      kind: 'test'
+      kind: 'test',
     });
   });
   it('controllers', () => {
@@ -213,7 +213,7 @@ describe('ClassicPathMatcher', () => {
       type: 'controller',
       name: 'cart-widgget/index',
       scope: 'application',
-      kind: 'test'
+      kind: 'test',
     });
   });
   it('templates', () => {

@@ -46,7 +46,7 @@ const emberCompletionItems: EmberCompletionItem[] = [
   new EmberCompletionItem('textarea', ComponentItem, ['MustachePath']),
   new EmberCompletionItem('unbound', HelperItem, ['MustachePath', 'SubExpressionPath']),
   new EmberCompletionItem('unless', HelperItem, ['BlockPath', 'MustachePath', 'SubExpressionPath']),
-  new EmberCompletionItem('with', HelperItem, ['BlockPath'])
+  new EmberCompletionItem('with', HelperItem, ['BlockPath']),
 ];
 
 function filterConfigs(type: UsableIn): EmberCompletionItem[] {

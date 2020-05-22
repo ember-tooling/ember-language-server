@@ -13,7 +13,7 @@ export class ReferenceProvider {
       textDocument,
       position,
       results: [],
-      server: this.server
+      server: this.server,
     });
     return addonResults;
   }

@@ -17,7 +17,7 @@ export class CodeActionProvider {
       results: [],
       project: project,
       document: document,
-      server: this.server
+      server: this.server,
     });
     return addonResults;
   }

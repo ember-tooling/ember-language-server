@@ -1,11 +1,11 @@
 import ASTPath from './../glimmer-utils';
 
 function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
-  let node = astPath.node;
+  const node = astPath.node;
   if (!isString(node)) {
     return false;
   }
-  let parent = astPath.parent;
+  const parent = astPath.parent;
   if (!isCallExpression(parent)) {
     return false;
   }
@@ -39,21 +39,21 @@ export function isRouteLookup(astPath: ASTPath): boolean {
   if (!isFirstStringParamInCallExpression(astPath)) {
     return false;
   }
-  let parent = astPath.parent;
+  const parent = astPath.parent;
   const matches = ['transitionTo', 'replaceWith', 'replaceRoute', 'modelFor', 'controllerFor', 'intermediateTransitionTo', 'paramsFor', 'transitionToRoute'];
   return expressionHasIdentifierName(parent, matches);
 }
 
 export function isTemplateElement(astPath: ASTPath): boolean {
-  let node = astPath.node;
+  const node = astPath.node;
   if (node.type !== 'TemplateElement') {
     return false;
   }
-  let parent = astPath.parent;
+  const parent = astPath.parent;
   if (parent.type !== 'TemplateLiteral') {
     return false;
   }
-  let grandpa = astPath.parentPath && astPath.parentPath.parent;
+  const grandpa = astPath.parentPath && astPath.parentPath.parent;
   if (grandpa.type !== 'TaggedTemplateExpression') {
     return false;
   }
@@ -67,17 +67,17 @@ export function isStoreModelLookup(astPath: ASTPath): boolean {
   if (!isFirstStringParamInCallExpression(astPath)) {
     return false;
   }
-  let parent = astPath.parent;
+  const parent = astPath.parent;
   const matches = ['findRecord', 'createRecord', 'findAll', 'queryRecord', 'peekAll', 'query', 'peekRecord', 'adapterFor', 'hasRecordForId'];
   return expressionHasIdentifierName(parent, matches);
 }
 
 export function isComputedPropertyArgument(astPath: ASTPath): boolean {
-  let node = astPath.node;
+  const node = astPath.node;
   if (!isString(node)) {
     return false;
   }
-  let parent = astPath.parent;
+  const parent = astPath.parent;
   if (!isCallExpression(parent)) {
     return false;
   }
@@ -128,7 +128,7 @@ export function isComputedPropertyArgument(astPath: ASTPath): boolean {
       'decrementDecrementProperty',
       'set',
       'get',
-      'getWithDefault '
+      'getWithDefault ',
     ])
   ) {
     return false;
@@ -141,11 +141,11 @@ export function isComputedPropertyArgument(astPath: ASTPath): boolean {
 }
 
 export function isTransformReference(astPath: ASTPath): boolean {
-  let node = astPath.node;
+  const node = astPath.node;
   if (!isString(node)) {
     return false;
   }
-  let parent = astPath.parent;
+  const parent = astPath.parent;
   if (!isCallExpression(parent)) {
     return false;
   }
@@ -156,7 +156,7 @@ export function isTransformReference(astPath: ASTPath): boolean {
 }
 
 export function isAngleComponentPath(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!hasNodeType(node, 'ElementNode')) {
     return false;
   }
@@ -171,14 +171,14 @@ export function isAngleComponentPath(path: ASTPath): boolean {
 }
 
 export function isModifierPath(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!isPathExpression(node)) {
     return false;
   }
   if (node.data) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!hasNodeType(parent, 'ElementModifierStatement')) {
     return false;
   }
@@ -186,11 +186,11 @@ export function isModifierPath(path: ASTPath): boolean {
 }
 
 export function isMustachePath(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!isPathExpression(node)) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!hasNodeType(parent, 'MustacheStatement')) {
     return false;
   }
@@ -198,11 +198,11 @@ export function isMustachePath(path: ASTPath): boolean {
 }
 
 export function isBlockPath(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!isPathExpression(node)) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!isBlock(parent)) {
     return false;
   }
@@ -210,11 +210,11 @@ export function isBlockPath(path: ASTPath): boolean {
 }
 
 export function isSubExpressionPath(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!isPathExpression(node)) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!hasNodeType(parent, 'SubExpression')) {
     return false;
   }
@@ -226,11 +226,11 @@ export function isLinkToTarget(path: ASTPath): boolean {
 }
 
 export function isInlineLinkToTarget(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!isString(node)) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!hasNodeType(parent, 'MustacheStatement')) {
     return false;
   }
@@ -238,11 +238,11 @@ export function isInlineLinkToTarget(path: ASTPath): boolean {
 }
 
 export function isBlockLinkToTarget(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!isString(node)) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!isBlock(parent)) {
     return false;
   }
@@ -250,11 +250,11 @@ export function isBlockLinkToTarget(path: ASTPath): boolean {
 }
 
 export function isImportPathDeclaration(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!isString(node)) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!hasNodeType(parent, 'ImportDeclaration')) {
     return false;
   }
@@ -262,11 +262,11 @@ export function isImportPathDeclaration(path: ASTPath): boolean {
 }
 
 export function isServiceInjection(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!hasNodeType(node, 'Identifier')) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!hasNodeType(parent, 'ObjectProperty')) {
     return false;
   }
@@ -277,11 +277,11 @@ export function isServiceInjection(path: ASTPath): boolean {
 }
 
 export function isNamedServiceInjection(path: ASTPath): boolean {
-  let node = path.node;
+  const node = path.node;
   if (!isString(node)) {
     return false;
   }
-  let parent = path.parent;
+  const parent = path.parent;
   if (!isCallExpression(parent)) {
     return false;
   }
@@ -289,11 +289,11 @@ export function isNamedServiceInjection(path: ASTPath): boolean {
 }
 
 export function isModelReference(astPath: ASTPath): boolean {
-  let node = astPath.node;
+  const node = astPath.node;
   if (!isString(node)) {
     return false;
   }
-  let parent = astPath.parent;
+  const parent = astPath.parent;
   if (!isCallExpression(parent)) {
     return false;
   }
@@ -337,14 +337,14 @@ export function isPathExpression(node: any): boolean {
 }
 function expressionHasIdentifierName(exp: any, name: string | string[]) {
   const names = typeof name === 'string' ? [name] : name;
-  let identifier = hasNodeType(exp.callee, 'Identifier') ? exp.callee : exp.callee.property;
+  const identifier = hasNodeType(exp.callee, 'Identifier') ? exp.callee : exp.callee.property;
   return names.includes(identifier.name);
 }
 function expressionHasArgument(exp: any, arg: any, position = -1) {
   if (!exp || !exp.arguments) {
     return false;
   }
-  let index = exp.arguments.indexOf(arg);
+  const index = exp.arguments.indexOf(arg);
   if (index === -1) {
     return false;
   }

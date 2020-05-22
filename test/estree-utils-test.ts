@@ -2,17 +2,17 @@ import { Position as LSPosition } from 'vscode-languageserver';
 
 import { newPosition, comparePositions, newLocation, containsPosition, toPosition, toLSPosition, toLSRange } from '../src/estree-utils';
 
-describe('estree-utils', function() {
-  describe('newPosition()', function() {
-    it('creates a new Position instances', function() {
-      let position = newPosition(42, 17);
+describe('estree-utils', function () {
+  describe('newPosition()', function () {
+    it('creates a new Position instances', function () {
+      const position = newPosition(42, 17);
       expect(position).toHaveProperty('line', 42);
       expect(position).toHaveProperty('column', 17);
     });
   });
 
-  describe('comparePositions()', function() {
-    it('compares two Position instances', function() {
+  describe('comparePositions()', function () {
+    it('compares two Position instances', function () {
       expect(comparePositions(newPosition(0, 0), newPosition(1, 1))).toEqual(-1);
       expect(comparePositions(newPosition(1, 0), newPosition(1, 1))).toEqual(-1);
       expect(comparePositions(newPosition(1, 1), newPosition(1, 1))).toEqual(0);
@@ -21,25 +21,25 @@ describe('estree-utils', function() {
     });
   });
 
-  describe('toPosition()', function() {
-    it('converts languageserver Position to estree Position', function() {
-      let position = toPosition(LSPosition.create(41, 17));
+  describe('toPosition()', function () {
+    it('converts languageserver Position to estree Position', function () {
+      const position = toPosition(LSPosition.create(41, 17));
       expect(position).toHaveProperty('line', 42);
       expect(position).toHaveProperty('column', 17);
     });
   });
 
-  describe('toLSPosition()', function() {
-    it('converts estree Position to languageserver Position', function() {
-      let position = toLSPosition(newPosition(42, 17));
+  describe('toLSPosition()', function () {
+    it('converts estree Position to languageserver Position', function () {
+      const position = toLSPosition(newPosition(42, 17));
       expect(position).toHaveProperty('line', 41);
       expect(position).toHaveProperty('character', 17);
     });
   });
 
-  describe('toLSRange()', function() {
-    it('converts estree SourceLocation to languageserver Range', function() {
-      let { start, end } = toLSRange(newLocation(42, 17, 43, 10));
+  describe('toLSRange()', function () {
+    it('converts estree SourceLocation to languageserver Range', function () {
+      const { start, end } = toLSRange(newLocation(42, 17, 43, 10));
       expect(start).toHaveProperty('line', 41);
       expect(start).toHaveProperty('character', 17);
       expect(end).toHaveProperty('line', 42);
@@ -47,8 +47,8 @@ describe('estree-utils', function() {
     });
   });
 
-  describe('contains()', function() {
-    it('checks if range contains a position', function() {
+  describe('contains()', function () {
+    it('checks if range contains a position', function () {
       expect(containsPosition(newLocation(42, 1, 42, 3), newPosition(42, 0))).toBeFalsy();
       expect(containsPosition(newLocation(42, 1, 42, 3), newPosition(42, 1))).toBeTruthy();
       expect(containsPosition(newLocation(42, 1, 42, 3), newPosition(42, 2))).toBeTruthy();

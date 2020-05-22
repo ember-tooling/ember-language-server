@@ -15,7 +15,7 @@ export default class DefinitionProvider {
   }
 
   async handle(params: TextDocumentPositionParams): Promise<Definition | null> {
-    let uri = params.textDocument.uri;
+    const uri = params.textDocument.uri;
     // this.server.setStatusText('Running');
     const project = this.server.projectRoots.projectForUri(uri);
 
@@ -24,7 +24,7 @@ export default class DefinitionProvider {
     }
 
     try {
-      let extension = getExtension(params.textDocument);
+      const extension = getExtension(params.textDocument);
 
       if (extension === '.hbs') {
         return await this.template.handle(params, project);

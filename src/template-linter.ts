@@ -70,7 +70,7 @@ export default class TemplateLinter {
     const errors = linter.verify({
       source,
       moduleId: uriToFilePath(textDocument.uri),
-      filePath: uriToFilePath(textDocument.uri)
+      filePath: uriToFilePath(textDocument.uri),
     });
 
     setCwd(cwd);
