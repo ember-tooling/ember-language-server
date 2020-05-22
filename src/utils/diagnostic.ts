@@ -10,7 +10,7 @@ export function toDiagnostic(source: string, error: TemplateLinterError): Diagno
     range: toRange(source, error),
     message: toMessage(error),
     code: error.rule,
-    source: error.rule ? 'ember-template-lint' : 'glimmer-engine'
+    source: error.rule ? 'ember-template-lint' : 'glimmer-engine',
   };
 }
 
@@ -57,6 +57,6 @@ function toRange(source: string, error: TemplateLinterError): Range {
 
   return {
     start: { line, character: column },
-    end: { line, character: end }
+    end: { line, character: end },
   };
 }

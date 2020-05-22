@@ -39,7 +39,7 @@ describe('TemplateTokensCollector', () => {
     expect(t('{{#my-component/foo name=(format-name (to-uppercase "boo"))}} {{/my-component/foo}}')).toEqual([
       'my-component/foo',
       'format-name',
-      'to-uppercase'
+      'to-uppercase',
     ]);
   });
   it('skip local paths for angle blocks', () => {

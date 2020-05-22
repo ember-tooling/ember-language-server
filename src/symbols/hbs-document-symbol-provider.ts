@@ -7,10 +7,10 @@ import { toLSRange } from '../estree-utils';
 export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.hbs'];
   process(content: string): SymbolInformation[] {
-    let symbols: SymbolInformation[] = [];
+    const symbols: SymbolInformation[] = [];
 
     try {
-      let ast = preprocess(content);
+      const ast = preprocess(content);
 
       traverse(ast, {
         ElementNode(node: any) {
@@ -30,7 +30,7 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
           if (node.program.blockParams.length === 0) return;
 
           node.program.blockParams.forEach((blockParam: string) => {
-            let symbol = SymbolInformation.create(blockParam, SymbolKind.Variable, toLSRange(node.loc));
+            const symbol = SymbolInformation.create(blockParam, SymbolKind.Variable, toLSRange(node.loc));
             symbols.push(symbol);
           });
         },
@@ -44,11 +44,11 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
           }
           if (node.path.type === 'PathExpression') {
             if (node.path.data) {
-              let symbol = SymbolInformation.create(node.path.original, SymbolKind.Variable, toLSRange(node.path.loc));
+              const symbol = SymbolInformation.create(node.path.original, SymbolKind.Variable, toLSRange(node.path.loc));
               symbols.push(symbol);
             }
           }
-        }
+        },
       });
     } catch (e) {
       log('symbolprovider:template:error', e, e.toString(), e.stack);

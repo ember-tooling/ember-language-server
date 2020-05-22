@@ -5,7 +5,7 @@ import {
   getProjectInRepoAddonsRoots,
   PackageInfo,
   ADDON_CONFIG_KEY,
-  hasEmberLanguageServerExtension
+  hasEmberLanguageServerExtension,
 } from './layout-helpers';
 import * as path from 'path';
 import { log, logInfo, logError } from './logger';
@@ -71,9 +71,9 @@ interface HandlerObject {
 
 export async function queryELSAddonsAPIChain(callbacks: any[], root: string, params: any): Promise<any[]> {
   let lastResult = params.results || [];
-  for (let callback of callbacks) {
+  for (const callback of callbacks) {
     try {
-      let tempResult = await callback(root, Object.assign({}, params, { results: JSON.parse(JSON.stringify(lastResult)) }));
+      const tempResult = await callback(root, Object.assign({}, params, { results: JSON.parse(JSON.stringify(lastResult)) }));
       // API must return array
       if (Array.isArray(tempResult)) {
         lastResult = tempResult;
@@ -97,7 +97,7 @@ export function initBuiltinProviders(): ProjectProviders {
     codeActionProviders: [],
     initFunctions: [templateCompletion.initRegistry.bind(templateCompletion), scriptCompletion.initRegistry.bind(scriptCompletion)],
     info: [],
-    completionProviders: [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)]
+    completionProviders: [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)],
   };
 }
 
@@ -131,7 +131,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
         packageRoot: packagePath,
         packageJSON: info,
         debug: isDebugModeEnabled(info),
-        capabilities: normalizeCapabilities(extensionCapabilities(info))
+        capabilities: normalizeCapabilities(extensionCapabilities(info)),
       };
       dagMap.add(info.name || packagePath, addon, addonInfo.before, addonInfo.after);
     }
@@ -150,7 +150,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
     completionProviders: [],
     codeActionProviders: [],
     initFunctions: [],
-    info: []
+    info: [],
   };
 
   // onReference, onComplete, onDefinition
@@ -164,7 +164,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
     if (handlerObject.debug) {
       result.info.push('addon-in-debug-mode: ' + _);
       logInfo(`els-addon-api: debug mode enabled for ${handlerObject.packageRoot}, for all requests resolvers will be reloaded.`);
-      result.completionProviders.push(function(root: string, params: CompletionFunctionParams) {
+      result.completionProviders.push(function (root: string, params: CompletionFunctionParams) {
         handlerObject.updateHandler();
         if (typeof handlerObject.handler.onComplete === 'function') {
           return handlerObject.handler.onComplete(root, params);
@@ -172,7 +172,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
           return params.results;
         }
       } as CompletionResolveFunction);
-      result.referencesProviders.push(function(root: string, params: ReferenceFunctionParams) {
+      result.referencesProviders.push(function (root: string, params: ReferenceFunctionParams) {
         handlerObject.updateHandler();
         if (typeof handlerObject.handler.onReference === 'function') {
           return handlerObject.handler.onReference(root, params);
@@ -180,7 +180,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
           return params.results;
         }
       } as ReferenceResolveFunction);
-      result.definitionProviders.push(function(root: string, params: DefinitionFunctionParams) {
+      result.definitionProviders.push(function (root: string, params: DefinitionFunctionParams) {
         handlerObject.updateHandler();
         if (typeof handlerObject.handler.onDefinition === 'function') {
           return handlerObject.handler.onDefinition(root, params);
@@ -188,7 +188,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
           return params.results;
         }
       } as DefinitionResolveFunction);
-      result.initFunctions.push(function(server: Server, project: Project) {
+      result.initFunctions.push(function (server: Server, project: Project) {
         handlerObject.updateHandler();
         if (typeof handlerObject.handler.onInit === 'function') {
           return handlerObject.handler.onInit(server, project);
@@ -196,7 +196,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
           return;
         }
       } as InitFunction);
-      result.codeActionProviders.push(function(root: string, params: CodeActionFunctionParams) {
+      result.codeActionProviders.push(function (root: string, params: CodeActionFunctionParams) {
         handlerObject.updateHandler();
         if (typeof handlerObject.handler.onCodeAction === 'function') {
           return handlerObject.handler.onCodeAction(root, params);
@@ -260,7 +260,7 @@ function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabiliti
     definitionProvider: raw.definitionProvider === true,
     codeActionProvider: raw.codeActionProvider === true,
     referencesProvider: raw.referencesProvider === true || (typeof raw.referencesProvider === 'object' && raw.referencesProvider.components === true),
-    completionProvider: typeof raw.completionProvider === 'object' || raw.completionProvider === true
+    completionProvider: typeof raw.completionProvider === 'object' || raw.completionProvider === true,
   };
 }
 

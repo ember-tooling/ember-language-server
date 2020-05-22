@@ -11,7 +11,7 @@ afterAll(async () => {
 });
 function createFile(name: string, content: string): string {
   dir.write({
-    [name]: content
+    [name]: content,
   });
   return path.join(dir.path(), name);
 }
@@ -19,7 +19,7 @@ function createFile(name: string, content: string): string {
 const knownRegistryKeys = ['transform', 'helper', 'component', 'routePath', 'model', 'service', 'modifier'];
 
 describe('addToRegistry - it able to add different kinds to registry', () => {
-  let files = [];
+  const files = [];
   it('able to add different file types to same kind', () => {
     const file1 = createFile('foo-bar.hbs', '<div><Boo /></div>');
     const file2 = createFile('foo-bar.js', '');
@@ -54,15 +54,15 @@ describe('normalizeMatchNaming - must normalize naming from mater to registry fo
   it('normalize special keys', () => {
     expect(normalizeMatchNaming({ type: 'route', name: 'foo/bar' })).toEqual({
       type: 'routePath',
-      name: 'foo.bar'
+      name: 'foo.bar',
     });
     expect(normalizeMatchNaming({ type: 'controller', name: 'foo/bar' })).toEqual({
       type: 'routePath',
-      name: 'foo.bar'
+      name: 'foo.bar',
     });
     expect(normalizeMatchNaming({ type: 'template', name: 'foo/bar' })).toEqual({
       type: 'routePath',
-      name: 'foo.bar'
+      name: 'foo.bar',
     });
   });
   it('skip normalization for other keys', () => {
@@ -70,7 +70,7 @@ describe('normalizeMatchNaming - must normalize naming from mater to registry fo
     knownRegistryKeys.forEach((keyName) => {
       expect(normalizeMatchNaming({ name, type: keyName as any })).toEqual({
         name,
-        type: keyName
+        type: keyName,
       });
     });
   });

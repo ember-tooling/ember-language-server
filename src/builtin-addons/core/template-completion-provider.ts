@@ -24,7 +24,7 @@ import {
   isPathExpression,
   isSubExpressionPath,
   isAngleComponentPath,
-  isModifierPath
+  isModifierPath,
 } from '../../utils/ast-helpers';
 import {
   listComponents,
@@ -34,24 +34,24 @@ import {
   listRoutes,
   listModifiers,
   builtinModifiers,
-  mGetProjectAddonsInfo
+  mGetProjectAddonsInfo,
 } from '../../utils/layout-helpers';
 
 import { normalizeToAngleBracketComponent } from '../../utils/normalizers';
 
 const mTemplateContextLookup = memoize(templateContextLookup, {
   length: 3,
-  maxAge: 60000
+  maxAge: 60000,
 }); // 1 second
 const mListModifiers = memoize(listModifiers, { length: 1, maxAge: 60000 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
 const mListMUComponents = memoize(listMUComponents, {
   length: 1,
-  maxAge: 60000
+  maxAge: 60000,
 }); // 1 second
 const mListPodsComponents = memoize(listPodsComponents, {
   length: 1,
-  maxAge: 60000
+  maxAge: 60000,
 }); // 1 second
 const mListHelpers = memoize(listHelpers, { length: 1, maxAge: 60000 }); // 1 second
 
@@ -75,7 +75,7 @@ export default class TemplateCompletionProvider {
   constructor() {}
   async initRegistry(_: Server, project: Project) {
     try {
-      let initStartTime = Date.now();
+      const initStartTime = Date.now();
       mListHelpers(project.root);
       mListModifiers(project.root);
       mListRoutes(project.root);
@@ -101,45 +101,45 @@ export default class TemplateCompletionProvider {
         )
         .map((item: any) => {
           return Object.assign({}, item, {
-            label: normalizeToAngleBracketComponent(item.label)
+            label: normalizeToAngleBracketComponent(item.label),
           });
         }),
       'label'
     );
   }
   getLocalPathExpressionCandidates(root: string, uri: string, originalText: string) {
-    let candidates: CompletionItem[] = [...mTemplateContextLookup(root, uri, originalText)];
+    const candidates: CompletionItem[] = [...mTemplateContextLookup(root, uri, originalText)];
     return candidates;
   }
   getMustachePathCandidates(root: string) {
-    let candidates: CompletionItem[] = [
+    const candidates: CompletionItem[] = [
       ...mListComponents(root),
       ...mListMUComponents(root),
       ...mListPodsComponents(root),
       ...mListHelpers(root),
       ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
         return detail === 'component' || detail === 'helper';
-      })
+      }),
     ];
     return candidates;
   }
   getBlockPathCandidates(root: string) {
-    let candidates: CompletionItem[] = [
+    const candidates: CompletionItem[] = [
       ...mListComponents(root),
       ...mListMUComponents(root),
       ...mListPodsComponents(root),
       ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
         return detail === 'component';
-      })
+      }),
     ];
     return candidates;
   }
   getSubExpressionPathCandidates(root: string) {
-    let candidates: CompletionItem[] = [
+    const candidates: CompletionItem[] = [
       ...mListHelpers(root),
       ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
         return detail === 'helper';
-      })
+      }),
     ];
     return candidates;
   }
@@ -149,7 +149,7 @@ export default class TemplateCompletionProvider {
       return {
         label: name,
         kind: CompletionItemKind.Variable,
-        detail: `Param from ${blockSource}`
+        detail: `Param from ${blockSource}`,
       };
     });
     return scopedValues;
@@ -188,15 +188,15 @@ export default class TemplateCompletionProvider {
           if (existingTpls.length) {
             const existingAttributes = focusPath.parent.attributes.map((attr: any) => attr.name).filter((name: string) => isArgumentName(name));
             const content = fs.readFileSync(existingTpls[0], 'utf8');
-            let candidates = this.getLocalPathExpressionCandidates(root, tpls[0], content);
-            let preResults: CompletionItem[] = [];
+            const candidates = this.getLocalPathExpressionCandidates(root, tpls[0], content);
+            const preResults: CompletionItem[] = [];
             candidates.forEach((obj: CompletionItem) => {
               const name = obj.label.split('.')[0];
               if (isArgumentName(name) && !existingAttributes.includes(name)) {
                 preResults.push({
                   label: name,
                   detail: obj.detail,
-                  kind: obj.kind
+                  kind: obj.kind,
                 });
               }
             });

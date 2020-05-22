@@ -20,20 +20,20 @@ export function hasEmberLanguageServerExtension(info: PackageInfo) {
 
 export const isModuleUnificationApp = memoize(isMuApp, {
   length: 1,
-  maxAge: 60000
+  maxAge: 60000,
 });
 export const podModulePrefixForRoot = memoize(getPodModulePrefix, {
   length: 1,
-  maxAge: 60000
+  maxAge: 60000,
 });
 export const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
   length: 1,
-  maxAge: 600000
+  maxAge: 600000,
 }); // 1 second
 
 export const isAddonRoot = memoize(isProjectAddonRoot, {
   length: 1,
-  maxAge: 600000
+  maxAge: 600000,
 });
 
 export interface PackageInfo {
@@ -115,7 +115,7 @@ export function getProjectInRepoAddonsRoots(root: string) {
   const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
   const addons = safeWalkSync(path.join(root, prefix), {
     directories: true,
-    globs: ['**/package.json']
+    globs: ['**/package.json'],
   });
   const roots: string[] = [];
   addons
@@ -139,7 +139,7 @@ export function listGlimmerXComponents(root: string) {
     const jsPaths = safeWalkSync(root, {
       directories: false,
       globs: ['**/*.{js,ts,jsx,hbs}'],
-      ignore: ['dist', 'lib', 'node_modules', 'tmp', 'cache', '.*', '.cache', '.git', '.*.{js,ts,jsx,hbs,gbx}']
+      ignore: ['dist', 'lib', 'node_modules', 'tmp', 'cache', '.*', '.cache', '.git', '.*.{js,ts,jsx,hbs,gbx}'],
     });
 
     return jsPaths
@@ -157,7 +157,7 @@ export function listGlimmerXComponents(root: string) {
         return {
           kind: CompletionItemKind.Class,
           label: name,
-          detail: 'component'
+          detail: 'component',
         };
       });
   } catch (e) {
@@ -176,7 +176,7 @@ export function listGlimmerNativeComponents(root: string) {
       return {
         kind: CompletionItemKind.Class,
         label: name,
-        detail: 'component'
+        detail: 'component',
       };
     });
   } catch (e) {
@@ -229,7 +229,7 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
     });
   const recursiveRoots: string[] = resolvedItems.slice(0);
   roots.forEach((rootItem: string) => {
-    let packInfo = getPackageJSON(rootItem);
+    const packInfo = getPackageJSON(rootItem);
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
       return;
@@ -300,7 +300,7 @@ export function getProjectAddonsInfo(root: string) {
         ...listModels(packagePath),
         ...listTransforms(packagePath),
         ...listServices(packagePath),
-        ...listModifiers(packagePath)
+        ...listModifiers(packagePath),
       ];
       // log('extractedData', extractedData);
       if (extractedData.length) {
@@ -317,7 +317,7 @@ export function getProjectAddonsInfo(root: string) {
     meta.push(listGlimmerXComponents(root));
   }
 
-  let normalizedResult: any[] = meta.reduce((arrs: any[], item: any[]) => {
+  const normalizedResult: any[] = meta.reduce((arrs: any[], item: any[]) => {
     if (!item.length) {
       return arrs;
     }
@@ -348,14 +348,14 @@ export function pureComponentName(relativePath: string) {
 }
 
 export function listPodsComponents(root: string): CompletionItem[] {
-  let podModulePrefix = podModulePrefixForRoot(root);
+  const podModulePrefix = podModulePrefixForRoot(root);
   if (podModulePrefix === null) {
     return [];
   }
   const entryPath = path.join(root, 'app', podModulePrefix, 'components');
   const jsPaths = safeWalkSync(entryPath, {
     directories: false,
-    globs: ['**/*.{js,ts,hbs,css,less,scss}']
+    globs: ['**/*.{js,ts,hbs,css,less,scss}'],
   });
 
   const items = jsPaths.map((filePath: string) => {
@@ -363,7 +363,7 @@ export function listPodsComponents(root: string): CompletionItem[] {
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
-      detail: 'component'
+      detail: 'component',
     };
   });
 
@@ -375,7 +375,7 @@ export function listMUComponents(root: string): CompletionItem[] {
   const entryPath = path.join(root, 'src', 'ui', 'components');
   const jsPaths = safeWalkSync(entryPath, {
     directories: false,
-    globs: ['**/*.{js,ts,hbs}']
+    globs: ['**/*.{js,ts,hbs}'],
   });
 
   const items = jsPaths.map((filePath: string) => {
@@ -383,7 +383,7 @@ export function listMUComponents(root: string): CompletionItem[] {
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
-      detail: 'component'
+      detail: 'component',
     };
   });
 
@@ -395,8 +395,8 @@ export function builtinModifiers(): CompletionItem[] {
     {
       kind: CompletionItemKind.Method,
       label: 'action',
-      detail: 'modifier'
-    }
+      detail: 'modifier',
+    },
   ];
 }
 
@@ -408,11 +408,11 @@ export function listComponents(root: string): CompletionItem[] {
   const addonTemplates = path.join(root, 'addon', 'templates', 'components');
   const addonComponentsPaths = safeWalkSync(addonComponents, {
     directories: false,
-    globs: ['**/*.{js,ts,hbs}']
+    globs: ['**/*.{js,ts,hbs}'],
   });
   const addonTemplatesPaths = safeWalkSync(addonTemplates, {
     directories: false,
-    globs: ['**/*.{js,ts,hbs}']
+    globs: ['**/*.{js,ts,hbs}'],
   });
 
   addonComponentsPaths.forEach((p) => {
@@ -424,7 +424,7 @@ export function listComponents(root: string): CompletionItem[] {
 
   const jsPaths = safeWalkSync(scriptEntry, {
     directories: false,
-    globs: ['**/*.{js,ts,hbs,css,less,scss}']
+    globs: ['**/*.{js,ts,hbs,css,less,scss}'],
   });
 
   jsPaths.forEach((p) => {
@@ -433,7 +433,7 @@ export function listComponents(root: string): CompletionItem[] {
 
   const hbsPaths = safeWalkSync(templateEntry, {
     directories: false,
-    globs: ['**/*.hbs']
+    globs: ['**/*.hbs'],
   });
 
   hbsPaths.forEach((p) => {
@@ -446,7 +446,7 @@ export function listComponents(root: string): CompletionItem[] {
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
-      detail: 'component'
+      detail: 'component',
     };
   });
 
@@ -457,7 +457,7 @@ export function findTestsForProject(project: Project) {
   const entry = path.resolve(path.join(project.root, 'tests'));
   const paths = safeWalkSync(entry, {
     directories: false,
-    globs: ['**/*.{js,ts}']
+    globs: ['**/*.{js,ts}'],
   });
 
   paths.forEach((filePath: string) => {
@@ -480,7 +480,7 @@ function listCollection(
   const entry = path.join(root, prefix, collectionName);
   const paths = safeWalkSync(entry, {
     directories: false,
-    globs: ['**/*.{js,ts}']
+    globs: ['**/*.{js,ts}'],
   });
 
   const items = paths.map((filePath: string) => {
@@ -488,7 +488,7 @@ function listCollection(
     return {
       kind: kindType,
       label: pureComponentName(filePath),
-      detail
+      detail,
     };
   });
 
@@ -522,12 +522,12 @@ export function listRoutes(root: string): CompletionItem[] {
   const controllersEntry = path.join(root, 'app', 'controllers');
   const paths = safeWalkSync(scriptEntry, {
     directories: false,
-    globs: ['**/*.{js,ts}']
+    globs: ['**/*.{js,ts}'],
   });
 
   const templatePaths = safeWalkSync(templateEntry, {
     directories: false,
-    globs: ['**/*.hbs']
+    globs: ['**/*.hbs'],
   }).filter((name: string) => {
     const skipEndings = ['-loading', '-error', '/loading', '/error'];
     return !name.startsWith('components/') && skipEndings.filter((ending: string) => name.endsWith(ending + '.hbs')).length === 0;
@@ -535,7 +535,7 @@ export function listRoutes(root: string): CompletionItem[] {
 
   const controllers = safeWalkSync(controllersEntry, {
     directories: false,
-    globs: ['**/*.{js,ts}']
+    globs: ['**/*.{js,ts}'],
   });
 
   let items: any[] = [];
@@ -546,7 +546,7 @@ export function listRoutes(root: string): CompletionItem[] {
       return {
         kind: CompletionItemKind.File,
         label,
-        detail: 'route'
+        detail: 'route',
       };
     })
   );
@@ -558,7 +558,7 @@ export function listRoutes(root: string): CompletionItem[] {
       return {
         kind: CompletionItemKind.File,
         label,
-        detail: 'route'
+        detail: 'route',
       };
     })
   );
@@ -572,12 +572,9 @@ export function listRoutes(root: string): CompletionItem[] {
 }
 
 export function getComponentNameFromURI(root: string, uri: string) {
-  let fileName = uri.replace('file://', '').replace(root, '');
-  let splitter = fileName.includes(path.sep + '-components' + path.sep) ? '/-components/' : '/components/';
-  let maybeComponentName = fileName
-    .split(path.sep)
-    .join('/')
-    .split(splitter)[1];
+  const fileName = uri.replace('file://', '').replace(root, '');
+  const splitter = fileName.includes(path.sep + '-components' + path.sep) ? '/-components/' : '/components/';
+  const maybeComponentName = fileName.split(path.sep).join('/').split(splitter)[1];
 
   if (!maybeComponentName) {
     return null;

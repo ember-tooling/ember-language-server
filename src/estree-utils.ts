@@ -28,8 +28,8 @@ export function toLSRange(loc: SourceLocation): LSRange {
 }
 
 export function newLocation(startLine: number, startColumn: number, endLine: number, endColumn: number): SourceLocation {
-  let start = { line: startLine, column: startColumn };
-  let end = { line: endLine, column: endColumn };
+  const start = { line: startLine, column: startColumn };
+  const end = { line: endLine, column: endColumn };
   return { start, end };
 }
 

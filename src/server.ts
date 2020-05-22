@@ -32,7 +32,7 @@ import {
   TextDocumentSyncKind,
   StreamMessageWriter,
   ReferenceParams,
-  Location
+  Location,
 } from 'vscode-languageserver';
 
 import ProjectRoots, { Project, Executors } from './project-roots';
@@ -64,8 +64,8 @@ export default class Server {
   documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
   projectRoots: ProjectRoots = new ProjectRoots(this);
   addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
-    let rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
-    let purePaths = rawPaths.filter((p) => path.isAbsolute(p));
+    const rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
+    const purePaths = rawPaths.filter((p) => path.isAbsolute(p));
     if (purePaths.length) {
       addToRegistry(normalizedName, kind, purePaths);
       return true;
@@ -113,18 +113,18 @@ export default class Server {
           this.projectRoots.reloadProject(project.root);
           return {
             msg: `Project reloaded`,
-            path: project.root
+            path: project.root,
           };
         } else {
           return {
             msg: 'No project found',
-            path: projectPath
+            path: projectPath,
           };
         }
       } else {
         this.projectRoots.reloadProjects();
         return {
-          msg: 'Projects reloaded'
+          msg: 'Projects reloaded',
         };
       }
     };
@@ -134,7 +134,7 @@ export default class Server {
       if (project) {
         const item = project.matchPathToType(fullPath);
         if (item) {
-          let normalizedItem = normalizeMatchNaming(item);
+          const normalizedItem = normalizeMatchNaming(item);
           return this.getRegistry(project.root)[normalizedItem.type][normalizedItem.name] || [];
         }
       }
@@ -155,11 +155,11 @@ export default class Server {
               if (usage.type === 'routePath') {
                 return {
                   ...usage,
-                  type: 'template'
+                  type: 'template',
                 };
               }
               return usage;
-            })
+            }),
           };
         }
       }
@@ -224,7 +224,7 @@ export default class Server {
         const result = await this.executors[params.command](this, params.command, params.arguments);
         return result;
       } else {
-        let [uri, ...args] = params.arguments;
+        const [uri, ...args] = params.arguments;
         try {
           const project = this.projectRoots.projectForPath(uri);
           let result = null;
@@ -300,8 +300,8 @@ export default class Server {
             'els.getRelatedFiles',
             'els.getKindUsages',
             'els.setConfig',
-            'els.reloadProject'
-          ]
+            'els.reloadProject',
+          ],
         },
         documentSymbolProvider: true,
         codeActionProvider: true,
@@ -309,14 +309,14 @@ export default class Server {
         workspace: {
           workspaceFolders: {
             supported: true,
-            changeNotifications: true
-          }
+            changeNotifications: true,
+          },
         },
         completionProvider: {
           resolveProvider: true,
-          triggerCharacters: ['.', '::', '=', '/', '{{', '(', '<', '@', 'this.']
-        }
-      }
+          triggerCharacters: ['.', '::', '=', '/', '{{', '(', '<', '@', 'this.'],
+        },
+      },
     };
   }
 
@@ -325,7 +325,7 @@ export default class Server {
   private async onDidChangeContent(change: any) {
     // this.setStatusText('did-change');
 
-    let lintResults = await this.templateLinter.lint(change.document);
+    const lintResults = await this.templateLinter.lint(change.document);
     const results: Diagnostic[] = [];
     if (Array.isArray(lintResults)) {
       lintResults.forEach((result) => {
@@ -334,9 +334,9 @@ export default class Server {
     }
     const project: Project | undefined = this.projectRoots.projectForUri(change.document.uri);
     if (project) {
-      for (let linter of project.linters) {
+      for (const linter of project.linters) {
         try {
-          let tempResults = await linter(change.document as TextDocument);
+          const tempResults = await linter(change.document as TextDocument);
           // API must return array
           if (Array.isArray(tempResults)) {
             tempResults.forEach((el) => {
@@ -354,7 +354,7 @@ export default class Server {
 
   private onDidChangeWatchedFiles(items: DidChangeWatchedFilesParams) {
     items.changes.forEach((change) => {
-      let project = this.projectRoots.projectForUri(change.uri);
+      const project = this.projectRoots.projectForUri(change.uri);
       if (project) {
         project.trackChange(change.uri, change.type);
       } else {
@@ -394,7 +394,7 @@ export default class Server {
     try {
       const [templateCompletions, scriptCompletions] = await Promise.all([
         await this.templateCompletionProvider.provideCompletions(textDocumentPosition),
-        await this.scriptCompletionProvider.provideCompletions(textDocumentPosition)
+        await this.scriptCompletionProvider.provideCompletions(textDocumentPosition),
       ]);
       completionItems.push(...templateCompletions, ...scriptCompletions);
     } catch (e) {
@@ -411,19 +411,19 @@ export default class Server {
   // }
 
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
-    let uri = params.textDocument.uri;
-    let filePath = uriToFilePath(uri);
+    const uri = params.textDocument.uri;
+    const filePath = uriToFilePath(uri);
     if (!filePath) {
       return [];
     }
 
-    let extension = path.extname(filePath);
+    const extension = path.extname(filePath);
 
-    let providers = this.documentSymbolProviders.filter((provider) => provider.extensions.indexOf(extension) !== -1);
+    const providers = this.documentSymbolProviders.filter((provider) => provider.extensions.indexOf(extension) !== -1);
 
     if (providers.length === 0) return [];
 
-    let content = fs.readFileSync(filePath, 'utf-8');
+    const content = fs.readFileSync(filePath, 'utf-8');
 
     return providers.map((providers) => providers.process(content)).reduce((a, b) => a.concat(b), []);
   }

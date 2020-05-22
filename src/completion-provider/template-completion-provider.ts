@@ -23,7 +23,7 @@ export default class TemplateCompletionProvider {
     const document = this.server.documents.get(doc.uri);
     return {
       project,
-      document
+      document,
     };
   }
   getAST(textContent: string) {
@@ -69,7 +69,7 @@ export default class TemplateCompletionProvider {
       PLACEHOLDER + '}}{{/' + PLACEHOLDER,
       PLACEHOLDER + ')}}',
       PLACEHOLDER + '))}}',
-      PLACEHOLDER + ')))}}'
+      PLACEHOLDER + ')))}}',
     ];
 
     let validText = '';
@@ -98,7 +98,7 @@ export default class TemplateCompletionProvider {
       ast,
       focusPath,
       originalText,
-      normalPlaceholder
+      normalPlaceholder,
     };
   }
   async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
@@ -133,7 +133,7 @@ export default class TemplateCompletionProvider {
       results: [],
       server: this.server,
       type: 'template',
-      originalText
+      originalText,
     });
 
     const addonResults = await queryELSAddonsAPIChain(project.providers.completionProviders, root, {
@@ -142,7 +142,7 @@ export default class TemplateCompletionProvider {
       position: params.position,
       results: completions,
       server: this.server,
-      type: 'template'
+      type: 'template',
     });
     const textPrefix = getTextPrefix(focusPath, normalPlaceholder);
     const endCharacterPosition = position.character;
@@ -152,28 +152,23 @@ export default class TemplateCompletionProvider {
     }
     return filter(addonResults, textPrefix, {
       key: 'label',
-      maxResults: 40
+      maxResults: 40,
     }).map((rawEl: CompletionItem) => {
       const el = Object.assign({}, rawEl);
       if (el.textEdit) {
         return el;
       }
-      let endPosition = {
+      const endPosition = {
         line: position.line,
-        character: endCharacterPosition
+        character: endCharacterPosition,
       };
       const shouldFixContent = normalPlaceholder.includes('}}{{');
       el.textEdit = {
-        newText: shouldFixContent
-          ? normalPlaceholder
-              .split(PLACEHOLDER)
-              .join(el.label)
-              .replace('}}{{', '}}\n  \n{{')
-          : el.label,
+        newText: shouldFixContent ? normalPlaceholder.split(PLACEHOLDER).join(el.label).replace('}}{{', '}}\n  \n{{') : el.label,
         range: {
           start: position,
-          end: endPosition
-        }
+          end: endPosition,
+        },
       };
       return el;
     });
@@ -190,6 +185,6 @@ function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
       node = maybeBlockDefenition;
     }
   }
-  let target = node.original || node.tag || node.name || node.chars || '';
+  const target = node.original || node.tag || node.name || node.chars || '';
   return target.replace(normalPlaceholder, '').replace(PLACEHOLDER, '');
 }

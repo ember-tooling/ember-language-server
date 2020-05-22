@@ -45,7 +45,7 @@ export class Project {
       return;
     }
     const filePath = path.resolve(rawPath);
-    let item = this.matchPathToType(filePath);
+    const item = this.matchPathToType(filePath);
     let normalizedItem: undefined | NormalizedRegistryItem = undefined;
     if (item) {
       normalizedItem = normalizeMatchNaming(item) as NormalizedRegistryItem;
@@ -62,7 +62,7 @@ export class Project {
       if (!this.files.has(filePath)) {
         this.files.set(filePath, { version: 0 });
       }
-      let file = this.files.get(filePath);
+      const file = this.files.get(filePath);
       if (file) {
         file.version++;
       }
@@ -104,7 +104,7 @@ export class Project {
   init(server: Server) {
     this.builtinProviders.initFunctions.forEach((initFn) => {
       try {
-        let initResult = initFn(server, this);
+        const initResult = initFn(server, this);
         if (typeof initResult === 'function') {
           this.destructors.push(initResult);
         }
@@ -116,7 +116,7 @@ export class Project {
     findTestsForProject(this);
     this.providers.initFunctions.forEach((initFn) => {
       try {
-        let initResult = initFn(server, this);
+        const initResult = initFn(server, this);
         if (typeof initResult === 'function') {
           this.destructors.push(initResult);
         }
@@ -178,7 +178,7 @@ export default class ProjectRoots {
     const roots = walkSync(workspaceRoot, {
       directories: false,
       globs: ['**/ember-cli-build.js', '**/package.json'],
-      ignore: ['**/.git/**', '**/bower_components/**', '**/dist/**', '**/node_modules/**', '**/tmp/**']
+      ignore: ['**/.git/**', '**/bower_components/**', '**/dist/**', '**/node_modules/**', '**/tmp/**'],
     });
 
     roots.forEach((rootPath: string) => {
@@ -215,7 +215,7 @@ export default class ProjectRoots {
       project.init(this.server);
       return {
         initIssues: project.initIssues,
-        providers: project.providers
+        providers: project.providers,
       };
     } catch (e) {
       logError(e);
@@ -224,14 +224,14 @@ export default class ProjectRoots {
   }
 
   projectForUri(uri: string): Project | undefined {
-    let path = uriToFilePath(uri);
+    const path = uriToFilePath(uri);
 
     if (!path) return;
     return this.projectForPath(path);
   }
 
   projectForPath(path: string): Project | undefined {
-    let root = (Array.from(this.projects.keys()) || []).filter((root) => path!.indexOf(root) === 0).reduce((a, b) => (a.length > b.length ? a : b), '');
+    const root = (Array.from(this.projects.keys()) || []).filter((root) => path!.indexOf(root) === 0).reduce((a, b) => (a.length > b.length ? a : b), '');
     return this.projects.get(root);
   }
 }

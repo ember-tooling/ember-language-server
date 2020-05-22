@@ -21,7 +21,7 @@ function tokensFromType(node: any, scopedTokens: any) {
         return;
       }
       return tag;
-    }
+    },
   };
   if (node.type in tokensMap) {
     return (tokensMap as any)[node.type](node);
@@ -53,7 +53,7 @@ function getTemplateTokens(html: string, nativeTokens: any) {
         blockParams.forEach(() => {
           scopedTokens.pop();
         });
-      }
+      },
     },
     ElementNode: {
       enter(node) {
@@ -66,11 +66,11 @@ function getTemplateTokens(html: string, nativeTokens: any) {
         blockParams.forEach(() => {
           scopedTokens.pop();
         });
-      }
+      },
     },
     All(node) {
       addTokens(tokensSet, node, scopedTokens, nativeTokens);
-    }
+    },
   });
   return Array.from(tokensSet).map((el) => normalizeToClassicComponent(el));
 }

@@ -8,7 +8,7 @@ function maybePathDeclaration(astPath: ASTPath) {
     const scope = getLocalScope(astPath);
     const pathName = getLocalPathName(astPath.node);
     if (pathName) {
-      let declaration = scope.find(({ name }) => name === pathName);
+      const declaration = scope.find(({ name }) => name === pathName);
       if (!declaration) {
         return;
       }
@@ -50,23 +50,23 @@ export function isLocalScopedPathExpression(astPath: ASTPath) {
 }
 
 export function focusedBlockParamName(content: string, position: Position) {
-  let source = content.match(reLines) as string[];
-  let focusedLine = source[position.line - 1];
+  const source = content.match(reLines) as string[];
+  const focusedLine = source[position.line - 1];
   let paramName = '';
   if (typeof focusedLine !== 'string') {
     return paramName;
   }
-  let definitionStartIndex = focusedLine.indexOf('|');
-  let definitionEndIndex = focusedLine.lastIndexOf('|');
-  let column = position.column;
+  const definitionStartIndex = focusedLine.indexOf('|');
+  const definitionEndIndex = focusedLine.lastIndexOf('|');
+  const column = position.column;
   if (definitionEndIndex >= column && definitionStartIndex <= column) {
-    let lineParts = focusedLine.split('|');
+    const lineParts = focusedLine.split('|');
     let localColIndex = lineParts[0].length + 1;
-    let targetPart = lineParts[1];
-    let targets = targetPart.split(' ');
+    const targetPart = lineParts[1];
+    const targets = targetPart.split(' ');
     for (let i = 0; i < targets.length; i++) {
-      let startIndex = localColIndex;
-      let endIndex = startIndex + targets[i].length;
+      const startIndex = localColIndex;
+      const endIndex = startIndex + targets[i].length;
       if (column >= startIndex && column <= endIndex) {
         paramName = targets[i].trim();
         break;
@@ -91,7 +91,7 @@ class BlockParamDefinition {
     return this.path.node;
   }
   get index(): number {
-    let node = this.path.node;
+    const node = this.path.node;
     if (node.type === 'BlockStatement' && node.program) {
       return node.program.blockParams.indexOf(this.name);
     } else if (node.type === 'Block') {
@@ -108,7 +108,7 @@ export function maybeBlockParamDefinition(astPath: ASTPath, content: string, pos
   if (!isBlockParamDefinition(astPath, content, position)) {
     return;
   }
-  let paramName = focusedBlockParamName(content, position);
+  const paramName = focusedBlockParamName(content, position);
   if (paramName === '') {
     return;
   }
@@ -120,8 +120,8 @@ export function isBlockParamDefinition(astPath: ASTPath, content: string, positi
   if (node.type !== 'Block' && node.type !== 'BlockStatement' && node.type !== 'ElementNode') {
     return;
   }
-  let source = content.match(reLines) as string[];
-  let focusedLine = source[position.line - 1];
+  const source = content.match(reLines) as string[];
+  const focusedLine = source[position.line - 1];
   if (focusedLine.lastIndexOf('|') > position.column && focusedLine.indexOf('|') < position.column) {
     return true;
   }
@@ -135,13 +135,13 @@ export function sourceForNode(node: any, content: string = '') {
     return;
   }
 
-  let firstLine = node.loc.start.line - 1;
-  let lastLine = node.loc.end.line - 1;
+  const firstLine = node.loc.start.line - 1;
+  const lastLine = node.loc.end.line - 1;
   let currentLine = firstLine - 1;
-  let firstColumn = node.loc.start.column;
-  let lastColumn = node.loc.end.column;
-  let string = [];
-  let source = content.match(reLines) as string[];
+  const firstColumn = node.loc.start.column;
+  const lastColumn = node.loc.end.column;
+  const string = [];
+  const source = content.match(reLines) as string[];
   if (currentLine > source.length) {
     return;
   }
@@ -197,7 +197,7 @@ class HandlebarsASTPathMeta {
 }
 export default class ASTPath {
   static toPosition(ast: any, position: Position, content: string = ''): ASTPath | undefined {
-    let path = _findFocusPath(ast, position);
+    const path = _findFocusPath(ast, position);
     if (path) {
       return new ASTPath(path, path.length - 1, content, position);
     }
@@ -241,7 +241,7 @@ function _findFocusPath(node: any, position: Position, seen = new Set()): any {
   seen.add(node);
 
   let path: any[] = [];
-  let range: SourceLocation = node.loc;
+  const range: SourceLocation = node.loc;
   if (range) {
     if (containsPosition(range, position)) {
       path.push(node);
@@ -250,17 +250,17 @@ function _findFocusPath(node: any, position: Position, seen = new Set()): any {
     }
   }
 
-  for (let key in node) {
+  for (const key in node) {
     if (!Object.prototype.hasOwnProperty.call(node, key)) {
       continue;
     }
 
-    let value = node[key];
+    const value = node[key];
     if (!value || typeof value !== 'object' || seen.has(value)) {
       continue;
     }
 
-    let childPath = _findFocusPath(value, position, seen);
+    const childPath = _findFocusPath(value, position, seen);
     if (childPath.length > 0) {
       path = path.concat(childPath);
       break;

@@ -35,18 +35,18 @@ export class ClassicPathMatcher {
     model: ['/models/'],
     transform: ['/transforms/'],
     adapter: ['/adapters/'],
-    serializer: ['/serializers/']
+    serializer: ['/serializers/'],
   };
   ignores = ['/tmp/', '/dist/', '/.git/'];
   matchKey(key: string, str: string) {
-    let isIgnored = this.ignores.find((el) => str.includes(el));
+    const isIgnored = this.ignores.find((el) => str.includes(el));
     if (isIgnored) {
       return false;
     }
     let matched = false;
     const keys = this.keys[key] as string[];
     for (let i = 0; i < keys.length; i++) {
-      let searchStr = keys[i];
+      const searchStr = keys[i];
       if (searchStr.charAt(0) === '!') {
         matched = str.includes(searchStr.replace('!', '')) === false;
       } else {
@@ -74,7 +74,7 @@ export class ClassicPathMatcher {
     return fullName;
   }
   metaFromPath(rawAbsPath: string): MatchResult | null {
-    let absPath = rawAbsPath.split(path.sep).join('/');
+    const absPath = rawAbsPath.split(path.sep).join('/');
     const isTest = absPath.includes('/tests/');
     const isTemplate = absPath.endsWith('.hbs');
     const isStyle = absPath.endsWith('.css') || absPath.endsWith('.less') || absPath.endsWith('.scss');
@@ -99,7 +99,7 @@ export class ClassicPathMatcher {
       type: results[0][0] as MatchResultType,
       name: results[0][1],
       kind,
-      scope
+      scope,
     };
   }
 }
@@ -123,7 +123,7 @@ export class PodMatcher extends ClassicPathMatcher {
     model: ['/model.'],
     transform: ['/transform.'],
     adapter: ['/adapter.'],
-    serializer: ['/serializer.']
+    serializer: ['/serializer.'],
   };
   rightPartFromFirstMatch(_: string, fileName: string, extName: string, str: string) {
     const fullName = str.slice(str.indexOf(this.podPrefix) + this.podPrefix.length + 1, str.length).slice(0, -(1 + extName.length + fileName.length));

@@ -11,7 +11,7 @@ import {
   isNamedServiceInjection,
   isTransformReference,
   isComputedPropertyArgument,
-  closestScriptNodeParent
+  closestScriptNodeParent,
 } from '../../utils/ast-helpers';
 import { listRoutes, listModels, listServices, mGetProjectAddonsInfo, listTransforms } from '../../utils/layout-helpers';
 
@@ -24,7 +24,7 @@ export default class ScriptCompletionProvider {
   constructor() {}
   async initRegistry(_: Server, project: Project) {
     try {
-      let initStartTime = Date.now();
+      const initStartTime = Date.now();
       mListModels(project.root);
       mListServices(project.root);
       logInfo(project.root + ': script registry initialized in ' + (Date.now() - initStartTime) + 'ms');
@@ -75,7 +75,7 @@ export default class ScriptCompletionProvider {
         if (!focusPath.parentPath || !focusPath.parentPath.parentPath) {
           return [];
         }
-        let node = closestScriptNodeParent(focusPath, 'ObjectExpression', ['ObjectProperty']) || closestScriptNodeParent(focusPath, 'ClassBody');
+        const node = closestScriptNodeParent(focusPath, 'ObjectExpression', ['ObjectProperty']) || closestScriptNodeParent(focusPath, 'ClassBody');
         if (node === null) {
           log('isComputedPropertyArgument - unable to find keys');
           return [];
@@ -91,7 +91,7 @@ export default class ScriptCompletionProvider {
             completions.push({
               kind: 10,
               label: name,
-              detail: 'ObjectProperty'
+              detail: 'ObjectProperty',
             });
           }
         });

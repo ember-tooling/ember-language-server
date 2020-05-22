@@ -10,7 +10,7 @@ import { Project } from '../project-roots';
 export default class TemplateDefinitionProvider {
   constructor(private server: Server) {}
   async handle(params: TextDocumentPositionParams, project: Project): Promise<Definition | null> {
-    let uri = params.textDocument.uri;
+    const uri = params.textDocument.uri;
     const root = project.root;
     const document = this.server.documents.get(uri);
     if (!document) {
@@ -18,20 +18,20 @@ export default class TemplateDefinitionProvider {
     }
     const ext = getExtension(params.textDocument);
     const isScript = ['.ts', '.js'].includes(ext as string);
-    let content = isScript ? searchAndExtractHbs(document.getText()) : document.getText();
-    let ast = preprocess(content);
-    let focusPath = ASTPath.toPosition(ast, toPosition(params.position), content);
+    const content = isScript ? searchAndExtractHbs(document.getText()) : document.getText();
+    const ast = preprocess(content);
+    const focusPath = ASTPath.toPosition(ast, toPosition(params.position), content);
     if (!focusPath) {
       return null;
     }
 
-    let definitions: Location[] = await queryELSAddonsAPIChain(project.builtinProviders.definitionProviders, root, {
+    const definitions: Location[] = await queryELSAddonsAPIChain(project.builtinProviders.definitionProviders, root, {
       focusPath,
       type: 'template',
       textDocument: params.textDocument,
       position: params.position,
       results: [],
-      server: this.server
+      server: this.server,
     });
 
     const addonResults = await queryELSAddonsAPIChain(project.providers.definitionProviders, root, {
@@ -40,7 +40,7 @@ export default class TemplateDefinitionProvider {
       textDocument: params.textDocument,
       position: params.position,
       results: definitions,
-      server: this.server
+      server: this.server,
     });
 
     return addonResults;
