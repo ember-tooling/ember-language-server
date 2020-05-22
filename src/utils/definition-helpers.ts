@@ -17,7 +17,7 @@ const mProjectInRepoAddonsRoots = memoize(getProjectInRepoAddonsRoots, {
 
 export function pathsToLocations(...paths: string[]): Location[] {
   return paths.filter(fs.existsSync).map((modulePath) => {
-    return Location.create(URI.file(modulePath).toString(), Range.create(0, 0, 0, 0));
+    return Location.create(URI.file(modulePath.split(':').pop() as string).toString(), Range.create(0, 0, 0, 0));
   });
 }
 

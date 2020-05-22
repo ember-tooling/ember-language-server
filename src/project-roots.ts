@@ -5,7 +5,14 @@ import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import * as fs from 'fs';
-import { isGlimmerNativeProject, isGlimmerXProject, getPodModulePrefix, findTestsForProject, isELSAddonRoot } from './utils/layout-helpers';
+import {
+  isGlimmerNativeProject,
+  isGlimmerXProject,
+  getPodModulePrefix,
+  findTestsForProject,
+  findAppItemsForProject,
+  isELSAddonRoot
+} from './utils/layout-helpers';
 import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem } from './utils/registry-api';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
@@ -114,6 +121,7 @@ export class Project {
       }
     });
     findTestsForProject(this);
+    findAppItemsForProject(this);
     this.providers.initFunctions.forEach((initFn) => {
       try {
         let initResult = initFn(server, this);
@@ -215,7 +223,8 @@ export default class ProjectRoots {
       project.init(this.server);
       return {
         initIssues: project.initIssues,
-        providers: project.providers
+        providers: project.providers,
+        registry: this.server.getRegistry(project.root)
       };
     } catch (e) {
       logError(e);
