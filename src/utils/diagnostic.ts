@@ -24,12 +24,16 @@ function toLineRange(source: string, idx: number): [number, number] {
   return [start, end];
 }
 
-function toMessage({ message }: TemplateLinterError): string {
+function toMessage({ message, isFixable }: TemplateLinterError): string {
   if (ParseErrorExp.test(message)) {
     return message.split('\n').pop() || '';
   }
 
   message = message.replace(OnLineErrorExp, '');
+
+  if (isFixable) {
+    message = `${message} (fixable)`;
+  }
 
   return message;
 }

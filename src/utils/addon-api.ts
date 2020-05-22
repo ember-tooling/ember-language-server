@@ -1,4 +1,4 @@
-import { Location, TextDocumentIdentifier, Command, CodeActionParams, CodeAction, Position, CompletionItem } from 'vscode-languageserver';
+import { Location, TextDocumentIdentifier, Command, CodeActionParams, CodeAction, Position, CompletionItem, TextDocument } from 'vscode-languageserver';
 import {
   getProjectAddonsRoots,
   getPackageJSON,
@@ -16,6 +16,7 @@ import CoreScriptDefinitionProvider from './../builtin-addons/core/script-defini
 import CoreTemplateDefinitionProvider from './../builtin-addons/core/template-definition-provider';
 import ScriptCompletionProvider from './../builtin-addons/core/script-completion-provider';
 import TemplateCompletionProvider from './../builtin-addons/core/template-completion-provider';
+import ProjectTemplateLinter from './../builtin-addons/core/template-linter';
 import { Project } from '../project-roots';
 
 interface BaseAPIParams {
@@ -39,18 +40,20 @@ export interface DefinitionFunctionParams extends ExtendedAPIParams {
 }
 export interface CodeActionFunctionParams extends CodeActionParams {
   results: (Command | CodeAction)[];
+  document: TextDocument;
 }
 
 type ReferenceResolveFunction = (root: string, params: ReferenceFunctionParams) => Promise<Location[]>;
 type CompletionResolveFunction = (root: string, params: CompletionFunctionParams) => Promise<CompletionItem[]>;
 type DefinitionResolveFunction = (root: string, params: DefinitionFunctionParams) => Promise<Location[]>;
-type CodeActionResolveFunction = (root: string, params: CodeActionParams) => Promise<(Command | CodeAction)[] | undefined | null>;
+type CodeActionResolveFunction = (root: string, params: CodeActionFunctionParams) => Promise<(Command | CodeAction)[] | undefined | null>;
 type InitFunction = (server: Server, project: Project) => any;
 export interface AddonAPI {
-  onReference: undefined | ReferenceResolveFunction;
-  onComplete: undefined | CompletionResolveFunction;
-  onDefinition: undefined | DefinitionResolveFunction;
-  onInit: undefined | InitFunction;
+  onReference?: ReferenceResolveFunction;
+  onComplete?: CompletionResolveFunction;
+  onCodeAction?: CodeActionResolveFunction;
+  onDefinition?: DefinitionResolveFunction;
+  onInit?: InitFunction;
 }
 
 interface PublicAddonAPI {
@@ -94,12 +97,17 @@ export function initBuiltinProviders(): ProjectProviders {
   const templateDefinition = new CoreTemplateDefinitionProvider();
   const scriptCompletion = new ScriptCompletionProvider();
   const templateCompletion = new TemplateCompletionProvider();
+  const templateCodeActionProvider = new ProjectTemplateLinter();
 
   return {
     definitionProviders: [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)],
     referencesProviders: [],
-    codeActionProviders: [],
-    initFunctions: [templateCompletion.initRegistry.bind(templateCompletion), scriptCompletion.initRegistry.bind(scriptCompletion)],
+    codeActionProviders: [templateCodeActionProvider.onCodeAction.bind(templateCodeActionProvider)],
+    initFunctions: [
+      templateCodeActionProvider.onInit.bind(templateCodeActionProvider),
+      templateCompletion.initRegistry.bind(templateCompletion),
+      scriptCompletion.initRegistry.bind(scriptCompletion),
+    ],
     info: [],
     completionProviders: [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)],
   };

@@ -17,6 +17,7 @@ export interface TemplateLinterError {
   rule?: string;
   severity: number;
   message: string;
+  isFixable?: boolean;
   line?: number;
   column?: number;
   source?: string;
@@ -37,17 +38,20 @@ export default class TemplateLinter {
 
   constructor(private server: Server) {}
 
-  async lint(textDocument: TextDocument) {
+  private getProjectForDocument(textDocument: TextDocument) {
     const ext = getExtension(textDocument);
 
     if (ext !== null && !extensionsToLint.includes(ext)) {
       return;
     }
 
-    const cwd = process.cwd();
-    const project = this.server.projectRoots.projectForUri(textDocument.uri);
+    return this.server.projectRoots.projectForUri(textDocument.uri);
+  }
 
-    if (!project) {
+  private sourceForDocument(textDocument: TextDocument) {
+    const ext = getExtension(textDocument);
+
+    if (ext !== null && !extensionsToLint.includes(ext)) {
       return;
     }
 
@@ -55,6 +59,22 @@ export default class TemplateLinter {
     const source = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
 
     if (!source.trim().length) {
+      return;
+    }
+
+    return source;
+  }
+  async lint(textDocument: TextDocument): Promise<Diagnostic[] | undefined> {
+    const cwd = process.cwd();
+    const project = this.getProjectForDocument(textDocument);
+
+    if (!project) {
+      return;
+    }
+
+    const source = this.sourceForDocument(textDocument);
+
+    if (!source) {
       return;
     }
 
@@ -83,9 +103,14 @@ export default class TemplateLinter {
 
     return diagnostics;
   }
-  private templateLintConfig(cwd: string) {
+  private templateLintConfig(cwd: string): string | undefined {
     return findUp.sync('.template-lintrc.js', { cwd });
   }
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  public async linterForProject(project: Project) {
+    return await this.getLinter(project);
+  }
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   private async getLinter(project: Project) {
     if (this._linterCache.has(project)) {
       return this._linterCache.get(project);
