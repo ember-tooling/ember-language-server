@@ -34,6 +34,7 @@ async function reloadProjects(connection, project = undefined) {
 
 async function createProject(files, connection) {
   const dir = await createTempDir();
+
   dir.write(files);
   const normalizedPath = path.normalize(dir.path()).split(':').pop();
   const result = await connection.sendRequest(ExecuteCommandRequest.type, ['els:registerProjectPath', normalizedPath]);
@@ -44,6 +45,7 @@ async function createProject(files, connection) {
       isELSTesting: true,
     },
   };
+
   await connection.sendRequest(InitializeRequest.type as any, params);
 
   return {
@@ -70,8 +72,10 @@ async function getResult(reqType, connection, files, fileToInspect, position) {
   const { normalizedPath, destroy } = await createProject(files, connection);
   const modelPath = path.join(normalizedPath, fileToInspect);
   const params = textDocument(modelPath, position);
+
   openFile(connection, modelPath);
   const response = await connection.sendRequest(reqType, params);
+
   await destroy();
 
   return normalizeUri(response, normalizedPath);
@@ -88,6 +92,7 @@ function openFile(connection: MessageConnection, filePath: string) {
 
 function replaceDynamicUriPart(uri: string) {
   let dirname = __dirname;
+
   if (dirname.indexOf(':') === 1) {
     dirname = dirname.substr(2);
   }
@@ -102,6 +107,7 @@ function replaceTempUriPart(uri: string, base: string) {
 function normalizeUri(objects: Definition, base?: string) {
   if (!Array.isArray(objects)) {
     objects.uri = replaceDynamicUriPart(objects.uri);
+
     if (base) {
       objects.uri = replaceTempUriPart(objects.uri, base);
     }
@@ -113,9 +119,12 @@ function normalizeUri(objects: Definition, base?: string) {
     if (object === null) {
       return object;
     }
+
     if (object.uri) {
       const { uri } = object;
+
       object.uri = replaceDynamicUriPart(uri);
+
       if (base) {
         object.uri = replaceTempUriPart(object.uri, base);
       }
@@ -128,6 +137,7 @@ function normalizeUri(objects: Definition, base?: string) {
 function makeProject(appFiles = {}, addons = {}) {
   const dependencies = {};
   const node_modules = {};
+
   Object.keys(addons).forEach((name) => {
     dependencies[name] = '*';
     node_modules[name] = addons[name];
@@ -528,6 +538,7 @@ describe('integration', function () {
         'App.js',
         { line: 0, character: 20 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -663,6 +674,7 @@ describe('integration', function () {
         'app/components/foo.hbs',
         { line: 0, character: 18 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -682,6 +694,7 @@ describe('integration', function () {
         'app/components/foo.hbs',
         { line: 1, character: 3 }
       );
+
       expect(result).toMatchSnapshot();
     });
     it('support mustache blocks', async () => {
@@ -698,6 +711,7 @@ describe('integration', function () {
         'app/components/foo.hbs',
         { line: 1, character: 3 }
       );
+
       expect(result).toMatchSnapshot();
     });
     it('support component name autocomplete from block params', async () => {
@@ -714,6 +728,7 @@ describe('integration', function () {
         'app/components/foo.hbs',
         { line: 2, character: 1 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -747,6 +762,7 @@ describe('integration', function () {
         'app/components/hello/index.hbs',
         { line: 0, character: 8 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -789,6 +805,7 @@ describe('integration', function () {
         'app/components/hello/index.hbs',
         { line: 0, character: 8 }
       );
+
       expect(result).toMatchSnapshot();
     });
     it('support dummy addon completion:script', async () => {
@@ -828,6 +845,7 @@ describe('integration', function () {
         'app/components/hello/index.js',
         { line: 0, character: 11 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -924,6 +942,7 @@ describe('integration', function () {
       expect(fs.existsSync(path.join(addonPath, 'tag1-removed'))).toBe(false);
 
       const reloadResult = await reloadProjects(connection, normalizedPath);
+
       expect(reloadResult.msg).toBe('Project reloaded');
       expect(reloadResult.path).toBe(normalizedPath);
       expect(fs.existsSync(path.join(addonPath, 'tag'))).toBe(true);
@@ -990,6 +1009,7 @@ describe('integration', function () {
       );
 
       const result = await getResult(CompletionRequest.type, connection, project, 'app/components/dory/index.hbs', { line: 0, character: 8 });
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -1049,6 +1069,7 @@ describe('integration', function () {
         'app/components/hello/index.hbs',
         { line: 0, character: 3 }
       );
+
       expect(result).toMatchSnapshot();
     });
 
@@ -1106,6 +1127,7 @@ describe('integration', function () {
         'app/components/hello/index.js',
         { line: 0, character: 10 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -1153,6 +1175,7 @@ describe('integration', function () {
         'app/components/hello/index.hbs',
         { line: 0, character: 3 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -1175,6 +1198,7 @@ describe('integration', function () {
         'app/components/hello/index.hbs',
         { line: 0, character: 7 }
       );
+
       expect(result).toMatchSnapshot();
     });
 
@@ -1195,6 +1219,7 @@ describe('integration', function () {
         'app/components/hello/index.hbs',
         { line: 0, character: 11 }
       );
+
       expect(result).toMatchSnapshot();
     });
 
@@ -1215,6 +1240,7 @@ describe('integration', function () {
         'app/components/hello/index.hbs',
         { line: 0, character: 17 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });
@@ -1241,6 +1267,7 @@ describe('integration', function () {
         'app/components/hello.hbs',
         { line: 0, character: 16 }
       );
+
       expect(result).toMatchSnapshot();
     });
   });

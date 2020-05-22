@@ -76,6 +76,7 @@ export default class TemplateCompletionProvider {
   async initRegistry(_: Server, project: Project) {
     try {
       const initStartTime = Date.now();
+
       mListHelpers(project.root);
       mListModifiers(project.root);
       mListRoutes(project.root);
@@ -167,6 +168,7 @@ export default class TemplateCompletionProvider {
     if (params.type !== 'template') {
       return params.results;
     }
+
     const completions: CompletionItem[] = params.results;
     const focusPath = params.focusPath;
     const uri = params.textDocument.uri;
@@ -178,6 +180,7 @@ export default class TemplateCompletionProvider {
         // <Foo>
         const candidates = this.getAllAngleBracketComponents(root, uri);
         const scopedValues = this.getScopedValues(focusPath);
+
         log(candidates, scopedValues);
         completions.push(...uniqBy([...candidates, ...scopedValues], 'label'));
       } else if (isComponentArgumentName(focusPath)) {
@@ -189,16 +192,20 @@ export default class TemplateCompletionProvider {
           !isArgumentName(maybeComponentName) &&
           !maybeComponentName.startsWith(':') &&
           !maybeComponentName.includes('.');
+
         if (isValidComponent) {
           const tpls: any[] = provideComponentTemplatePaths(root, maybeComponentName);
           const existingTpls = tpls.filter(fs.existsSync);
+
           if (existingTpls.length) {
             const existingAttributes = focusPath.parent.attributes.map((attr: any) => attr.name).filter((name: string) => isArgumentName(name));
             const content = fs.readFileSync(existingTpls[0], 'utf8');
             const candidates = this.getLocalPathExpressionCandidates(root, tpls[0], content);
             const preResults: CompletionItem[] = [];
+
             candidates.forEach((obj: CompletionItem) => {
               const name = obj.label.split('.')[0];
+
               if (isArgumentName(name) && !existingAttributes.includes(name)) {
                 preResults.push({
                   label: name,
@@ -207,6 +214,7 @@ export default class TemplateCompletionProvider {
                 });
               }
             });
+
             if (preResults.length) {
               completions.push(...uniqBy(preResults, 'label'));
             }
@@ -218,22 +226,27 @@ export default class TemplateCompletionProvider {
         const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText).filter((el) => {
           return el.label.startsWith('this.');
         });
+
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isArgumentPathExpression(focusPath)) {
         // {{@ite..}}
         const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText).filter((el) => {
           return isArgumentName(el.label);
         });
+
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isMustachePath(focusPath)) {
         // {{foo-bar?}}
         log('isMustachePath');
         const candidates = this.getMustachePathCandidates(root);
         const localCandidates = this.getLocalPathExpressionCandidates(root, uri, originalText);
+
         if (isScopedPathExpression(focusPath)) {
           const scopedValues = this.getScopedValues(focusPath);
+
           completions.push(...uniqBy(scopedValues, 'label'));
         }
+
         completions.push(...uniqBy(localCandidates, 'label'));
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberMustacheItems);
@@ -241,24 +254,31 @@ export default class TemplateCompletionProvider {
         // {{#foo-bar?}} {{/foo-bar}}
         log('isBlockPath');
         const candidates = this.getBlockPathCandidates(root);
+
         if (isScopedPathExpression(focusPath)) {
           const scopedValues = this.getScopedValues(focusPath);
+
           completions.push(...uniqBy(scopedValues, 'label'));
         }
+
         completions.push(...emberBlockItems);
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isSubExpressionPath(focusPath)) {
         // {{foo-bar name=(subexpr? )}}
         log('isSubExpressionPath');
         const candidates = this.getSubExpressionPathCandidates(root);
+
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
       } else if (isPathExpression(focusPath)) {
         if (isScopedPathExpression(focusPath)) {
           const scopedValues = this.getScopedValues(focusPath);
+
           completions.push(...uniqBy(scopedValues, 'label'));
         }
+
         const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText);
+
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isLinkToTarget(focusPath)) {
         // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
@@ -273,6 +293,7 @@ export default class TemplateCompletionProvider {
         const addonModifiers = mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
           return detail === 'modifier';
         });
+
         completions.push(...uniqBy([...emberModifierItems, ...mListModifiers(root), ...addonModifiers, ...builtinModifiers()], 'label'));
       }
     } catch (e) {

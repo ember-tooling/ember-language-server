@@ -25,12 +25,15 @@ export function getFirstTextPostion(text: string, content: string) {
   const arrayOfLines = text.match(/(.*?(?:\r\n?|\n|$))/gm) || [];
   let startLine = 0;
   let startCharacter = 0;
+
   arrayOfLines.forEach((line: string, index: number) => {
     if (startLine || startCharacter) {
       return;
     }
+
     const textPosition = line.indexOf(content);
     const bounds = line.split(content);
+
     if (textPosition > -1) {
       if (/\s/.test(bounds[0].charAt(bounds[0].length - 1)) || bounds[0].trim().length === 0) {
         if (/^[A-Za-z]+$/.test(bounds[1].charAt(0)) === false) {
@@ -100,14 +103,17 @@ export function getPathsForComponentScripts(root: string, maybeComponentName: st
   let podComponentsScriptsParts: string[][] = [];
   let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
+
   if (podModulePrefix) {
     podComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app/' + podModulePrefix, maybeComponentName);
   }
+
   if (isModuleUnificationApp(root)) {
     muComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'src/ui', maybeComponentName);
   } else {
     classicComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app', maybeComponentName);
   }
+
   const paths = [...muComponentsScriptsParts, ...podComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
     return path.join(...pathParts.filter((part: any) => !!part));
   });
@@ -120,14 +126,17 @@ export function getPathsForComponentTemplates(root: string, maybeComponentName: 
   let podComponentsScriptsParts: string[][] = [];
   let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
+
   if (podModulePrefix) {
     podComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app' + path.sep + podModulePrefix, maybeComponentName);
   }
+
   if (isModuleUnificationApp(root)) {
     muComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'src/ui', maybeComponentName);
   } else {
     classicComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app', maybeComponentName);
   }
+
   const paths = [...podComponentsScriptsParts, ...muComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
     return path.join(...pathParts.filter((part: any) => !!part));
   });
@@ -138,23 +147,29 @@ export function getPathsForComponentTemplates(root: string, maybeComponentName: 
 export function getAddonImport(root: string, importPath: string) {
   const importParts = importPath.split('/');
   let addonName = importParts.shift();
+
   if (addonName && addonName.startsWith('@')) {
     addonName = addonName + path.sep + importParts.shift();
   }
+
   if (!addonName) {
     return [];
   }
+
   const items: string[] = [];
   const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
+
   roots.forEach((rootPath: string) => {
     if (!rootPath.endsWith(addonName as string)) {
       return;
     }
+
     if (hasValidPath) {
       return;
     }
+
     const addonPaths: string[][] = [];
     const possibleLocations = [
       [rootPath, 'app', ...importParts],
@@ -172,6 +187,7 @@ export function getAddonImport(root: string, importPath: string) {
         return path.join(...pathArr.filter((part: any) => !!part));
       })
       .filter(fs.existsSync);
+
     if (validPaths.length) {
       hasValidPath = true;
       existingPaths = validPaths;
@@ -179,6 +195,7 @@ export function getAddonImport(root: string, importPath: string) {
   });
 
   const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
+
   if (addonFolderFiles.length) {
     return addonFolderFiles;
   }
@@ -191,11 +208,14 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
   const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
+
   roots.forEach((rootPath: string) => {
     if (hasValidPath) {
       return;
     }
+
     const addonPaths: string[][] = [];
+
     getAbstractParts(rootPath, 'app', collection, name).forEach((parts: any) => {
       addonPaths.push(parts);
     });
@@ -207,6 +227,7 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
         return path.join(...pathArr.filter((part: any) => !!part));
       })
       .filter(fs.existsSync);
+
     if (validPaths.length) {
       hasValidPath = true;
       existingPaths = validPaths;
@@ -214,6 +235,7 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
   });
 
   const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
+
   if (addonFolderFiles.length) {
     return addonFolderFiles;
   }
@@ -226,10 +248,12 @@ export function getAddonPathsForComponentTemplates(root: string, maybeComponentN
   const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
+
   roots.forEach((rootPath: string) => {
     if (hasValidPath) {
       return;
     }
+
     const addonPaths: string[][] = [];
 
     getAbstractComponentScriptsParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
@@ -256,6 +280,7 @@ export function getAddonPathsForComponentTemplates(root: string, maybeComponentN
         return path.join(...pathArr.filter((part: any) => !!part));
       })
       .filter(fs.existsSync);
+
     if (validPaths.length) {
       hasValidPath = true;
       existingPaths = validPaths;
@@ -263,6 +288,7 @@ export function getAddonPathsForComponentTemplates(root: string, maybeComponentN
   });
 
   const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
+
   if (addonFolderFiles.length) {
     return addonFolderFiles;
   }

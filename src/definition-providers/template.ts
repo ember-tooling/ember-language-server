@@ -13,14 +13,17 @@ export default class TemplateDefinitionProvider {
     const uri = params.textDocument.uri;
     const root = project.root;
     const document = this.server.documents.get(uri);
+
     if (!document) {
       return null;
     }
+
     const ext = getExtension(params.textDocument);
     const isScript = ['.ts', '.js'].includes(ext as string);
     const content = isScript ? searchAndExtractHbs(document.getText()) : document.getText();
     const ast = preprocess(content);
     const focusPath = ASTPath.toPosition(ast, toPosition(params.position), content);
+
     if (!focusPath) {
       return null;
     }

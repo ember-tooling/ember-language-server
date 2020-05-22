@@ -13,6 +13,7 @@ import { Position as EsTreePosition } from 'estree';
 
 const extensionsToProvideTemplateCompletions = ['.hbs', '.js', '.ts'];
 const PLACEHOLDER = 'ELSCompletionDummy';
+
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
@@ -46,12 +47,15 @@ export default class TemplateCompletionProvider {
     const documentContent = document.getText();
     const ext = getExtension(document);
     const originalText = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
+
     log('originalText', originalText);
+
     if (originalText.trim().length === 0) {
       log('originalText - empty');
 
       return null;
     }
+
     const offset = document.offsetAt(position);
     let normalPlaceholder: any = placeholder;
     let ast: any = {};
@@ -75,8 +79,10 @@ export default class TemplateCompletionProvider {
     ];
 
     let validText = '';
+
     while (cases.length) {
       normalPlaceholder = cases.shift();
+
       try {
         validText = this.getTextForGuessing(originalText, offset, normalPlaceholder);
         ast = this.getAST(validText);
@@ -87,12 +93,15 @@ export default class TemplateCompletionProvider {
         ast = null;
       }
     }
+
     log('ast must exists');
+
     if (ast === null) {
       return null;
     }
 
     const focusPath = this.createFocusPath(ast, toPosition(position), validText);
+
     if (!focusPath) {
       return null;
     }
@@ -123,9 +132,11 @@ export default class TemplateCompletionProvider {
 
     const { root } = project;
     const results = this.getFocusPath(document, position, PLACEHOLDER);
+
     if (!results) {
       return [];
     }
+
     const focusPath = results.focusPath;
     const originalText = results.originalText;
     const normalPlaceholder = results.normalPlaceholder;
@@ -150,6 +161,7 @@ export default class TemplateCompletionProvider {
     });
     const textPrefix = getTextPrefix(focusPath, normalPlaceholder);
     const endCharacterPosition = position.character;
+
     if (textPrefix.length) {
       // eslint-disable-next-line
       position.character -= textPrefix.length;
@@ -160,14 +172,17 @@ export default class TemplateCompletionProvider {
       maxResults: 40,
     }).map((rawEl: CompletionItem) => {
       const el = Object.assign({}, rawEl);
+
       if (el.textEdit) {
         return el;
       }
+
       const endPosition = {
         line: position.line,
         character: endCharacterPosition,
       };
       const shouldFixContent = normalPlaceholder.includes('}}{{');
+
       el.textEdit = {
         newText: shouldFixContent ? normalPlaceholder.split(PLACEHOLDER).join(el.label).replace('}}{{', '}}\n  \n{{') : el.label,
         range: {
@@ -183,14 +198,17 @@ export default class TemplateCompletionProvider {
 
 function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
   let node = astPath.node;
+
   // handle block params autocomplete case
   if (node.type === 'ElementNode' || node.type === 'BlockStatement') {
     const meta = astPath.metaForType('handlebars');
     const maybeBlockDefenition = meta && meta.maybeBlockParamDefinition;
+
     if (maybeBlockDefenition) {
       node = maybeBlockDefenition;
     }
   }
+
   const target = node.original || node.tag || node.name || node.chars || '';
 
   return target.replace(normalPlaceholder, '').replace(PLACEHOLDER, '');

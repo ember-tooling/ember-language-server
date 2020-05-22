@@ -31,6 +31,7 @@ function setCwd(cwd: string) {
     logError(`chdir: ${err.toString()}`);
   }
 }
+
 export default class TemplateLinter {
   private _linterCache = new Map<Project, any>();
 
@@ -52,6 +53,7 @@ export default class TemplateLinter {
 
     const documentContent = textDocument.getText();
     const source = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
+
     if (!source.trim().length) {
       return;
     }
@@ -59,6 +61,7 @@ export default class TemplateLinter {
     const TemplateLinter = await this.getLinter(project);
 
     let linter = null;
+
     try {
       setCwd(project.root);
       linter = new TemplateLinter();
@@ -93,23 +96,30 @@ export default class TemplateLinter {
       if (!this.templateLintConfig(project.root)) {
         return;
       }
+
       let nodePath = Files.resolveGlobalNodePath();
+
       // vs-code-online fix (we don't have global path, but it returned)
       if (!nodePath || !fs.existsSync(nodePath)) {
         // easy fix case
         nodePath = 'node_modules';
+
         if (!fs.existsSync(path.join(project.root, nodePath))) {
           return;
         }
       }
+
       const linterPath = await (Files.resolveModulePath(project.root, 'ember-template-lint', nodePath, () => {
         /* intentially empty default callback */
       }) as Promise<any>);
+
       if (!linterPath) {
         return;
       }
+
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const linter = require(linterPath);
+
       this._linterCache.set(project, linter);
 
       return linter;

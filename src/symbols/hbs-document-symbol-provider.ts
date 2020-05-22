@@ -31,6 +31,7 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
 
           node.program.blockParams.forEach((blockParam: string) => {
             const symbol = SymbolInformation.create(blockParam, SymbolKind.Variable, toLSRange(node.loc));
+
             symbols.push(symbol);
           });
         },
@@ -42,9 +43,11 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
                 symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
               });
           }
+
           if (node.path.type === 'PathExpression') {
             if (node.path.data) {
               const symbol = SymbolInformation.create(node.path.original, SymbolKind.Variable, toLSRange(node.path.loc));
+
               symbols.push(symbol);
             }
           }

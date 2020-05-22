@@ -71,9 +71,11 @@ interface HandlerObject {
 
 export async function queryELSAddonsAPIChain(callbacks: any[], root: string, params: any): Promise<any[]> {
   let lastResult = params.results || [];
+
   for (const callback of callbacks) {
     try {
       const tempResult = await callback(root, Object.assign({}, params, { results: JSON.parse(JSON.stringify(lastResult)) }));
+
       // API must return array
       if (Array.isArray(tempResult)) {
         lastResult = tempResult;
@@ -106,6 +108,7 @@ export function initBuiltinProviders(): ProjectProviders {
 function requireUncached(module: string) {
   delete require.cache[require.resolve(module)];
   let result = {};
+
   try {
     result = require(module);
   } catch (e) {
@@ -121,8 +124,10 @@ export function collectProjectProviders(root: string, addons: string[]): Project
     .concat(getProjectAddonsRoots(root) as any, getProjectInRepoAddonsRoots(root) as any)
     .filter((pathItem: any) => typeof pathItem === 'string');
   const dagMap: DAGMap<HandlerObject> = new DAGMap();
+
   roots.forEach((packagePath: string) => {
     const info = getPackageJSON(packagePath);
+
     if (hasEmberLanguageServerExtension(info)) {
       const handlerPath = languageServerHandler(info);
       const addonInfo = info['ember-addon'] || {};
@@ -136,6 +141,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
         debug: isDebugModeEnabled(info),
         capabilities: normalizeCapabilities(extensionCapabilities(info)),
       };
+
       dagMap.add(info.name || packagePath, addon, addonInfo.before, addonInfo.after);
     }
   });
@@ -169,6 +175,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
       logInfo(`els-addon-api: debug mode enabled for ${handlerObject.packageRoot}, for all requests resolvers will be reloaded.`);
       result.completionProviders.push(function (root: string, params: CompletionFunctionParams) {
         handlerObject.updateHandler();
+
         if (typeof handlerObject.handler.onComplete === 'function') {
           return handlerObject.handler.onComplete(root, params);
         } else {
@@ -177,6 +184,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
       } as CompletionResolveFunction);
       result.referencesProviders.push(function (root: string, params: ReferenceFunctionParams) {
         handlerObject.updateHandler();
+
         if (typeof handlerObject.handler.onReference === 'function') {
           return handlerObject.handler.onReference(root, params);
         } else {
@@ -185,6 +193,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
       } as ReferenceResolveFunction);
       result.definitionProviders.push(function (root: string, params: DefinitionFunctionParams) {
         handlerObject.updateHandler();
+
         if (typeof handlerObject.handler.onDefinition === 'function') {
           return handlerObject.handler.onDefinition(root, params);
         } else {
@@ -193,6 +202,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
       } as DefinitionResolveFunction);
       result.initFunctions.push(function (server: Server, project: Project) {
         handlerObject.updateHandler();
+
         if (typeof handlerObject.handler.onInit === 'function') {
           return handlerObject.handler.onInit(server, project);
         } else {
@@ -201,6 +211,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
       } as InitFunction);
       result.codeActionProviders.push(function (root: string, params: CodeActionFunctionParams) {
         handlerObject.updateHandler();
+
         if (typeof handlerObject.handler.onCodeAction === 'function') {
           return handlerObject.handler.onCodeAction(root, params);
         } else {
@@ -209,18 +220,23 @@ export function collectProjectProviders(root: string, addons: string[]): Project
       } as CodeActionResolveFunction);
     } else {
       result.info.push('addon: ' + _);
+
       if (handlerObject.capabilities.completionProvider && typeof handlerObject.handler.onComplete === 'function') {
         result.completionProviders.push(handlerObject.handler.onComplete);
       }
+
       if (handlerObject.capabilities.referencesProvider && typeof handlerObject.handler.onReference === 'function') {
         result.referencesProviders.push(handlerObject.handler.onReference);
       }
+
       if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
         result.definitionProviders.push(handlerObject.handler.onDefinition);
       }
+
       if (handlerObject.capabilities.codeActionProvider && typeof handlerObject.handler.onCodeAction === 'function') {
         result.codeActionProviders.push(handlerObject.handler.onCodeAction);
       }
+
       if (typeof handlerObject.handler.onInit === 'function') {
         result.initFunctions.push(handlerObject.handler.onInit);
       }
@@ -270,9 +286,11 @@ function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabiliti
 export function extensionCapabilities(info: any): ExtensionCapabilities {
   return info[ADDON_CONFIG_KEY].capabilities || {};
 }
+
 export function languageServerHandler(info: any): string {
   return info[ADDON_CONFIG_KEY].entry;
 }
+
 export function isDebugModeEnabled(info: any): boolean {
   return info[ADDON_CONFIG_KEY].debug === true;
 }

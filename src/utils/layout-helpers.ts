@@ -60,6 +60,7 @@ export function safeWalkSync(filePath: string | false, opts: any) {
   if (!filePath) {
     return [];
   }
+
   if (!fs.existsSync(filePath)) {
     return [];
   }
@@ -69,12 +70,15 @@ export function safeWalkSync(filePath: string | false, opts: any) {
 
 export function getPodModulePrefix(root: string): string | null {
   let podModulePrefix = '';
+
   // log('listPodsComponents');
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const appConfig = require(path.join(root, 'config', 'environment.js'));
+
     // log('appConfig', appConfig);
     podModulePrefix = appConfig('development').podModulePrefix || '';
+
     if (podModulePrefix.includes('/')) {
       podModulePrefix = podModulePrefix.split('/').pop() as string;
     }
@@ -82,6 +86,7 @@ export function getPodModulePrefix(root: string): string | null {
     // log('catch', e);
     return null;
   }
+
   if (!podModulePrefix) {
     return null;
   }
@@ -91,15 +96,18 @@ export function getPodModulePrefix(root: string): string | null {
 
 export function resolvePackageRoot(root: string, addonName: string, packagesFolder = 'node_modules') {
   const roots = root.split(path.sep);
+
   while (roots.length) {
     const prefix = roots.join(path.sep);
     const maybePath = path.join(prefix, packagesFolder, addonName);
     const linkedPath = path.join(prefix, addonName);
+
     if (fs.existsSync(path.join(maybePath, 'package.json'))) {
       return maybePath;
     } else if (fs.existsSync(path.join(linkedPath, 'package.json'))) {
       return linkedPath;
     }
+
     roots.pop();
   }
 
@@ -126,6 +134,7 @@ export function getProjectInRepoAddonsRoots(root: string) {
     globs: ['**/package.json'],
   });
   const roots: string[] = [];
+
   addons
     .map((relativePath: string) => {
       return path.dirname(path.join(root, prefix, relativePath));
@@ -154,6 +163,7 @@ export function listGlimmerXComponents(root: string) {
     return jsPaths
       .map((p) => {
         const fileName = p.split('/').pop();
+
         if (fileName === undefined) {
           return '';
         }
@@ -178,9 +188,11 @@ export function listGlimmerXComponents(root: string) {
 export function listGlimmerNativeComponents(root: string) {
   try {
     const possiblePath = resolvePackageRoot(root, 'glimmer-native', 'node_modules');
+
     if (!possiblePath) {
       return [];
     }
+
     const components = fs.readdirSync(path.join(possiblePath, 'dist', 'src', 'glimmer', 'native-components'));
 
     return components.map((name) => {
@@ -199,9 +211,11 @@ function hasDep(pack: any, depName: string) {
   if (pack.dependencies && pack.dependencies[depName]) {
     return true;
   }
+
   if (pack.devDependencies && pack.devDependencies[depName]) {
     return true;
   }
+
   if (pack.peerDependencies && pack.peerDependencies[depName]) {
     return true;
   }
@@ -223,11 +237,13 @@ export function isGlimmerXProject(root: string) {
 
 export function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
   const pack = getPackageJSON(root);
+
   if (resolvedItems.length) {
     if (!isEmberAddon(pack)) {
       return [];
     }
   }
+
   // log('getPackageJSON', pack);
   const items = resolvedItems.length
     ? [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.peerDependencies || {})]
@@ -242,12 +258,15 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
       return p !== false;
     });
   const recursiveRoots: string[] = resolvedItems.slice(0);
+
   roots.forEach((rootItem: string) => {
     const packInfo = getPackageJSON(rootItem);
+
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
       return;
     }
+
     if (!recursiveRoots.includes(rootItem)) {
       recursiveRoots.push(rootItem);
       getProjectAddonsRoots(rootItem, recursiveRoots, packageFolderName).forEach((item: string) => {
@@ -301,13 +320,16 @@ export function getProjectAddonsInfo(root: string) {
     .filter((pathItem: any) => typeof pathItem === 'string');
   // log('roots', roots);
   const meta: any = [];
+
   roots.forEach((packagePath: string) => {
     const info = getPackageJSON(packagePath);
     // log('info', info);
     const version = addonVersion(info);
+
     if (version === null) {
       return;
     }
+
     if (version === 1) {
       // log('isEmberAddon', packagePath);
       const extractedData = [
@@ -319,12 +341,14 @@ export function getProjectAddonsInfo(root: string) {
         ...listServices(packagePath),
         ...listModifiers(packagePath),
       ];
+
       // log('extractedData', extractedData);
       if (extractedData.length) {
         meta.push(extractedData);
       }
     }
   });
+
   // log('meta', meta);
   if (isGlimmerNativeProject(root)) {
     meta.push(listGlimmerNativeComponents(root));
@@ -347,9 +371,11 @@ export function getProjectAddonsInfo(root: string) {
 
 export function pureComponentName(relativePath: string) {
   const ext = path.extname(relativePath); // .hbs
+
   if (relativePath.startsWith('/')) {
     relativePath = relativePath.slice(1);
   }
+
   if (relativePath.endsWith(`/template${ext}`)) {
     return relativePath.replace(`/template${ext}`, '');
   } else if (relativePath.endsWith(`/component${ext}`)) {
@@ -367,9 +393,11 @@ export function pureComponentName(relativePath: string) {
 
 export function listPodsComponents(root: string): CompletionItem[] {
   const podModulePrefix = podModulePrefixForRoot(root);
+
   if (podModulePrefix === null) {
     return [];
   }
+
   const entryPath = path.join(root, 'app', podModulePrefix, 'components');
   const jsPaths = safeWalkSync(entryPath, {
     directories: false,
@@ -483,8 +511,10 @@ export function findTestsForProject(project: Project) {
   paths.forEach((filePath: string) => {
     const fullPath = path.join(entry, filePath);
     const item = project.matchPathToType(fullPath);
+
     if (item) {
       const normalizedItem = normalizeMatchNaming(item);
+
       addToRegistry(normalizedItem.name, normalizedItem.type, [fullPath]);
     }
   });
@@ -561,9 +591,11 @@ export function listRoutes(root: string): CompletionItem[] {
   });
 
   let items: any[] = [];
+
   items = items.concat(
     templatePaths.map((filePath) => {
       const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+
       addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
 
       return {
@@ -577,6 +609,7 @@ export function listRoutes(root: string): CompletionItem[] {
   items = items.concat(
     paths.map((filePath) => {
       const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+
       addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
 
       return {
@@ -589,6 +622,7 @@ export function listRoutes(root: string): CompletionItem[] {
 
   controllers.forEach((filePath) => {
     const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+
     addToRegistry(label, 'routePath', [path.join(controllersEntry, filePath)]);
   });
 

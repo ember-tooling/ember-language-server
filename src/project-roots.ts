@@ -40,18 +40,24 @@ export class Project {
       logError('too many files for project ' + this.root);
       this.files.clear();
     }
+
     const rawPath = uriToFilePath(uri);
+
     if (!rawPath) {
       return;
     }
+
     const filePath = path.resolve(rawPath);
     const item = this.matchPathToType(filePath);
     let normalizedItem: undefined | NormalizedRegistryItem = undefined;
+
     if (item) {
       normalizedItem = normalizeMatchNaming(item) as NormalizedRegistryItem;
     }
+
     if (change === 3) {
       this.files.delete(filePath);
+
       if (normalizedItem) {
         removeFromRegistry(normalizedItem.name, normalizedItem.type, [filePath]);
       }
@@ -59,14 +65,18 @@ export class Project {
       if (normalizedItem) {
         addToRegistry(normalizedItem.name, normalizedItem.type, [filePath]);
       }
+
       if (!this.files.has(filePath)) {
         this.files.set(filePath, { version: 0 });
       }
+
       const file = this.files.get(filePath);
+
       if (file) {
         file.version++;
       }
     }
+
     this.watchers.forEach((cb) => cb(uri, change));
   }
   addCommandExecutor(key: string, cb: Executor) {
@@ -82,9 +92,11 @@ export class Project {
     this.providers = collectProjectProviders(root, addons);
     this.builtinProviders = initBuiltinProviders();
     const maybePrefix = getPodModulePrefix(root);
+
     if (maybePrefix) {
       this.podModulePrefix = 'app/' + maybePrefix;
     }
+
     this.classicMatcher = new ClassicPathMatcher();
     this.podMatcher = new PodMatcher();
   }
@@ -105,6 +117,7 @@ export class Project {
     this.builtinProviders.initFunctions.forEach((initFn) => {
       try {
         const initResult = initFn(server, this);
+
         if (typeof initResult === 'function') {
           this.destructors.push(initResult);
         }
@@ -117,6 +130,7 @@ export class Project {
     this.providers.initFunctions.forEach((initFn) => {
       try {
         const initResult = initFn(server, this);
+
         if (typeof initResult === 'function') {
           this.destructors.push(initResult);
         }
@@ -125,6 +139,7 @@ export class Project {
         this.initIssues.push(e);
       }
     });
+
     if (this.providers.info.length) {
       logInfo('--------------------');
       logInfo('loded language server addons:');
@@ -157,15 +172,18 @@ export default class ProjectRoots {
 
   removeProject(projectRoot: string) {
     const project = this.projectForPath(projectRoot);
+
     if (project) {
       project.unload();
     }
+
     this.projects.delete(projectRoot);
   }
 
   setLocalAddons(paths: string[]) {
     paths.forEach((element: string) => {
       const addonPath = path.resolve(element);
+
       if (fs.existsSync(addonPath) && isELSAddonRoot(addonPath)) {
         if (!this.localAddons.includes(addonPath)) {
           this.localAddons.push(addonPath);
@@ -184,6 +202,7 @@ export default class ProjectRoots {
     roots.forEach((rootPath: string) => {
       const filePath = path.join(workspaceRoot, rootPath);
       const fullPath = path.dirname(filePath);
+
       if (filePath.endsWith('package.json')) {
         try {
           if (isGlimmerNativeProject(fullPath) || isGlimmerXProject(fullPath)) {
@@ -208,8 +227,10 @@ export default class ProjectRoots {
     if (this.projects.has(path)) {
       return false;
     }
+
     try {
       const project = new Project(path, this.localAddons);
+
       this.projects.set(path, project);
       logInfo(`Ember CLI project added at ${path}`);
       project.init(this.server);

@@ -47,18 +47,23 @@ export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, 
   if (!(kind in GLOBAL_REGISTRY)) {
     return;
   }
+
   if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
     return;
   }
+
   if (GLOBAL_REGISTRY[kind].has(normalizedName)) {
     const regItem = GLOBAL_REGISTRY[kind].get(normalizedName);
+
     if (regItem) {
       files.forEach((file) => {
         regItem.delete(file);
+
         if (file.endsWith('.hbs')) {
           updateTemplateTokens(kind as UsageType, normalizedName, null);
         }
       });
+
       if (regItem.size === 0) {
         GLOBAL_REGISTRY[kind].delete(normalizedName);
       }
@@ -69,15 +74,19 @@ export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, 
 export function getRegistryForRoot(root: string) {
   const registryForRoot: any = {};
   const registry = getGlobalRegistry();
+
   Object.keys(registry).forEach((key: REGISTRY_KIND) => {
     registryForRoot[key] = {};
+
     for (const [itemName, paths] of registry[key].entries()) {
       const items: string[] = [];
+
       paths.forEach((normalizedPath) => {
         if (normalizedPath.startsWith(root)) {
           items.push(normalizedPath);
         }
       });
+
       if (items.length) {
         registryForRoot[key][itemName] = items;
       }
@@ -91,14 +100,18 @@ export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files
   if (!(kind in GLOBAL_REGISTRY)) {
     return;
   }
+
   if (!GLOBAL_REGISTRY[kind].has(normalizedName)) {
     GLOBAL_REGISTRY[kind].set(normalizedName, new Set());
   }
+
   if (GLOBAL_REGISTRY[kind].has(normalizedName)) {
     const regItem = GLOBAL_REGISTRY[kind].get(normalizedName);
+
     if (regItem) {
       files.forEach((file) => {
         regItem.add(file);
+
         if ((kind === 'component' || kind === 'routePath') && file.endsWith('.hbs')) {
           updateTemplateTokens(kind, normalizedName, file);
         }

@@ -24,6 +24,7 @@ export default class ScriptCompletionProvider {
   async initRegistry(_: Server, project: Project) {
     try {
       const initStartTime = Date.now();
+
       mListModels(project.root);
       mListServices(project.root);
       logInfo(project.root + ': script registry initialized in ' + (Date.now() - initStartTime) + 'ms');
@@ -33,11 +34,14 @@ export default class ScriptCompletionProvider {
   }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     const focusPath = params.focusPath;
+
     if (params.type !== 'script') {
       return params.results;
     }
+
     log('script:onComplete');
     const completions: CompletionItem[] = params.results;
+
     try {
       if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
         log('isStoreModelLookup || isModelReference');
@@ -71,22 +75,28 @@ export default class ScriptCompletionProvider {
         });
       } else if (isComputedPropertyArgument(focusPath)) {
         log('isComputedPropertyArgument');
+
         if (!focusPath.parentPath || !focusPath.parentPath.parentPath) {
           return [];
         }
+
         const node = closestScriptNodeParent(focusPath, 'ObjectExpression', ['ObjectProperty']) || closestScriptNodeParent(focusPath, 'ClassBody');
+
         if (node === null) {
           log('isComputedPropertyArgument - unable to find keys');
 
           return [];
         }
+
         (node.properties || node.body || []).forEach((property: any) => {
           let name = null;
+
           if (property.key.type === 'StringLiteral') {
             name = property.key.value;
           } else if (property.key.type === 'Identifier') {
             name = property.key.name;
           }
+
           if (name !== null) {
             completions.push({
               kind: 10,

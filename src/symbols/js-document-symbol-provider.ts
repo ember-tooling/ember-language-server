@@ -19,6 +19,7 @@ export default class JSDocumentSymbolProvider implements DocumentSymbolProvider 
           const node = path.node;
 
           const symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, toLSRange(node.key.loc));
+
           symbols.push(symbol);
 
           this.traverse(path);

@@ -63,6 +63,7 @@ class PathResolvers {
   }
   classicImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
+
     pathParts.shift();
     const params = [root, 'app', ...pathParts];
 
@@ -70,6 +71,7 @@ class PathResolvers {
   }
   muImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
+
     pathParts.shift();
     const params = [root, ...pathParts];
 
@@ -86,8 +88,10 @@ export default class CoreScriptDefinitionProvider {
     if (!uri) {
       return null;
     }
+
     const guessedPaths: string[] = [];
     const fnName = 'Import';
+
     if (isModuleUnificationApp(root)) {
       this.resolvers[`mu${fnName}Paths`](root, importPath).forEach((pathLocation: string) => {
         guessedPaths.push(pathLocation);
@@ -97,6 +101,7 @@ export default class CoreScriptDefinitionProvider {
         guessedPaths.push(pathLocation);
       });
     }
+
     this.resolvers.addonImportPaths(root, importPath).forEach((pathLocation: string) => {
       guessedPaths.push(pathLocation);
     });
@@ -115,6 +120,7 @@ export default class CoreScriptDefinitionProvider {
         guessedPaths.push(pathLocation);
       });
       const podPrefix = podModulePrefixForRoot(root);
+
       if (podPrefix) {
         this.resolvers[`pod${fnName}Paths`](root, typeName, podPrefix).forEach((pathLocation: string) => {
           guessedPaths.push(pathLocation);
@@ -132,17 +138,22 @@ export default class CoreScriptDefinitionProvider {
   }
   async onDefinition(root: string, params: DefinitionFunctionParams): Promise<Definition | null> {
     const { textDocument, focusPath, type, results, server, position } = params;
+
     if (type !== 'script') {
       return results;
     }
+
     const uri = textDocument.uri;
     let definitions: Location[] = results;
     const astPath = focusPath;
+
     if (isTemplateElement(astPath)) {
       const project = server.projectRoots.projectForUri(uri);
+
       if (!project) {
         return results;
       }
+
       const templateResults = await server.definitionProvider.template.handle(
         {
           textDocument,
@@ -150,29 +161,36 @@ export default class CoreScriptDefinitionProvider {
         },
         project
       );
+
       if (Array.isArray(templateResults)) {
         definitions = templateResults;
       }
     } else if (isModelReference(astPath)) {
       const modelName = astPath.node.value;
+
       definitions = this.guessPathsForType(root, 'Model', modelName);
     } else if (isTransformReference(astPath)) {
       const transformName = astPath.node.value;
+
       definitions = this.guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
       definitions = this.guessPathForImport(root, uri, astPath.node.value) || [];
     } else if (isServiceInjection(astPath)) {
       let serviceName = astPath.node.name;
       const args = astPath.parent.value.arguments;
+
       if (args.length && args[0].type === 'StringLiteral') {
         serviceName = args[0].value;
       }
+
       definitions = this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
     } else if (isNamedServiceInjection(astPath)) {
       const serviceName = astPath.node.value;
+
       definitions = this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
     } else if (isRouteLookup(astPath)) {
       const routePath = astPath.node.value;
+
       definitions = provideRouteDefinition(root, routePath);
     }
 

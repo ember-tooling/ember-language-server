@@ -39,6 +39,7 @@ function toRange(source: string, error: TemplateLinterError): Range {
   let column: number;
 
   const match = error.message.match(ParseErrorExp) || error.message.match(OnLineErrorExp);
+
   if (match) {
     line = Number(match[1]) - 1;
   } else if (error.line) {

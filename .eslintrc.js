@@ -21,7 +21,14 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {
-    'padding-line-between-statements': ['error', { blankLine: 'always', prev: '*', next: 'return' }],
+    'padding-line-between-statements': [
+      'error',
+      { blankLine: 'always', prev: '*', next: 'return' },
+      { blankLine: 'always', prev: '*', next: 'block-like' },
+      { blankLine: 'always', prev: 'block-like', next: '*' },
+      { blankLine: 'always', prev: ['const', 'let'], next: '*' },
+      { blankLine: 'any', prev: ['const', 'let'], next: ['const', 'let'] },
+    ],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',

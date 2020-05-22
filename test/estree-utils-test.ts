@@ -6,6 +6,7 @@ describe('estree-utils', function () {
   describe('newPosition()', function () {
     it('creates a new Position instances', function () {
       const position = newPosition(42, 17);
+
       expect(position).toHaveProperty('line', 42);
       expect(position).toHaveProperty('column', 17);
     });
@@ -24,6 +25,7 @@ describe('estree-utils', function () {
   describe('toPosition()', function () {
     it('converts languageserver Position to estree Position', function () {
       const position = toPosition(LSPosition.create(41, 17));
+
       expect(position).toHaveProperty('line', 42);
       expect(position).toHaveProperty('column', 17);
     });
@@ -32,6 +34,7 @@ describe('estree-utils', function () {
   describe('toLSPosition()', function () {
     it('converts estree Position to languageserver Position', function () {
       const position = toLSPosition(newPosition(42, 17));
+
       expect(position).toHaveProperty('line', 41);
       expect(position).toHaveProperty('character', 17);
     });
@@ -40,6 +43,7 @@ describe('estree-utils', function () {
   describe('toLSRange()', function () {
     it('converts estree SourceLocation to languageserver Range', function () {
       const { start, end } = toLSRange(newLocation(42, 17, 43, 10));
+
       expect(start).toHaveProperty('line', 41);
       expect(start).toHaveProperty('character', 17);
       expect(end).toHaveProperty('line', 42);

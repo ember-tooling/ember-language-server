@@ -66,6 +66,7 @@ export default class Server {
   addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
     const rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
     const purePaths = rawPaths.filter((p) => path.isAbsolute(p));
+
     if (purePaths.length) {
       addToRegistry(normalizedName, kind, purePaths);
 
@@ -103,13 +104,16 @@ export default class Server {
 
     this.executors['els.setConfig'] = async (_, __, [config]) => {
       this.projectRoots.setLocalAddons(config.local.addons);
+
       if (this.lazyInit) {
         this.executeInitializers();
       }
     };
+
     this.executors['els.reloadProject'] = async (_, __, [projectPath]) => {
       if (projectPath) {
         const project = this.projectRoots.projectForPath(projectPath);
+
         if (project) {
           this.projectRoots.reloadProject(project.root);
 
@@ -131,11 +135,14 @@ export default class Server {
         };
       }
     };
+
     this.executors['els.getRelatedFiles'] = async (_, __, [filePath]) => {
       const fullPath = path.resolve(filePath);
       const project = this.projectRoots.projectForPath(filePath);
+
       if (project) {
         const item = project.matchPathToType(fullPath);
+
         if (item) {
           const normalizedItem = normalizeMatchNaming(item);
 
@@ -145,11 +152,14 @@ export default class Server {
 
       return [];
     };
+
     this.executors['els.getKindUsages'] = async (_, __, [filePath]) => {
       const fullPath = path.resolve(filePath);
       const project = this.projectRoots.projectForPath(filePath);
+
       if (project) {
         const item = project.matchPathToType(fullPath);
+
         if (item) {
           return {
             name: item.name,
@@ -233,9 +243,11 @@ export default class Server {
         return result;
       } else {
         const [uri, ...args] = params.arguments;
+
         try {
           const project = this.projectRoots.projectForPath(uri);
           let result = null;
+
           if (project) {
             if (params.command in project.executors) {
               result = await project.executors[params.command](this, uri, args);
@@ -268,23 +280,29 @@ export default class Server {
   private onInitialize({ rootUri, rootPath, workspaceFolders, initializationOptions, capabilities }: InitializeParams): InitializeResult {
     rootPath = rootUri ? uriToFilePath(rootUri) : rootPath;
     this.clientCapabilities = capabilities || {};
+
     if (!rootPath) {
       return { capabilities: {} };
     }
+
     if (initializationOptions && initializationOptions.editor && initializationOptions.editor === 'vscode') {
       logInfo('lazy init enabled, waiting for config from VSCode');
       this.lazyInit = true;
     }
+
     if (initializationOptions && initializationOptions.isELSTesting) {
       this.onInitialized();
     }
+
     log(`Initializing Ember Language Server at ${rootPath}`);
 
     this.initializers.push(() => {
       this.projectRoots.initialize(rootPath as string);
+
       if (workspaceFolders && Array.isArray(workspaceFolders)) {
         workspaceFolders.forEach((folder) => {
           const folderPath = uriToFilePath(folder.uri);
+
           if (folderPath && rootPath !== folderPath) {
             this.projectRoots.findProjectsInsideRoot(folderPath);
           }
@@ -337,16 +355,20 @@ export default class Server {
 
     const lintResults = await this.templateLinter.lint(change.document);
     const results: Diagnostic[] = [];
+
     if (Array.isArray(lintResults)) {
       lintResults.forEach((result) => {
         results.push(result);
       });
     }
+
     const project: Project | undefined = this.projectRoots.projectForUri(change.document.uri);
+
     if (project) {
       for (const linter of project.linters) {
         try {
           const tempResults = await linter(change.document as TextDocument);
+
           // API must return array
           if (Array.isArray(tempResults)) {
             tempResults.forEach((el) => {
@@ -365,13 +387,16 @@ export default class Server {
   private onDidChangeWatchedFiles(items: DidChangeWatchedFilesParams) {
     items.changes.forEach((change) => {
       const project = this.projectRoots.projectForUri(change.uri);
+
       if (project) {
         project.trackChange(change.uri, change.type);
       } else {
         if (change.type === 1 && change.uri.endsWith('ember-cli-build.js')) {
           const rawPath = uriToFilePath(change.uri);
+
           if (rawPath) {
             const filePath = path.dirname(path.resolve(rawPath));
+
             this.projectRoots.findProjectsInsideRoot(filePath);
           }
         }
@@ -406,6 +431,7 @@ export default class Server {
         await this.templateCompletionProvider.provideCompletions(textDocumentPosition),
         await this.scriptCompletionProvider.provideCompletions(textDocumentPosition),
       ]);
+
       completionItems.push(...templateCompletions, ...scriptCompletions);
     } catch (e) {
       logError(e);
@@ -423,6 +449,7 @@ export default class Server {
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
     const uri = params.textDocument.uri;
     const filePath = uriToFilePath(uri);
+
     if (!filePath) {
       return [];
     }

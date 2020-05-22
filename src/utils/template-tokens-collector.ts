@@ -7,16 +7,20 @@ function tokensFromType(node: any, scopedTokens: any) {
       if (node.data === true || node.this === true) {
         return;
       }
+
       const [possbleToken] = node.parts;
+
       if (!scopedTokens.includes(possbleToken)) {
         return possbleToken;
       }
     },
     ElementNode: ({ tag }: any) => {
       const char = tag.charAt(0);
+
       if (char !== char.toUpperCase() || char === ':') {
         return;
       }
+
       if (scopedTokens.includes(tag)) {
         return;
       }
@@ -24,6 +28,7 @@ function tokensFromType(node: any, scopedTokens: any) {
       return tag;
     },
   };
+
   if (node.type in tokensMap) {
     return (tokensMap as any)[node.type](node);
   }
@@ -31,6 +36,7 @@ function tokensFromType(node: any, scopedTokens: any) {
 
 function addTokens(tokensSet: Set<string>, node: any, scopedTokens: any, nativeTokens: string[] = []) {
   const maybeTokens = tokensFromType(node, scopedTokens);
+
   (Array.isArray(maybeTokens) ? maybeTokens : [maybeTokens]).forEach((maybeToken: string) => {
     if (maybeToken !== undefined && !nativeTokens.includes(maybeToken) && !maybeToken.startsWith('@')) {
       tokensSet.add(maybeToken);
@@ -81,6 +87,7 @@ export function extractTokensFromTemplate(template: string): string[] {
   if (template === '') {
     return [];
   }
+
   const ignored = ['if', 'yield', 'outlet', 'component', 'else', 'unless', 'let', 'each', 'each-in', 'in-element', 'on', 'fn', 'debugger', 'console'];
 
   return getTemplateTokens(template, ignored);

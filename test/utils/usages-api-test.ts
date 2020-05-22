@@ -2,12 +2,14 @@ import { updateTemplateTokens, findRelatedFiles } from '../../src/utils/usages-a
 import { createTempDir } from 'broccoli-test-helper';
 import * as path from 'path';
 let dir = null;
+
 beforeAll(async () => {
   dir = await createTempDir();
 });
 afterAll(async () => {
   await dir.dispose();
 });
+
 function createFile(name: string, content: string): string {
   dir.write({
     [name]: content,

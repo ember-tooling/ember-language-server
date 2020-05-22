@@ -23,9 +23,11 @@ function localizeName(name: string) {
 export function templateContextLookup(root: string, rawCurrentFilePath: string, templateContent: string) {
   const currentFilePath = rawCurrentFilePath.replace('file://', '').split('\\').join('/');
   const nameParts = currentFilePath.split('/components/');
+
   if (nameParts.length !== 2) {
     return [];
   }
+
   const componentName = pureComponentName(nameParts[1].split('.')[0]);
 
   return componentsContextData(root, componentName, templateContent);
@@ -34,14 +36,17 @@ export function templateContextLookup(root: string, rawCurrentFilePath: string, 
 function findComponentScripts(root: string, componentName: string) {
   const possibleLocations = [];
   const registry = getGlobalRegistry();
+
   if (registry.component.has(componentName)) {
     const els: string[] = Array.from((registry.component.get(componentName) as any).values());
+
     els.forEach((el) => {
       if (el.includes(root)) {
         possibleLocations.push([el]);
       }
     });
   }
+
   if (isModuleUnificationApp(root)) {
     possibleLocations.push([root, 'src', 'ui', 'components', componentName, 'component.js']);
     possibleLocations.push([root, 'src', 'ui', 'components', componentName, 'component.ts']);
@@ -53,6 +58,7 @@ function findComponentScripts(root: string, componentName: string) {
     possibleLocations.push([root, 'app', 'components', componentName + '.js']);
     possibleLocations.push([root, 'app', 'components', componentName + '.ts']);
     const prefix = podModulePrefixForRoot(root);
+
     if (prefix) {
       possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.js']);
       possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.ts']);
@@ -73,6 +79,7 @@ function componentsContextData(root: string, componentName: string, templateCont
       const filePath = hasAddonScript ? hasAddonScript : existingScripts.pop();
       const fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
       const jsMeta = processJSFile(fileContent, filePath);
+
       log('jsMeta', jsMeta);
       infoItems.push(jsMeta);
     } catch (e) {
@@ -82,6 +89,7 @@ function componentsContextData(root: string, componentName: string, templateCont
 
   try {
     let templateInfo: any = null;
+
     templateInfo = processTemplate(templateContent);
     infoItems.push(templateInfo);
   } catch (e) {
@@ -105,16 +113,20 @@ function componentsContextData(root: string, componentName: string, templateCont
       return result;
     }, {});
   const items: CompletionItem[] = [];
+
   log('meta', meta);
   let contextInfo: any = {};
+
   try {
     contextInfo = extractComponentInformationFromMeta(meta);
   } catch (e) {
     log('contextInforError', e);
   }
+
   log('contextInfo', contextInfo);
   contextInfo.jsProps.forEach((propName: string) => {
     const [name]: any = propName.split(' ');
+
     items.push({
       kind: CompletionItemKind.Property,
       label: localizeName(name),
@@ -123,6 +135,7 @@ function componentsContextData(root: string, componentName: string, templateCont
   });
   contextInfo.jsComputeds.forEach((propName: string) => {
     const [name]: any = propName.split(' ');
+
     items.push({
       kind: CompletionItemKind.Property,
       label: localizeName(name),
@@ -131,6 +144,7 @@ function componentsContextData(root: string, componentName: string, templateCont
   });
   contextInfo.jsFunc.forEach((propName: string) => {
     const [name]: any = propName.split(' ');
+
     items.push({
       kind: CompletionItemKind.Function,
       label: localizeName(name),
@@ -139,6 +153,7 @@ function componentsContextData(root: string, componentName: string, templateCont
   });
   contextInfo.hbsProps.forEach((propName: string) => {
     const [name]: any = propName.split(' ');
+
     items.push({
       kind: CompletionItemKind.Property,
       label: name,

@@ -33,8 +33,10 @@ export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', 
 export function provideComponentTemplatePaths(root: string, rawComponentName: string) {
   const maybeComponentName = normalizeToClassicComponent(rawComponentName);
   const items = getPathsFromRegistry('component', maybeComponentName, root);
+
   if (items.length) {
     const results = items.filter((el) => el.endsWith('.hbs'));
+
     if (results.length) {
       return results;
     }
@@ -68,6 +70,7 @@ export function provideRouteDefinition(root: string, routeName: string): Locatio
         [root, 'app', 'templates', ...routeParts, lastRoutePart + '.hbs'],
       ];
   const podPrefix = getPodModulePrefix(root);
+
   if (podPrefix) {
     routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.js']);
     routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'route.ts']);
@@ -75,6 +78,7 @@ export function provideRouteDefinition(root: string, routeName: string): Locatio
     routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'controller.ts']);
     routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'template.hbs']);
   }
+
   const filteredPaths = routePaths.map((parts: string[]) => path.join.apply(null, parts)).filter(fs.existsSync);
 
   return pathsToLocations(...filteredPaths);
@@ -85,6 +89,7 @@ export default class TemplateDefinitionProvider {
     const uri = params.textDocument.uri;
     const focusPath = params.focusPath;
     let definitions: Location[] = params.results;
+
     if (params.type !== 'template') {
       return params.results;
     }
@@ -126,9 +131,11 @@ export default class TemplateDefinitionProvider {
     let value = '';
     const node = focusPath.node;
     const parent = focusPath.parent;
+
     if (!parent) {
       return value;
     }
+
     if (node.type === 'StringLiteral' && parent.type === 'HashPair') {
       value = node.original;
     } else if (node.type === 'TextNode' && parent.type === 'AttrNode') {
@@ -139,6 +146,7 @@ export default class TemplateDefinitionProvider {
   }
   maybeClassicComponentName(focusPath: ASTPath) {
     const value = this.extractValueForMaybeClassicComponentName(focusPath);
+
     if (this.looksLikeClassicComponentName(value)) {
       return true;
     } else {
@@ -154,9 +162,11 @@ export default class TemplateDefinitionProvider {
   _provideLikelyRawComponentTemplatePaths(root: string, rawComponentName: string) {
     const maybeComponentName = normalizeToClassicComponent(rawComponentName);
     let paths = getPathsFromRegistry('component', maybeComponentName, root);
+
     if (!paths.length) {
       paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(fs.existsSync);
     }
+
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
@@ -174,6 +184,7 @@ export default class TemplateDefinitionProvider {
   provideBlockComponentDefinition(root: string, focusPath: ASTPath): Location[] {
     const maybeComponentName = focusPath.node.path.original;
     let paths: string[] = getPathsForComponentTemplates(root, maybeComponentName).filter(fs.existsSync);
+
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter((name: string) => {
         return isTemplatePath(name);
@@ -186,15 +197,19 @@ export default class TemplateDefinitionProvider {
 
   providePropertyDefinition(root: string, focusPath: ASTPath, uri: string): Location[] {
     const maybeComponentName = getComponentNameFromURI(root, uri);
+
     if (!maybeComponentName) {
       return [];
     }
+
     let paths: string[] = getPathsForComponentScripts(root, maybeComponentName).filter(fs.existsSync);
+
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName).filter((name: string) => {
         return !isTemplatePath(name);
       });
     }
+
     const text = focusPath.node.original;
 
     return pathsToLocationsWithPosition(paths, text.replace('this.', '').split('.')[0]);
@@ -222,8 +237,10 @@ export default class TemplateDefinitionProvider {
   }
   provideHashPropertyUsage(root: string, focusPath: ASTPath): Location[] {
     const parentPath = focusPath.parentPath;
+
     if (parentPath && parentPath.parent && parentPath.parent.path) {
       const maybeComponentName = parentPath.parent.path.original;
+
       if (!maybeComponentName.includes('.') && maybeComponentName.includes('-')) {
         let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName)].filter(
           fs.existsSync
@@ -257,6 +274,7 @@ export default class TemplateDefinitionProvider {
 
   isLocalProperty(path: ASTPath) {
     const node = path.node;
+
     if (node.type === 'PathExpression') {
       return node.this;
     }
@@ -272,6 +290,7 @@ export default class TemplateDefinitionProvider {
 
   isAnglePropertyAttribute(path: ASTPath) {
     const node = path.node;
+
     if (node.type === 'AttrNode') {
       if (node.name.charAt(0) === '@') {
         return true;
@@ -281,9 +300,11 @@ export default class TemplateDefinitionProvider {
 
   isActionName(path: ASTPath) {
     const node = path.node;
+
     if (!path.parent) {
       return false;
     }
+
     if (
       path.parent.type !== 'MustacheStatement' &&
       path.parent.type !== 'PathExpression' &&
@@ -292,9 +313,11 @@ export default class TemplateDefinitionProvider {
     ) {
       return false;
     }
+
     if (!path.parent || path.parent.path.original !== 'action' || !path.parent.params[0] === node) {
       return false;
     }
+
     if (node.type === 'StringLiteral') {
       return true;
     } else if (node.type === 'PathExpression' && node.this) {
@@ -350,6 +373,7 @@ export default class TemplateDefinitionProvider {
     }
 
     const parent = path.parent;
+
     if (!parent || parent.path !== node || (parent.type !== 'MustacheStatement' && parent.type !== 'BlockStatement' && parent.type !== 'SubExpression')) {
       return false;
     }

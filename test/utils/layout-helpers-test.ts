@@ -69,6 +69,7 @@ describe('definition-helpers', function () {
   describe('listPodsComponents()', function () {
     it('return expected list of components for pods project', function () {
       const components = listPodsComponents(path.join(__dirname, './../fixtures/pod-project'));
+
       expect(components.map(({ label }: { label: string }) => label)).toEqual(['foo-bar-js', 'foo-bar-js', 'foo-bar-ts']);
     });
   });
@@ -76,6 +77,7 @@ describe('definition-helpers', function () {
   describe('listMUComponents()', function () {
     it('return expected list of components for mu project', function () {
       const components = listMUComponents(path.join(__dirname, './../fixtures/mu-project'));
+
       expect(components.map(({ label }: { label: string }) => label)).toEqual(['foo-bar-js', 'foo-bar-js', 'foo-bar-ts']);
     });
   });
@@ -83,6 +85,7 @@ describe('definition-helpers', function () {
   describe('listComponents()', function () {
     it('return expected list of components for classic project', function () {
       const components = listComponents(path.join(__dirname, './../fixtures/full-project'));
+
       expect(components.map(({ label }: { label: string }) => label)).toEqual([
         'another-awesome-component',
         'my-awesome-component',
@@ -95,6 +98,7 @@ describe('definition-helpers', function () {
   describe('listHelpers()', function () {
     it('return expected list of helpers for classic project', function () {
       const components = listHelpers(path.join(__dirname, './../fixtures/full-project'));
+
       expect(components.map(({ label }: { label: string }) => label)).toEqual(['some-helper']);
     });
   });
@@ -102,6 +106,7 @@ describe('definition-helpers', function () {
   describe('listRoutes()', function () {
     it('return expected list of routes for classic project', function () {
       const components = listRoutes(path.join(__dirname, './../fixtures/full-project'));
+
       expect(components.map(({ label }: { label: string }) => label)).toEqual([
         'angle-completion',
         'application',
@@ -118,18 +123,21 @@ describe('definition-helpers', function () {
       const root = __dirname;
       const uri = 'file://' + path.join(__dirname, 'components', 'foo-bar', 'template.hbs');
       const component = getComponentNameFromURI(root, uri);
+
       expect(component).toEqual('foo-bar');
     });
     it('return correct component name from route scoped component template URI', function () {
       const root = __dirname;
       const uri = 'file://' + path.join(__dirname, 'routes', 'hello', '-components', 'foo-bar.hbs');
       const component = getComponentNameFromURI(root, uri);
+
       expect(component).toEqual('foo-bar');
     });
     it('return correct component name from route template URI', function () {
       const root = __dirname;
       const uri = 'file://' + path.join(__dirname, 'templates', 'foo-bar.hbs');
       const component = getComponentNameFromURI(root, uri);
+
       expect(component).toEqual(null);
     });
   });
@@ -138,11 +146,13 @@ describe('definition-helpers', function () {
     it('must discover in-repo addons for classic structure', function () {
       const root = path.join(__dirname, './../fixtures/project-with-in-repo-addons');
       const items = getProjectInRepoAddonsRoots(root);
+
       expect(items.length).toEqual(1);
     });
     it('must discover in-repo addons for MU structure', function () {
       const root = path.join(__dirname, './../fixtures/mu-project-with-in-repo-addons');
       const items = getProjectInRepoAddonsRoots(root);
+
       expect(items.length).toEqual(1);
     });
   });
@@ -151,6 +161,7 @@ describe('definition-helpers', function () {
     it('must resolve all related to project addons', function () {
       const root = path.join(__dirname, './../fixtures/full-project');
       const items = getProjectAddonsRoots(root, [], 'hope_modules');
+
       expect(items.length).toEqual(2);
     });
   });

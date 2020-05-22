@@ -7,8 +7,10 @@ function maybePathDeclaration(astPath: ASTPath) {
   if (isLocalScopedPathExpression(astPath)) {
     const scope = getLocalScope(astPath);
     const pathName = getLocalPathName(astPath.node);
+
     if (pathName) {
       const declaration = scope.find(({ name }) => name === pathName);
+
       if (!declaration) {
         return;
       }
@@ -20,6 +22,7 @@ function maybePathDeclaration(astPath: ASTPath) {
 
 export function maybeComponentNameForPath(astPath: ASTPath) {
   const declaration = maybePathDeclaration(astPath);
+
   if (declaration && declaration.node.type === 'ElementNode') {
     return declaration.node.tag;
   }
@@ -29,7 +32,9 @@ function getLocalPathName(node: any) {
   if (!node || node.type !== 'PathExpression' || !node.parts.length) {
     return undefined;
   }
+
   const pathName: string = node.parts[0];
+
   if (pathName === 'this') {
     return undefined;
   }
@@ -39,11 +44,14 @@ function getLocalPathName(node: any) {
 
 export function isLocalScopedPathExpression(astPath: ASTPath) {
   const pathName = getLocalPathName(astPath.node);
+
   if (!pathName) {
     return false;
   }
+
   const scope = getLocalScope(astPath);
   const declarations = scope.filter(({ name }) => name === pathName);
+
   if (declarations.length) {
     return true;
   } else {
@@ -55,20 +63,25 @@ export function focusedBlockParamName(content: string, position: Position) {
   const source = content.match(reLines) as string[];
   const focusedLine = source[position.line - 1];
   let paramName = '';
+
   if (typeof focusedLine !== 'string') {
     return paramName;
   }
+
   const definitionStartIndex = focusedLine.indexOf('|');
   const definitionEndIndex = focusedLine.lastIndexOf('|');
   const column = position.column;
+
   if (definitionEndIndex >= column && definitionStartIndex <= column) {
     const lineParts = focusedLine.split('|');
     let localColIndex = lineParts[0].length + 1;
     const targetPart = lineParts[1];
     const targets = targetPart.split(' ');
+
     for (let i = 0; i < targets.length; i++) {
       const startIndex = localColIndex;
       const endIndex = startIndex + targets[i].length;
+
       if (column >= startIndex && column <= endIndex) {
         paramName = targets[i].trim();
         break;
@@ -96,6 +109,7 @@ class BlockParamDefinition {
   }
   get index(): number {
     const node = this.path.node;
+
     if (node.type === 'BlockStatement' && node.program) {
       return node.program.blockParams.indexOf(this.name);
     } else if (node.type === 'Block') {
@@ -112,7 +126,9 @@ export function maybeBlockParamDefinition(astPath: ASTPath, content: string, pos
   if (!isBlockParamDefinition(astPath, content, position)) {
     return;
   }
+
   const paramName = focusedBlockParamName(content, position);
+
   if (paramName === '') {
     return;
   }
@@ -122,11 +138,14 @@ export function maybeBlockParamDefinition(astPath: ASTPath, content: string, pos
 
 export function isBlockParamDefinition(astPath: ASTPath, content: string, position: Position) {
   const node = astPath.node;
+
   if (node.type !== 'Block' && node.type !== 'BlockStatement' && node.type !== 'ElementNode') {
     return;
   }
+
   const source = content.match(reLines) as string[];
   const focusedLine = source[position.line - 1];
+
   if (focusedLine.lastIndexOf('|') > position.column && focusedLine.indexOf('|') < position.column) {
     return true;
   }
@@ -147,9 +166,11 @@ export function sourceForNode(node: any, content = '') {
   const lastColumn = node.loc.end.column;
   const string = [];
   const source = content.match(reLines) as string[];
+
   if (currentLine > source.length) {
     return;
   }
+
   let line;
 
   while (currentLine < lastLine) {
@@ -175,14 +196,18 @@ export function sourceForNode(node: any, content = '') {
 export function getLocalScope(astPath: ASTPath) {
   const scopeValues: BlockParamDefinition[] = [];
   let cursor: ASTPath | undefined = astPath.parentPath;
+
   while (cursor) {
     const node = cursor.node;
+
     if (node && (node.type === 'ElementNode' || node.type === 'Block')) {
       const params = node.blockParams;
+
       params.forEach((param: string) => {
         scopeValues.push(new BlockParamDefinition(param, cursor as ASTPath));
       });
     }
+
     cursor = cursor.parentPath;
   }
 
@@ -204,6 +229,7 @@ class HandlebarsASTPathMeta {
 export default class ASTPath {
   static toPosition(ast: any, position: Position, content = ''): ASTPath | undefined {
     const path = _findFocusPath(ast, position);
+
     if (path) {
       return new ASTPath(path, path.length - 1, content, position);
     }
@@ -249,6 +275,7 @@ function _findFocusPath(node: any, position: Position, seen = new Set()): any {
 
   let path: any[] = [];
   const range: SourceLocation = node.loc;
+
   if (range) {
     if (containsPosition(range, position)) {
       path.push(node);
@@ -263,11 +290,13 @@ function _findFocusPath(node: any, position: Position, seen = new Set()): any {
     }
 
     const value = node[key];
+
     if (!value || typeof value !== 'object' || seen.has(value)) {
       continue;
     }
 
     const childPath = _findFocusPath(value, position, seen);
+
     if (childPath.length > 0) {
       path = path.concat(childPath);
       break;

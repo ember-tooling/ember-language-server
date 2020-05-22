@@ -29,8 +29,10 @@ export interface Usage {
 
 export function findRelatedFiles(token: string): Usage[] {
   const results: Usage[] = [];
+
   Object.keys(TEMPLATE_TOKENS).forEach((kindName) => {
     const components = TEMPLATE_TOKENS[kindName as UsageType];
+
     Object.keys(components).forEach((normalizedComponentName: string) => {
       if (components[normalizedComponentName].tokens.includes(token)) {
         results.push({
@@ -52,8 +54,10 @@ export function updateTemplateTokens(kind: UsageType, normalizedName: string, fi
 
     return;
   }
+
   try {
     const tokens = extractTokensFromTemplate(fs.readFileSync(file, 'utf8'));
+
     TEMPLATE_TOKENS[kind][normalizedName] = {
       source: file,
       tokens,
