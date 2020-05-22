@@ -157,7 +157,8 @@ export function getAddonImport(root: string, importPath: string) {
       [rootPath, 'addon', ...importParts],
       [rootPath, ...importParts],
     ];
-    possibleLocations.forEach((locationArr: any) => {
+
+    possibleLocations.forEach((locationArr: Parameters<typeof getAbstractPartsWithTemplates>) => {
       getAbstractPartsWithTemplates(...locationArr).forEach((parts: any) => {
         addonPaths.push(parts);
       });

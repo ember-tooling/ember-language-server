@@ -155,7 +155,7 @@ export default class CoreScriptDefinitionProvider {
       const transformName = astPath.node.value;
       definitions = this.guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
-      definitions = this.guessPathForImport(root, uri, astPath.node.value);
+      definitions = this.guessPathForImport(root, uri, astPath.node.value) || [];
     } else if (isServiceInjection(astPath)) {
       let serviceName = astPath.node.name;
       const args = astPath.parent.value.arguments;
