@@ -1,7 +1,6 @@
 import { getExtension, hasExtension } from '../../src/utils/file-extension';
 
 describe('file-extension-utils', function() {
-
   describe('getExtension()', function() {
     it('return right extensions', function() {
       expect(getExtension({ uri: 'file:///project/app.js' })).toEqual('.js');

@@ -1,0 +1,5 @@
+test/fixtures/
+out/
+node_modules/
+lib/
+coverage/

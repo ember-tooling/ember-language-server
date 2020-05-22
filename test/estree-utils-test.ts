@@ -1,14 +1,6 @@
 import { Position as LSPosition } from 'vscode-languageserver';
 
-import {
-  newPosition,
-  comparePositions,
-  newLocation,
-  containsPosition,
-  toPosition,
-  toLSPosition,
-  toLSRange,
-} from '../src/estree-utils';
+import { newPosition, comparePositions, newLocation, containsPosition, toPosition, toLSPosition, toLSRange } from '../src/estree-utils';
 
 describe('estree-utils', function() {
   describe('newPosition()', function() {

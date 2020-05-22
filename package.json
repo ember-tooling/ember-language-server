@@ -82,7 +82,7 @@
     "changelog": "lerna-changelog",
     "clean": "rimraf lib/",
     "compile": "tsc --skipLibCheck -p .",
-    "lint": "eslint ./src/**/*.ts",
+    "lint": "eslint . --ext js,ts",
     "prepublish": "yarn clean && yarn compile",
     "test": "jest",
     "test:coverage": "jest --coverage",

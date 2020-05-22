@@ -1,7 +1,6 @@
 import { getFirstTextPostion } from '../../src/utils/definition-helpers';
 
 describe('definition-helpers', function() {
-
   describe('getFirstTextPostion()', function() {
     it('return crrect position for different text files', function() {
       expect(getFirstTextPostion(['', ' fooBar ', ''].join('\n'), 'foo')).toEqual([0, 0]);
@@ -10,5 +9,4 @@ describe('definition-helpers', function() {
       expect(getFirstTextPostion(['', ' foo ', ''].join('\n'), 'foo')).toEqual([1, 1]);
     });
   });
-
 });
