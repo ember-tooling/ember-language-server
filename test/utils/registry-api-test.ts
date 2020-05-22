@@ -13,6 +13,7 @@ function createFile(name: string, content: string): string {
   dir.write({
     [name]: content,
   });
+
   return path.join(dir.path(), name);
 }
 

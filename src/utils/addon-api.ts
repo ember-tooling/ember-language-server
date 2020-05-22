@@ -83,6 +83,7 @@ export async function queryELSAddonsAPIChain(callbacks: any[], root: string, par
       log('ELSAddonsAPIError', callback, e.toString(), root, params);
     }
   }
+
   return lastResult;
 }
 
@@ -91,6 +92,7 @@ export function initBuiltinProviders(): ProjectProviders {
   const templateDefinition = new CoreTemplateDefinitionProvider();
   const scriptCompletion = new ScriptCompletionProvider();
   const templateCompletion = new TemplateCompletionProvider();
+
   return {
     definitionProviders: [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)],
     referencesProviders: [],
@@ -109,6 +111,7 @@ function requireUncached(module: string) {
   } catch (e) {
     logError(e);
   }
+
   return result;
 }
 

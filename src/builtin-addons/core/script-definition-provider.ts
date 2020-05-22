@@ -21,6 +21,7 @@ function joinPaths(...args: string[]) {
   return ['.ts', '.js'].map((extName: string) => {
     const localArgs = args.slice(0);
     const lastArg = localArgs.pop() + extName;
+
     return path.join.apply(path, [...localArgs, lastArg]);
   });
 }
@@ -64,12 +65,14 @@ class PathResolvers {
     const pathParts = pathName.split('/');
     pathParts.shift();
     const params = [root, 'app', ...pathParts];
+
     return joinPaths(...params);
   }
   muImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
     pathParts.shift();
     const params = [root, ...pathParts];
+
     return joinPaths(...params);
   }
 }
@@ -97,6 +100,7 @@ export default class CoreScriptDefinitionProvider {
     this.resolvers.addonImportPaths(root, importPath).forEach((pathLocation: string) => {
       guessedPaths.push(pathLocation);
     });
+
     return pathsToLocations(...guessedPaths);
   }
   guessPathsForType(root: string, fnName: ItemType, typeName: string) {
@@ -123,6 +127,7 @@ export default class CoreScriptDefinitionProvider {
         guessedPaths.push(item);
       });
     }
+
     return pathsToLocations(...guessedPaths);
   }
   async onDefinition(root: string, params: DefinitionFunctionParams): Promise<Definition | null> {

@@ -21,6 +21,7 @@ export default class TemplateCompletionProvider {
   getRoots(doc: TextDocumentIdentifier) {
     const project = this.server.projectRoots.projectForUri(doc.uri);
     const document = this.server.documents.get(doc.uri);
+
     return {
       project,
       document,
@@ -48,6 +49,7 @@ export default class TemplateCompletionProvider {
     log('originalText', originalText);
     if (originalText.trim().length === 0) {
       log('originalText - empty');
+
       return null;
     }
     const offset = document.offsetAt(position);
@@ -94,6 +96,7 @@ export default class TemplateCompletionProvider {
     if (!focusPath) {
       return null;
     }
+
     return {
       ast,
       focusPath,
@@ -107,6 +110,7 @@ export default class TemplateCompletionProvider {
 
     if (ext !== null && !extensionsToProvideTemplateCompletions.includes(ext)) {
       log('template:provideCompletions:unsupportedExtension', ext);
+
       return [];
     }
 
@@ -150,6 +154,7 @@ export default class TemplateCompletionProvider {
       // eslint-disable-next-line
       position.character -= textPrefix.length;
     }
+
     return filter(addonResults, textPrefix, {
       key: 'label',
       maxResults: 40,
@@ -170,6 +175,7 @@ export default class TemplateCompletionProvider {
           end: endPosition,
         },
       };
+
       return el;
     });
   }
@@ -186,5 +192,6 @@ function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
     }
   }
   const target = node.original || node.tag || node.name || node.chars || '';
+
   return target.replace(normalPlaceholder, '').replace(PLACEHOLDER, '');
 }

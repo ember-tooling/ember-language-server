@@ -64,6 +64,7 @@ export default class TemplateLinter {
       linter = new TemplateLinter();
     } catch (e) {
       setCwd(cwd);
+
       return;
     }
 
@@ -107,6 +108,7 @@ export default class TemplateLinter {
       }
       const linter = require(linterPath);
       this._linterCache.set(project, linter);
+
       return linter;
     } catch (error) {
       log('Module ember-template-lint not found.');

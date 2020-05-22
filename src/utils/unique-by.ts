@@ -7,6 +7,7 @@ export default function uniqueBy<T extends object, K extends keyof T>(arr: T[], 
     }
 
     flags.set(entry[property], true);
+
     return true;
   });
 }

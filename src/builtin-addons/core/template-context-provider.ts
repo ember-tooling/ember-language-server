@@ -27,6 +27,7 @@ export function templateContextLookup(root: string, rawCurrentFilePath: string, 
     return [];
   }
   const componentName = pureComponentName(nameParts[1].split('.')[0]);
+
   return componentsContextData(root, componentName, templateContent);
 }
 
@@ -57,6 +58,7 @@ function findComponentScripts(root: string, componentName: string) {
       possibleLocations.push([root, 'app', prefix, 'components', componentName, 'component.ts']);
     }
   }
+
   return possibleLocations.map((locArr: string[]) => path.join.apply(null, locArr));
 }
 
@@ -99,6 +101,7 @@ function componentsContextData(root: string, componentName: string, templateCont
           result[name] = it[name].slice(0);
         }
       });
+
       return result;
     }, {});
   const items: CompletionItem[] = [];
@@ -142,6 +145,7 @@ function componentsContextData(root: string, componentName: string, templateCont
       detail: 'Template Property: ' + propName,
     });
   });
+
   // contextInfo.api.actions.forEach((propName: string) => {
   //   const [name]: any = propName.split(' ');
   //   items.push({

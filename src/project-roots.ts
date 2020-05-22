@@ -213,12 +213,14 @@ export default class ProjectRoots {
       this.projects.set(path, project);
       logInfo(`Ember CLI project added at ${path}`);
       project.init(this.server);
+
       return {
         initIssues: project.initIssues,
         providers: project.providers,
       };
     } catch (e) {
       logError(e);
+
       return false;
     }
   }
@@ -227,11 +229,13 @@ export default class ProjectRoots {
     const path = uriToFilePath(uri);
 
     if (!path) return;
+
     return this.projectForPath(path);
   }
 
   projectForPath(path: string): Project | undefined {
     const root = (Array.from(this.projects.keys()) || []).filter((root) => path!.indexOf(root) === 0).reduce((a, b) => (a.length > b.length ? a : b), '');
+
     return this.projects.get(root);
   }
 }

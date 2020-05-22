@@ -30,6 +30,7 @@ export function toLSRange(loc: SourceLocation): LSRange {
 export function newLocation(startLine: number, startColumn: number, endLine: number, endColumn: number): SourceLocation {
   const start = { line: startLine, column: startColumn };
   const end = { line: endLine, column: endColumn };
+
   return { start, end };
 }
 

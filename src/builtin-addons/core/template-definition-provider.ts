@@ -26,6 +26,7 @@ export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', 
   const absRoot = path.normalize(root);
   const registry = getGlobalRegistry();
   const bucket: any = registry[type].get(name) || new Set();
+
   return Array.from(bucket).filter((el: string) => path.normalize(el).includes(absRoot) && fs.existsSync(el)) as string[];
 }
 
@@ -44,6 +45,7 @@ export function provideComponentTemplatePaths(root: string, rawComponentName: st
   if (!paths.length) {
     paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
   }
+
   return paths;
 }
 
@@ -74,6 +76,7 @@ export function provideRouteDefinition(root: string, routeName: string): Locatio
     routePaths.push([root, 'app', podPrefix, ...routeParts, lastRoutePart, 'template.hbs']);
   }
   const filteredPaths = routePaths.map((parts: string[]) => path.join.apply(null, parts)).filter(fs.existsSync);
+
   return pathsToLocations(...filteredPaths);
 }
 
@@ -132,6 +135,7 @@ export default class TemplateDefinitionProvider {
     } else if (node.type === 'TextNode' && parent.type === 'AttrNode') {
       value = node.chars;
     }
+
     return value;
   }
   maybeClassicComponentName(focusPath: ASTPath) {
@@ -157,6 +161,7 @@ export default class TemplateDefinitionProvider {
     if (!paths.length) {
       paths = mAddonPathsForComponentTemplates(root, maybeComponentName);
     }
+
     return paths;
   }
   provideLikelyComponentTemplatePath(root: string, rawComponentName: string): Location[] {
@@ -175,6 +180,7 @@ export default class TemplateDefinitionProvider {
         return isTemplatePath(name);
       });
     }
+
     // mAddonPathsForComponentTemplates
     return pathsToLocationsWithPosition(paths, '{{yield');
   }
@@ -191,6 +197,7 @@ export default class TemplateDefinitionProvider {
       });
     }
     const text = focusPath.node.original;
+
     return pathsToLocationsWithPosition(paths, text.replace('this.', '').split('.')[0]);
   }
 
@@ -211,6 +218,7 @@ export default class TemplateDefinitionProvider {
   }
   provideMustacheDefinition(root: string, focusPath: ASTPath) {
     const maybeComponentName = focusPath.node.type === 'ElementNode' ? normalizeToClassicComponent(focusPath.node.tag) : focusPath.node.original;
+
     return this.provideComponentDefinition(root, maybeComponentName);
   }
   provideHashPropertyUsage(root: string, focusPath: ASTPath): Location[] {
@@ -227,9 +235,11 @@ export default class TemplateDefinitionProvider {
         }
 
         const finalPaths = paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths;
+
         return pathsToLocationsWithPosition(finalPaths, '@' + focusPath.node.key);
       }
     }
+
     return [];
   }
   provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath): Location[] {
@@ -242,6 +252,7 @@ export default class TemplateDefinitionProvider {
     }
 
     const finalPaths = paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths;
+
     return pathsToLocationsWithPosition(finalPaths, focusPath.node.name);
   }
 
@@ -250,11 +261,13 @@ export default class TemplateDefinitionProvider {
     if (node.type === 'PathExpression') {
       return node.this;
     }
+
     return false;
   }
 
   isHashPairKey(path: ASTPath) {
     const node = path.node;
+
     return node.type === 'HashPair';
   }
 
@@ -288,11 +301,13 @@ export default class TemplateDefinitionProvider {
     } else if (node.type === 'PathExpression' && node.this) {
       return true;
     }
+
     return false;
   }
 
   isComponentWithBlock(path: ASTPath) {
     const node = path.node;
+
     return (
       node.type === 'BlockStatement' &&
       node.path.type === 'PathExpression' &&

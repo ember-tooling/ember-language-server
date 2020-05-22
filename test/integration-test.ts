@@ -28,6 +28,7 @@ async function reloadProjects(connection, project = undefined) {
     command: 'els.reloadProject',
     arguments: project ? [project] : [],
   });
+
   return result;
 }
 
@@ -44,6 +45,7 @@ async function createProject(files, connection) {
     },
   };
   await connection.sendRequest(InitializeRequest.type as any, params);
+
   return {
     normalizedPath,
     result,
@@ -60,6 +62,7 @@ function textDocument(modelPath, position = { line: 0, character: 0 }) {
     },
     position,
   };
+
   return params;
 }
 
@@ -70,6 +73,7 @@ async function getResult(reqType, connection, files, fileToInspect, position) {
   openFile(connection, modelPath);
   const response = await connection.sendRequest(reqType, params);
   await destroy();
+
   return normalizeUri(response, normalizedPath);
 }
 
@@ -101,6 +105,7 @@ function normalizeUri(objects: Definition, base?: string) {
     if (base) {
       objects.uri = replaceTempUriPart(objects.uri, base);
     }
+
     return objects;
   }
 
@@ -133,6 +138,7 @@ function makeProject(appFiles = {}, addons = {}) {
       dependencies,
     }),
   });
+
   return fileStructure;
 }
 
@@ -145,6 +151,7 @@ function makeAddonPackage(name, config, addonConfig = undefined) {
   if (addonConfig) {
     pack['ember-addon'] = addonConfig;
   }
+
   return JSON.stringify(pack);
 }
 

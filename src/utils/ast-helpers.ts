@@ -15,6 +15,7 @@ function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   if (!parent.callee || !parent.callee.property) {
     return false;
   }
+
   return true;
 }
 
@@ -32,6 +33,7 @@ export function closestScriptNodeParent(astPath: ASTPath, type: string, ignorePa
       lookupPath = lookupPath.parentPath;
     }
   }
+
   return null;
 }
 
@@ -41,6 +43,7 @@ export function isRouteLookup(astPath: ASTPath): boolean {
   }
   const parent = astPath.parent;
   const matches = ['transitionTo', 'replaceWith', 'replaceRoute', 'modelFor', 'controllerFor', 'intermediateTransitionTo', 'paramsFor', 'transitionToRoute'];
+
   return expressionHasIdentifierName(parent, matches);
 }
 
@@ -60,6 +63,7 @@ export function isTemplateElement(astPath: ASTPath): boolean {
   if (grandpa.tag && grandpa.tag.type === 'Identifier' && grandpa.tag.name === 'hbs') {
     return true;
   }
+
   return false;
 }
 
@@ -69,6 +73,7 @@ export function isStoreModelLookup(astPath: ASTPath): boolean {
   }
   const parent = astPath.parent;
   const matches = ['findRecord', 'createRecord', 'findAll', 'queryRecord', 'peekAll', 'query', 'peekRecord', 'adapterFor', 'hasRecordForId'];
+
   return expressionHasIdentifierName(parent, matches);
 }
 
@@ -137,6 +142,7 @@ export function isComputedPropertyArgument(astPath: ASTPath): boolean {
   if (!grandParent) {
     return false;
   }
+
   return true;
 }
 
@@ -152,6 +158,7 @@ export function isTransformReference(astPath: ASTPath): boolean {
   if (!expressionHasArgument(parent, node, 0)) {
     return false;
   }
+
   return expressionHasIdentifierName(parent, 'attr');
 }
 
@@ -182,6 +189,7 @@ export function isModifierPath(path: ASTPath): boolean {
   if (!hasNodeType(parent, 'ElementModifierStatement')) {
     return false;
   }
+
   return node === parent.path;
 }
 
@@ -194,6 +202,7 @@ export function isMustachePath(path: ASTPath): boolean {
   if (!hasNodeType(parent, 'MustacheStatement')) {
     return false;
   }
+
   return parent.path === node;
 }
 
@@ -206,6 +215,7 @@ export function isBlockPath(path: ASTPath): boolean {
   if (!isBlock(parent)) {
     return false;
   }
+
   return parent.path === node;
 }
 
@@ -218,6 +228,7 @@ export function isSubExpressionPath(path: ASTPath): boolean {
   if (!hasNodeType(parent, 'SubExpression')) {
     return false;
   }
+
   return parent.path === node;
 }
 
@@ -234,6 +245,7 @@ export function isInlineLinkToTarget(path: ASTPath): boolean {
   if (!hasNodeType(parent, 'MustacheStatement')) {
     return false;
   }
+
   return parent.params[1] === node && parent.path && parent.path.original === 'link-to';
 }
 
@@ -246,6 +258,7 @@ export function isBlockLinkToTarget(path: ASTPath): boolean {
   if (!isBlock(parent)) {
     return false;
   }
+
   return parent.params[0] === node && parent.path && parent.path.original === 'link-to';
 }
 
@@ -258,6 +271,7 @@ export function isImportPathDeclaration(path: ASTPath): boolean {
   if (!hasNodeType(parent, 'ImportDeclaration')) {
     return false;
   }
+
   return true;
 }
 
@@ -273,6 +287,7 @@ export function isServiceInjection(path: ASTPath): boolean {
   if (!isCallExpression(parent.value)) {
     return false;
   }
+
   return expressionHasIdentifierName(parent.value, 'service');
 }
 
@@ -285,6 +300,7 @@ export function isNamedServiceInjection(path: ASTPath): boolean {
   if (!isCallExpression(parent)) {
     return false;
   }
+
   return expressionHasIdentifierName(parent, 'service');
 }
 
@@ -300,12 +316,14 @@ export function isModelReference(astPath: ASTPath): boolean {
   if (!expressionHasArgument(parent, node, 0)) {
     return false;
   }
+
   return expressionHasIdentifierName(parent, ['belongsTo', 'hasMany']);
 }
 function hasNodeType(node: any, type: string) {
   if (!node) {
     return false;
   }
+
   return node.type === type;
 }
 function isBlock(node: any): boolean {
@@ -338,6 +356,7 @@ export function isPathExpression(node: any): boolean {
 function expressionHasIdentifierName(exp: any, name: string | string[]) {
   const names = typeof name === 'string' ? [name] : name;
   const identifier = hasNodeType(exp.callee, 'Identifier') ? exp.callee : exp.callee.property;
+
   return names.includes(identifier.name);
 }
 function expressionHasArgument(exp: any, arg: any, position = -1) {

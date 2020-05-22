@@ -26,6 +26,7 @@ export function normalizeToAngleBracketComponent(name: string) {
 // https://github.com/rwjblue/ember-angle-bracket-invocation-polyfill/blob/master/lib/ast-transform.js#L33
 export function normalizeToClassicComponent(name: string) {
   const ALPHA = /[A-Za-z]/;
+
   return name
     .replace(/[A-Z]/g, (char, index) => {
       if (index === 0 || !ALPHA.test(name[index - 1])) {

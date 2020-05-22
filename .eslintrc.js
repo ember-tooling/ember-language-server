@@ -15,6 +15,7 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {
+    'padding-line-between-statements': ['error', { blankLine: 'always', prev: '*', next: 'return' }],
     '@typescript-eslint/no-unused-vars': [
       'error',
       {

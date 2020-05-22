@@ -40,6 +40,7 @@ export function getFirstTextPostion(text: string, content: string) {
       }
     }
   });
+
   return [startLine, startCharacter];
 }
 
@@ -47,6 +48,7 @@ export function pathsToLocationsWithPosition(paths: string[], findMe: string) {
   return paths.filter(fs.existsSync).map((fileName: string) => {
     const text = fs.readFileSync(fileName, 'utf8');
     const [startLine, startCharacter] = getFirstTextPostion(text, findMe);
+
     return Location.create(URI.file(fileName).toString(), Range.create(startLine, startCharacter, startLine, startCharacter + findMe.length));
   });
 }
@@ -109,6 +111,7 @@ export function getPathsForComponentScripts(root: string, maybeComponentName: st
   const paths = [...muComponentsScriptsParts, ...podComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
     return path.join(...pathParts.filter((part: any) => !!part));
   });
+
   return paths;
 }
 
@@ -128,6 +131,7 @@ export function getPathsForComponentTemplates(root: string, maybeComponentName: 
   const paths = [...podComponentsScriptsParts, ...muComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
     return path.join(...pathParts.filter((part: any) => !!part));
   });
+
   return paths;
 }
 
@@ -178,6 +182,7 @@ export function getAddonImport(root: string, importPath: string) {
   if (addonFolderFiles.length) {
     return addonFolderFiles;
   }
+
   return existingPaths;
 }
 
@@ -212,6 +217,7 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
   if (addonFolderFiles.length) {
     return addonFolderFiles;
   }
+
   return existingPaths;
 }
 
@@ -260,5 +266,6 @@ export function getAddonPathsForComponentTemplates(root: string, maybeComponentN
   if (addonFolderFiles.length) {
     return addonFolderFiles;
   }
+
   return existingPaths;
 }

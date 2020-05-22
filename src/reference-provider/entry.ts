@@ -15,6 +15,7 @@ export class ReferenceProvider {
       results: [],
       server: this.server,
     });
+
     return addonResults;
   }
 }

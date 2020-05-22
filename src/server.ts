@@ -68,6 +68,7 @@ export default class Server {
     const purePaths = rawPaths.filter((p) => path.isAbsolute(p));
     if (purePaths.length) {
       addToRegistry(normalizedName, kind, purePaths);
+
       return true;
     } else {
       return false;
@@ -111,6 +112,7 @@ export default class Server {
         const project = this.projectRoots.projectForPath(projectPath);
         if (project) {
           this.projectRoots.reloadProject(project.root);
+
           return {
             msg: `Project reloaded`,
             path: project.root,
@@ -123,6 +125,7 @@ export default class Server {
         }
       } else {
         this.projectRoots.reloadProjects();
+
         return {
           msg: 'Projects reloaded',
         };
@@ -135,6 +138,7 @@ export default class Server {
         const item = project.matchPathToType(fullPath);
         if (item) {
           const normalizedItem = normalizeMatchNaming(item);
+
           return this.getRegistry(project.root)[normalizedItem.type][normalizedItem.name] || [];
         }
       }
@@ -158,6 +162,7 @@ export default class Server {
                   type: 'template',
                 };
               }
+
               return usage;
             }),
           };
@@ -170,9 +175,11 @@ export default class Server {
   private async onCodeAction(params: CodeActionParams): Promise<(Command | CodeAction)[] | undefined | null> {
     try {
       const results = await this.codeActionProvider.provideCodeActions(params);
+
       return results;
     } catch (e) {
       logError(e);
+
       return null;
     }
   }
@@ -222,6 +229,7 @@ export default class Server {
     } else {
       if (params.command in this.executors) {
         const result = await this.executors[params.command](this, params.command, params.arguments);
+
         return result;
       } else {
         const [uri, ...args] = params.arguments;
@@ -233,12 +241,14 @@ export default class Server {
               result = await project.executors[params.command](this, uri, args);
             }
           }
+
           return result;
         } catch (e) {
           logError(e);
         }
       }
     }
+
     return params;
   }
 

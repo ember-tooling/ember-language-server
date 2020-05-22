@@ -49,6 +49,7 @@ export function findRelatedFiles(token: string): Usage[] {
 export function updateTemplateTokens(kind: UsageType, normalizedName: string, file: string | null) {
   if (file === null) {
     delete TEMPLATE_TOKENS[kind][normalizedName];
+
     return;
   }
   try {

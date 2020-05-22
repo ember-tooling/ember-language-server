@@ -9,6 +9,7 @@ export function getExtension(textDocument: TextDocumentIdentifier): string | nul
   if (ext === '.handlebars') {
     return '.hbs';
   }
+
   return ext;
 }
 

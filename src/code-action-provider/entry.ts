@@ -19,6 +19,7 @@ export class CodeActionProvider {
       document: document,
       server: this.server,
     });
+
     return addonResults;
   }
 }

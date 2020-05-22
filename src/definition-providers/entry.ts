@@ -35,6 +35,7 @@ export default class DefinitionProvider {
       }
     } catch (e) {
       logError(e);
+
       return null;
     }
   }

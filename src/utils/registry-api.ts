@@ -39,6 +39,7 @@ export function normalizeMatchNaming(item: MatchResult): NormalizedRegistryItem 
       name: normalizeRoutePath(item.name),
     };
   }
+
   return item as NormalizedRegistryItem;
 }
 
@@ -82,6 +83,7 @@ export function getRegistryForRoot(root: string) {
       }
     }
   });
+
   return registryForRoot;
 }
 

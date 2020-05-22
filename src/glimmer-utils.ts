@@ -12,6 +12,7 @@ function maybePathDeclaration(astPath: ASTPath) {
       if (!declaration) {
         return;
       }
+
       return declaration.path;
     }
   }
@@ -32,6 +33,7 @@ function getLocalPathName(node: any) {
   if (pathName === 'this') {
     return undefined;
   }
+
   return pathName;
 }
 
@@ -74,8 +76,10 @@ export function focusedBlockParamName(content: string, position: Position) {
         localColIndex = endIndex + 1;
       }
     }
+
     return paramName;
   }
+
   return '';
 }
 
@@ -112,6 +116,7 @@ export function maybeBlockParamDefinition(astPath: ASTPath, content: string, pos
   if (paramName === '') {
     return;
   }
+
   return new BlockParamDefinition(paramName, astPath);
 }
 
@@ -180,6 +185,7 @@ export function getLocalScope(astPath: ASTPath) {
     }
     cursor = cursor.parentPath;
   }
+
   return scopeValues;
 }
 
@@ -233,6 +239,7 @@ export default class ASTPath {
     if (this.index - 1 < 0) {
       return undefined;
     }
+
     return new ASTPath(this.path, this.index - 1, this.content, this.position);
   }
 }

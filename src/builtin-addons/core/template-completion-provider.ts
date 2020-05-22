@@ -64,6 +64,7 @@ function mListMURouteLevelComponents(projectRoot: string, fileURI: string) {
   if (!projectRoot || !fileURI) {
     return [];
   }
+
   return [];
 }
 
@@ -88,6 +89,7 @@ export default class TemplateCompletionProvider {
   }
   getAllAngleBracketComponents(root: string, uri: string) {
     const items: CompletionItem[] = [];
+
     return uniqBy(
       items
         .concat(
@@ -109,6 +111,7 @@ export default class TemplateCompletionProvider {
   }
   getLocalPathExpressionCandidates(root: string, uri: string, originalText: string) {
     const candidates: CompletionItem[] = [...mTemplateContextLookup(root, uri, originalText)];
+
     return candidates;
   }
   getMustachePathCandidates(root: string) {
@@ -121,6 +124,7 @@ export default class TemplateCompletionProvider {
         return detail === 'component' || detail === 'helper';
       }),
     ];
+
     return candidates;
   }
   getBlockPathCandidates(root: string) {
@@ -132,6 +136,7 @@ export default class TemplateCompletionProvider {
         return detail === 'component';
       }),
     ];
+
     return candidates;
   }
   getSubExpressionPathCandidates(root: string) {
@@ -141,17 +146,20 @@ export default class TemplateCompletionProvider {
         return detail === 'helper';
       }),
     ];
+
     return candidates;
   }
   getScopedValues(focusPath: ASTPath) {
     const scopedValues = getLocalScope(focusPath).map(({ name, node, path }) => {
       const blockSource = node.type === 'ElementNode' ? `<${node.tag} as |...|>` : `{{#${path.parentPath && path.parentPath.node.path.original} as |...|}}`;
+
       return {
         label: name,
         kind: CompletionItemKind.Variable,
         detail: `Param from ${blockSource}`,
       };
     });
+
     return scopedValues;
   }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {

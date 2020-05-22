@@ -78,6 +78,7 @@ export default class ScriptCompletionProvider {
         const node = closestScriptNodeParent(focusPath, 'ObjectExpression', ['ObjectProperty']) || closestScriptNodeParent(focusPath, 'ClassBody');
         if (node === null) {
           log('isComputedPropertyArgument - unable to find keys');
+
           return [];
         }
         (node.properties || node.body || []).forEach((property: any) => {

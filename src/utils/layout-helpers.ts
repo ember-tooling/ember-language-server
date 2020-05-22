@@ -61,6 +61,7 @@ export function safeWalkSync(filePath: string | false, opts: any) {
   if (!fs.existsSync(filePath)) {
     return [];
   }
+
   return walkSync(filePath, opts);
 }
 
@@ -81,6 +82,7 @@ export function getPodModulePrefix(root: string): string | null {
   if (!podModulePrefix) {
     return null;
   }
+
   return podModulePrefix.trim().length > 0 ? podModulePrefix : null;
 }
 
@@ -97,17 +99,20 @@ export function resolvePackageRoot(root: string, addonName: string, packagesFold
     }
     roots.pop();
   }
+
   return false;
 }
 
 export function isProjectAddonRoot(root: string) {
   const pack = getPackageJSON(root);
   const hasIndexJs = fs.existsSync(path.join(root, 'index.js'));
+
   return isEmberAddon(pack) && hasIndexJs;
 }
 
 export function isELSAddonRoot(root: string) {
   const pack = getPackageJSON(root);
+
   return hasEmberLanguageServerExtension(pack);
 }
 
@@ -131,6 +136,7 @@ export function getProjectInRepoAddonsRoots(root: string) {
         }
       });
     });
+
   return roots;
 }
 
@@ -148,6 +154,7 @@ export function listGlimmerXComponents(root: string) {
         if (fileName === undefined) {
           return '';
         }
+
         return fileName.slice(0, fileName.lastIndexOf('.'));
       })
       .filter((p) => {
@@ -172,6 +179,7 @@ export function listGlimmerNativeComponents(root: string) {
       return [];
     }
     const components = fs.readdirSync(path.join(possiblePath, 'dist', 'src', 'glimmer', 'native-components'));
+
     return components.map((name) => {
       return {
         kind: CompletionItemKind.Class,
@@ -194,16 +202,19 @@ function hasDep(pack: any, depName: string) {
   if (pack.peerDependencies && pack.peerDependencies[depName]) {
     return true;
   }
+
   return false;
 }
 
 export function isGlimmerNativeProject(root: string) {
   const pack = getPackageJSON(root);
+
   return hasDep(pack, 'glimmer-native');
 }
 
 export function isGlimmerXProject(root: string) {
   const pack = getPackageJSON(root);
+
   return hasDep(pack, '@glimmerx/core') || hasDep(pack, 'glimmer-lite-core');
 }
 
@@ -243,12 +254,14 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
       });
     }
   });
+
   return recursiveRoots;
 }
 
 export function getPackageJSON(file: string): PackageInfo {
   try {
     const result = JSON.parse(fs.readFileSync(path.join(file, 'package.json'), 'utf8'));
+
     return result;
   } catch (e) {
     return {};
@@ -263,6 +276,7 @@ function addonVersion(info: PackageInfo) {
   if (!isEmberAddon(info)) {
     return null;
   }
+
   return isEmberAddonV2(info) ? 2 : 1;
 }
 
@@ -321,6 +335,7 @@ export function getProjectAddonsInfo(root: string) {
     if (!item.length) {
       return arrs;
     }
+
     return arrs.concat(item);
   }, []);
 
@@ -360,6 +375,7 @@ export function listPodsComponents(root: string): CompletionItem[] {
 
   const items = jsPaths.map((filePath: string) => {
     addToRegistry(pureComponentName(filePath), 'component', [path.join(entryPath, filePath)]);
+
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -380,6 +396,7 @@ export function listMUComponents(root: string): CompletionItem[] {
 
   const items = jsPaths.map((filePath: string) => {
     addToRegistry(pureComponentName(filePath), 'component', [path.join(entryPath, filePath)]);
+
     return {
       kind: CompletionItemKind.Class,
       label: pureComponentName(filePath),
@@ -485,6 +502,7 @@ function listCollection(
 
   const items = paths.map((filePath: string) => {
     addToRegistry(pureComponentName(filePath), detail, [path.join(entry, filePath)]);
+
     return {
       kind: kindType,
       label: pureComponentName(filePath),
@@ -530,6 +548,7 @@ export function listRoutes(root: string): CompletionItem[] {
     globs: ['**/*.hbs'],
   }).filter((name: string) => {
     const skipEndings = ['-loading', '-error', '/loading', '/error'];
+
     return !name.startsWith('components/') && skipEndings.filter((ending: string) => name.endsWith(ending + '.hbs')).length === 0;
   });
 
@@ -543,6 +562,7 @@ export function listRoutes(root: string): CompletionItem[] {
     templatePaths.map((filePath) => {
       const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
       addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
+
       return {
         kind: CompletionItemKind.File,
         label,
@@ -555,6 +575,7 @@ export function listRoutes(root: string): CompletionItem[] {
     paths.map((filePath) => {
       const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
       addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
+
       return {
         kind: CompletionItemKind.File,
         label,
@@ -579,5 +600,6 @@ export function getComponentNameFromURI(root: string, uri: string) {
   if (!maybeComponentName) {
     return null;
   }
+
   return pureComponentName(maybeComponentName);
 }

@@ -56,6 +56,7 @@ export class ClassicPathMatcher {
         return false;
       }
     }
+
     return matched;
   }
   rightPartFromFirstMatch(type: string, fileName: string, extName: string, str: string, strToMatch: string) {
@@ -71,6 +72,7 @@ export class ClassicPathMatcher {
     if (str.includes('/tests/') && fullName.endsWith('-test')) {
       fullName = fullName.replace('-test', '');
     }
+
     return fullName;
   }
   metaFromPath(rawAbsPath: string): MatchResult | null {
@@ -95,6 +97,7 @@ export class ClassicPathMatcher {
     if (!results.length) {
       return null;
     }
+
     return {
       type: results[0][0] as MatchResultType,
       name: results[0][1],
@@ -127,6 +130,7 @@ export class PodMatcher extends ClassicPathMatcher {
   };
   rightPartFromFirstMatch(_: string, fileName: string, extName: string, str: string) {
     const fullName = str.slice(str.indexOf(this.podPrefix) + this.podPrefix.length + 1, str.length).slice(0, -(1 + extName.length + fileName.length));
+
     return fullName;
   }
 }

@@ -20,6 +20,7 @@ function tokensFromType(node: any, scopedTokens: any) {
       if (scopedTokens.includes(tag)) {
         return;
       }
+
       return tag;
     },
   };
@@ -72,6 +73,7 @@ function getTemplateTokens(html: string, nativeTokens: any) {
       addTokens(tokensSet, node, scopedTokens, nativeTokens);
     },
   });
+
   return Array.from(tokensSet).map((el) => normalizeToClassicComponent(el));
 }
 
@@ -80,5 +82,6 @@ export function extractTokensFromTemplate(template: string): string[] {
     return [];
   }
   const ignored = ['if', 'yield', 'outlet', 'component', 'else', 'unless', 'let', 'each', 'each-in', 'in-element', 'on', 'fn', 'debugger', 'console'];
+
   return getTemplateTokens(template, ignored);
 }
