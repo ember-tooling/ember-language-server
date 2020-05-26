@@ -95,10 +95,12 @@ export class Project {
 
     if (maybePrefix) {
       this.podModulePrefix = 'app/' + maybePrefix;
+    } else {
+      this.podModulePrefix = 'app';
     }
 
     this.classicMatcher = new ClassicPathMatcher();
-    this.podMatcher = new PodMatcher();
+    this.podMatcher = new PodMatcher(this.podModulePrefix);
   }
   unload() {
     this.initIssues = [];

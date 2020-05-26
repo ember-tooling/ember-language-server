@@ -92,8 +92,10 @@ describe('PodMatcher :customPrefix', () => {
   it('controllers', () => {
     expect(m('foo/bar/app/foo/controller.ts')).toEqual({ type: 'controller', name: 'foo', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/foo/index/controller.ts')).toEqual({ type: 'controller', name: 'foo/index', scope: 'application', kind: 'script' });
+    expect(m('foo/bar/app/pricing/controller.js')).toEqual({ type: 'controller', name: 'pricing', scope: 'application', kind: 'script' });
   });
   it('templates', () => {
+    expect(m('foo/bar/app/pricing/template.hbs')).toEqual({ type: 'template', name: 'pricing', scope: 'application', kind: 'template' });
     expect(m('foo/bar/app/foo/index/template.hbs')).toEqual({ type: 'template', name: 'foo/index', scope: 'application', kind: 'template' });
     expect(m('foo/bar/app/foo/template.hbs')).toEqual({ type: 'template', name: 'foo', scope: 'application', kind: 'template' });
   });
@@ -173,6 +175,18 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/components/foo/index.hbs')).toEqual({ type: 'component', name: 'foo', scope: 'application', kind: 'template' });
     expect(m('foo/bar/app/components/foo/component.js')).toEqual({ type: 'component', name: 'foo', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/components/foo/template.hbs')).toEqual({ type: 'component', name: 'foo', scope: 'application', kind: 'template' });
+    expect(m('repos/emberclear/packages/frontend/app/components/app/off-canvas/index.hbs')).toEqual({
+      type: 'component',
+      name: 'app/off-canvas',
+      scope: 'application',
+      kind: 'template',
+    });
+    expect(m('frontend/app/components/app/sidebar/chats/channel-form/index.ts')).toEqual({
+      type: 'component',
+      name: 'app/sidebar/chats/channel-form',
+      scope: 'application',
+      kind: 'script',
+    });
     expect(m('repos/brn/frontend/tests/integration/components/login-form/input/component-test.js')).toEqual({
       type: 'component',
       name: 'login-form/input',
@@ -249,6 +263,13 @@ describe('ClassicPathMatcher', () => {
       name: 'my-component',
       scope: 'application',
       kind: 'template',
+    });
+
+    expect(m('repos/els-addon-typed-templates/tests/integration/components/exercise-stats/panel/component-test.js')).toEqual({
+      type: 'component',
+      name: 'exercise-stats/panel',
+      scope: 'application',
+      kind: 'test',
     });
   });
   it('routes', () => {
