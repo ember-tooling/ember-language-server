@@ -1165,6 +1165,66 @@ describe('integration', function () {
     });
   });
 
+  describe('Able to use classes for API', () => {
+    it('support dummy class-based addon definition:template', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': `
+                  module.exports = class Boo { onDefinition(root) {
+                    let path = require("path");
+                    let filePath = path.resolve(path.normalize(path.join(__dirname, "./../../../app/components/hello/index.hbs")));
+                    return [ {
+                      "range": {
+                        "end": {
+                          "character": 0,
+                          "line": 0,
+                        },
+                        "start": {
+                          "character": 0,
+                          "line": 0,
+                        }
+                      },
+                      "uri": filePath
+                    } ];
+                  }}
+                `,
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    definitionProvider: true,
+                  },
+                },
+              }),
+            },
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*',
+            },
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this}}',
+              },
+            },
+          },
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 3 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+  });
   describe('Able to provide API:Definition', () => {
     it('support dummy addon definition:template', async () => {
       const result = await getResult(

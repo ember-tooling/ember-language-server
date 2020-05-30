@@ -632,6 +632,33 @@ Object {
 }
 `;
 
+exports[`integration Able to use classes for API support dummy class-based addon definition:template 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.hbs",
+    },
+  ],
+}
+`;
+
 exports[`integration Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
 Array [
   Object {
