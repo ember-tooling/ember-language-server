@@ -310,6 +310,18 @@ export function isTemplatePath(filePath: string) {
   return filePath.endsWith('.hbs');
 }
 
+export function normalizedPath(filePath: string) {
+  if (filePath.includes('\\')) {
+    return filePath.split('\\').join('/');
+  } else {
+    return filePath;
+  }
+}
+
+export function isTestFile(filePath: string) {
+  return normalizedPath(filePath).includes('/tests/');
+}
+
 export function hasAddonFolderInPath(name: string) {
   return name.includes(path.sep + 'addon' + path.sep);
 }

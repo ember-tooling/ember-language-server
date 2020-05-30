@@ -7,7 +7,7 @@ import { isLinkToTarget, isLinkComponentRouteTarget } from './../../utils/ast-he
 import ASTPath from './../../glimmer-utils';
 import { getGlobalRegistry } from './../../utils/registry-api';
 import { normalizeToClassicComponent } from '../../utils/normalizers';
-import { isTemplatePath, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../../utils/layout-helpers';
+import { isTemplatePath, isTestFile, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../../utils/layout-helpers';
 
 import {
   getAbstractHelpersParts,
@@ -27,7 +27,7 @@ export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', 
   const registry = getGlobalRegistry();
   const bucket: any = registry[type].get(name) || new Set();
 
-  return Array.from(bucket).filter((el: string) => path.normalize(el).includes(absRoot) && fs.existsSync(el)) as string[];
+  return Array.from(bucket).filter((el: string) => path.normalize(el).includes(absRoot) && !isTestFile(path.normalize(el)) && fs.existsSync(el)) as string[];
 }
 
 export function provideComponentTemplatePaths(root: string, rawComponentName: string) {

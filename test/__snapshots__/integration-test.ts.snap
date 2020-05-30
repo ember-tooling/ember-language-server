@@ -2962,6 +2962,68 @@ Object {
 }
 `;
 
+exports[`integration Go to definition works for all supported cases go to definition from handlebars template working if we have test for component 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling.ts",
+        "tests/integration/components/darling/component-test.js",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling.ts",
+    },
+  ],
+}
+`;
+
+exports[`integration Go to definition works for all supported cases go to definition from script template working if we have test for component 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling.ts",
+        "tests/integration/components/darling/component-test.js",
+      ],
+      "hello": Array [
+        "app/components/hello.ts",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling.ts",
+    },
+  ],
+}
+`;
+
 exports[`integration Go to definition works for all supported cases go to local template-only component 1`] = `
 Object {
   "registry": Object {
