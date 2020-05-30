@@ -1,20 +1,28 @@
 'use strict';
 
 import * as path from 'path';
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
+import { URI } from 'vscode-uri';
 import * as fs from 'fs';
-import { isGlimmerNativeProject, isGlimmerXProject, getPodModulePrefix, findTestsForProject, isELSAddonRoot } from './utils/layout-helpers';
+import {
+  isGlimmerNativeProject,
+  isGlimmerXProject,
+  getPodModulePrefix,
+  findTestsForProject,
+  findAddonItemsForProject,
+  findAppItemsForProject,
+  isELSAddonRoot,
+} from './utils/layout-helpers';
 import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem } from './utils/registry-api';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
 import { TextDocument, Diagnostic, FileChangeType } from 'vscode-languageserver';
 import { PodMatcher, ClassicPathMatcher } from './utils/path-matcher';
 export type Executor = (server: Server, command: string, args: any[]) => any;
-export type Destructor = (project: Project) => any;
+export type Destructor = (project: Project) => void;
 export type Linter = (document: TextDocument) => Diagnostic[];
-export type Watcher = (uri: string, change: FileChangeType) => any;
+export type Watcher = (uri: string, change: FileChangeType) => void;
 export interface Executors {
   [key: string]: Executor;
 }
@@ -41,7 +49,7 @@ export class Project {
       this.files.clear();
     }
 
-    const rawPath = uriToFilePath(uri);
+    const rawPath = URI.parse(uri).fsPath;
 
     if (!rawPath) {
       return;
@@ -99,8 +107,8 @@ export class Project {
       this.podModulePrefix = 'app';
     }
 
-    this.classicMatcher = new ClassicPathMatcher();
-    this.podMatcher = new PodMatcher(this.podModulePrefix);
+    this.classicMatcher = new ClassicPathMatcher(this.root);
+    this.podMatcher = new PodMatcher(this.root, this.podModulePrefix);
   }
   unload() {
     this.initIssues = [];
@@ -128,7 +136,10 @@ export class Project {
         this.initIssues.push(e);
       }
     });
+    // prefer explicit registry tree building
     findTestsForProject(this);
+    findAppItemsForProject(this);
+    findAddonItemsForProject(this);
     this.providers.initFunctions.forEach((initFn) => {
       try {
         const initResult = initFn(server, this);
@@ -225,21 +236,24 @@ export default class ProjectRoots {
     this.findProjectsInsideRoot(this.workspaceRoot);
   }
 
-  onProjectAdd(path: string) {
-    if (this.projects.has(path)) {
+  onProjectAdd(rawPath: string) {
+    const projectPath = path.resolve(URI.parse(rawPath).fsPath);
+
+    if (this.projects.has(projectPath)) {
       return false;
     }
 
     try {
-      const project = new Project(path, this.localAddons);
+      const project = new Project(projectPath, this.localAddons);
 
-      this.projects.set(path, project);
-      logInfo(`Ember CLI project added at ${path}`);
+      this.projects.set(projectPath, project);
+      logInfo(`Ember CLI project added at ${projectPath}`);
       project.init(this.server);
 
       return {
         initIssues: project.initIssues,
         providers: project.providers,
+        registry: this.server.getRegistry(project.root),
       };
     } catch (e) {
       logError(e);
@@ -249,15 +263,38 @@ export default class ProjectRoots {
   }
 
   projectForUri(uri: string): Project | undefined {
-    const path = uriToFilePath(uri);
+    const filePath = URI.parse(uri).fsPath;
 
-    if (!path) return;
+    if (!filePath) {
+      return;
+    }
 
-    return this.projectForPath(path);
+    return this.projectForPath(filePath);
   }
 
-  projectForPath(path: string): Project | undefined {
-    const root = (Array.from(this.projects.keys()) || []).filter((root) => path!.indexOf(root) === 0).reduce((a, b) => (a.length > b.length ? a : b), '');
+  projectForPath(rawPath: string): Project | undefined {
+    const filePath = path.resolve(rawPath).toLowerCase();
+    /*
+      to fix C:\\Users\\lifeart\\AppData\\Local\\Temp\\tmp-30396kTX1RpAxCCyc
+      and c:\\Users\\lifeart\\AppData\\Local\\Temp\\tmp-30396kTX1RpAxCCyc\\app\\components\\hello.hbs
+      we need to lowercase items (because of capital C);
+    */
+    const rootMap: { [key: string]: string } = {};
+
+    const projectRoots = (Array.from(this.projects.keys()) || []).map((root) => {
+      const lowerName = root.toLowerCase();
+
+      rootMap[lowerName] = root;
+
+      return lowerName;
+    });
+
+    const rawRoot = projectRoots
+      .filter((root) => filePath.startsWith(root))
+      .reduce((a, b) => {
+        return a.length > b.length ? a : b;
+      }, '');
+    const root = rootMap[rawRoot] || '';
 
     return this.projects.get(root);
   }

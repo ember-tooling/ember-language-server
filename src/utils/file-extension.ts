@@ -1,9 +1,9 @@
 import * as path from 'path';
 import { TextDocumentIdentifier } from 'vscode-languageserver';
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
+import { URI } from 'vscode-uri';
 
 export function getExtension(textDocument: TextDocumentIdentifier): string | null {
-  const filePath = uriToFilePath(textDocument.uri);
+  const filePath = URI.parse(textDocument.uri).fsPath;
   const ext = filePath ? path.extname(filePath) : '';
 
   if (ext === '.handlebars') {

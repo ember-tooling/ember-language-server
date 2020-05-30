@@ -1,7 +1,7 @@
 import { ClassicPathMatcher, PodMatcher } from '../../src/utils/path-matcher';
 
 describe('PodMatcher', () => {
-  const matcher = new PodMatcher();
+  const matcher = new PodMatcher('');
 
   function m(str: string) {
     return matcher.metaFromPath(str);
@@ -61,7 +61,7 @@ describe('PodMatcher', () => {
 });
 
 describe('PodMatcher :customPrefix', () => {
-  const matcher = new PodMatcher('app');
+  const matcher = new PodMatcher('', 'app');
 
   function m(str: string) {
     return matcher.metaFromPath(str);

@@ -115,7 +115,7 @@ export function getPathsForComponentScripts(root: string, maybeComponentName: st
   }
 
   const paths = [...muComponentsScriptsParts, ...podComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
-    return path.join(...pathParts.filter((part: any) => !!part));
+    return path.join(...pathParts.filter((part: string) => !!part));
   });
 
   return paths;

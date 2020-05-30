@@ -6,7 +6,7 @@ import { filter } from 'fuzzaldrin';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import { preprocess } from '@glimmer/syntax';
 import { getExtension } from '../utils/file-extension';
-import { log } from '../utils/logger';
+import { log, logInfo } from '../utils/logger';
 import { searchAndExtractHbs } from 'extract-tagged-template-literals';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { Position as EsTreePosition } from 'estree';
@@ -127,6 +127,8 @@ export default class TemplateCompletionProvider {
     const { project, document } = this.getRoots(params.textDocument);
 
     if (!project || !document) {
+      logInfo(`No project for file: ${params.textDocument.uri}`);
+
       return [];
     }
 

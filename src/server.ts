@@ -46,9 +46,9 @@ import { CodeActionProvider } from './code-action-provider/entry';
 import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
 import { getRegistryForRoot, addToRegistry, REGISTRY_KIND, normalizeMatchNaming } from './utils/registry-api';
 import { Usage, findRelatedFiles } from './utils/usages-api';
+import { URI } from 'vscode-uri';
 
 export default class Server {
   initializers: any[] = [];
@@ -136,17 +136,28 @@ export default class Server {
       }
     };
 
-    this.executors['els.getRelatedFiles'] = async (_, __, [filePath]) => {
+    this.executors['els.getRelatedFiles'] = async (_, __, [filePath, flags]: [string, { includeMeta: boolean }?]) => {
       const fullPath = path.resolve(filePath);
       const project = this.projectRoots.projectForPath(filePath);
+      const includeMeta = typeof flags === 'object' && flags.includeMeta === true;
 
       if (project) {
         const item = project.matchPathToType(fullPath);
 
         if (item) {
           const normalizedItem = normalizeMatchNaming(item);
+          const registryResults: string[] = (this.getRegistry(project.root)[normalizedItem.type][normalizedItem.name] || []).sort();
 
-          return this.getRegistry(project.root)[normalizedItem.type][normalizedItem.name] || [];
+          if (!includeMeta) {
+            return registryResults;
+          }
+
+          return registryResults.map((filePath) => {
+            return {
+              path: filePath,
+              meta: project.matchPathToType(filePath),
+            };
+          });
         }
       }
 
@@ -271,14 +282,14 @@ export default class Server {
   private onDidChangeWorkspaceFolders(event: WorkspaceFoldersChangeEvent) {
     if (event.added.length) {
       event.added.forEach((folder) => {
-        this.projectRoots.findProjectsInsideRoot(folder.uri);
+        this.projectRoots.findProjectsInsideRoot(URI.parse(folder.uri).fsPath);
       });
     }
   }
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
   private onInitialize({ rootUri, rootPath, workspaceFolders, initializationOptions, capabilities }: InitializeParams): InitializeResult {
-    rootPath = rootUri ? uriToFilePath(rootUri) : rootPath;
+    rootPath = rootUri ? URI.parse(rootUri).fsPath : rootPath;
     this.clientCapabilities = capabilities || {};
 
     if (!rootPath) {
@@ -301,7 +312,7 @@ export default class Server {
 
       if (workspaceFolders && Array.isArray(workspaceFolders)) {
         workspaceFolders.forEach((folder) => {
-          const folderPath = uriToFilePath(folder.uri);
+          const folderPath = URI.parse(folder.uri).fsPath;
 
           if (folderPath && rootPath !== folderPath) {
             this.projectRoots.findProjectsInsideRoot(folderPath);
@@ -392,7 +403,7 @@ export default class Server {
         project.trackChange(change.uri, change.type);
       } else {
         if (change.type === 1 && change.uri.endsWith('ember-cli-build.js')) {
-          const rawPath = uriToFilePath(change.uri);
+          const rawPath = URI.parse(change.uri).fsPath;
 
           if (rawPath) {
             const filePath = path.dirname(path.resolve(rawPath));
@@ -448,7 +459,7 @@ export default class Server {
 
   private onDocumentSymbol(params: DocumentSymbolParams): SymbolInformation[] {
     const uri = params.textDocument.uri;
-    const filePath = uriToFilePath(uri);
+    const filePath = URI.parse(uri).fsPath;
 
     if (!filePath) {
       return [];

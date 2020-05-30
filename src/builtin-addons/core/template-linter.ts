@@ -1,6 +1,6 @@
 import { AddonAPI, CodeActionFunctionParams } from '../../utils/addon-api';
 import { Command, CodeAction, WorkspaceEdit, CodeActionKind, TextEdit } from 'vscode-languageserver';
-import { uriToFilePath } from 'vscode-languageserver/lib/files';
+import { URI } from 'vscode-uri';
 import Server from '../../server';
 import { Project } from '../../project-roots';
 import { logError } from '../../utils/logger';
@@ -87,8 +87,8 @@ export default class ProjectTemplateLinter implements AddonAPI {
         .map((issue) => {
           const { output, isFixed } = linter.verifyAndFix({
             source: meta.selection,
-            moduleId: uriToFilePath(params.textDocument.uri),
-            filePath: uriToFilePath(params.textDocument.uri),
+            moduleId: URI.parse(params.textDocument.uri).fsPath,
+            filePath: URI.parse(params.textDocument.uri).fsPath,
           });
 
           if (!isFixed) {

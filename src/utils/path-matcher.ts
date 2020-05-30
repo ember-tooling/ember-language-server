@@ -22,6 +22,7 @@ export interface MatchResult {
 }
 
 export class ClassicPathMatcher {
+  constructor(private root: string = '') {}
   keys: {
     [key: string]: string[];
   } = {
@@ -83,8 +84,10 @@ export class ClassicPathMatcher {
 
     return fullName;
   }
-  metaFromPath(rawAbsPath: string): MatchResult | null {
-    const absPath = rawAbsPath.split(path.sep).join('/');
+  metaFromPath(rawAbsoluteAbsPath: string): MatchResult | null {
+    const rawAbsPath = path.relative(this.root, path.resolve(rawAbsoluteAbsPath));
+    const normalizedAbsPath = rawAbsPath.split(path.sep).join('/');
+    const absPath = '/' + normalizedAbsPath;
     const isTest = absPath.includes('/tests/');
     const isTemplate = absPath.endsWith('.hbs');
     const isStyle = absPath.endsWith('.css') || absPath.endsWith('.less') || absPath.endsWith('.scss');
@@ -118,8 +121,8 @@ export class ClassicPathMatcher {
 }
 
 export class PodMatcher extends ClassicPathMatcher {
-  constructor(podPrefix: string | false = false) {
-    super();
+  constructor(root: string, podPrefix: string | false = false) {
+    super(root);
 
     if (podPrefix) {
       this.podPrefix = podPrefix;

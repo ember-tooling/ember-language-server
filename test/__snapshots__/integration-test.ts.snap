@@ -1,503 +1,635 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`integration API:Chain support addon ordering 1`] = `
-Array [
-  Object {
-    "detail": "a = undefined",
-    "kind": 10,
-    "label": "this.a_addon2__addon1__addon4__addon3_",
-    "textEdit": Object {
-      "newText": "this.a_addon2__addon1__addon4__addon3_",
-      "range": Object {
-        "end": Object {
-          "character": 8,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 0,
+Object {
+  "registry": Object {
+    "component": Object {
+      "dory": Array [
+        "app/components/dory/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "a = undefined",
+      "kind": 10,
+      "label": "this.a_addon2__addon1__addon4__addon3_",
+      "textEdit": Object {
+        "newText": "this.a_addon2__addon1__addon4__addon3_",
+        "range": Object {
+          "end": Object {
+            "character": 8,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Able to load API from project itself project custom completion:template 1`] = `
-Array [
-  Object {
-    "label": "this.name",
-    "textEdit": Object {
-      "newText": "this.name",
-      "range": Object {
-        "end": Object {
-          "character": 8,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 0,
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "label": "this.name",
+      "textEdit": Object {
+        "newText": "this.name",
+        "range": Object {
+          "end": Object {
+            "character": 8,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Able to provide API:Completion support dummy addon completion:script 1`] = `
-Array [
-  Object {
-    "label": "name",
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.js",
+      ],
+    },
   },
-]
+  "response": Array [
+    Object {
+      "label": "name",
+    },
+  ],
+}
 `;
 
 exports[`integration Able to provide API:Completion support dummy addon completion:template 1`] = `
-Array [
-  Object {
-    "label": "this.name",
-    "textEdit": Object {
-      "newText": "this.name",
-      "range": Object {
-        "end": Object {
-          "character": 8,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 0,
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "label": "this.name",
+      "textEdit": Object {
+        "newText": "this.name",
+        "range": Object {
+          "end": Object {
+            "character": 8,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Able to provide API:Definition support dummy addon definition:script 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.js",
+      ],
     },
-    "uri": "/app/components/hello/index.js",
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.js",
+    },
+  ],
+}
 `;
 
 exports[`integration Able to provide API:Definition support dummy addon definition:template 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
     },
-    "uri": "/app/components/hello/index.hbs",
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.hbs",
+    },
+  ],
+}
 `;
 
 exports[`integration Able to provide API:Reference support dummy addon reference:template 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
     },
-    "uri": "/app/components/hello/index.hbs",
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.hbs",
+    },
+  ],
+}
 `;
 
 exports[`integration Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
-Array [
-  Object {
-    "detail": "@foo = undefined // (used in template)",
-    "kind": 10,
-    "label": "@foo",
-    "textEdit": Object {
-      "newText": "@foo",
-      "range": Object {
-        "end": Object {
-          "character": 18,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 17,
-          "line": 0,
+Object {
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+      "my-bar": Array [
+        "app/components/my-bar.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "@foo = undefined // (used in template)",
+      "kind": 10,
+      "label": "@foo",
+      "textEdit": Object {
+        "newText": "@foo",
+        "range": Object {
+          "end": Object {
+            "character": 18,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 17,
+            "line": 0,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "@name = undefined // (used in template)",
-    "kind": 10,
-    "label": "@name",
-    "textEdit": Object {
-      "newText": "@name",
-      "range": Object {
-        "end": Object {
-          "character": 18,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 17,
-          "line": 0,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "@picture = undefined // (used in template)",
-    "kind": 10,
-    "label": "@picture",
-    "textEdit": Object {
-      "newText": "@picture",
-      "range": Object {
-        "end": Object {
-          "character": 18,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 17,
-          "line": 0,
+    Object {
+      "detail": "@name = undefined // (used in template)",
+      "kind": 10,
+      "label": "@name",
+      "textEdit": Object {
+        "newText": "@name",
+        "range": Object {
+          "end": Object {
+            "character": 18,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 17,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+    Object {
+      "detail": "@picture = undefined // (used in template)",
+      "kind": 10,
+      "label": "@picture",
+      "textEdit": Object {
+        "newText": "@picture",
+        "range": Object {
+          "end": Object {
+            "character": 18,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 17,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
 `;
 
 exports[`integration Able to provide autocomplete information for local context access support collocated components 1`] = `
-Array [
-  Object {
-    "detail": "lastName = \\"b\\"",
-    "kind": 10,
-    "label": "this.lastName",
-    "textEdit": Object {
-      "newText": "this.lastName",
-      "range": Object {
-        "end": Object {
-          "character": 7,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 0,
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+        "app/components/hello/index.js",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "lastName = \\"b\\"",
+      "kind": 10,
+      "label": "this.lastName",
+      "textEdit": Object {
+        "newText": "this.lastName",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "firstName = \\"a\\"",
-    "kind": 10,
-    "label": "this.firstName",
-    "textEdit": Object {
-      "newText": "this.firstName",
-      "range": Object {
-        "end": Object {
-          "character": 7,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 0,
+    Object {
+      "detail": "firstName = \\"a\\"",
+      "kind": 10,
+      "label": "this.firstName",
+      "textEdit": Object {
+        "newText": "this.firstName",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Able to provide autocomplete information for local context access support collocated components in mustache arguments 1`] = `
-Array [
-  Object {
-    "detail": "lastName = \\"b\\"",
-    "kind": 10,
-    "label": "this.lastName",
-    "textEdit": Object {
-      "newText": "this.lastName",
-      "range": Object {
-        "end": Object {
-          "character": 11,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 6,
-          "line": 0,
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+        "app/components/hello/index.js",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "lastName = \\"b\\"",
+      "kind": 10,
+      "label": "this.lastName",
+      "textEdit": Object {
+        "newText": "this.lastName",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 6,
+            "line": 0,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "firstName = \\"a\\"",
-    "kind": 10,
-    "label": "this.firstName",
-    "textEdit": Object {
-      "newText": "this.firstName",
-      "range": Object {
-        "end": Object {
-          "character": 11,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 6,
-          "line": 0,
+    Object {
+      "detail": "firstName = \\"a\\"",
+      "kind": 10,
+      "label": "this.firstName",
+      "textEdit": Object {
+        "newText": "this.firstName",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 6,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Able to provide autocomplete information for local context access support collocated components in node attributes 1`] = `
-Array [
-  Object {
-    "detail": "lastName = \\"b\\"",
-    "kind": 10,
-    "label": "this.lastName",
-    "textEdit": Object {
-      "newText": "this.lastName",
-      "range": Object {
-        "end": Object {
-          "character": 17,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 12,
-          "line": 0,
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+        "app/components/hello/index.js",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "lastName = \\"b\\"",
+      "kind": 10,
+      "label": "this.lastName",
+      "textEdit": Object {
+        "newText": "this.lastName",
+        "range": Object {
+          "end": Object {
+            "character": 17,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 12,
+            "line": 0,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "firstName = \\"a\\"",
-    "kind": 10,
-    "label": "this.firstName",
-    "textEdit": Object {
-      "newText": "this.firstName",
-      "range": Object {
-        "end": Object {
-          "character": 17,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 12,
-          "line": 0,
+    Object {
+      "detail": "firstName = \\"a\\"",
+      "kind": 10,
+      "label": "this.firstName",
+      "textEdit": Object {
+        "newText": "this.firstName",
+        "range": Object {
+          "end": Object {
+            "character": 17,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 12,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Able to provide autocomplete information for local scoped params support component name autocomplete from block params 1`] = `
-Array [
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Foo",
-    "textEdit": Object {
-      "newText": "Foo",
-      "range": Object {
-        "end": Object {
-          "character": 1,
-          "line": 2,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 2,
+Object {
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Foo",
+      "textEdit": Object {
+        "newText": "Foo",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "Param from <MyComponent as |...|>",
-    "kind": 6,
-    "label": "boo",
-    "textEdit": Object {
-      "newText": "boo",
-      "range": Object {
-        "end": Object {
-          "character": 1,
-          "line": 2,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 2,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "Param from {{#my-component as |...|}}",
-    "kind": 6,
-    "label": "bar",
-    "textEdit": Object {
-      "newText": "bar",
-      "range": Object {
-        "end": Object {
-          "character": 1,
-          "line": 2,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 2,
+    Object {
+      "detail": "Param from <MyComponent as |...|>",
+      "kind": 6,
+      "label": "boo",
+      "textEdit": Object {
+        "newText": "boo",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
         },
       },
     },
-  },
-]
+    Object {
+      "detail": "Param from {{#my-component as |...|}}",
+      "kind": 6,
+      "label": "bar",
+      "textEdit": Object {
+        "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+  ],
+}
 `;
 
 exports[`integration Able to provide autocomplete information for local scoped params support mustache blocks 1`] = `
-Array [
-  Object {
-    "detail": "Param from {{#my-component as |...|}}",
-    "kind": 6,
-    "label": "bar",
-    "textEdit": Object {
-      "newText": "bar",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 1,
+Object {
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Param from {{#my-component as |...|}}",
+      "kind": 6,
+      "label": "bar",
+      "textEdit": Object {
+        "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "unbound",
-    "textEdit": Object {
-      "newText": "unbound",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 1,
-        },
-      },
-    },
-    "usableIn": Array [
-      "MustachePath",
-      "SubExpressionPath",
-    ],
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "debugger",
-    "textEdit": Object {
-      "newText": "debugger",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 1,
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "unbound",
+      "textEdit": Object {
+        "newText": "unbound",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "MustachePath",
+        "SubExpressionPath",
+      ],
     },
-    "usableIn": Array [
-      "MustachePath",
-    ],
-  },
-]
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "debugger",
+      "textEdit": Object {
+        "newText": "debugger",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+      ],
+    },
+  ],
+}
 `;
 
 exports[`integration Able to provide autocomplete information for local scoped params support tag blocks 1`] = `
-Array [
-  Object {
-    "detail": "Param from <MyComponent as |...|>",
-    "kind": 6,
-    "label": "bar",
-    "textEdit": Object {
-      "newText": "bar",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 1,
+Object {
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Param from <MyComponent as |...|>",
+      "kind": 6,
+      "label": "bar",
+      "textEdit": Object {
+        "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "unbound",
-    "textEdit": Object {
-      "newText": "unbound",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 1,
-        },
-      },
-    },
-    "usableIn": Array [
-      "MustachePath",
-      "SubExpressionPath",
-    ],
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "debugger",
-    "textEdit": Object {
-      "newText": "debugger",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 1,
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "unbound",
+      "textEdit": Object {
+        "newText": "unbound",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "MustachePath",
+        "SubExpressionPath",
+      ],
     },
-    "usableIn": Array [
-      "MustachePath",
-    ],
-  },
-]
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "debugger",
+      "textEdit": Object {
+        "newText": "debugger",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+      ],
+    },
+  ],
+}
 `;
 
 exports[`integration Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
@@ -604,6 +736,19 @@ Array [
 ]
 `;
 
+exports[`integration Autocomplete works for broken templates autocomplete information for component #1 {{ 2`] = `
+Object {
+  "component": Object {
+    "darling": Array [
+      "app/components/darling.hbs",
+    ],
+    "hello": Array [
+      "app/components/hello.hbs",
+    ],
+  },
+}
+`;
+
 exports[`integration Autocomplete works for broken templates autocomplete information for component #2 < 1`] = `
 Array [
   Object {
@@ -645,241 +790,266 @@ Array [
 ]
 `;
 
+exports[`integration Autocomplete works for broken templates autocomplete information for component #2 < 2`] = `
+Object {
+  "component": Object {
+    "darling": Array [
+      "app/components/darling.hbs",
+    ],
+    "hello": Array [
+      "app/components/hello.hbs",
+    ],
+  },
+}
+`;
+
 exports[`integration Autocomplete works for broken templates autocomplete information for component #3 {{# 1`] = `
-Array [
-  Object {
-    "detail": "Ember 1.11.0",
-    "kind": 3,
-    "label": "component",
-    "textEdit": Object {
-      "newText": "component}}
+Object {
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Ember 1.11.0",
+      "kind": 3,
+      "label": "component",
+      "textEdit": Object {
+        "newText": "component}}
   
 {{/component}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "BlockPath",
+        "MustachePath",
+        "SubExpressionPath",
+      ],
+      "version": "1.11.0",
     },
-    "usableIn": Array [
-      "BlockPath",
-      "MustachePath",
-      "SubExpressionPath",
-    ],
-    "version": "1.11.0",
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "each",
-    "textEdit": Object {
-      "newText": "each}}
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "each",
+      "textEdit": Object {
+        "newText": "each}}
   
 {{/each}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "BlockPath",
+      ],
     },
-    "usableIn": Array [
-      "BlockPath",
-    ],
-  },
-  Object {
-    "detail": "Ember 2.1.0",
-    "kind": 3,
-    "label": "each-in",
-    "textEdit": Object {
-      "newText": "each-in}}
+    Object {
+      "detail": "Ember 2.1.0",
+      "kind": 3,
+      "label": "each-in",
+      "textEdit": Object {
+        "newText": "each-in}}
   
 {{/each-in}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "BlockPath",
+      ],
+      "version": "2.1.0",
     },
-    "usableIn": Array [
-      "BlockPath",
-    ],
-    "version": "2.1.0",
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "in-element",
-    "textEdit": Object {
-      "newText": "in-element}}
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "in-element",
+      "textEdit": Object {
+        "newText": "in-element}}
   
 {{/in-element}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "BlockPath",
+      ],
     },
-    "usableIn": Array [
-      "BlockPath",
-    ],
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "let",
-    "textEdit": Object {
-      "newText": "let}}
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "let",
+      "textEdit": Object {
+        "newText": "let}}
   
 {{/let}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "BlockPath",
+      ],
     },
-    "usableIn": Array [
-      "BlockPath",
-    ],
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "if",
-    "textEdit": Object {
-      "newText": "if}}
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "if",
+      "textEdit": Object {
+        "newText": "if}}
   
 {{/if}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "BlockPath",
+        "MustachePath",
+        "SubExpressionPath",
+      ],
     },
-    "usableIn": Array [
-      "BlockPath",
-      "MustachePath",
-      "SubExpressionPath",
-    ],
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "unless",
-    "textEdit": Object {
-      "newText": "unless}}
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "unless",
+      "textEdit": Object {
+        "newText": "unless}}
   
 {{/unless}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "BlockPath",
+        "MustachePath",
+        "SubExpressionPath",
+      ],
     },
-    "usableIn": Array [
-      "BlockPath",
-      "MustachePath",
-      "SubExpressionPath",
-    ],
-  },
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "with",
-    "textEdit": Object {
-      "newText": "with}}
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "with",
+      "textEdit": Object {
+        "newText": "with}}
   
 {{/with}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
+      "usableIn": Array [
+        "BlockPath",
+      ],
     },
-    "usableIn": Array [
-      "BlockPath",
-    ],
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "darling",
-    "textEdit": Object {
-      "newText": "darling}}
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "darling",
+      "textEdit": Object {
+        "newText": "darling}}
   
 {{/darling}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "hello",
-    "textEdit": Object {
-      "newText": "hello}}
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "hello",
+      "textEdit": Object {
+        "newText": "hello}}
   
 {{/hello}}",
-      "range": Object {
-        "end": Object {
-          "character": 3,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 3,
-          "line": 1,
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 1`] = `
@@ -1194,6 +1364,21 @@ Array [
 ]
 `;
 
+exports[`integration Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 2`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "app/components/hello.hbs",
+    ],
+  },
+  "helper": Object {
+    "boo": Array [
+      "app/helpers/boo.js",
+    ],
+  },
+}
+`;
+
 exports[`integration Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 1`] = `
 Array [
   Object {
@@ -1506,89 +1691,132 @@ Array [
 ]
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for modifier #4 <Foo {{ 1`] = `
-Array [
-  Object {
-    "detail": "Ember",
-    "kind": 3,
-    "label": "on",
-    "textEdit": Object {
-      "newText": "on",
-      "range": Object {
-        "end": Object {
-          "character": 7,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 7,
-          "line": 0,
-        },
-      },
-    },
-    "usableIn": Array [
-      "ModifierPath",
+exports[`integration Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 2`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "app/components/hello.hbs",
     ],
   },
-  Object {
-    "detail": "modifier",
-    "kind": 3,
-    "label": "boo",
-    "textEdit": Object {
-      "newText": "boo",
-      "range": Object {
-        "end": Object {
-          "character": 7,
-          "line": 0,
+  "helper": Object {
+    "boo": Array [
+      "app/helpers/boo.js",
+    ],
+  },
+}
+`;
+
+exports[`integration Autocomplete works for broken templates autocomplete information for modifier #4 <Foo {{ 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "modifier": Object {
+      "boo": Array [
+        "app/modifiers/boo.js",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "on",
+      "textEdit": Object {
+        "newText": "on",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
         },
-        "start": Object {
-          "character": 7,
-          "line": 0,
+      },
+      "usableIn": Array [
+        "ModifierPath",
+      ],
+    },
+    Object {
+      "detail": "modifier",
+      "kind": 3,
+      "label": "boo",
+      "textEdit": Object {
+        "newText": "boo",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "modifier",
-    "kind": 2,
-    "label": "action",
-    "textEdit": Object {
-      "newText": "action",
-      "range": Object {
-        "end": Object {
-          "character": 7,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 7,
-          "line": 0,
+    Object {
+      "detail": "modifier",
+      "kind": 2,
+      "label": "action",
+      "textEdit": Object {
+        "newText": "action",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Autocomplete works in LinkTo components for @route argument able to autocomplete basic routes 1`] = `
-Array [
-  Object {
-    "detail": "route",
-    "kind": 17,
-    "label": "foo.bar.baz",
-    "textEdit": Object {
-      "newText": "foo.bar.baz",
-      "range": Object {
-        "end": Object {
-          "character": 16,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 16,
-          "line": 0,
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "routePath": Object {
+      "foo.bar.baz": Array [
+        "app/templates/foo/bar/baz.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "route",
+      "kind": 17,
+      "label": "foo.bar.baz",
+      "textEdit": Object {
+        "newText": "foo.bar.baz",
+        "range": Object {
+          "end": Object {
+            "character": 16,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 16,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+  ],
+}
 `;
 
 exports[`integration Completion request returns all angle-bracket in a element expression 1`] = `
@@ -2327,7 +2555,7 @@ Array [
         "line": 0,
       },
     },
-    "uri": "file:///path-to-tests/fixtures/full-project/app/models/model-a.js",
+    "uri": "/app/models/model-a.js",
   },
 ]
 `;
@@ -2345,7 +2573,7 @@ Array [
         "line": 0,
       },
     },
-    "uri": "file:///path-to-tests/fixtures/full-project/app/components/my-awesome-component.js",
+    "uri": "/app/components/my-awesome-component.js",
   },
 ]
 `;
@@ -2363,7 +2591,7 @@ Array [
         "line": 0,
       },
     },
-    "uri": "file:///path-to-tests/fixtures/full-project/app/models/model-b.js",
+    "uri": "/app/models/model-b.js",
   },
 ]
 `;
@@ -2381,7 +2609,7 @@ Array [
         "line": 0,
       },
     },
-    "uri": "file:///path-to-tests/fixtures/full-project/app/helpers/some-helper.js",
+    "uri": "/app/helpers/some-helper.js",
   },
 ]
 `;
@@ -2399,297 +2627,491 @@ Array [
         "line": 0,
       },
     },
-    "uri": "file:///path-to-tests/fixtures/full-project/app/transforms/custom-transform.js",
+    "uri": "/app/transforms/custom-transform.js",
   },
 ]
 `;
 
-exports[`integration DocumentSymbolProvider able to provide symbols for script document 1`] = `Array []`;
+exports[`integration Diffent commands handle "els.getRelatedFiles" command 1`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "app/components/hello/component.js",
+      "app/components/hello/template.hbs",
+      "tests/integration/components/hello-test.js",
+    ],
+  },
+}
+`;
 
-exports[`integration DocumentSymbolProvider able to provide symbols for template document 1`] = `Array []`;
+exports[`integration Diffent commands handle "els.getRelatedFiles" command 2`] = `
+Array [
+  "app/components/hello/component.js",
+  "app/components/hello/template.hbs",
+  "tests/integration/components/hello-test.js",
+]
+`;
 
-exports[`integration DocumentSymbolProvider stable if ast broken in script document 1`] = `Array []`;
+exports[`integration Diffent commands handle "els.getRelatedFiles" command with meta flag 1`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "app/components/hello/index.hbs",
+      "app/components/hello/index.js",
+      "tests/integration/components/hello-test.js",
+    ],
+  },
+}
+`;
 
-exports[`integration DocumentSymbolProvider stable if ast broken in template document 1`] = `Array []`;
-
-exports[`integration GlimmerNative able to provide glimmer-native component 1`] = `
+exports[`integration Diffent commands handle "els.getRelatedFiles" command with meta flag 2`] = `
 Array [
   Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Hello",
-    "textEdit": Object {
-      "newText": "Hello",
-      "range": Object {
-        "end": Object {
-          "character": 1,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 0,
-        },
-      },
+    "meta": Object {
+      "kind": "template",
+      "name": "hello",
+      "scope": "application",
+      "type": "component",
     },
+    "path": "app/components/hello/index.hbs",
   },
   Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Button",
-    "textEdit": Object {
-      "newText": "Button",
-      "range": Object {
-        "end": Object {
-          "character": 1,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 0,
-        },
-      },
+    "meta": Object {
+      "kind": "script",
+      "name": "hello",
+      "scope": "application",
+      "type": "component",
     },
+    "path": "app/components/hello/index.js",
   },
   Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "ListView",
-    "textEdit": Object {
-      "newText": "ListView",
-      "range": Object {
-        "end": Object {
-          "character": 1,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 0,
-        },
-      },
+    "meta": Object {
+      "kind": "test",
+      "name": "hello",
+      "scope": "application",
+      "type": "component",
     },
+    "path": "tests/integration/components/hello-test.js",
   },
 ]
+`;
+
+exports[`integration DocumentSymbolProvider able to provide symbols for script document 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration DocumentSymbolProvider able to provide symbols for template document 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration DocumentSymbolProvider stable if ast broken in script document 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration DocumentSymbolProvider stable if ast broken in template document 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration GlimmerNative able to provide glimmer-native component 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Hello",
+      "textEdit": Object {
+        "newText": "Hello",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Button",
+      "textEdit": Object {
+        "newText": "Button",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "ListView",
+      "textEdit": Object {
+        "newText": "ListView",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
 `;
 
 exports[`integration GlimmerX able to provide list of locally defined components 1`] = `
-Array [
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "App",
-    "textEdit": Object {
-      "newText": "App",
-      "range": Object {
-        "end": Object {
-          "character": 20,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 20,
-          "line": 0,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Button",
-    "textEdit": Object {
-      "newText": "Button",
-      "range": Object {
-        "end": Object {
-          "character": 20,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 20,
-          "line": 0,
+Object {
+  "registry": Object {},
+  "response": Array [
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "App",
+      "textEdit": Object {
+        "newText": "App",
+        "range": Object {
+          "end": Object {
+            "character": 20,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 20,
+            "line": 0,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Ball",
-    "textEdit": Object {
-      "newText": "Ball",
-      "range": Object {
-        "end": Object {
-          "character": 20,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 20,
-          "line": 0,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Border",
-    "textEdit": Object {
-      "newText": "Border",
-      "range": Object {
-        "end": Object {
-          "character": 20,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 20,
-          "line": 0,
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Button",
+      "textEdit": Object {
+        "newText": "Button",
+        "range": Object {
+          "end": Object {
+            "character": 20,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 20,
+            "line": 0,
+          },
         },
       },
     },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Bus",
-    "textEdit": Object {
-      "newText": "Bus",
-      "range": Object {
-        "end": Object {
-          "character": 20,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 20,
-          "line": 0,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Table",
-    "textEdit": Object {
-      "newText": "Table",
-      "range": Object {
-        "end": Object {
-          "character": 20,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 20,
-          "line": 0,
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Ball",
+      "textEdit": Object {
+        "newText": "Ball",
+        "range": Object {
+          "end": Object {
+            "character": 20,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 20,
+            "line": 0,
+          },
         },
       },
     },
-  },
-]
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Border",
+      "textEdit": Object {
+        "newText": "Border",
+        "range": Object {
+          "end": Object {
+            "character": 20,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 20,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Bus",
+      "textEdit": Object {
+        "newText": "Bus",
+        "range": Object {
+          "end": Object {
+            "character": 20,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 20,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Table",
+      "textEdit": Object {
+        "newText": "Table",
+        "range": Object {
+          "end": Object {
+            "character": 20,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 20,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
 `;
 
 exports[`integration Go to definition works for all supported cases go to component from typescripted inline template 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/templates/components/darling.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.ts",
+      ],
     },
-    "uri": "/app/templates/components/darling.hbs",
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/components/darling.hbs",
+    },
+  ],
+}
 `;
 
 exports[`integration Go to definition works for all supported cases go to local template-only component 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
     },
-    "uri": "/app/components/darling.hbs",
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling.hbs",
+    },
+  ],
+}
 `;
 
 exports[`integration Go to definition works for all supported cases go to local template-only component in module 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling/index.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
     },
-    "uri": "/app/components/darling/index.hbs",
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling/index.hbs",
+    },
+  ],
+}
 `;
 
 exports[`integration Go to definition works for all supported cases go to local template-only component in pod-like 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling/template.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
     },
-    "uri": "/app/components/darling/template.hbs",
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling/template.hbs",
+    },
+  ],
+}
 `;
 
 exports[`integration Go to definition works for all supported cases go to local template-only component in templates dir 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/templates/components/darling.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
     },
-    "uri": "/app/templates/components/darling.hbs",
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/components/darling.hbs",
+    },
+  ],
+}
 `;
 
 exports[`integration Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
-Array [
-  Object {
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
+Object {
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
     },
-    "uri": "/app/templates/foo/bar/baz.hbs",
+    "routePath": Object {
+      "foo.bar.baz": Array [
+        "app/templates/foo/bar/baz.hbs",
+      ],
+    },
   },
-]
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo/bar/baz.hbs",
+    },
+  ],
+}
 `;
 
 exports[`integration Initialize request returns an initialize request 1`] = `
