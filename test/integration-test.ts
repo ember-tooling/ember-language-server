@@ -1224,6 +1224,80 @@ describe('integration', function () {
 
       expect(result).toMatchSnapshot();
     });
+
+    it('support dummy class-based addon definition:template with correctly binded context', async () => {
+      const result = await getResult(
+        DefinitionRequest.type,
+        connection,
+        {
+          node_modules: {
+            provider: {
+              lib: {
+                'langserver.js': `
+                module.exports = class Boo {
+                  end() {
+                    return {
+                      character: 0,
+                      line: 0,
+                    };
+                  }
+                  start() {
+                    return {
+                      character: 0,
+                      line: 0,
+                    };
+                  }
+                  onDefinition(root) {
+                    let path = require("path");
+                    let filePath = path.resolve(
+                      path.normalize(
+                        path.join(__dirname, "./../../../app/components/hello/index.hbs")
+                      )
+                    );
+                    return [
+                      {
+                        range: {
+                          end: this.end(),
+                          start: this.start(),
+                        },
+                        uri: filePath,
+                      },
+                    ];
+                  }
+                };
+
+                `,
+              },
+              'package.json': JSON.stringify({
+                name: 'provider',
+                'ember-language-server': {
+                  entry: './lib/langserver',
+                  capabilities: {
+                    definitionProvider: true,
+                  },
+                },
+              }),
+            },
+          },
+          'package.json': JSON.stringify({
+            dependencies: {
+              provider: '*',
+            },
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{this}}',
+              },
+            },
+          },
+        },
+        'app/components/hello/index.hbs',
+        { line: 0, character: 3 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
   });
   describe('Able to provide API:Definition', () => {
     it('support dummy addon definition:template', async () => {

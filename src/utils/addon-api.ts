@@ -153,7 +153,7 @@ function requireUncached(module: string) {
         instanceResult.onReference = instance.onReference.bind(instance);
       }
 
-      return instance;
+      return instanceResult;
     }
   } catch (e) {
     logError(e);
