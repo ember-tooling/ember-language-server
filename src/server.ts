@@ -303,6 +303,7 @@ export default class Server {
 
     if (initializationOptions && initializationOptions.isELSTesting) {
       this.onInitialized();
+      setConsole(null); //no console for testing as we use stdio for communication
     }
 
     log(`Initializing Ember Language Server at ${rootPath}`);

@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { createTempDir } from 'broccoli-test-helper';
 import { URI } from 'vscode-uri';
 
-import { createMessageConnection, MessageConnection, Logger, IPCMessageReader, IPCMessageWriter } from 'vscode-jsonrpc';
+import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc';
 import {
   DidOpenTextDocumentNotification,
   InitializeRequest,
@@ -24,9 +24,7 @@ type Registry = {
 };
 
 function startServer() {
-  const serverPath = './lib/start-server.js';
-
-  return cp.fork(serverPath, [], {
+  return cp.spawn('node_modules/.bin/nyc', ['--reporter', 'none', 'node', './inst/start-server.js', '--stdio'], {
     cwd: path.join(__dirname, '..'),
   });
 }
@@ -182,7 +180,7 @@ describe('integration', function () {
 
   beforeAll(() => {
     serverProcess = startServer();
-    connection = createMessageConnection(new IPCMessageReader(serverProcess), new IPCMessageWriter(serverProcess), <Logger>{
+    connection = createMessageConnection(new StreamMessageReader(serverProcess.stdout), new StreamMessageWriter(serverProcess.stdin), <Logger>{
       error(msg) {
         console.log('error', msg);
       },
@@ -196,7 +194,7 @@ describe('integration', function () {
         console.log('warn', msg);
       },
     });
-
+    // connection.trace(2, {log: console.log}, false);
     connection.listen();
   });
 

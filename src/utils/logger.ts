@@ -23,7 +23,7 @@ export function logInfo(str: string) {
   }
 }
 
-export function setConsole(item: RemoteConsole) {
+export function setConsole(item: RemoteConsole | null) {
   remoteConsole = item;
 }
 
