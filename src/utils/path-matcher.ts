@@ -2,6 +2,7 @@ import * as path from 'path';
 
 export type MatchResultType =
   | 'helper'
+  | 'util'
   | 'service'
   | 'route'
   | 'controller'
@@ -37,6 +38,7 @@ export class ClassicPathMatcher {
     transform: ['/transforms/'],
     adapter: ['/adapters/'],
     serializer: ['/serializers/'],
+    util: ['/utils/'],
   };
   ignores = ['/tmp/', '/dist/', '/.git/'];
   matchKey(key: string, str: string) {
@@ -141,8 +143,13 @@ export class PodMatcher extends ClassicPathMatcher {
     transform: ['/transform.'],
     adapter: ['/adapter.'],
     serializer: ['/serializer.'],
+    util: ['/utils/'],
   };
-  rightPartFromFirstMatch(_: string, fileName: string, extName: string, str: string) {
+  rightPartFromFirstMatch(propName: string, fileName: string, extName: string, str: string, strToMatch: string) {
+    if (propName === 'util') {
+      return super.rightPartFromFirstMatch(propName, fileName, extName, str, strToMatch);
+    }
+
     const indexAfterPodPrefix = str.indexOf(this.podPrefix) + this.podPrefix.length + 1;
     const indexBeforeExtName = 1 + extName.length + fileName.length;
     const componentFolderPath = 'components/';

@@ -53,6 +53,11 @@ describe('PodMatcher', () => {
     expect(m('foo/bar/app/pods/foo-bar/service.js')).toEqual({ type: 'service', name: 'foo-bar', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/pods/foo-bar/baz/service.js')).toEqual({ type: 'service', name: 'foo-bar/baz', scope: 'application', kind: 'script' });
   });
+  it('utils', () => {
+    expect(m('foo/bar/app/pods/utils/baz-util.js')).toEqual({ type: 'util', name: 'baz-util', scope: 'application', kind: 'script' });
+    expect(m('foo/bar/pods/tests/unit/utils/baz-util-test.js')).toEqual({ type: 'util', name: 'baz-util', scope: 'application', kind: 'test' });
+    expect(m('foo/bar/pods/app/utils/fizz/baz-util.js')).toEqual({ type: 'util', name: 'fizz/baz-util', scope: 'application', kind: 'script' });
+  });
   it('empty', () => {
     expect(m('foo/bar/app/components/foo/index.hbs')).toEqual(null);
     expect(m('foo/bar/app/routes/foo.ts')).toEqual(null);
@@ -127,6 +132,11 @@ describe('PodMatcher :customPrefix', () => {
     expect(m('foo/bar/app/foo-bar/service.js')).toEqual({ type: 'service', name: 'foo-bar', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/foo-bar/baz/service.js')).toEqual({ type: 'service', name: 'foo-bar/baz', scope: 'application', kind: 'script' });
   });
+  it('utils', () => {
+    expect(m('foo/bar/app/utils/baz-util.js')).toEqual({ type: 'util', name: 'baz-util', scope: 'application', kind: 'script' });
+    expect(m('foo/bar/tests/unit/utils/baz-util-test.js')).toEqual({ type: 'util', name: 'baz-util', scope: 'application', kind: 'test' });
+    expect(m('foo/bar/app/utils/fizz/baz-util.js')).toEqual({ type: 'util', name: 'fizz/baz-util', scope: 'application', kind: 'script' });
+  });
   it('empty', () => {
     expect(m('foo/bar/app/components/foo/index.hbs')).toEqual(null);
     expect(m('foo/bar/app/routes/foo.ts')).toEqual(null);
@@ -145,12 +155,16 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/lib/my-addon/app/components/route/foo/index.ts')).toEqual({ type: 'component', name: 'route/foo', scope: 'addon', kind: 'script' });
     expect(m('foo/bar/lib/my-addon/components/routes/foo/index.ts')).toEqual({ type: 'component', name: 'routes/foo', scope: 'addon', kind: 'script' });
     expect(m('foo/bar/lib/my-addon/app/components/route/foo/index.ts')).toEqual({ type: 'component', name: 'route/foo', scope: 'addon', kind: 'script' });
+    expect(m('lib/my-addon/addon/utils/baz/foo-bar.js')).toEqual({ type: 'util', name: 'baz/foo-bar', scope: 'addon', kind: 'script' });
+    expect(m('lib/my-addon/tests/unit/utils/baz/foo-bar-test.js')).toEqual({ type: 'util', name: 'baz/foo-bar', scope: 'addon', kind: 'test' });
   });
   it('support addons', () => {
     expect(m('foo/bar/addon/components/routes/foo/index.ts')).toEqual({ type: 'component', name: 'routes/foo', scope: 'addon', kind: 'script' });
     expect(m('foo/bar/addon/components/route/foo/index.ts')).toEqual({ type: 'component', name: 'route/foo', scope: 'addon', kind: 'script' });
     expect(m('foo/bar/addon/components/routes/foo/index.ts')).toEqual({ type: 'component', name: 'routes/foo', scope: 'addon', kind: 'script' });
     expect(m('foo/bar/addon/components/route/foo/index.ts')).toEqual({ type: 'component', name: 'route/foo', scope: 'addon', kind: 'script' });
+    expect(m('foo/bar/addon/utils/foo/baz.ts')).toEqual({ type: 'util', name: 'foo/baz', scope: 'addon', kind: 'script' });
+    expect(m('foo/bar/addon/tests/unit/utils/foo/baz-test.ts')).toEqual({ type: 'util', name: 'foo/baz', scope: 'addon', kind: 'test' });
 
     expect(m('foo/bar/app/components/routes/foo/index.ts')).toEqual({ type: 'component', name: 'routes/foo', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/components/route/foo/index.ts')).toEqual({ type: 'component', name: 'route/foo', scope: 'application', kind: 'script' });
@@ -328,5 +342,11 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/services/foo-bar.js')).toEqual({ type: 'service', name: 'foo-bar', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/services/foo-bar/baz.js')).toEqual({ type: 'service', name: 'foo-bar/baz', scope: 'application', kind: 'script' });
     expect(m('foo/bar/tests/unit/services/foo-bar-test.js')).toEqual({ type: 'service', name: 'foo-bar', scope: 'application', kind: 'test' });
+  });
+
+  it('utils', () => {
+    expect(m('foo/bar/app/utils/baz-util.js')).toEqual({ type: 'util', name: 'baz-util', scope: 'application', kind: 'script' });
+    expect(m('foo/bar/app/utils/fizz/baz-util.js')).toEqual({ type: 'util', name: 'fizz/baz-util', scope: 'application', kind: 'script' });
+    expect(m('foo/bar/app/tests/unit/utils/fizz/baz-util.js')).toEqual({ type: 'util', name: 'fizz/baz-util', scope: 'application', kind: 'test' });
   });
 });
