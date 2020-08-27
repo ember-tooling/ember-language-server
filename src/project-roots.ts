@@ -155,7 +155,7 @@ export class Project {
 
     if (this.providers.info.length) {
       logInfo('--------------------');
-      logInfo('loded language server addons:');
+      logInfo('loaded language server addons:');
       this.providers.info.forEach((addonName) => {
         logInfo('    ' + addonName);
       });
