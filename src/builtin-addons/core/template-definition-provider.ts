@@ -357,13 +357,10 @@ export default class TemplateDefinitionProvider {
       return true;
     }
 
+    const parent = path.parent;
+
     if (node.type === 'StringLiteral') {
-      // if (node.original.includes('/')) {
-      //   return true;
-      // } else if (!node.original.includes('.') && node.original.includes('-')) {
-      //   return true;
-      // }
-      if (path.parent && path.parent.path.original === 'component' && path.parent.params[0] === node) {
+      if (parent && parent.path && parent.path.original === 'component' && parent.params[0] === node) {
         return true;
       }
     }
@@ -371,8 +368,6 @@ export default class TemplateDefinitionProvider {
     if (node.type !== 'PathExpression') {
       return false;
     }
-
-    const parent = path.parent;
 
     if (!parent || parent.path !== node || (parent.type !== 'MustacheStatement' && parent.type !== 'BlockStatement' && parent.type !== 'SubExpression')) {
       return false;
