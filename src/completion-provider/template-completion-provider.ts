@@ -201,6 +201,10 @@ export default class TemplateCompletionProvider {
 function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
   let node = astPath.node;
 
+  if (node === undefined) {
+    return normalPlaceholder;
+  }
+
   // handle block params autocomplete case
   if (node.type === 'ElementNode' || node.type === 'BlockStatement') {
     const meta = astPath.metaForType('handlebars');
