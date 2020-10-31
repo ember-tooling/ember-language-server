@@ -20,6 +20,7 @@
   "dependencies": {
     "@glimmer/syntax": "^0.52.0",
     "ast-types": "^0.13.3",
+    "cross-spawn": "^7.0.3",
     "dag-map": "^2.0.2",
     "ember-meta-explorer": "^0.1.1",
     "extract-tagged-template-literals": "^1.0.3",

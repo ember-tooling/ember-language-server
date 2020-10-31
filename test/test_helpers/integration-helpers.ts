@@ -1,14 +1,13 @@
-import * as cp from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 import { createTempDir } from 'broccoli-test-helper';
 import { URI } from 'vscode-uri';
 import { MessageConnection } from 'vscode-jsonrpc';
-
+import * as spawn from 'cross-spawn';
 import { DidOpenTextDocumentNotification, InitializeRequest, ExecuteCommandRequest, Definition } from 'vscode-languageserver-protocol';
 
 export function startServer() {
-  return cp.spawn('node_modules/.bin/nyc', ['--reporter', 'none', 'node', './inst/start-server.js', '--stdio'], {
+  return spawn('node_modules/.bin/nyc', ['--reporter', 'none', 'node', './inst/start-server.js', '--stdio'], {
     cwd: path.join(__dirname, '../..'),
   });
 }

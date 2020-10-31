@@ -54,6 +54,7 @@ describe('integration', function () {
 
   describe('Initialize request', () => {
     it('returns an initialize request', async () => {
+      jest.setTimeout(15000);
       const response = await initServer(connection);
 
       expect(response).toMatchSnapshot();
