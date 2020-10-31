@@ -12,6 +12,13 @@ export function startServer() {
   });
 }
 
+export type UnknownResult = Record<string, unknown>;
+export type Registry = {
+  [key: string]: {
+    [key: string]: string[];
+  };
+};
+
 export async function reloadProjects(connection, project = undefined) {
   const result = await connection.sendRequest(ExecuteCommandRequest.type, {
     command: 'els.reloadProject',
@@ -64,7 +71,7 @@ export async function getResult(reqType, connection, files, fileToInspect, posit
 }
 
 export function openFile(connection: MessageConnection, filePath: string) {
-  connection.sendNotification(DidOpenTextDocumentNotification.type, {
+  connection.sendNotification(DidOpenTextDocumentNotification.method, {
     textDocument: {
       uri: URI.file(filePath).toString(),
       text: fs.readFileSync(filePath, 'utf8'),

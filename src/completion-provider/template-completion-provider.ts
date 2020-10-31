@@ -17,6 +17,8 @@ const PLACEHOLDER = 'ELSCompletionDummy';
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
+    log('getTextForGuessing', originalText, offset, PLACEHOLDER);
+
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
   getRoots(doc: TextDocumentIdentifier) {

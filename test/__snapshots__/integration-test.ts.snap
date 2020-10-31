@@ -2433,6 +2433,7 @@ Object {
         "<",
         "@",
         "this.",
+        "<:",
       ],
     },
     "definitionProvider": true,
@@ -2458,4 +2459,86 @@ Object {
     },
   },
 }
+`;
+
+exports[`integration autocomplete works for angle component slots 1`] = `
+Array [
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":main",
+    "textEdit": Object {
+      "newText": ":main",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration autocomplete works for multiple angle component slots 1`] = `
+Array [
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":main",
+    "textEdit": Object {
+      "newText": ":main",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":body",
+    "textEdit": Object {
+      "newText": ":body",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":footer",
+    "textEdit": Object {
+      "newText": ":footer",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
 `;

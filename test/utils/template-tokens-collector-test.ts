@@ -1,7 +1,11 @@
-import { extractTokensFromTemplate } from '../../src/utils/template-tokens-collector';
+import { extractTokensFromTemplate, getTemplateBlocks } from '../../src/utils/template-tokens-collector';
 
 function t(tpl) {
   return extractTokensFromTemplate(tpl);
+}
+
+function tok(tpl) {
+  return getTemplateBlocks(tpl);
 }
 
 describe('TemplateTokensCollector', () => {
@@ -50,5 +54,23 @@ describe('TemplateTokensCollector', () => {
   });
   it('skip external arguments', () => {
     expect(t('<@Foo />')).toEqual([]);
+  });
+});
+
+describe('getTemplateBlocks', () => {
+  it('extract named blocks from template and skip built-ins [inverse]', () => {
+    expect(tok('{{yield to="inverse"}}')).toEqual([]);
+  });
+  it('extract named blocks from template and skip built-ins [else]', () => {
+    expect(tok('{{yield to="else"}}')).toEqual([]);
+  });
+  it('extract named blocks from complex template', () => {
+    expect(tok('{{#if a}}{{yield to="body"}}{{else}}{{yield to="head"}}{{/if}}')).toEqual(['body', 'head']);
+  });
+  it('extract multiple named blocks template', () => {
+    expect(tok('{{yield to="body"}}{{yield to="head"}}')).toEqual(['body', 'head']);
+  });
+  it('extract single block name if multiple used', () => {
+    expect(tok('{{yield to="body"}}{{yield to="head"}}{{yield to="body"}}{{yield to="head"}}')).toEqual(['body', 'head']);
   });
 });

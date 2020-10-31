@@ -1,5 +1,5 @@
 import { preprocess, traverse } from '@glimmer/syntax';
-import { normalizeToClassicComponent } from './normalizers';
+import { normalizeToClassicComponent, normalizeToNamedBlockName } from './normalizers';
 
 function tokensFromType(node: any, scopedTokens: any) {
   const tokensMap = {
@@ -42,6 +42,34 @@ function addTokens(tokensSet: Set<string>, node: any, scopedTokens: any, nativeT
       tokensSet.add(maybeToken);
     }
   });
+}
+
+export function getTemplateBlocks(html: string): string[] {
+  const ast = preprocess(html);
+  const tokensSet: Set<string> = new Set();
+  const defaultBlocks = ['inverse', 'else'];
+
+  traverse(ast, {
+    MustacheStatement: {
+      enter(node) {
+        const p = node.path;
+
+        if (p && p.type === 'PathExpression' && p.original === 'yield' && p.data === false && p.this === false) {
+          const to = node.hash.pairs.find((p) => {
+            return p.key === 'to';
+          });
+
+          if (to && to.value && to.value.type === 'StringLiteral') {
+            if (!defaultBlocks.includes(to.value.original)) {
+              tokensSet.add(to.value.original);
+            }
+          }
+        }
+      },
+    },
+  });
+
+  return Array.from(tokensSet).map((el) => normalizeToNamedBlockName(el));
 }
 
 function getTemplateTokens(html: string, nativeTokens: any) {

@@ -25,6 +25,7 @@ import {
   isSubExpressionPath,
   isAngleComponentPath,
   isModifierPath,
+  isNamedBlockName,
 } from '../../utils/ast-helpers';
 import {
   listComponents,
@@ -38,6 +39,8 @@ import {
 } from '../../utils/layout-helpers';
 
 import { normalizeToAngleBracketComponent } from '../../utils/normalizers';
+import { getTemplateBlocks } from '../../utils/template-tokens-collector';
+import { ASTNode } from 'ast-types';
 
 const mTemplateContextLookup = memoize(templateContextLookup, {
   length: 3,
@@ -162,6 +165,29 @@ export default class TemplateCompletionProvider {
 
     return scopedValues;
   }
+  getParentComponentYields(root: string, focusPath: ASTNode & { tag: string }) {
+    if (focusPath.type !== 'ElementNode') {
+      return [];
+    }
+
+    const paths = provideComponentTemplatePaths(root, focusPath.tag).filter((p) => fs.existsSync(p));
+
+    if (!paths.length) {
+      return [];
+    }
+
+    const tpl = paths[0];
+
+    const content = fs.readFileSync(tpl, 'utf8');
+
+    return getTemplateBlocks(content).map((blockName: string) => {
+      return {
+        label: `:${blockName}`,
+        kind: CompletionItemKind.Variable,
+        detail: `Named block (Slot) for <${focusPath.tag}>`,
+      };
+    });
+  }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     log('provideCompletions');
 
@@ -175,7 +201,13 @@ export default class TemplateCompletionProvider {
     const originalText = params.originalText || '';
 
     try {
-      if (isAngleComponentPath(focusPath)) {
+      if (isNamedBlockName(focusPath)) {
+        log('isNamedBlockName');
+        // <:main>
+        const yields = this.getParentComponentYields(root, focusPath.parent);
+
+        completions.push(...yields);
+      } else if (isAngleComponentPath(focusPath) && !isNamedBlockName(focusPath)) {
         log('isAngleComponentPath');
         // <Foo>
         const candidates = this.getAllAngleBracketComponents(root, uri);

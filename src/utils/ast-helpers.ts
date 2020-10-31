@@ -188,6 +188,10 @@ export function isTransformReference(astPath: ASTPath): boolean {
   return expressionHasIdentifierName(parent, 'attr');
 }
 
+export function isNamedBlockName(path: ASTPath): boolean {
+  return isAngleComponentPath(path) && path.parent && path.node.tag.startsWith(':');
+}
+
 export function isAngleComponentPath(path: ASTPath): boolean {
   const node = path.node;
 

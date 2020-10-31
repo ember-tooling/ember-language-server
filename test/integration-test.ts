@@ -12,22 +12,18 @@ import {
   createProject,
   normalizeRegistry,
   normalizePath,
+  Registry,
+  UnknownResult,
 } from './test_helpers/integration-helpers';
 import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc';
 
 import { CompletionRequest, DefinitionRequest, DocumentSymbolRequest, ExecuteCommandRequest, ReferencesRequest } from 'vscode-languageserver-protocol';
-type UnknownResult = Record<string, unknown>;
-type Registry = {
-  [key: string]: {
-    [key: string]: string[];
-  };
-};
 
 describe('integration', function () {
   let connection: MessageConnection;
   let serverProcess: cp.ChildProcess;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     serverProcess = startServer();
     connection = createMessageConnection(new StreamMessageReader(serverProcess.stdout), new StreamMessageWriter(serverProcess.stdin), <Logger>{
       error(msg) {
@@ -45,6 +41,7 @@ describe('integration', function () {
     });
     // connection.trace(2, {log: console.log}, false);
     connection.listen();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   afterAll(() => {
@@ -1211,6 +1208,44 @@ describe('integration', function () {
 
       expect(result).toMatchSnapshot();
     });
+  });
+
+  it('autocomplete works for angle component slots', async () => {
+    const result = await getResult(
+      CompletionRequest.type,
+      connection,
+      {
+        app: {
+          components: {
+            'hello.hbs': '<Darling><:</Darling>',
+            'darling.hbs': '{{yield to="main"}}',
+          },
+        },
+      },
+      'app/components/hello.hbs',
+      { line: 0, character: 11 }
+    );
+
+    expect(result.response).toMatchSnapshot();
+  });
+
+  it('autocomplete works for multiple angle component slots', async () => {
+    const result = await getResult(
+      CompletionRequest.type,
+      connection,
+      {
+        app: {
+          components: {
+            'hello.hbs': '<Darling><:</Darling>',
+            'darling.hbs': '{{yield to="main"}}{{yield to="footer"}}<div>{{yield to="body"}}</div>',
+          },
+        },
+      },
+      'app/components/hello.hbs',
+      { line: 0, character: 11 }
+    );
+
+    expect(result.response).toMatchSnapshot();
   });
 
   describe('Autocomplete works for broken templates', () => {

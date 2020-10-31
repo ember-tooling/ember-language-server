@@ -1,4 +1,4 @@
-import { normalizeToAngleBracketComponent, normalizeToClassicComponent, normalizeServiceName } from '../../src/utils/normalizers';
+import { normalizeToAngleBracketComponent, normalizeToNamedBlockName, normalizeToClassicComponent, normalizeServiceName } from '../../src/utils/normalizers';
 
 describe('normalizeServiceName', () => {
   it('able to convert service to path', () => {
@@ -24,6 +24,14 @@ describe('normalizeToClassicComponent', () => {
     expect(normalizeToClassicComponent('foo-bar/baz')).toEqual('foo-bar/baz');
     expect(normalizeToClassicComponent('foo-bar/baz-boo')).toEqual('foo-bar/baz-boo');
     expect(normalizeToClassicComponent('tables/i18n-models-table')).toEqual('tables/i18n-models-table');
+  });
+});
+
+describe('normalizeToNamedBlockName', () => {
+  it('able to convert dasherized blocks to camel-case', () => {
+    expect(normalizeToNamedBlockName('foo')).toEqual('foo');
+    expect(normalizeToNamedBlockName('foo-bar')).toEqual('fooBar');
+    expect(normalizeToNamedBlockName('fooBar')).toEqual('fooBar');
   });
 });
 
