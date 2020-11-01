@@ -49,6 +49,7 @@ import ScriptCompletionProvider from './completion-provider/script-completion-pr
 import { getRegistryForRoot, addToRegistry, REGISTRY_KIND, normalizeMatchNaming } from './utils/registry-api';
 import { Usage, findRelatedFiles } from './utils/usages-api';
 import { URI } from 'vscode-uri';
+import { MatchResultType } from './utils/path-matcher';
 
 export default class Server {
   initializers: any[] = [];
@@ -75,8 +76,8 @@ export default class Server {
       return false;
     }
   }
-  getUsages(normalizedToken: string): Usage[] {
-    return findRelatedFiles(normalizedToken);
+  getUsages(normalizedToken: string, resultType: MatchResultType): Usage[] {
+    return findRelatedFiles(normalizedToken, resultType);
   }
   getRegistry(rawRoot: string) {
     return getRegistryForRoot(path.resolve(rawRoot));
@@ -176,7 +177,7 @@ export default class Server {
             name: item.name,
             path: filePath,
             type: item.type,
-            usages: this.getUsages(item.name).map((usage) => {
+            usages: this.getUsages(item.name, item.type).map((usage) => {
               if (usage.type === 'routePath') {
                 return {
                   ...usage,
