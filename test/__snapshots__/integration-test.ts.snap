@@ -2385,6 +2385,85 @@ Object {
 }
 `;
 
+exports[`integration Go to definition works for all supported cases to children route from application outlet 1`] = `
+Object {
+  "registry": Object {
+    "routePath": Object {
+      "application": Array [
+        "app/templates/application.hbs",
+      ],
+      "foo": Array [
+        "app/templates/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo.hbs",
+    },
+  ],
+}
+`;
+
+exports[`integration Go to definition works for all supported cases to children route from meaningful outlet 1`] = `
+Object {
+  "registry": Object {
+    "routePath": Object {
+      "foo": Array [
+        "app/templates/foo.hbs",
+      ],
+      "foo.bar": Array [
+        "app/templates/foo/bar.hbs",
+      ],
+      "foo.baz": Array [
+        "app/templates/foo/baz.hbs",
+      ],
+      "foo.boo.bax": Array [
+        "app/templates/foo/boo/bax.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo/bar.hbs",
+    },
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo/baz.hbs",
+    },
+  ],
+}
+`;
+
 exports[`integration Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
 Object {
   "registry": Object {

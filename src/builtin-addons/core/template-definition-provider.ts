@@ -3,9 +3,9 @@ import * as fs from 'fs';
 
 import { Definition, Location } from 'vscode-languageserver';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
-import { isLinkToTarget, isLinkComponentRouteTarget } from './../../utils/ast-helpers';
+import { isLinkToTarget, isLinkComponentRouteTarget, isOutlet } from './../../utils/ast-helpers';
 import ASTPath from './../../glimmer-utils';
-import { getGlobalRegistry } from './../../utils/registry-api';
+import { getGlobalRegistry, getRegistryForRoot } from './../../utils/registry-api';
 import { normalizeToClassicComponent } from '../../utils/normalizers';
 import { isTemplatePath, isTestFile, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../../utils/layout-helpers';
 
@@ -19,6 +19,7 @@ import {
 } from './../../utils/definition-helpers';
 
 import * as memoize from 'memoizee';
+import { URI } from 'vscode-uri';
 
 const mAddonPathsForComponentTemplates = memoize(getAddonPathsForComponentTemplates, { length: 2, maxAge: 600000 });
 
@@ -94,8 +95,10 @@ export default class TemplateDefinitionProvider {
       return params.results;
     }
 
-    // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
-    if (this.maybeClassicComponentName(focusPath)) {
+    if (isOutlet(focusPath)) {
+      definitions = this.provideChildRouteDefinitions(root, uri);
+    } else if (this.maybeClassicComponentName(focusPath)) {
+      // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
       definitions = this.provideComponentDefinition(root, this.extractValueForMaybeClassicComponentName(focusPath));
     } else if (this.isAngleComponent(focusPath)) {
       // <FooBar />
@@ -193,6 +196,59 @@ export default class TemplateDefinitionProvider {
 
     // mAddonPathsForComponentTemplates
     return pathsToLocationsWithPosition(paths, '{{yield');
+  }
+
+  provideChildRouteDefinitions(root: string, uri: string): Location[] {
+    const rawPath = URI.parse(uri).fsPath.toLowerCase();
+    const absRoot = path.normalize(root);
+    const registry = getRegistryForRoot(absRoot);
+    const allPaths = registry.routePath;
+    let pathName: string | null = null;
+    const paths: string[] = [];
+
+    Object.keys(allPaths).forEach((name) => {
+      const files = allPaths[name].map((item) => item.toLowerCase());
+
+      if (files.includes(rawPath)) {
+        pathName = name;
+      } else {
+        paths.push(name);
+      }
+    });
+
+    if (pathName === null || paths.length === 0) {
+      return [];
+    }
+
+    const files: string[] = [];
+    const distance = 2;
+
+    const interestingPaths = paths
+      .filter((p) => {
+        if (pathName === 'application') {
+          return p.split('.').length <= distance;
+        }
+
+        if (!p.startsWith(`${pathName as string}.`)) {
+          return false;
+        }
+
+        return p.replace(pathName as string, '').split('.').length <= distance;
+      })
+      .sort();
+
+    interestingPaths.forEach((p) => {
+      const registryItem = registry.routePath[p] || [];
+      const items = registryItem.filter((el: string) => {
+        return path.normalize(el).includes(absRoot) && !isTestFile(path.normalize(el)) && isTemplatePath(el);
+      });
+
+      if (items.length) {
+        files.push(items[0]);
+      }
+    });
+
+    return pathsToLocations(...files);
   }
 
   providePropertyDefinition(root: string, focusPath: ASTPath, uri: string): Location[] {

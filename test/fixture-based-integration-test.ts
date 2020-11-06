@@ -45,6 +45,7 @@ describe('With `full-project` initialized on server', () => {
   });
 
   describe('Completion request', () => {
+    jest.setTimeout(15000);
     it('returns all components and helpers when requesting completion items in a handlebars expression', async () => {
       const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'application.hbs');
       const params = {

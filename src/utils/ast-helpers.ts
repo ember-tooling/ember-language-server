@@ -282,6 +282,14 @@ export function isLinkToTarget(path: ASTPath): boolean {
   return isInlineLinkToTarget(path) || isBlockLinkToTarget(path);
 }
 
+export function isOutlet(path: ASTPath): boolean {
+  if (isPathExpression(path.node)) {
+    return path.node.original === 'outlet' && path.node.this === false && path.node.data === false;
+  }
+
+  return false;
+}
+
 export function isInlineLinkToTarget(path: ASTPath): boolean {
   const node = path.node;
 
