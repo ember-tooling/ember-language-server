@@ -7,7 +7,7 @@ import * as spawn from 'cross-spawn';
 import { DidOpenTextDocumentNotification, InitializeRequest, ExecuteCommandRequest, Definition } from 'vscode-languageserver-protocol';
 
 export function startServer() {
-  return spawn('node_modules/.bin/nyc', ['--reporter', 'none', 'node', './inst/start-server.js', '--stdio'], {
+  return spawn('node_modules/.bin/nyc', ['--reporter', 'none', 'node', './inst/start-server.js', '--stdio', '--no-clean'], {
     cwd: path.join(__dirname, '../..'),
   });
 }

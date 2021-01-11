@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Node 12.x - ubuntu
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+
+      - name: install dependencies
+        run: yarn install --frozen-lockfile
+
+      - run: yarn compile
+      - run: yarn lint
+      - run: yarn test:coverage
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [test]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+
+      - name: install dependencies
+        run: yarn install --frozen-lockfile
+
+      - run: yarn compile
+      - run: yarn test:coverage
+      - uses: codecov/codecov-action@v1
+
+  nodeX:
+    name: Node ${{ matrix.node-version }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    timeout-minutes: 10
+
+    needs: [test]
+
+    strategy:
+      matrix:
+        os: [ubuntu, windows]
+        node-version: [10.x, 12.x, 13.x, 14.x]
+
+        # excluded because it is the `test` job above
+        exclude:
+          - os: ubuntu
+            node-version: 12.x
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: install dependencies
+        run: yarn install --frozen-lockfile --ignore-engines
+
+      - name: compile
+        run: yarn compile
+
+      - name: test
+        run: yarn test:coverage
+
+  floating-dependencies:
+    name: Floating Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    needs: [test]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+        with:
+          node-version: 12.x
+
+      - name: install dependencies
+        run: yarn install --no-lockfile
+
+      - name: compile
+        run: yarn compile
+
+      - name: test
+        run: yarn test:coverage

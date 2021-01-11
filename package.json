@@ -90,7 +90,7 @@
     "lint": "eslint . --ext js,ts",
     "prepublish": "yarn clean && yarn compile",
     "test": "jest",
-    "test:coverage": "rimraf inst/ && nyc instrument lib inst && nyc --clean --reporter=clover --reporter=json --reporter=lcov yarn run jest --no-coverage",
+    "test:coverage": "rimraf inst/ && nyc instrument lib inst && nyc --no-clean --reporter=clover --reporter=json --reporter=lcov yarn run jest --no-coverage",
     "watch": "tsc --watch -p ."
   },
   "volta": {
