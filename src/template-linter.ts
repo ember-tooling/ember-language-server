@@ -1,7 +1,8 @@
 import { Diagnostic, Files, TextDocument } from 'vscode-languageserver';
 import { getExtension } from './utils/file-extension';
-import { toDiagnostic } from './utils/diagnostic';
-import { searchAndExtractHbs } from 'extract-tagged-template-literals';
+import { toDiagnostic, toHbsSource } from './utils/diagnostic';
+import { getTemplateNodes } from '@lifeart/ember-extract-inline-templates';
+import { parseScriptFile } from 'ember-meta-explorer';
 import { URI } from 'vscode-uri';
 import { log, logError } from './utils/logger';
 import * as findUp from 'find-up';
@@ -48,21 +49,35 @@ export default class TemplateLinter {
     return this.server.projectRoots.projectForUri(textDocument.uri);
   }
 
-  private sourceForDocument(textDocument: TextDocument) {
+  private sourcesForDocument(textDocument: TextDocument) {
     const ext = getExtension(textDocument);
 
     if (ext !== null && !extensionsToLint.includes(ext)) {
-      return;
+      return [];
     }
 
     const documentContent = textDocument.getText();
-    const source = ext === '.hbs' ? documentContent : searchAndExtractHbs(documentContent);
 
-    if (!source.trim().length) {
-      return;
+    if (ext === '.hbs') {
+      if (documentContent.trim().length === 0) {
+        return [];
+      } else {
+        return [documentContent];
+      }
+    } else {
+      const nodes = getTemplateNodes(documentContent, {
+        parse(source: string) {
+          return parseScriptFile(source);
+        },
+      });
+      const sources = nodes.filter((el) => {
+        return el.template.trim().length > 0;
+      });
+
+      return sources.map((el) => {
+        return toHbsSource(el);
+      });
     }
-
-    return source;
   }
   async lint(textDocument: TextDocument): Promise<Diagnostic[] | undefined> {
     const cwd = process.cwd();
@@ -72,15 +87,15 @@ export default class TemplateLinter {
       return;
     }
 
-    const source = this.sourceForDocument(textDocument);
+    const sources = this.sourcesForDocument(textDocument);
 
-    if (!source) {
+    if (!sources.length) {
       return;
     }
 
     const TemplateLinter = await this.getLinter(project);
 
-    let linter = null;
+    let linter: any = null;
 
     try {
       setCwd(project.root);
@@ -91,15 +106,23 @@ export default class TemplateLinter {
       return;
     }
 
-    const errors = linter.verify({
-      source,
-      moduleId: URI.parse(textDocument.uri).fsPath,
-      filePath: URI.parse(textDocument.uri).fsPath,
-    });
+    let diagnostics: Diagnostic[] = [];
+
+    try {
+      sources.forEach((source) => {
+        const errors = linter.verify({
+          source,
+          moduleId: URI.parse(textDocument.uri).fsPath,
+          filePath: URI.parse(textDocument.uri).fsPath,
+        });
+
+        diagnostics = [...diagnostics, ...errors.map((error: TemplateLinterError) => toDiagnostic(source, error))];
+      });
+    } catch (e) {
+      logError(e);
+    }
 
     setCwd(cwd);
-
-    const diagnostics: Diagnostic[] = errors.map((error: TemplateLinterError) => toDiagnostic(source, error));
 
     return diagnostics;
   }

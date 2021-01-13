@@ -15,6 +15,9 @@ import { normalizeServiceName } from '../../utils/normalizers';
 import { isModuleUnificationApp, podModulePrefixForRoot } from './../../utils/layout-helpers';
 import { provideRouteDefinition } from './template-definition-provider';
 type ItemType = 'Model' | 'Transform' | 'Service';
+
+// barking on 'LayoutCollectorFn' is defined but never used  @typescript-eslint/no-unused-vars
+// eslint-disable-line
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
 
 function joinPaths(...args: string[]) {

@@ -4,6 +4,33 @@ import { TemplateLinterError } from '../template-linter';
 const ParseErrorExp = /^Parse error on line (\d+)/;
 const OnLineErrorExp = / \(on line (\d+)\)\.$/;
 
+interface ITemplateNode {
+  template: string;
+  startLine: number;
+  startColumn: number;
+  endLine: number;
+  endColumn: number;
+}
+
+export function toHbsSource(templateNode: ITemplateNode): string {
+  let lastParsedLine = 1;
+  const sortedTemplateNodes = [templateNode];
+  const output = sortedTemplateNodes.reduce((acc: string, node: ITemplateNode): string => {
+    const verticalGap = lastParsedLine < node.startLine ? '\n'.repeat(node.startLine - lastParsedLine) : '';
+    const indentation = node.startColumn > 1 && !node.template.startsWith('\n') ? ' '.repeat(node.startColumn) : '';
+    // We have to remove the trailing whitespace(s) after the last new line `\n` for **mutliline inline template(s)**
+    // otherwise, we will have trailing whitespace lint error !!
+    const rightTrimmedTemplate = node.template.replace(/(\n)[ ]+$/, (_, newLine) => newLine);
+
+    lastParsedLine = node.endLine;
+    acc += verticalGap + indentation + rightTrimmedTemplate;
+
+    return acc;
+  }, '');
+
+  return output;
+}
+
 export function toDiagnostic(source: string, error: TemplateLinterError): Diagnostic {
   return {
     severity: DiagnosticSeverity.Error,

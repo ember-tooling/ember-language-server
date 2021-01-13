@@ -30,15 +30,7 @@ module.exports = {
       { blankLine: 'any', prev: ['const', 'let'], next: ['const', 'let'] },
     ],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      {
-        vars: 'local',
-        args: 'after-used',
-        ignoreRestSiblings: false,
-      },
-    ],
-    'linebreak-style': ['error', 'unix'],
+    'linebreak-style': 'off',
     semi: ['error', 'always'],
   },
 };
