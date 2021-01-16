@@ -1,5 +1,6 @@
 import { Position, SourceLocation } from 'estree';
 import { containsPosition } from './estree-utils';
+import { ASTv1 } from '@glimmer/syntax';
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
@@ -24,7 +25,7 @@ export function maybeComponentNameForPath(astPath: ASTPath) {
   const declaration = maybePathDeclaration(astPath);
 
   if (declaration && declaration.node.type === 'ElementNode') {
-    return declaration.node.tag;
+    return (declaration.node as ASTv1.ElementNode).tag;
   }
 }
 
@@ -110,12 +111,12 @@ class BlockParamDefinition {
   get index(): number {
     const node = this.path.node;
 
-    if (node.type === 'BlockStatement' && node.program) {
-      return node.program.blockParams.indexOf(this.name);
+    if (node.type === 'BlockStatement' && (node as ASTv1.BlockStatement).program) {
+      return (node as ASTv1.BlockStatement).program.blockParams.indexOf(this.name);
     } else if (node.type === 'Block') {
-      return node.blockParams.indexOf(this.name);
+      return (node as ASTv1.Block).blockParams.indexOf(this.name);
     } else if (node.type === 'ElementNode') {
-      return node.blockParams.indexOf(this.name);
+      return (node as ASTv1.ElementNode).blockParams.indexOf(this.name);
     } else {
       return -1;
     }
@@ -151,19 +152,22 @@ export function isBlockParamDefinition(astPath: ASTPath, content: string, positi
   }
 }
 
-export function sourceForNode(node: any, content = '') {
+export function sourceForNode(node: ASTv1.BaseNode, content = '') {
   // mostly copy/pasta from ember-template-lint and tildeio/htmlbars with a few tweaks:
   // https://github.com/tildeio/htmlbars/blob/v0.14.17/packages/htmlbars-syntax/lib/parser.js#L59-L90
   // https://github.com/ember-template-lint/ember-template-lint/blob/v2.0.0-beta.3/lib/rules/base.js#L511
+
   if (!node || !node.loc) {
     return;
   }
 
-  const firstLine = node.loc.start.line - 1;
-  const lastLine = node.loc.end.line - 1;
+  const loc = 'toJSON' in node.loc ? node.loc.toJSON() : node.loc;
+
+  const firstLine = loc.start.line - 1;
+  const lastLine = loc.end.line - 1;
   let currentLine = firstLine - 1;
-  const firstColumn = node.loc.start.column;
-  const lastColumn = node.loc.end.column;
+  const firstColumn = loc.start.column;
+  const lastColumn = loc.end.column;
   const string = [];
   const source = content.match(reLines) as string[];
 
@@ -201,7 +205,7 @@ export function getLocalScope(astPath: ASTPath) {
     const node = cursor.node;
 
     if (node && (node.type === 'ElementNode' || node.type === 'Block')) {
-      const params = node.blockParams;
+      const params = (node as ASTv1.ElementNode | ASTv1.Block).blockParams;
 
       params.forEach((param: string) => {
         scopeValues.push(new BlockParamDefinition(param, cursor as ASTPath));
@@ -237,7 +241,7 @@ export default class ASTPath {
 
   private constructor(private readonly path: any[], private readonly index: number, private readonly content: string, private readonly position: Position) {}
 
-  get node(): any {
+  get node(): ASTv1.BaseNode {
     return this.path[this.index];
   }
 
@@ -270,11 +274,11 @@ export default class ASTPath {
   }
 }
 
-function _findFocusPath(node: any, position: Position, seen = new Set()): any {
+function _findFocusPath(node: ASTv1.BaseNode, position: Position, seen = new Set()): any {
   seen.add(node);
 
   let path: any[] = [];
-  const range: SourceLocation = node.loc;
+  const range: SourceLocation | null = node.loc ? ('toJSON' in node.loc ? node.loc.toJSON() : node.loc) : null;
 
   if (range) {
     if (containsPosition(range, position)) {
@@ -285,17 +289,21 @@ function _findFocusPath(node: any, position: Position, seen = new Set()): any {
   }
 
   for (const key in node) {
+    if (key === 'loc') {
+      continue;
+    }
+
     if (!Object.prototype.hasOwnProperty.call(node, key)) {
       continue;
     }
 
-    const value = node[key];
+    const value = (node as any)[key];
 
     if (!value || typeof value !== 'object' || seen.has(value)) {
       continue;
     }
 
-    const childPath = _findFocusPath(value, position, seen);
+    const childPath = _findFocusPath(value as ASTv1.BaseNode, position, seen);
 
     if (childPath.length > 0) {
       path = path.concat(childPath);

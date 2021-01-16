@@ -1,14 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`glimmer-utils ASTPath works as expected 1`] = `
-Object {
+PathExpressionImplV1 {
   "data": false,
-  "loc": SourceLocation {
+  "loc": Object {
     "end": Object {
       "column": 5,
       "line": 4,
     },
-    "source": undefined,
     "start": Object {
       "column": 2,
       "line": 4,
@@ -49,7 +48,6 @@ BlockParamDefinition {
                     "column": 0,
                     "line": 2,
                   },
-                  "source": null,
                   "start": Object {
                     "column": 30,
                     "line": 1,
@@ -62,13 +60,12 @@ BlockParamDefinition {
                 "hash": Object {
                   "loc": Object {
                     "end": Object {
-                      "column": 0,
-                      "line": 1,
+                      "column": 5,
+                      "line": 2,
                     },
-                    "source": "(synthetic)",
                     "start": Object {
-                      "column": 0,
-                      "line": 1,
+                      "column": 5,
+                      "line": 2,
                     },
                   },
                   "pairs": Array [],
@@ -79,21 +76,19 @@ BlockParamDefinition {
                     "column": 7,
                     "line": 2,
                   },
-                  "source": null,
                   "start": Object {
                     "column": 0,
                     "line": 2,
                   },
                 },
                 "params": Array [],
-                "path": Object {
+                "path": PathExpressionImplV1 {
                   "data": false,
-                  "loc": SourceLocation {
+                  "loc": Object {
                     "end": Object {
                       "column": 5,
                       "line": 2,
                     },
-                    "source": undefined,
                     "start": Object {
                       "column": 2,
                       "line": 2,
@@ -110,6 +105,7 @@ BlockParamDefinition {
                   "close": false,
                   "open": false,
                 },
+                "trusting": false,
                 "type": "MustacheStatement",
               },
               Object {
@@ -120,7 +116,6 @@ BlockParamDefinition {
                     "column": 0,
                     "line": 3,
                   },
-                  "source": null,
                   "start": Object {
                     "column": 7,
                     "line": 2,
@@ -135,7 +130,6 @@ BlockParamDefinition {
                 "column": 12,
                 "line": 3,
               },
-              "source": null,
               "start": Object {
                 "column": 0,
                 "line": 1,
@@ -152,7 +146,6 @@ BlockParamDefinition {
             "column": 12,
             "line": 3,
           },
-          "source": null,
           "start": Object {
             "column": 0,
             "line": 1,
@@ -176,7 +169,6 @@ BlockParamDefinition {
                 "column": 0,
                 "line": 2,
               },
-              "source": null,
               "start": Object {
                 "column": 30,
                 "line": 1,
@@ -189,13 +181,12 @@ BlockParamDefinition {
             "hash": Object {
               "loc": Object {
                 "end": Object {
-                  "column": 0,
-                  "line": 1,
+                  "column": 5,
+                  "line": 2,
                 },
-                "source": "(synthetic)",
                 "start": Object {
-                  "column": 0,
-                  "line": 1,
+                  "column": 5,
+                  "line": 2,
                 },
               },
               "pairs": Array [],
@@ -206,21 +197,19 @@ BlockParamDefinition {
                 "column": 7,
                 "line": 2,
               },
-              "source": null,
               "start": Object {
                 "column": 0,
                 "line": 2,
               },
             },
             "params": Array [],
-            "path": Object {
+            "path": PathExpressionImplV1 {
               "data": false,
-              "loc": SourceLocation {
+              "loc": Object {
                 "end": Object {
                   "column": 5,
                   "line": 2,
                 },
-                "source": undefined,
                 "start": Object {
                   "column": 2,
                   "line": 2,
@@ -237,6 +226,7 @@ BlockParamDefinition {
               "close": false,
               "open": false,
             },
+            "trusting": false,
             "type": "MustacheStatement",
           },
           Object {
@@ -247,7 +237,6 @@ BlockParamDefinition {
                 "column": 0,
                 "line": 3,
               },
-              "source": null,
               "start": Object {
                 "column": 7,
                 "line": 2,
@@ -262,7 +251,6 @@ BlockParamDefinition {
             "column": 12,
             "line": 3,
           },
-          "source": null,
           "start": Object {
             "column": 0,
             "line": 1,
@@ -307,7 +295,6 @@ BlockParamDefinition {
                     "column": 0,
                     "line": 2,
                   },
-                  "source": null,
                   "start": Object {
                     "column": 22,
                     "line": 1,
@@ -320,13 +307,12 @@ BlockParamDefinition {
                 "hash": Object {
                   "loc": Object {
                     "end": Object {
-                      "column": 0,
-                      "line": 1,
+                      "column": 5,
+                      "line": 2,
                     },
-                    "source": "(synthetic)",
                     "start": Object {
-                      "column": 0,
-                      "line": 1,
+                      "column": 5,
+                      "line": 2,
                     },
                   },
                   "pairs": Array [],
@@ -337,21 +323,19 @@ BlockParamDefinition {
                     "column": 7,
                     "line": 2,
                   },
-                  "source": null,
                   "start": Object {
                     "column": 0,
                     "line": 2,
                   },
                 },
                 "params": Array [],
-                "path": Object {
+                "path": PathExpressionImplV1 {
                   "data": false,
-                  "loc": SourceLocation {
+                  "loc": Object {
                     "end": Object {
                       "column": 5,
                       "line": 2,
                     },
-                    "source": undefined,
                     "start": Object {
                       "column": 2,
                       "line": 2,
@@ -368,6 +352,7 @@ BlockParamDefinition {
                   "close": false,
                   "open": false,
                 },
+                "trusting": false,
                 "type": "MustacheStatement",
               },
               Object {
@@ -378,7 +363,6 @@ BlockParamDefinition {
                     "column": 0,
                     "line": 3,
                   },
-                  "source": null,
                   "start": Object {
                     "column": 7,
                     "line": 2,
@@ -393,7 +377,6 @@ BlockParamDefinition {
                 "column": 12,
                 "line": 3,
               },
-              "source": null,
               "start": Object {
                 "column": 0,
                 "line": 1,
@@ -410,7 +393,6 @@ BlockParamDefinition {
             "column": 12,
             "line": 3,
           },
-          "source": null,
           "start": Object {
             "column": 0,
             "line": 1,
@@ -432,7 +414,6 @@ BlockParamDefinition {
                 "column": 0,
                 "line": 2,
               },
-              "source": null,
               "start": Object {
                 "column": 22,
                 "line": 1,
@@ -445,13 +426,12 @@ BlockParamDefinition {
             "hash": Object {
               "loc": Object {
                 "end": Object {
-                  "column": 0,
-                  "line": 1,
+                  "column": 5,
+                  "line": 2,
                 },
-                "source": "(synthetic)",
                 "start": Object {
-                  "column": 0,
-                  "line": 1,
+                  "column": 5,
+                  "line": 2,
                 },
               },
               "pairs": Array [],
@@ -462,21 +442,19 @@ BlockParamDefinition {
                 "column": 7,
                 "line": 2,
               },
-              "source": null,
               "start": Object {
                 "column": 0,
                 "line": 2,
               },
             },
             "params": Array [],
-            "path": Object {
+            "path": PathExpressionImplV1 {
               "data": false,
-              "loc": SourceLocation {
+              "loc": Object {
                 "end": Object {
                   "column": 5,
                   "line": 2,
                 },
-                "source": undefined,
                 "start": Object {
                   "column": 2,
                   "line": 2,
@@ -493,6 +471,7 @@ BlockParamDefinition {
               "close": false,
               "open": false,
             },
+            "trusting": false,
             "type": "MustacheStatement",
           },
           Object {
@@ -503,7 +482,6 @@ BlockParamDefinition {
                 "column": 0,
                 "line": 3,
               },
-              "source": null,
               "start": Object {
                 "column": 7,
                 "line": 2,
@@ -518,7 +496,6 @@ BlockParamDefinition {
             "column": 12,
             "line": 3,
           },
-          "source": null,
           "start": Object {
             "column": 0,
             "line": 1,

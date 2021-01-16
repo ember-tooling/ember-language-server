@@ -214,7 +214,7 @@ export default class TemplateCompletionProvider {
 }
 
 function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
-  let node = astPath.node;
+  let node = astPath.node as any;
 
   if (node === undefined) {
     return normalPlaceholder;

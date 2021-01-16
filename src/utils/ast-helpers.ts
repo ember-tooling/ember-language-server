@@ -1,4 +1,5 @@
 import ASTPath from './../glimmer-utils';
+import { ASTv1 } from '@glimmer/syntax';
 
 function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   const node = astPath.node;
@@ -56,7 +57,7 @@ export function isRouteLookup(astPath: ASTPath): boolean {
 }
 
 export function isTemplateElement(astPath: ASTPath): boolean {
-  const node = astPath.node;
+  const node = astPath.node as any;
 
   if (node.type !== 'TemplateElement') {
     return false;
@@ -189,11 +190,11 @@ export function isTransformReference(astPath: ASTPath): boolean {
 }
 
 export function isNamedBlockName(path: ASTPath): boolean {
-  return isAngleComponentPath(path) && path.parent && path.node.tag.startsWith(':');
+  return isAngleComponentPath(path) && path.parent && (path.node as ASTv1.ElementNode).tag.startsWith(':');
 }
 
 export function isAngleComponentPath(path: ASTPath): boolean {
-  const node = path.node;
+  const node = (path.node as unknown) as ASTv1.ElementNode;
 
   if (!hasNodeType(node, 'ElementNode')) {
     return false;
@@ -217,7 +218,7 @@ export function isModifierPath(path: ASTPath): boolean {
     return false;
   }
 
-  if (node.data) {
+  if ((node as ASTv1.PathExpression).head.type === 'AtHead') {
     return false;
   }
 
@@ -284,7 +285,9 @@ export function isLinkToTarget(path: ASTPath): boolean {
 
 export function isOutlet(path: ASTPath): boolean {
   if (isPathExpression(path.node)) {
-    return path.node.original === 'outlet' && path.node.this === false && path.node.data === false;
+    const node = path.node as ASTv1.PathExpression;
+
+    return node.original === 'outlet' && node.head.type === 'VarHead';
   }
 
   return false;

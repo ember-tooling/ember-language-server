@@ -3,7 +3,7 @@ import * as util from 'util';
 
 import { RemoteConsole } from 'vscode-languageserver';
 
-const debug = false;
+const debug = true;
 const log_file = debug ? fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' }) : null;
 let remoteConsole: RemoteConsole | null = null;
 

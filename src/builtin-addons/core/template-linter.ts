@@ -69,7 +69,7 @@ export default class ProjectTemplateLinter implements AddonAPI {
 
           if (children) {
             items++;
-            const startColumn = node.loc.start.column;
+            const startColumn = node.loc.toJSON().start.column;
             const text = ` ${comment} `;
 
             children.splice(children.indexOf(node), 0, b.mustacheComment(text));

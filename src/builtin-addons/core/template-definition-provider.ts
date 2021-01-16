@@ -20,6 +20,7 @@ import {
 
 import * as memoize from 'memoizee';
 import { URI } from 'vscode-uri';
+import { ASTv1 } from '@glimmer/syntax';
 
 const mAddonPathsForComponentTemplates = memoize(getAddonPathsForComponentTemplates, { length: 2, maxAge: 600000 });
 
@@ -115,14 +116,14 @@ export default class TemplateDefinitionProvider {
       // <FooBar @somePropertyToFindUsage="" />
     } else if (isLinkComponentRouteTarget(focusPath)) {
       // <LinkTo @route="name" />
-      definitions = this.provideRouteDefinition(root, focusPath.node.chars);
+      definitions = this.provideRouteDefinition(root, (focusPath.node as ASTv1.TextNode).chars);
     } else if (this.isAnglePropertyAttribute(focusPath)) {
       definitions = this.provideAngleBracketComponentAttributeUsage(root, focusPath);
       // {{hello propertyUsageToFind=someValue}}
     } else if (this.isHashPairKey(focusPath)) {
       definitions = this.provideHashPropertyUsage(root, focusPath);
     } else if (isLinkToTarget(focusPath)) {
-      definitions = this.provideRouteDefinition(root, focusPath.node.original);
+      definitions = this.provideRouteDefinition(root, (focusPath.node as ASTv1.PathExpression).original);
     }
 
     return definitions;
@@ -140,9 +141,9 @@ export default class TemplateDefinitionProvider {
     }
 
     if (node.type === 'StringLiteral' && parent.type === 'HashPair') {
-      value = node.original;
+      value = (node as ASTv1.StringLiteral).original;
     } else if (node.type === 'TextNode' && parent.type === 'AttrNode') {
-      value = node.chars;
+      value = (node as ASTv1.TextNode).chars;
     }
 
     return value;
@@ -182,10 +183,10 @@ export default class TemplateDefinitionProvider {
     return pathsToLocations(...(paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths));
   }
   provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
-    return this.provideLikelyComponentTemplatePath(root, focusPath.node.tag);
+    return this.provideLikelyComponentTemplatePath(root, (focusPath.node as ASTv1.ElementNode).tag);
   }
   provideBlockComponentDefinition(root: string, focusPath: ASTPath): Location[] {
-    const maybeComponentName = focusPath.node.path.original;
+    const maybeComponentName = ((focusPath.node as ASTv1.BlockStatement).path as ASTv1.PathExpression).original;
     let paths: string[] = getPathsForComponentTemplates(root, maybeComponentName).filter(fs.existsSync);
 
     if (!paths.length) {
@@ -266,7 +267,7 @@ export default class TemplateDefinitionProvider {
       });
     }
 
-    const text = focusPath.node.original;
+    const text = (focusPath.node as ASTv1.PathExpression).original;
 
     return pathsToLocationsWithPosition(paths, text.replace('this.', '').split('.')[0]);
   }
@@ -287,7 +288,10 @@ export default class TemplateDefinitionProvider {
     return pathsToLocations(...(paths.length > 1 ? paths.filter(isTemplatePath) : paths));
   }
   provideMustacheDefinition(root: string, focusPath: ASTPath) {
-    const maybeComponentName = focusPath.node.type === 'ElementNode' ? normalizeToClassicComponent(focusPath.node.tag) : focusPath.node.original;
+    const maybeComponentName =
+      focusPath.node.type === 'ElementNode'
+        ? normalizeToClassicComponent((focusPath.node as ASTv1.ElementNode).tag)
+        : (focusPath.node as ASTv1.PathExpression).original;
 
     return this.provideComponentDefinition(root, maybeComponentName);
   }
@@ -308,7 +312,7 @@ export default class TemplateDefinitionProvider {
 
         const finalPaths = paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths;
 
-        return pathsToLocationsWithPosition(finalPaths, '@' + focusPath.node.key);
+        return pathsToLocationsWithPosition(finalPaths, '@' + (focusPath.node as ASTv1.HashPair).key);
       }
     }
 
@@ -325,14 +329,14 @@ export default class TemplateDefinitionProvider {
 
     const finalPaths = paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths;
 
-    return pathsToLocationsWithPosition(finalPaths, focusPath.node.name);
+    return pathsToLocationsWithPosition(finalPaths, (focusPath.node as ASTv1.AttrNode).name);
   }
 
   isLocalProperty(path: ASTPath) {
-    const node = path.node;
+    const node = path.node as ASTv1.PathExpression;
 
     if (node.type === 'PathExpression') {
-      return node.this;
+      return node.head.type === 'ThisHead';
     }
 
     return false;
@@ -345,7 +349,7 @@ export default class TemplateDefinitionProvider {
   }
 
   isAnglePropertyAttribute(path: ASTPath) {
-    const node = path.node;
+    const node = path.node as ASTv1.AttrNode;
 
     if (node.type === 'AttrNode') {
       if (node.name.charAt(0) === '@') {
@@ -370,13 +374,14 @@ export default class TemplateDefinitionProvider {
       return false;
     }
 
+    // @ts-expect-error @todo - fix typings
     if (!path.parent || path.parent.path.original !== 'action' || !path.parent.params[0] === node) {
       return false;
     }
 
     if (node.type === 'StringLiteral') {
       return true;
-    } else if (node.type === 'PathExpression' && node.this) {
+    } else if (node.type === 'PathExpression' && (node as ASTv1.PathExpression).head.type === 'ThisHead') {
       return true;
     }
 
@@ -384,12 +389,12 @@ export default class TemplateDefinitionProvider {
   }
 
   isComponentWithBlock(path: ASTPath) {
-    const node = path.node;
+    const node = path.node as ASTv1.BlockStatement;
 
     return (
       node.type === 'BlockStatement' &&
       node.path.type === 'PathExpression' &&
-      node.path.this === false &&
+      node.path.head.type !== 'ThisHead' &&
       node.path.original.includes('-') &&
       node.path.original.charAt(0) !== '-' &&
       !node.path.original.includes('.')
@@ -397,7 +402,7 @@ export default class TemplateDefinitionProvider {
   }
 
   isAngleComponent(path: ASTPath) {
-    const node = path.node;
+    const node = path.node as ASTv1.ElementNode;
 
     if (node.type === 'ElementNode') {
       if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
