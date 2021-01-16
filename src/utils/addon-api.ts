@@ -1,4 +1,4 @@
-import { Location, TextDocumentIdentifier, Command, CodeActionParams, CodeAction, Position, CompletionItem, TextDocument } from 'vscode-languageserver';
+import { Location, TextDocumentIdentifier, Command, CodeActionParams, CodeAction, Position, CompletionItem } from 'vscode-languageserver/node';
 import {
   getProjectAddonsRoots,
   getPackageJSON,
@@ -7,6 +7,7 @@ import {
   ADDON_CONFIG_KEY,
   hasEmberLanguageServerExtension,
 } from './layout-helpers';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 import * as path from 'path';
 import { log, logInfo, logError } from './logger';
 import Server from '../server';
@@ -16,8 +17,11 @@ import CoreScriptDefinitionProvider from './../builtin-addons/core/script-defini
 import CoreTemplateDefinitionProvider from './../builtin-addons/core/template-definition-provider';
 import ScriptCompletionProvider from './../builtin-addons/core/script-completion-provider';
 import TemplateCompletionProvider from './../builtin-addons/core/template-completion-provider';
-import ProjectTemplateLinter from './../builtin-addons/core/template-linter';
 import { Project } from '../project-roots';
+
+import TemplateLintFixesCodeAction from '../builtin-addons/core/code-actions/template-lint-fixes';
+import TemplateLintCommentsCodeAction from '../builtin-addons/core/code-actions/template-lint-comments';
+import TypedTemplatesCodeAction from '../builtin-addons/core/code-actions/typed-template-comments';
 
 interface BaseAPIParams {
   server: Server;
@@ -98,14 +102,23 @@ export function initBuiltinProviders(): ProjectProviders {
   const templateDefinition = new CoreTemplateDefinitionProvider();
   const scriptCompletion = new ScriptCompletionProvider();
   const templateCompletion = new TemplateCompletionProvider();
-  const templateCodeActionProvider = new ProjectTemplateLinter();
+
+  const templateLintFixesCodeAction = new TemplateLintFixesCodeAction();
+  const templateLintCommentsCodeAction = new TemplateLintCommentsCodeAction();
+  const typedTemplatesCodeAction = new TypedTemplatesCodeAction();
 
   return {
     definitionProviders: [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)],
     referencesProviders: [],
-    codeActionProviders: [templateCodeActionProvider.onCodeAction.bind(templateCodeActionProvider)],
+    codeActionProviders: [
+      templateLintFixesCodeAction.onCodeAction.bind(templateLintFixesCodeAction),
+      templateLintCommentsCodeAction.onCodeAction.bind(templateLintCommentsCodeAction),
+      typedTemplatesCodeAction.onCodeAction.bind(typedTemplatesCodeAction),
+    ],
     initFunctions: [
-      templateCodeActionProvider.onInit.bind(templateCodeActionProvider),
+      templateLintFixesCodeAction.onInit.bind(templateLintFixesCodeAction),
+      templateLintCommentsCodeAction.onInit.bind(templateLintCommentsCodeAction),
+      typedTemplatesCodeAction.onInit.bind(typedTemplatesCodeAction),
       templateCompletion.initRegistry.bind(templateCompletion),
       scriptCompletion.initRegistry.bind(scriptCompletion),
     ],

@@ -17,7 +17,8 @@ import {
 import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem } from './utils/registry-api';
 import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
 import Server from './server';
-import { TextDocument, Diagnostic, FileChangeType } from 'vscode-languageserver';
+import { Diagnostic, FileChangeType } from 'vscode-languageserver/node';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 import { PodMatcher, ClassicPathMatcher } from './utils/path-matcher';
 export type Executor = (server: Server, command: string, args: any[]) => any;
 export type Destructor = (project: Project) => void;

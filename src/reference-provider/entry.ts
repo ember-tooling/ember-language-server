@@ -1,4 +1,4 @@
-import { Location, ReferenceParams } from 'vscode-languageserver';
+import { Location, ReferenceParams } from 'vscode-languageserver/node';
 import Server from '../server';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
 

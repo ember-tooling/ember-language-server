@@ -1,4 +1,4 @@
-import { RequestHandler, TextDocumentPositionParams, Definition, Location } from 'vscode-languageserver';
+import { RequestHandler, TextDocumentPositionParams, Definition, Location } from 'vscode-languageserver/node';
 import { searchAndExtractHbs } from '@lifeart/ember-extract-inline-templates';
 import { getExtension } from './../utils/file-extension';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';

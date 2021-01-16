@@ -1,4 +1,4 @@
-import { Position, Range } from 'vscode-languageserver';
+import { Position, Range } from 'vscode-languageserver/node';
 
 import { compare } from './position-utils';
 

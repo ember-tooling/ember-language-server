@@ -2,9 +2,15 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { createTempDir } from 'broccoli-test-helper';
 import { URI } from 'vscode-uri';
-import { MessageConnection } from 'vscode-jsonrpc';
+import { MessageConnection } from 'vscode-jsonrpc/node';
 import * as spawn from 'cross-spawn';
-import { DidOpenTextDocumentNotification, InitializeRequest, ExecuteCommandRequest, Definition } from 'vscode-languageserver-protocol';
+import {
+  DidOpenTextDocumentNotification,
+  InitializeRequest,
+  ExecuteCommandRequest,
+  Definition,
+  DidOpenTextDocumentParams,
+} from 'vscode-languageserver-protocol/node';
 
 export function startServer() {
   return spawn('node_modules/.bin/nyc', ['--reporter', 'none', 'node', './inst/start-server.js', '--stdio', '--no-clean'], {
@@ -19,7 +25,7 @@ export type Registry = {
   };
 };
 
-export async function reloadProjects(connection, project = undefined) {
+export async function reloadProjects(connection: MessageConnection, project = undefined) {
   const result = await connection.sendRequest(ExecuteCommandRequest.type, {
     command: 'els.reloadProject',
     arguments: project ? [project] : [],
@@ -28,12 +34,18 @@ export async function reloadProjects(connection, project = undefined) {
   return result;
 }
 
-export async function createProject(files, connection): Promise<{ normalizedPath: string; result: UnknownResult; destroy(): void }> {
+export async function createProject(files, connection: MessageConnection): Promise<{ normalizedPath: string; result: UnknownResult; destroy(): void }> {
   const dir = await createTempDir();
 
   dir.write(files);
   const normalizedPath = path.normalize(dir.path());
-  const result = (await connection.sendRequest(ExecuteCommandRequest.type, ['els:registerProjectPath', normalizedPath])) as {
+
+  const params = {
+    command: 'els.registerProjectPath',
+    arguments: [normalizedPath],
+  };
+
+  const result = (await connection.sendRequest(ExecuteCommandRequest.type, params)) as {
     registry: Registry;
   };
 
@@ -57,7 +69,7 @@ export function textDocument(modelPath, position = { line: 0, character: 0 }) {
   return params;
 }
 
-export async function getResult(reqType, connection, files, fileToInspect, position) {
+export async function getResult(reqType, connection: MessageConnection, files, fileToInspect, position) {
   const { normalizedPath, destroy, result } = await createProject(files, connection);
   const modelPath = path.join(normalizedPath, fileToInspect);
   const params = textDocument(modelPath, position);
@@ -71,12 +83,12 @@ export async function getResult(reqType, connection, files, fileToInspect, posit
 }
 
 export function openFile(connection: MessageConnection, filePath: string) {
-  connection.sendNotification(DidOpenTextDocumentNotification.method, {
+  connection.sendNotification(DidOpenTextDocumentNotification.type, {
     textDocument: {
       uri: URI.file(filePath).toString(),
       text: fs.readFileSync(filePath, 'utf8'),
     },
-  });
+  } as DidOpenTextDocumentParams);
 }
 
 export function normalizePath(file: string) {
@@ -173,5 +185,5 @@ export function initServer(connection: MessageConnection) {
     },
   };
 
-  return connection.sendRequest((InitializeRequest.type as unknown) as string, params);
+  return connection.sendRequest(InitializeRequest.type, params);
 }

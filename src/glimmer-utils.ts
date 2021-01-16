@@ -152,6 +152,14 @@ export function isBlockParamDefinition(astPath: ASTPath, content: string, positi
   }
 }
 
+export function nodeLoc(node: ASTv1.BaseNode): SourceLocation {
+  if ('toJSON' in node.loc) {
+    return node.loc.toJSON();
+  } else {
+    return node.loc as SourceLocation;
+  }
+}
+
 export function sourceForNode(node: ASTv1.BaseNode, content = '') {
   // mostly copy/pasta from ember-template-lint and tildeio/htmlbars with a few tweaks:
   // https://github.com/tildeio/htmlbars/blob/v0.14.17/packages/htmlbars-syntax/lib/parser.js#L59-L90
@@ -161,7 +169,7 @@ export function sourceForNode(node: ASTv1.BaseNode, content = '') {
     return;
   }
 
-  const loc = 'toJSON' in node.loc ? node.loc.toJSON() : node.loc;
+  const loc = nodeLoc(node);
 
   const firstLine = loc.start.line - 1;
   const lastLine = loc.end.line - 1;
@@ -278,7 +286,7 @@ function _findFocusPath(node: ASTv1.BaseNode, position: Position, seen = new Set
   seen.add(node);
 
   let path: any[] = [];
-  const range: SourceLocation | null = node.loc ? ('toJSON' in node.loc ? node.loc.toJSON() : node.loc) : null;
+  const range: SourceLocation | null = node.loc ? nodeLoc(node) : null;
 
   if (range) {
     if (containsPosition(range, position)) {

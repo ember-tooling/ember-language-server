@@ -1,4 +1,4 @@
-import { Command, CodeAction, CodeActionParams } from 'vscode-languageserver';
+import { Command, CodeAction, CodeActionParams } from 'vscode-languageserver/node';
 import Server from '../server';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
 

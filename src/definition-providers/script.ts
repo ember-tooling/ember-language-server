@@ -1,6 +1,6 @@
 import Server from './../server';
 import ASTPath from './../glimmer-utils';
-import { TextDocumentPositionParams, Definition, Location } from 'vscode-languageserver';
+import { TextDocumentPositionParams, Definition, Location } from 'vscode-languageserver/node';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { toPosition } from './../estree-utils';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';

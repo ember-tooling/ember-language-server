@@ -1,4 +1,4 @@
-import { CompletionItem } from 'vscode-languageserver';
+import { CompletionItem } from 'vscode-languageserver/node';
 import { CompletionFunctionParams } from '../../utils/addon-api';
 import * as memoize from 'memoizee';
 import { log, logError, logInfo } from '../../utils/logger';

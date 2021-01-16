@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as util from 'util';
 
-import { RemoteConsole } from 'vscode-languageserver';
+import { RemoteConsole } from 'vscode-languageserver/node';
 
 const debug = true;
 const log_file = debug ? fs.createWriteStream(__dirname + '/debug.log', { flags: 'w' }) : null;

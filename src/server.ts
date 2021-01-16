@@ -14,7 +14,7 @@ import {
   IPCMessageWriter,
   createConnection,
   DidChangeWatchedFilesParams,
-  IConnection,
+  Connection,
   TextDocuments,
   InitializeResult,
   Diagnostic,
@@ -33,7 +33,8 @@ import {
   StreamMessageWriter,
   ReferenceParams,
   Location,
-} from 'vscode-languageserver';
+  ExecuteCommandParams,
+} from 'vscode-languageserver/node';
 
 import ProjectRoots, { Project, Executors } from './project-roots';
 import DefinitionProvider from './definition-providers/entry';
@@ -56,7 +57,7 @@ export default class Server {
   lazyInit = false;
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
   // also supports stdio via command line flag
-  connection: IConnection = process.argv.includes('--stdio')
+  connection: Connection = process.argv.includes('--stdio')
     ? createConnection(new StreamMessageReader(process.stdin), new StreamMessageWriter(process.stdout))
     : createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 
@@ -109,6 +110,10 @@ export default class Server {
       if (this.lazyInit) {
         this.executeInitializers();
       }
+    };
+
+    this.executors['els.registerProjectPath'] = async (_, __, [projectPath]) => {
+      return this.projectRoots.onProjectAdd(projectPath);
     };
 
     this.executors['els.reloadProject'] = async (_, __, [projectPath]) => {
@@ -243,33 +248,31 @@ export default class Server {
     this.connection.sendNotification('$/displayError', msg);
   }
 
-  async onExecute(params: string[] | any) {
-    if (Array.isArray(params)) {
-      if (params[0] === 'els:registerProjectPath') {
-        return this.projectRoots.onProjectAdd(params[1]);
-      }
+  async onExecute(params: ExecuteCommandParams) {
+    if (!params) {
+      return;
+    }
+
+    if (params.command in this.executors) {
+      const result = await this.executors[params.command](this, params.command, params.arguments || []);
+
+      return result;
     } else {
-      if (params.command in this.executors) {
-        const result = await this.executors[params.command](this, params.command, params.arguments);
+      const [uri, ...args] = params.arguments || [];
+
+      try {
+        const project = this.projectRoots.projectForPath(uri);
+        let result = null;
+
+        if (project) {
+          if (params.command in project.executors) {
+            result = await project.executors[params.command](this, uri, args);
+          }
+        }
 
         return result;
-      } else {
-        const [uri, ...args] = params.arguments;
-
-        try {
-          const project = this.projectRoots.projectForPath(uri);
-          let result = null;
-
-          if (project) {
-            if (params.command in project.executors) {
-              result = await project.executors[params.command](this, uri, args);
-            }
-          }
-
-          return result;
-        } catch (e) {
-          logError(e);
-        }
+      } catch (e) {
+        logError(e);
       }
     }
 

@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { Definition, Location } from 'vscode-languageserver';
+import { Definition, Location } from 'vscode-languageserver/node';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../../utils/definition-helpers';
 import {

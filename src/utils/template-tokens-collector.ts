@@ -1,20 +1,20 @@
-import { preprocess, traverse } from '@glimmer/syntax';
+import { preprocess, traverse, ASTv1 } from '@glimmer/syntax';
 import { normalizeToClassicComponent, normalizeToNamedBlockName } from './normalizers';
 
 function tokensFromType(node: any, scopedTokens: any) {
   const tokensMap = {
-    PathExpression: (node: any) => {
-      if (node.data === true || node.this === true) {
+    PathExpression: (node: ASTv1.PathExpression) => {
+      if (node.head.type === 'AtHead' || node.head.type === 'ThisHead') {
         return;
       }
 
-      const [possbleToken] = node.parts;
+      const possbleToken = node.head.name;
 
       if (!scopedTokens.includes(possbleToken)) {
         return possbleToken;
       }
     },
-    ElementNode: ({ tag }: any) => {
+    ElementNode: ({ tag }: ASTv1.ElementNode) => {
       const char = tag.charAt(0);
 
       if (char !== char.toUpperCase() || char === ':') {
@@ -51,10 +51,10 @@ export function getTemplateBlocks(html: string): string[] {
 
   traverse(ast, {
     MustacheStatement: {
-      enter(node) {
+      enter(node: ASTv1.MustacheStatement) {
         const p = node.path;
 
-        if (p && p.type === 'PathExpression' && p.original === 'yield' && p.data === false && p.this === false) {
+        if (p && p.type === 'PathExpression' && p.original === 'yield' && p.head.type !== 'AtHead' && p.head.type !== 'ThisHead') {
           const to = node.hash.pairs.find((p) => {
             return p.key === 'to';
           });
@@ -79,25 +79,25 @@ function getTemplateTokens(html: string, nativeTokens: any) {
 
   traverse(ast, {
     Block: {
-      enter({ blockParams }) {
+      enter({ blockParams }: ASTv1.Block) {
         blockParams.forEach((param) => {
           scopedTokens.push(param);
         });
       },
-      exit({ blockParams }) {
+      exit({ blockParams }: ASTv1.Block) {
         blockParams.forEach(() => {
           scopedTokens.pop();
         });
       },
     },
     ElementNode: {
-      enter(node) {
+      enter(node: ASTv1.ElementNode) {
         node.blockParams.forEach((param) => {
           scopedTokens.push(param);
         });
         addTokens(tokensSet, node, scopedTokens);
       },
-      exit({ blockParams }) {
+      exit({ blockParams }: ASTv1.ElementNode) {
         blockParams.forEach(() => {
           scopedTokens.pop();
         });

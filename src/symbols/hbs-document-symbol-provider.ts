@@ -1,5 +1,5 @@
-import { SymbolInformation, SymbolKind } from 'vscode-languageserver';
-import { preprocess, traverse } from '@glimmer/syntax';
+import { SymbolInformation, SymbolKind } from 'vscode-languageserver/node';
+import { preprocess, traverse, ASTv1 } from '@glimmer/syntax';
 import { log } from './../utils/logger';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';
@@ -13,18 +13,16 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
       const ast = preprocess(content);
 
       traverse(ast, {
-        ElementNode(node: any) {
+        ElementNode(node: ASTv1.ElementNode) {
           if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {
             symbols.push(SymbolInformation.create(node.tag, SymbolKind.Variable, toLSRange(node.loc)));
           }
         },
-        BlockStatement(node: any) {
+        BlockStatement(node: ASTv1.BlockStatement) {
           if (node.hash.pairs.length) {
-            node.hash.pairs
-              .filter((el: any) => el.type === 'HashPair')
-              .forEach((pair: any) => {
-                symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
-              });
+            node.hash.pairs.forEach((pair: ASTv1.HashPair) => {
+              symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
+            });
           }
 
           if (node.program.blockParams.length === 0) return;
@@ -35,17 +33,15 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
             symbols.push(symbol);
           });
         },
-        MustacheStatement(node: any) {
+        MustacheStatement(node: ASTv1.MustacheStatement) {
           if (node.hash.pairs.length) {
-            node.hash.pairs
-              .filter((el: any) => el.type === 'HashPair')
-              .forEach((pair: any) => {
-                symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
-              });
+            node.hash.pairs.forEach((pair: ASTv1.HashPair) => {
+              symbols.push(SymbolInformation.create(pair.key, SymbolKind.Property, toLSRange(pair.loc)));
+            });
           }
 
           if (node.path.type === 'PathExpression') {
-            if (node.path.data) {
+            if (node.path.head.type === 'AtHead') {
               const symbol = SymbolInformation.create(node.path.original, SymbolKind.Variable, toLSRange(node.path.loc));
 
               symbols.push(symbol);

@@ -2,9 +2,9 @@ import * as cp from 'child_process';
 import * as path from 'path';
 import { URI } from 'vscode-uri';
 import { startServer, initServer, reloadProjects, openFile, normalizeUri } from './test_helpers/integration-helpers';
-import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc';
+import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 
-import { CompletionRequest, DefinitionRequest } from 'vscode-languageserver-protocol';
+import { CompletionRequest, DefinitionRequest } from 'vscode-languageserver-protocol/node';
 
 describe('With `full-project` initialized on server', () => {
   let connection: MessageConnection;

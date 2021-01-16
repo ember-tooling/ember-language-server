@@ -1,4 +1,4 @@
-import { SymbolInformation, SymbolKind } from 'vscode-languageserver';
+import { SymbolInformation, SymbolKind } from 'vscode-languageserver/node';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';

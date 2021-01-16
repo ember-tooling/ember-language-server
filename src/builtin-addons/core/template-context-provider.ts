@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 
 import { isModuleUnificationApp, podModulePrefixForRoot, pureComponentName } from '../../utils/layout-helpers';
 import { getGlobalRegistry } from '../../utils/registry-api';

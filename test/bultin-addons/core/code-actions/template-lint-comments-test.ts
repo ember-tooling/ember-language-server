@@ -1,5 +1,5 @@
-import ProjectTemplateLinter from '../../../src/builtin-addons/core/template-linter';
-import TemplateCompletionProvider from '../../../src/completion-provider/template-completion-provider';
+import TemplateLintCommentsCodeAction from '../../../../src/builtin-addons/core/code-actions/template-lint-comments';
+import TemplateCompletionProvider from '../../../../src/completion-provider/template-completion-provider';
 
 describe('ProjectTemplateLinter', () => {
   let server, project, instance, output;
@@ -22,7 +22,7 @@ describe('ProjectTemplateLinter', () => {
     project = {
       root: __dirname,
     };
-    instance = new ProjectTemplateLinter();
+    instance = new TemplateLintCommentsCodeAction();
     instance.onInit(server, project);
   });
 
@@ -38,7 +38,7 @@ describe('ProjectTemplateLinter', () => {
         diagnostics: [
           {
             source: 'ember-template-lint',
-            message: '(fixable)',
+            message: 'baad',
             code: 'no-unfixed-codebase',
           },
         ],
@@ -47,7 +47,7 @@ describe('ProjectTemplateLinter', () => {
         uri: 'layout.hbs',
       },
       document: {
-        getText: (): string => '<button></button>',
+        getText: (): string => '<button type="button"></button>',
       },
       range: {
         start: {
@@ -56,7 +56,7 @@ describe('ProjectTemplateLinter', () => {
         },
         end: {
           line: 0,
-          col: 17,
+          col: 31,
         },
       },
     };
@@ -66,11 +66,16 @@ describe('ProjectTemplateLinter', () => {
       {
         edit: {
           changes: {
-            'layout.hbs': [{ newText: '<button type="button"></button>', range: { end: { character: 17, line: 0 }, start: { character: 0, line: 0 } } }],
+            'layout.hbs': [
+              {
+                newText: '{{!-- template-lint-disable no-unfixed-codebase --}}\n<button type="button"></button>',
+                range: { end: { character: 31, line: 0 }, start: { character: 0, line: 0 } },
+              },
+            ],
           },
         },
         kind: 'quickfix',
-        title: 'fix: no-unfixed-codebase',
+        title: 'disable: no-unfixed-codebase',
       },
     ]);
   });
@@ -82,7 +87,7 @@ describe('ProjectTemplateLinter', () => {
         diagnostics: [
           {
             range: { start: { line: 0, character: 5 }, end: { line: 0, character: 45 } },
-            message: "HTML class attribute sorting is: 'md:flex bg-white rounded-lg p-2', but should be: 'md:flex p-2 bg-white rounded-lg' (fixable)",
+            message: "HTML class attribute sorting is: 'md:flex bg-white rounded-lg p-2', but should be: 'md:flex p-2 bg-white rounded-lg'",
             severity: 1,
             code: 'class-order',
             source: 'ember-template-lint',
@@ -93,7 +98,7 @@ describe('ProjectTemplateLinter', () => {
         uri: 'layout.hbs',
       },
       document: {
-        getText: (): string => '<div class="md:flex bg-white rounded-lg p-2">\n  <h3 class="mb-4">Hello</h3>\n</div>',
+        getText: (): string => '<div class="md:flex p-2 bg-white rounded-lg">\n  <h3 class="mb-4">Hello</h3>\n</div>',
       },
       range: { start: { line: 0, character: 14 }, end: { line: 0, character: 14 } },
     };
@@ -106,13 +111,13 @@ describe('ProjectTemplateLinter', () => {
             'layout.hbs': [
               {
                 range: { start: { line: 0, character: 0 }, end: { line: 2, character: 6 } },
-                newText: '<div class="md:flex p-2 bg-white rounded-lg">\n  <h3 class="mb-4">Hello</h3>\n</div>',
+                newText: '{{!-- template-lint-disable class-order --}}\n<div class="md:flex p-2 bg-white rounded-lg">\n  <h3 class="mb-4">Hello</h3>\n</div>',
               },
             ],
           },
         },
         kind: 'quickfix',
-        title: 'fix: class-order',
+        title: 'disable: class-order',
       },
     ]);
   });

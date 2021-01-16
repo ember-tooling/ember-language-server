@@ -1,4 +1,4 @@
-import { CompletionItem, TextDocumentPositionParams } from 'vscode-languageserver';
+import { CompletionItem, TextDocumentPositionParams } from 'vscode-languageserver/node';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import Server from '../server';
 import ASTPath from '../glimmer-utils';

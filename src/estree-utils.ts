@@ -1,5 +1,5 @@
 import { Position, SourceLocation } from 'estree';
-import { Position as LSPosition, Range as LSRange } from 'vscode-languageserver';
+import { Position as LSPosition, Range as LSRange } from 'vscode-languageserver/node';
 
 export function newPosition(line: number, column: number): Position {
   return { line, column };

@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
+import { Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver/node';
 import { TemplateLinterError } from '../template-linter';
 
 const ParseErrorExp = /^Parse error on line (\d+)/;

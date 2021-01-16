@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 
 type UsableIn = 'BlockPath' | 'MustachePath' | 'SubExpressionPath' | 'ModifierPath';
 

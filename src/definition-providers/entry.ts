@@ -1,4 +1,4 @@
-import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-languageserver';
+import { RequestHandler, TextDocumentPositionParams, Definition } from 'vscode-languageserver/node';
 import Server from './../server';
 import { getExtension } from './../utils/file-extension';
 import TemplateDefinitionProvider from './template';

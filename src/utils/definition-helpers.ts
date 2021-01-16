@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as memoize from 'memoizee';
-import { Location, Range } from 'vscode-languageserver';
+import { Location, Range } from 'vscode-languageserver/node';
 
 import { URI } from 'vscode-uri';
 

@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { CompletionFunctionParams } from './../../utils/addon-api';
 import { uniqBy } from 'lodash';
 

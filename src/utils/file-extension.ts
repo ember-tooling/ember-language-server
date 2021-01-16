@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { TextDocumentIdentifier } from 'vscode-languageserver';
+import { TextDocumentIdentifier } from 'vscode-languageserver/node';
 import { URI } from 'vscode-uri';
 
 export function getExtension(textDocument: TextDocumentIdentifier): string | null {
