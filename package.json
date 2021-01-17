@@ -13,10 +13,10 @@
     "url": "https://github.com/lifeart/ember-language-server.git"
   },
   "engines": {
-    "node": ">= 10.16.3"
+    "node": ">= 10.17.0"
   },
-  "main": "lib/start-server.js",
-  "typings": "lib/start-server.d.ts",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "dependencies": {
     "@glimmer/syntax": "^0.73.1",
     "@lifeart/ember-extract-inline-templates": "^2.0.0",
@@ -45,6 +45,9 @@
     "@types/memoizee": "^0.4.5"
   },
   "devDependencies": {
+    "ts-loader": "^8.0.14",
+    "webpack": "5.15.0",
+    "webpack-cli": "^4.3.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/jest": "^26.0.20",
     "@types/node": "^12.12.5",
@@ -88,15 +91,16 @@
   "scripts": {
     "changelog": "lerna-changelog",
     "clean": "rimraf lib/",
+    "build": "webpack --mode production",
     "compile": "tsc --skipLibCheck -p .",
-    "lint": "eslint . --ext js,ts",
+    "lint": "eslint ./{src,test}/**/*.{js,ts}",
     "prepublish": "yarn clean && yarn compile",
     "test": "jest",
     "test:coverage": "rimraf inst/ && nyc instrument lib inst && nyc --no-clean --reporter=clover --reporter=json --reporter=lcov yarn run jest --no-coverage",
     "watch": "tsc --watch -p ."
   },
   "volta": {
-    "node": "10.16.3",
+    "node": "10.17.0",
     "yarn": "1.22.4"
   }
 }

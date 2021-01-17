@@ -4,7 +4,7 @@ import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
-import { preprocess } from '@glimmer/syntax';
+import { preprocess, ASTv1 } from '@glimmer/syntax';
 import { getExtension } from '../utils/file-extension';
 import { log, logInfo } from '../utils/logger';
 import { searchAndExtractHbs } from '@lifeart/ember-extract-inline-templates';
@@ -31,7 +31,7 @@ export default class TemplateCompletionProvider {
       document,
     };
   }
-  getAST(textContent: string) {
+  getAST(textContent: string): ASTv1.Template {
     return preprocess(textContent);
   }
   createFocusPath(ast: any, position: EsTreePosition, validText: string) {

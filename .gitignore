@@ -1,6 +1,7 @@
 out
 node_modules
 lib/
+dist/
 !test/**/
 coverage
 inst/

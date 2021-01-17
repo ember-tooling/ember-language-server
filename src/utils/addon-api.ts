@@ -135,12 +135,15 @@ function create<T>(model: new () => T): T {
   return new model();
 }
 
+// @ts-expect-error @todo - fix webpack imports
+const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
+
 function requireUncached(module: string) {
-  delete require.cache[require.resolve(module)];
+  delete require.cache[requireFunc.resolve(module)];
   let result = {};
 
   try {
-    result = require(module);
+    result = requireFunc(module);
 
     if (isConstructor(result)) {
       const instance: PublicAddonAPI = create(result as any);
@@ -312,7 +315,7 @@ export interface ProjectProviders {
   info: string[];
 }
 
-interface ExtensionCapabilities {
+export interface ExtensionCapabilities {
   definitionProvider: undefined | true | false;
   codeActionProvider: undefined | true | false;
   referencesProvider:
