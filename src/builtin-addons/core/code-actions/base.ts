@@ -19,6 +19,17 @@ function findValidNodeSelection(focusPath: ASTPath): null | INodeSelectionInfo {
 
   while (cursor && cursor.node) {
     if (validNodes.includes(cursor.node.type)) {
+      if (cursor.node.type === 'MustacheStatement') {
+        if (cursor.parentPath?.node.type === 'AttrNode') {
+          const resolvedPath = cursor.parentPath.parentPath as ASTPath;
+
+          return {
+            selection: resolvedPath.sourceForNode(),
+            location: resolvedPath.node.loc,
+          };
+        }
+      }
+
       return {
         selection: cursor.sourceForNode(),
         location: cursor.node.loc,

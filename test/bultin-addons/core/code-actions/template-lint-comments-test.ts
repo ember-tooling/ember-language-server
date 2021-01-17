@@ -121,4 +121,46 @@ describe('ProjectTemplateLinter', () => {
       },
     ]);
   });
+
+  test('it return valid result on template mustache in element arguments', async () => {
+    output = '<img src={{this.filler}}>';
+    const params = {
+      context: {
+        diagnostics: [
+          {
+            range: { start: { line: 0, character: 11 }, end: { line: 0, character: 22 } },
+            message: 'some-error',
+            severity: 1,
+            code: 'some-error',
+            source: 'ember-template-lint',
+          },
+        ],
+      },
+      textDocument: {
+        uri: 'layout.hbs',
+      },
+      document: {
+        getText: (): string => '<img src={{this.filler}}>',
+      },
+      range: { start: { line: 0, character: 11 }, end: { line: 0, character: 11 } },
+    };
+    const result = await instance.onCodeAction('', params);
+
+    expect(result).toStrictEqual([
+      {
+        edit: {
+          changes: {
+            'layout.hbs': [
+              {
+                range: { start: { line: 0, character: 0 }, end: { line: 0, character: 25 } },
+                newText: '{{!-- template-lint-disable some-error --}}\n<img src={{this.filler}}>',
+              },
+            ],
+          },
+        },
+        kind: 'quickfix',
+        title: 'disable: some-error',
+      },
+    ]);
+  });
 });
