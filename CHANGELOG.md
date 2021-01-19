@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/lifeart/ember-language-server/compare/v1.0.2...v1.0.3) (2021-01-19)
+
+
+### Bug Fixes
+
+* **pencil:** improve component names token collector ([f485ad5](https://github.com/lifeart/ember-language-server/commit/f485ad58066fbf1ea041c4e70f3400f47d6c07e5))
+
 # Changelog
 
 ## v0.2.1 (2018-12-10)
