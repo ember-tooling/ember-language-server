@@ -116,10 +116,14 @@ jobs:
     if: github.ref == 'refs/heads/component-context-info-origin'
     timeout-minutes: 10
     needs: [floating-dependencies]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
 
       - name: checkout repo
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
 
       - name: fetch all history and tags from all branches for gitversion
         run: git fetch --prune --unshallow
@@ -135,7 +139,6 @@ jobs:
 
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
 

@@ -10,7 +10,6 @@
 /.editorconfig
 /.eslintrc.js
 /.eslintignore
-/.travis.yml
 /.gitignore
 /appveyor.yml
 /jest.config.js
