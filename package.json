@@ -19,6 +19,7 @@
   "engines": {
     "node": ">= 10.17.0"
   },
+  "bin": "bin/ember-language-server.js",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "dependencies": {
