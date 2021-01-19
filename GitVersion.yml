@@ -2,4 +2,5 @@ branches:
   component-context-info-origin:
     increment: Patch
     regex: ^component-context-info-origin
+    source-branches: [component-context-info-origin]
     is-release-branch: true
