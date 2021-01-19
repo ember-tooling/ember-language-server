@@ -6,7 +6,7 @@ import { isModuleUnificationApp, podModulePrefixForRoot, pureComponentName } fro
 import { getGlobalRegistry } from '../../utils/registry-api';
 import { log } from '../../utils/logger';
 
-import { extractComponentInformationFromMeta, processJSFile, processTemplate } from 'ember-meta-explorer';
+import { extractComponentInformationFromMeta, IComponentMetaInformation, IJsMeta, processJSFile, processTemplate } from 'ember-meta-explorer';
 
 import { uniqBy } from 'lodash';
 
@@ -72,7 +72,7 @@ function componentsContextData(root: string, componentName: string, templateCont
   const maybeScripts = findComponentScripts(root, componentName);
   const existingScripts = maybeScripts.filter(fs.existsSync);
   const hasAddonScript = existingScripts.find((el) => el.includes('addon'));
-  const infoItems: any[] = [];
+  const infoItems: IJsMeta[] = [];
 
   if (existingScripts.length) {
     try {
@@ -88,21 +88,21 @@ function componentsContextData(root: string, componentName: string, templateCont
   }
 
   try {
-    let templateInfo: any = null;
+    let templateInfo: unknown = null;
 
     templateInfo = processTemplate(templateContent);
-    infoItems.push(templateInfo);
+    infoItems.push(templateInfo as IJsMeta);
   } catch (e) {
     log('templateError', e);
   }
 
   log('infoItems', infoItems);
 
-  const meta: any = infoItems
-    .filter((item: any) => item !== null)
-    .reduce((result: any, it: any) => {
+  const meta: Record<string, string[]> = infoItems
+    .filter((item: IJsMeta) => item !== null)
+    .reduce((result: Record<string, string[]>, it: IJsMeta) => {
       log('it', it);
-      Object.keys(it).forEach((name) => {
+      Object.keys(it).forEach((name: keyof IJsMeta) => {
         if (name in result) {
           result[name] = result[name].concat(it[name]);
         } else {
@@ -115,7 +115,7 @@ function componentsContextData(root: string, componentName: string, templateCont
   const items: CompletionItem[] = [];
 
   log('meta', meta);
-  let contextInfo: any = {};
+  let contextInfo: IComponentMetaInformation = {} as IComponentMetaInformation;
 
   try {
     contextInfo = extractComponentInformationFromMeta(meta);
@@ -125,7 +125,7 @@ function componentsContextData(root: string, componentName: string, templateCont
 
   log('contextInfo', contextInfo);
   contextInfo.jsProps.forEach((propName: string) => {
-    const [name]: any = propName.split(' ');
+    const [name]: string[] = propName.split(' ');
 
     items.push({
       kind: CompletionItemKind.Property,
@@ -134,7 +134,7 @@ function componentsContextData(root: string, componentName: string, templateCont
     });
   });
   contextInfo.jsComputeds.forEach((propName: string) => {
-    const [name]: any = propName.split(' ');
+    const [name]: string[] = propName.split(' ');
 
     items.push({
       kind: CompletionItemKind.Property,
@@ -143,7 +143,7 @@ function componentsContextData(root: string, componentName: string, templateCont
     });
   });
   contextInfo.jsFunc.forEach((propName: string) => {
-    const [name]: any = propName.split(' ');
+    const [name]: string[] = propName.split(' ');
 
     items.push({
       kind: CompletionItemKind.Function,
@@ -152,7 +152,7 @@ function componentsContextData(root: string, componentName: string, templateCont
     });
   });
   contextInfo.hbsProps.forEach((propName: string) => {
-    const [name]: any = propName.split(' ');
+    const [name]: string[] = propName.split(' ');
 
     items.push({
       kind: CompletionItemKind.Property,

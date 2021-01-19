@@ -4,6 +4,7 @@ import * as memoize from 'memoizee';
 import { log, logError, logInfo } from '../../utils/logger';
 import Server from '../../server';
 import { Project } from '../../project-roots';
+import * as t from '@babel/types';
 import {
   isStoreModelLookup,
   isRouteLookup,
@@ -45,7 +46,7 @@ export default class ScriptCompletionProvider {
     try {
       if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
         log('isStoreModelLookup || isModelReference');
-        mListModels(root).forEach((model: any) => {
+        mListModels(root).forEach((model: CompletionItem) => {
           completions.push(model);
         });
         mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
@@ -55,7 +56,7 @@ export default class ScriptCompletionProvider {
         });
       } else if (isRouteLookup(focusPath)) {
         log('isRouteLookup');
-        mListRoutes(root).forEach((model: any) => {
+        mListRoutes(root).forEach((model: CompletionItem) => {
           completions.push(model);
         });
         mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
@@ -65,7 +66,7 @@ export default class ScriptCompletionProvider {
         });
       } else if (isNamedServiceInjection(focusPath)) {
         log('isNamedServiceInjection');
-        mListServices(root).forEach((model: any) => {
+        mListServices(root).forEach((model: CompletionItem) => {
           completions.push(model);
         });
         mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
@@ -88,7 +89,7 @@ export default class ScriptCompletionProvider {
           return [];
         }
 
-        (node.properties || node.body || []).forEach((property: any) => {
+        (node.properties || node.body || []).forEach((property: t.ObjectProperty) => {
           let name = null;
 
           if (property.key.type === 'StringLiteral') {
@@ -107,7 +108,7 @@ export default class ScriptCompletionProvider {
         });
       } else if (isTransformReference(focusPath)) {
         log('isTransformReference');
-        mListTransforms(root).forEach((model: any) => {
+        mListTransforms(root).forEach((model: CompletionItem) => {
           completions.push(model);
         });
         mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {

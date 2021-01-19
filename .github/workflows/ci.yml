@@ -2,7 +2,6 @@ name: CI
 
 on:
   push:
-  pull_request:
 
 jobs:
   test:
@@ -27,20 +26,27 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    continue-on-error: true
     needs: [test]
 
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
       - uses: volta-cli/action@v1
 
       - name: install dependencies
         run: yarn install --frozen-lockfile
 
-      - run: yarn compile
-      - run: yarn test:coverage
-      - uses: codecov/codecov-action@v1
+      - name: compile codebase
+        run: yarn compile
+
+      - name: check coverage
+        run: yarn test:coverage
+
+      - name: submit coverage
+        uses: codecov/codecov-action@v1
 
   nodeX:
     name: Node ${{ matrix.node-version }} - ${{ matrix.os }}
@@ -51,8 +57,9 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu, windows]
-        node-version: [10.x, 12.x, 13.x, 14.x]
+        os: [ubuntu]
+        # os: [ubuntu, windows] @to-to finally fix CI for windows
+        node-version: [10.x, 12.x, 14.x]
 
         # excluded because it is the `test` job above
         exclude:
@@ -99,3 +106,73 @@ jobs:
 
       - name: test
         run: yarn test:coverage
+
+  cd:
+    runs-on: ubuntu-latest
+    name: cd
+    if: github.ref == 'refs/heads/component-context-info-origin'
+    timeout-minutes: 10
+    needs: [floating-dependencies]
+    steps:
+
+      - name: checkout repo
+        uses: actions/checkout@v2
+
+      - name: fetch all history and tags from all branches for gitversion
+        run: git fetch --prune --unshallow
+
+      - name: install gitversion tool
+        uses: gittools/actions/gitversion/setup@v0.9
+        with:
+          versionSpec: '5.1.x'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+
+      - name: execute gitversion
+        id: gitversion # step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v0.9
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+
+      - name: print gitversion
+        run: |
+          echo "Major: ${{ steps.gitversion.outputs.major }}"
+          echo "Minor: ${{ steps.gitversion.outputs.minor }}"
+          echo "Patch: ${{ steps.gitversion.outputs.patch }}"
+          echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+
+      - name: setup node
+        uses: volta-cli/action@v1
+
+      - name: install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: compile
+        run: yarn compile
+
+      - name: update metadata in package.json
+        uses: onlyutkarsh/patch-files-action@v1.0.1
+        with:
+          files: '${{github.workspace}}/package.json'
+          patch-syntax: |
+            = /version => "${{ steps.gitversion.outputs.majorMinorPatch }}"
+      - name: add version in CHANGELOG.md
+        uses: cschleiden/replace-tokens@v1.0
+        with:
+          files: '${{github.workspace}}/CHANGELOG.md'
+        env:
+          VERSION: "${{ steps.gitversion.outputs.majorMinorPatch }}"
+
+      - name: publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+      - name: create a release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: v${{ steps.gitversion.outputs.semVer }}
+          release_name: v${{ steps.gitversion.outputs.semVer }}

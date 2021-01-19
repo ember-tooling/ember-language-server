@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as t from '@babel/types';
 import { Definition, Location } from 'vscode-languageserver/node';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../../utils/definition-helpers';
@@ -169,17 +170,17 @@ export default class CoreScriptDefinitionProvider {
         definitions = templateResults;
       }
     } else if (isModelReference(astPath)) {
-      const modelName = (astPath.node as any).value;
+      const modelName = ((astPath.node as unknown) as t.StringLiteral).value;
 
       definitions = this.guessPathsForType(root, 'Model', modelName);
     } else if (isTransformReference(astPath)) {
-      const transformName = (astPath.node as any).value;
+      const transformName = ((astPath.node as unknown) as t.StringLiteral).value;
 
       definitions = this.guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
-      definitions = this.guessPathForImport(root, uri, (astPath.node as any).value) || [];
+      definitions = this.guessPathForImport(root, uri, ((astPath.node as unknown) as t.StringLiteral).value) || [];
     } else if (isServiceInjection(astPath)) {
-      let serviceName = (astPath.node as any).name;
+      let serviceName = ((astPath.node as unknown) as t.Identifier).name;
       const args = astPath.parent.value.arguments;
 
       if (args.length && args[0].type === 'StringLiteral') {
@@ -188,11 +189,11 @@ export default class CoreScriptDefinitionProvider {
 
       definitions = this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
     } else if (isNamedServiceInjection(astPath)) {
-      const serviceName = (astPath.node as any).value;
+      const serviceName = ((astPath.node as unknown) as t.StringLiteral).value;
 
       definitions = this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
     } else if (isRouteLookup(astPath)) {
-      const routePath = (astPath.node as any).value;
+      const routePath = ((astPath.node as unknown) as t.StringLiteral).value;
 
       definitions = provideRouteDefinition(root, routePath);
     }

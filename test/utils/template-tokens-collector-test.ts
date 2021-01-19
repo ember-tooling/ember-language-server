@@ -55,6 +55,18 @@ describe('TemplateTokensCollector', () => {
   it('skip external arguments', () => {
     expect(t('<@Foo />')).toEqual([]);
   });
+  it('works for component helper in let block', () => {
+    expect(t('{{#let (component "foo-bar") as |MyComponent|}}<MyComponent />{{/let}}')).toEqual(['foo-bar']);
+  });
+  it('works for component helper in let hash block', () => {
+    expect(t('{{#let (hash foo=(component "foo-bar")) as |hashes|}}<hashes.foo />{{/let}}')).toEqual(['foo-bar']);
+  });
+  it('works for component helper inline', () => {
+    expect(t('{{component "foo-bar"}}')).toEqual(['foo-bar']);
+  });
+  it('works for component helper in block', () => {
+    expect(t('{{#component "foo-bar"}}{{/component}}')).toEqual(['foo-bar']);
+  });
 });
 
 describe('getTemplateBlocks', () => {
