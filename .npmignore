@@ -22,3 +22,4 @@
 /jest.config.js
 /appveyor.yml
 /tsconfig.json
+/GitVersion.yml

@@ -1,0 +1,4 @@
+branches:
+  component-context-info-origin:
+    increment: Patch
+    is-release-branch: true
