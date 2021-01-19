@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - component-context-info-origin
+  pull_request: {}
 
 jobs:
   test:
