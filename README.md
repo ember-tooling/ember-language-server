@@ -1,7 +1,6 @@
 # Ember Language Server
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/lifeart/ember-language-server.svg)](https://greenkeeper.io/)
-[![Build Status](https://travis-ci.org/lifeart/ember-language-server.svg)](https://travis-ci.org/lifeart/ember-language-server)
 
 The Ember Language Server (ELS) implements the [Language Server Protocol](https://github.com/Microsoft/language-server-protocol) for Ember.js projects. ELS enables editors to provide features like auto complete, goto definition and diagnostics. To get these features, you have to install the plugin for your editor.
 
