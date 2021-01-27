@@ -27,6 +27,22 @@ export function setConsole(item: RemoteConsole | null) {
   remoteConsole = item;
 }
 
+export function safeStringify(obj: unknown, indent = 2) {
+  const cache = new WeakSet();
+  const retVal = JSON.stringify(
+    obj,
+    (_, value) =>
+      typeof value === 'object' && value !== null
+        ? cache.has(value)
+          ? undefined // Duplicate reference found, discard key
+          : cache.add(value) && value // Store value in our collection
+        : value,
+    indent
+  );
+
+  return retVal;
+}
+
 export function log(...args: any[]) {
   if (!debug || !log_file) {
     return;
@@ -34,7 +50,7 @@ export function log(...args: any[]) {
 
   const output = args
     .map((a: any) => {
-      return JSON.stringify(a);
+      return safeStringify(a);
     })
     .join(' ');
 

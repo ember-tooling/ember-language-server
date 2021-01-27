@@ -9,7 +9,7 @@ import {
 } from './layout-helpers';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import * as path from 'path';
-import { log, logInfo, logError } from './logger';
+import { log, logInfo, logError, safeStringify } from './logger';
 import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
@@ -82,7 +82,7 @@ export async function queryELSAddonsAPIChain(callbacks: any[], root: string, par
 
   for (const callback of callbacks) {
     try {
-      const tempResult = await callback(root, Object.assign({}, params, { results: JSON.parse(JSON.stringify(lastResult)) }));
+      const tempResult = await callback(root, Object.assign({}, params, { results: JSON.parse(safeStringify(lastResult)) }));
 
       // API must return array
       if (Array.isArray(tempResult)) {

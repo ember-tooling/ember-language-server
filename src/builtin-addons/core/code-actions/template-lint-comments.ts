@@ -99,15 +99,19 @@ export default class TemplateLintCommentsCodeAction extends BaseCodeActionProvid
       return null;
     }
 
-    const meta = this.metaForRange(params);
+    try {
+      const meta = this.metaForRange(params);
 
-    if (!meta) {
+      if (!meta) {
+        return null;
+      }
+
+      const fixedIssues = await this.fixTemplateLintIssuesWithComment(commentableIssues, params, meta);
+      const codeActions = fixedIssues.filter((el) => el !== null) as CodeAction[];
+
+      return codeActions;
+    } catch (e) {
       return null;
     }
-
-    const fixedIssues = await this.fixTemplateLintIssuesWithComment(commentableIssues, params, meta);
-    const codeActions = fixedIssues.filter((el) => el !== null) as CodeAction[];
-
-    return codeActions;
   }
 }
