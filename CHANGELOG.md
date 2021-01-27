@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/lifeart/ember-language-server/compare/v1.0.3...v1.0.4) (2021-01-27)
+
+
+### Bug Fixes
+
+* json serializtion ([ee7e99e](https://github.com/lifeart/ember-language-server/commit/ee7e99e808ed9cc4e4099d7a4b38ada5e2963ccd))
+
 ## [1.0.3](https://github.com/lifeart/ember-language-server/compare/v1.0.2...v1.0.3) (2021-01-19)
 
 
