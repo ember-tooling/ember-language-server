@@ -230,7 +230,7 @@ export default class TemplateCompletionProvider {
           !maybeComponentName.includes('.');
 
         if (isValidComponent) {
-          const tpls: any[] = provideComponentTemplatePaths(root, maybeComponentName);
+          const tpls: string[] = provideComponentTemplatePaths(root, maybeComponentName);
           const existingTpls = tpls.filter(fs.existsSync);
 
           if (existingTpls.length) {
