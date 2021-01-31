@@ -34,6 +34,7 @@ import {
   ReferenceParams,
   Location,
   ExecuteCommandParams,
+  TextDocumentChangeEvent,
 } from 'vscode-languageserver/node';
 
 import ProjectRoots, { Project, Executors } from './project-roots';
@@ -395,7 +396,7 @@ export default class Server {
     return results;
   }
 
-  private async onDidChangeContent(change: any) {
+  private async onDidChangeContent(change: TextDocumentChangeEvent<any>) {
     // this.setStatusText('did-change');
 
     const lintResults = await this.templateLinter.lint(change.document);
