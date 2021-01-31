@@ -116,6 +116,10 @@ export default class Server {
       return this.projectRoots.onProjectAdd(projectPath);
     };
 
+    this.executors['els.provideDiagnostics'] = async (_, __, [document]: [TextDocument]) => {
+      return this.runAddonLinters(document);
+    };
+
     this.executors['els.reloadProject'] = async (_, __, [projectPath]) => {
       if (projectPath) {
         const project = this.projectRoots.projectForPath(projectPath);
@@ -338,7 +342,8 @@ export default class Server {
         definitionProvider: true,
         executeCommandProvider: {
           commands: [
-            'els:registerProjectPath',
+            'els.registerProjectPath',
+            'els.provideDiagnostics',
             'els.extractSourceCodeToComponent',
             'els.executeInEmberCLI',
             'els.getRelatedFiles',
@@ -366,24 +371,14 @@ export default class Server {
 
   executors: Executors = {};
 
-  private async onDidChangeContent(change: any) {
-    // this.setStatusText('did-change');
-
-    const lintResults = await this.templateLinter.lint(change.document);
+  private async runAddonLinters(document: TextDocument) {
     const results: Diagnostic[] = [];
-
-    if (Array.isArray(lintResults)) {
-      lintResults.forEach((result) => {
-        results.push(result);
-      });
-    }
-
-    const project: Project | undefined = this.projectRoots.projectForUri(change.document.uri);
+    const project: Project | undefined = this.projectRoots.projectForUri(document.uri);
 
     if (project) {
       for (const linter of project.linters) {
         try {
-          const tempResults = await linter(change.document as TextDocument);
+          const tempResults = await linter(document as TextDocument);
 
           // API must return array
           if (Array.isArray(tempResults)) {
@@ -396,6 +391,27 @@ export default class Server {
         }
       }
     }
+
+    return results;
+  }
+
+  private async onDidChangeContent(change: any) {
+    // this.setStatusText('did-change');
+
+    const lintResults = await this.templateLinter.lint(change.document);
+    const results: Diagnostic[] = [];
+
+    if (Array.isArray(lintResults)) {
+      lintResults.forEach((result) => {
+        results.push(result);
+      });
+    }
+
+    const addonResults = await this.runAddonLinters(change.document);
+
+    addonResults.forEach((result) => {
+      results.push(result);
+    });
 
     this.connection.sendDiagnostics({ uri: change.document.uri, diagnostics: results });
   }

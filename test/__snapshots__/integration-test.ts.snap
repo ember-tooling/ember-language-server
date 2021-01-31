@@ -2519,7 +2519,8 @@ Object {
     "documentSymbolProvider": true,
     "executeCommandProvider": Object {
       "commands": Array [
-        "els:registerProjectPath",
+        "els.registerProjectPath",
+        "els.provideDiagnostics",
         "els.extractSourceCodeToComponent",
         "els.executeInEmberCLI",
         "els.getRelatedFiles",
