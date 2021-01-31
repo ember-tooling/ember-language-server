@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/lifeart/ember-language-server/compare/v1.0.4...v1.0.5) (2021-01-31)
+
+
+### Bug Fixes
+
+* improve typings ([3942add](https://github.com/lifeart/ember-language-server/commit/3942add6ecde57c83dc5401d05ad49821f4f2650))
+
 ## [1.0.4](https://github.com/lifeart/ember-language-server/compare/v1.0.3...v1.0.4) (2021-01-27)
 
 
