@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/lifeart/ember-language-server/compare/v1.0.5...v1.1.0) (2021-02-02)
+
+
+### Features
+
+* template-lint documentation link support ([e9577b1](https://github.com/lifeart/ember-language-server/commit/e9577b1184213a9b4ae56b22e1cd61ac9b26140b))
+
 ## [1.0.5](https://github.com/lifeart/ember-language-server/compare/v1.0.4...v1.0.5) (2021-01-31)
 
 
