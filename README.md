@@ -22,7 +22,8 @@ All features currently only work in Ember CLI application that use the default c
   - Component imports (from addons)
 
 - Route autocompletion in `link-to`
-- Diagnostics for ember-template-lint (if it is included in a project)
+- Diagnostics for `ember-template-lint` (if it is included in a project)
+- Workspaces support
 
 ## Editor Plugins
 
