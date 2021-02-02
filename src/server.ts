@@ -336,7 +336,13 @@ export default class Server {
     }
     // this.setStatusText('Initialized');
 
+    const info = JSON.parse(fs.readFileSync(path.join(__dirname, './../package.json'), 'utf8'));
+
     return {
+      serverInfo: {
+        name: info.name,
+        version: info.version,
+      },
       capabilities: {
         // Tell the client that the server works in FULL text document sync mode
         textDocumentSync: TextDocumentSyncKind.Full,

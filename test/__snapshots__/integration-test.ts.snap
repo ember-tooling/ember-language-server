@@ -2538,6 +2538,9 @@ Object {
       },
     },
   },
+  "serverInfo": Object {
+    "name": "@lifeart/ember-language-server",
+  },
 }
 `;
 

@@ -32,13 +32,21 @@ export function toHbsSource(templateNode: ITemplateNode): string {
 }
 
 export function toDiagnostic(source: string, error: TemplateLinterError): Diagnostic {
-  return {
+  const result = {
     severity: DiagnosticSeverity.Error,
     range: toRange(source, error),
     message: toMessage(error),
-    code: error.rule,
+    code: error.rule || 'syntax',
     source: error.rule ? 'ember-template-lint' : 'glimmer-engine',
   };
+
+  if (result.source === 'ember-template-lint') {
+    (result as any).codeDescription = {
+      href: `https://github.com/ember-template-lint/ember-template-lint/blob/master/docs/rule/${result.code}.md`,
+    };
+  }
+
+  return result as Diagnostic;
 }
 
 function toLineRange(source: string, idx: number): [number, number] {

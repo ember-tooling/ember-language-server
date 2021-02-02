@@ -54,6 +54,8 @@ describe('integration', function () {
       jest.setTimeout(15000);
       const response = await initServer(connection);
 
+      expect(response.serverInfo.version.split('.').length).toEqual(3);
+      delete response.serverInfo.version;
       expect(response).toMatchSnapshot();
     });
   });
