@@ -16,6 +16,8 @@ import {
 } from '../../src/utils/layout-helpers';
 import * as path from 'path';
 
+import { initFileStructure } from './../test_helpers/integration-helpers';
+
 describe('definition-helpers', function () {
   describe('isMuApp()', function () {
     it('return true for paths, containing "src/ui"', function () {
@@ -163,6 +165,44 @@ describe('definition-helpers', function () {
       const items = getProjectAddonsRoots(root, [], 'hope_modules');
 
       expect(items.length).toEqual(2);
+    });
+  });
+
+  describe('yarn workspaces support', function () {
+    it('should work for simple case', async function () {
+      const info = await initFileStructure({
+        node_modules: {
+          '@skylight': {
+            anvil: {
+              'package.json': JSON.stringify({
+                name: '@skylight/anvil',
+                keywords: ['ember-addon'],
+                'ember-addon': {
+                  configPath: 'tests/dummy/config',
+                },
+              }),
+              'index.js': '',
+            },
+          },
+        },
+        packages: {
+          touchstone: {
+            'package.json': JSON.stringify({
+              name: 'touchstone',
+              devDependencies: {
+                '@skylight/anvil': '*',
+              },
+            }),
+          },
+        },
+      });
+
+      const items = getProjectAddonsRoots(path.join(info.path, 'packages', 'touchstone'));
+
+      expect(items.length).toEqual(1);
+      expect(items[0].split(path.sep).join('/').split('node_modules/')[1]).toEqual('@skylight/anvil');
+
+      await info.destroy();
     });
   });
 });

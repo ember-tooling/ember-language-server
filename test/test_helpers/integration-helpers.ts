@@ -34,6 +34,19 @@ export async function reloadProjects(connection: MessageConnection, project = un
   return result;
 }
 
+export async function initFileStructure(files) {
+  const dir = await createTempDir();
+
+  dir.write(files);
+
+  return {
+    path: path.normalize(dir.path()),
+    destroy() {
+      return dir.dispose();
+    },
+  };
+}
+
 export async function createProject(files, connection: MessageConnection): Promise<{ normalizedPath: string; result: UnknownResult; destroy(): void }> {
   const dir = await createTempDir();
 
