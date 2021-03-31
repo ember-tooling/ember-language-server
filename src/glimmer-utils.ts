@@ -257,6 +257,10 @@ export default class ASTPath {
     return this.path[this.index - 1];
   }
 
+  parentFromLevel(level: number): any | undefined {
+    return this.path[this.index - level];
+  }
+
   metaForType(astType: 'handlebars'): HandlebarsASTPathMeta | null {
     if (astType === 'handlebars') {
       return new HandlebarsASTPathMeta(this, this.position, this.content);

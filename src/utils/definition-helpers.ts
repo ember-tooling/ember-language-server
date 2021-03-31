@@ -6,6 +6,7 @@ import { Location, Range } from 'vscode-languageserver/node';
 import { URI } from 'vscode-uri';
 
 import { isModuleUnificationApp, podModulePrefixForRoot, hasAddonFolderInPath, getProjectAddonsRoots, getProjectInRepoAddonsRoots } from './layout-helpers';
+
 const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
   length: 1,
   maxAge: 600000,
@@ -14,6 +15,17 @@ const mProjectInRepoAddonsRoots = memoize(getProjectInRepoAddonsRoots, {
   length: 1,
   maxAge: 600000,
 });
+
+export const mProjectRoot = memoize(getProjectParentRoot);
+
+/**
+ * Find the top level package.json of the project.
+ */
+export function getProjectParentRoot(root: string, appRoot: string) {
+  const indexOfAppRoot = root.indexOf(`/${appRoot}`);
+
+  return appRoot && indexOfAppRoot > -1 ? root.slice(0, indexOfAppRoot) : root;
+}
 
 export function pathsToLocations(...paths: string[]): Location[] {
   return paths.filter(fs.existsSync).map((modulePath) => {
@@ -70,11 +82,13 @@ export function getAbstractParts(root: string, prefix: string, collection: strin
   ];
 }
 
-export function getAbstractPartsWithTemplates(root: string, prefix: string, collection: string, name: string) {
+export function getAbstractPartsWithTemplates(root: string, prefix: string, ...collection: string[]) {
+  const name = collection.pop();
+
   return [
-    [root, prefix, collection, `${name}.js`],
-    [root, prefix, collection, `${name}.ts`],
-    [root, prefix, collection, `${name}.hbs`],
+    [root, prefix, ...collection, `${name}.js`],
+    [root, prefix, ...collection, `${name}.ts`],
+    [root, prefix, ...collection, `${name}.hbs`],
   ];
 }
 
@@ -144,7 +158,7 @@ export function getPathsForComponentTemplates(root: string, maybeComponentName: 
   return paths;
 }
 
-export function getAddonImport(root: string, importPath: string) {
+export function getAddonImport(root: string, importPath: string, appName: string) {
   const importParts = importPath.split('/');
   let addonName = importParts.shift();
 
@@ -157,7 +171,7 @@ export function getAddonImport(root: string, importPath: string) {
   }
 
   const items: string[] = [];
-  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root), mProjectInRepoAddonsRoots(path.join(root, appName)));
   let existingPaths: string[] = [];
   let hasValidPath = false;
 
@@ -173,8 +187,9 @@ export function getAddonImport(root: string, importPath: string) {
     const addonPaths: string[][] = [];
     const possibleLocations = [
       [rootPath, 'app', ...importParts],
+      [rootPath, 'tests', ...importParts],
       [rootPath, 'addon', ...importParts],
-      [rootPath, ...importParts],
+      [rootPath, '', ...importParts],
     ];
 
     possibleLocations.forEach((locationArr: Parameters<typeof getAbstractPartsWithTemplates>) => {
@@ -243,11 +258,16 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
   return existingPaths;
 }
 
-export function getAddonPathsForComponentTemplates(root: string, maybeComponentName: string) {
+export function getAddonPathsForComponentTemplates(root: string, maybeComponentName: string, appRoot: string, addonName?: string) {
   const items: string[] = [];
-  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  let roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root), mProjectInRepoAddonsRoots(path.join(root, appRoot)));
   let existingPaths: string[] = [];
   let hasValidPath = false;
+
+  // if addonName is present then only iterate over the root with that addon
+  if (addonName) {
+    roots = roots.filter((rootItem) => rootItem.includes(addonName));
+  }
 
   roots.forEach((rootPath: string) => {
     if (hasValidPath) {

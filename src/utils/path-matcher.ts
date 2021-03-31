@@ -95,7 +95,7 @@ export class ClassicPathMatcher {
     const isStyle = absPath.endsWith('.css') || absPath.endsWith('.less') || absPath.endsWith('.scss');
     const kind = isStyle ? 'style' : isTemplate ? 'template' : isTest ? 'test' : 'script';
     const isAddon = absPath.includes('/addon/');
-    const isInRepoAddon = absPath.includes('/lib/');
+    const isInRepoAddon = absPath.includes('/lib/') || absPath.includes('/engines/');
     const isExternalAddon = absPath.includes('/node_modules/');
     const isDummy = absPath.includes('/dummy');
     const scope = isDummy || isAddon || isInRepoAddon || isExternalAddon ? 'addon' : 'application';

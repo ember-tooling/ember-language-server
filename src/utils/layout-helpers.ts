@@ -136,11 +136,29 @@ export function getProjectInRepoAddonsRoots(root: string) {
     directories: true,
     globs: ['**/package.json'],
   });
+  const engineAddons = safeWalkSync(path.join(root, 'engines'), {
+    directories: true,
+    globs: ['**/package.json'],
+  });
   const roots: string[] = [];
 
   addons
     .map((relativePath: string) => {
       return path.dirname(path.join(root, prefix, relativePath));
+    })
+    .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
+    .forEach((validRoot: string) => {
+      roots.push(validRoot);
+      getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
+        if (!roots.includes(relatedRoot)) {
+          roots.push(relatedRoot);
+        }
+      });
+    });
+
+  engineAddons
+    .map((relativePath: string) => {
+      return path.dirname(path.join(root, 'engines', relativePath));
     })
     .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
     .forEach((validRoot: string) => {
@@ -326,7 +344,7 @@ export function isTestFile(filePath: string) {
 }
 
 export function hasAddonFolderInPath(name: string) {
-  return name.includes(path.sep + 'addon' + path.sep);
+  return name.includes(path.sep + 'addon' + path.sep) || name.includes(path.sep + 'addon-test-support' + path.sep);
 }
 
 export function getProjectAddonsInfo(root: string) {

@@ -39,6 +39,7 @@ import {
 } from '../../utils/layout-helpers';
 
 import { normalizeToAngleBracketComponent } from '../../utils/normalizers';
+import { getAppRootFromConfig } from '../../utils/common-helpers';
 import { getTemplateBlocks } from '../../utils/template-tokens-collector';
 import { ASTNode } from 'ast-types';
 import { ASTv1 } from '@glimmer/syntax';
@@ -169,12 +170,12 @@ export default class TemplateCompletionProvider {
 
     return scopedValues;
   }
-  getParentComponentYields(root: string, focusPath: ASTNode & { tag: string }) {
+  getParentComponentYields(root: string, focusPath: ASTNode & { tag: string }, appName: string) {
     if (focusPath.type !== 'ElementNode') {
       return [];
     }
 
-    const paths = provideComponentTemplatePaths(root, focusPath.tag).filter((p) => fs.existsSync(p));
+    const paths = provideComponentTemplatePaths(root, focusPath.tag, appName).filter((p) => fs.existsSync(p));
 
     if (!paths.length) {
       return [];
@@ -203,12 +204,13 @@ export default class TemplateCompletionProvider {
     const focusPath = params.focusPath;
     const uri = params.textDocument.uri;
     const originalText = params.originalText || '';
+    const appRoot = await getAppRootFromConfig(params.server);
 
     try {
       if (isNamedBlockName(focusPath)) {
         log('isNamedBlockName');
         // <:main>
-        const yields = this.getParentComponentYields(root, focusPath.parent);
+        const yields = this.getParentComponentYields(root, focusPath.parent, appRoot);
 
         completions.push(...yields);
       } else if (isAngleComponentPath(focusPath) && !isNamedBlockName(focusPath)) {
@@ -230,7 +232,7 @@ export default class TemplateCompletionProvider {
           !maybeComponentName.includes('.');
 
         if (isValidComponent) {
-          const tpls: string[] = provideComponentTemplatePaths(root, maybeComponentName);
+          const tpls: string[] = provideComponentTemplatePaths(root, maybeComponentName, appRoot);
           const existingTpls = tpls.filter(fs.existsSync);
 
           if (existingTpls.length) {

@@ -1,0 +1,10 @@
+{
+  "name": "classic-in-repo-engine",
+  "keywords": [
+    "ember-addon",
+    "ember-engine"
+  ],
+  "dependencies": {
+  
+  }
+}

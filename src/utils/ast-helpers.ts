@@ -341,6 +341,14 @@ export function isImportPathDeclaration(path: ASTPath): boolean {
   return true;
 }
 
+export function isImportSpecifier(path: ASTPath): boolean {
+  if (!hasNodeType(path.parent, 'ImportDefaultSpecifier') && !hasNodeType(path.parent, 'ImportSpecifier')) {
+    return false;
+  }
+
+  return true;
+}
+
 export function isServiceInjection(path: ASTPath): boolean {
   const node = path.node;
 

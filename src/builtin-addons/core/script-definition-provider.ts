@@ -2,7 +2,8 @@ import * as path from 'path';
 import * as t from '@babel/types';
 import { Definition, Location } from 'vscode-languageserver/node';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
-import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../../utils/definition-helpers';
+import { pathsToLocations, getAddonPathsForType, getAddonImport, mProjectRoot } from '../../utils/definition-helpers';
+import { getAppRootFromConfig } from '../../utils/common-helpers';
 import {
   isRouteLookup,
   isTransformReference,
@@ -11,10 +12,12 @@ import {
   isServiceInjection,
   isNamedServiceInjection,
   isTemplateElement,
+  isImportSpecifier,
 } from './../../utils/ast-helpers';
 import { normalizeServiceName } from '../../utils/normalizers';
 import { isModuleUnificationApp, podModulePrefixForRoot } from './../../utils/layout-helpers';
 import { provideRouteDefinition } from './template-definition-provider';
+
 type ItemType = 'Model' | 'Transform' | 'Service';
 
 // barking on 'LayoutCollectorFn' is defined but never used  @typescript-eslint/no-unused-vars
@@ -62,16 +65,18 @@ class PathResolvers {
   addonServicePaths(root: string, serviceName: string) {
     return getAddonPathsForType(root, 'services', serviceName);
   }
-  addonImportPaths(root: string, pathName: string) {
-    return getAddonImport(root, pathName);
+  addonImportPaths(root: string, pathName: string, appName: string) {
+    return getAddonImport(root, pathName, appName);
   }
-  classicImportPaths(root: string, pathName: string) {
+  classicImportPaths(root: string, pathName: string, appName: string) {
     const pathParts = pathName.split('/');
 
     pathParts.shift();
-    const params = [root, 'app', ...pathParts];
+    const appParams = [root, appName, 'app', ...pathParts];
+    const testParams = [root, appName, 'tests', ...pathParts];
+    const rootParams = [root, appName, ...pathParts];
 
-    return joinPaths(...params);
+    return joinPaths(...appParams).concat(joinPaths(...testParams).concat(joinPaths(...rootParams)));
   }
   muImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
@@ -88,7 +93,7 @@ export default class CoreScriptDefinitionProvider {
   constructor() {
     this.resolvers = new PathResolvers();
   }
-  guessPathForImport(root: string, uri: string, importPath: string) {
+  guessPathForImport(root: string, uri: string, importPath: string, appName?: string) {
     if (!uri) {
       return null;
     }
@@ -101,12 +106,12 @@ export default class CoreScriptDefinitionProvider {
         guessedPaths.push(pathLocation);
       });
     } else {
-      this.resolvers[`classic${fnName}Paths`](root, importPath).forEach((pathLocation: string) => {
+      this.resolvers[`classic${fnName}Paths`](root, importPath, appName).forEach((pathLocation: string) => {
         guessedPaths.push(pathLocation);
       });
     }
 
-    this.resolvers.addonImportPaths(root, importPath).forEach((pathLocation: string) => {
+    this.resolvers.addonImportPaths(root, importPath, appName as string).forEach((pathLocation: string) => {
       guessedPaths.push(pathLocation);
     });
 
@@ -179,6 +184,13 @@ export default class CoreScriptDefinitionProvider {
       definitions = this.guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
       definitions = this.guessPathForImport(root, uri, ((astPath.node as unknown) as t.StringLiteral).value) || [];
+    } else if (isImportSpecifier(astPath)) {
+      const pathName: string = ((astPath.parentFromLevel(2) as unknown) as any).source.value;
+      const appName = await getAppRootFromConfig(server);
+
+      const parentRoot = mProjectRoot(root, appName);
+
+      definitions = this.guessPathForImport(parentRoot, uri, pathName, appName) || [];
     } else if (isServiceInjection(astPath)) {
       let serviceName = ((astPath.node as unknown) as t.Identifier).name;
       const args = astPath.parent.value.arguments;
