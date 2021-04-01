@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/lifeart/ember-language-server/compare/v1.2.0...v1.3.0) (2021-04-01)
+
+
+### Features
+
+* add support for multinamespaced components ([#212](https://github.com/lifeart/ember-language-server/issues/212)) ([6b03c83](https://github.com/lifeart/ember-language-server/commit/6b03c83469da9cf4022e702dd55e7df9d5a9a1d8))
+
 # [1.2.0](https://github.com/lifeart/ember-language-server/compare/v1.1.0...v1.2.0) (2021-04-01)
 
 
