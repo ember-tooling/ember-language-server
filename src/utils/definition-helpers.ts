@@ -71,13 +71,11 @@ export function getAbstractParts(root: string, prefix: string, collection: strin
   ];
 }
 
-export function getAbstractPartsWithTemplates(root: string, prefix: string, ...collection: string[]) {
-  const name = collection.pop();
-
+export function getAbstractPartsWithTemplates(root: string, prefix: string, collection: string, name: string) {
   return [
-    [root, prefix, ...collection, `${name}.js`],
-    [root, prefix, ...collection, `${name}.ts`],
-    [root, prefix, ...collection, `${name}.hbs`],
+    [root, prefix, collection, `${name}.js`],
+    [root, prefix, collection, `${name}.ts`],
+    [root, prefix, collection, `${name}.hbs`],
   ];
 }
 
@@ -147,7 +145,7 @@ export function getPathsForComponentTemplates(root: string, maybeComponentName: 
   return paths;
 }
 
-export function getAddonImport(root: string, importPath: string, appName: string) {
+export function getAddonImport(root: string, importPath: string) {
   const importParts = importPath.split('/');
   let addonName = importParts.shift();
 
@@ -160,7 +158,7 @@ export function getAddonImport(root: string, importPath: string, appName: string
   }
 
   const items: string[] = [];
-  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root), mProjectInRepoAddonsRoots(path.join(root, appName)));
+  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
 
@@ -176,9 +174,8 @@ export function getAddonImport(root: string, importPath: string, appName: string
     const addonPaths: string[][] = [];
     const possibleLocations = [
       [rootPath, 'app', ...importParts],
-      [rootPath, 'tests', ...importParts],
       [rootPath, 'addon', ...importParts],
-      [rootPath, '', ...importParts],
+      [rootPath, ...importParts],
     ];
 
     possibleLocations.forEach((locationArr: Parameters<typeof getAbstractPartsWithTemplates>) => {
@@ -247,16 +244,11 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
   return existingPaths;
 }
 
-export function getAddonPathsForComponentTemplates(root: string, maybeComponentName: string, appRoot: string, addonName?: string) {
+export function getAddonPathsForComponentTemplates(root: string, maybeComponentName: string) {
   const items: string[] = [];
-  let roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root), mProjectInRepoAddonsRoots(path.join(root, appRoot)));
+  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
   let existingPaths: string[] = [];
   let hasValidPath = false;
-
-  // if addonName is present then only iterate over the root with that addon
-  if (addonName) {
-    roots = roots.filter((rootItem) => rootItem.includes(addonName));
-  }
 
   roots.forEach((rootPath: string) => {
     if (hasValidPath) {

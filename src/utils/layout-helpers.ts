@@ -356,16 +356,10 @@ export function hasAddonFolderInPath(name: string) {
   return name.includes(path.sep + 'addon' + path.sep) || name.includes(path.sep + 'addon-test-support' + path.sep);
 }
 
-export function getProjectAddonsInfo(root: string, appName?: string) {
-  const childAppRoot = appName ? mProjectInRepoAddonsRoots(path.join(root, appName)) : [];
-
-  const roots = ([] as string[])
-    .concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root), childAppRoot as any)
-    .filter((pathItem: any) => typeof pathItem === 'string');
+export function getProjectAddonsInfo(root: string) {
+  const roots = ([] as string[]).concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root)).filter((pathItem: unknown) => typeof pathItem === 'string');
   // log('roots', roots);
-  const meta: any = [];
-
-  const isNamespaceSupported = hasNamespaceSupport(root);
+  const meta: CompletionItem[][] = [];
 
   roots.forEach((packagePath: string) => {
     const info = getPackageJSON(packagePath);
@@ -377,9 +371,8 @@ export function getProjectAddonsInfo(root: string, appName?: string) {
     }
 
     if (version === 1) {
-      const addonName = packagePath.split('/').pop();
       const extractedData = [
-        ...listComponents(packagePath, addonName, isNamespaceSupported),
+        ...listComponents(packagePath),
         ...listRoutes(packagePath),
         ...listHelpers(packagePath),
         ...listModels(packagePath),
@@ -495,13 +488,13 @@ export function builtinModifiers(): CompletionItem[] {
   ];
 }
 
-function hasNamespaceSupport(root: string) {
+export function hasNamespaceSupport(root: string) {
   const pack = getPackageJSON(root);
 
   return hasDep(pack, 'ember-holy-futuristic-template-namespacing-batman');
 }
 
-export function listComponents(_root: string, addonName?: string, isNamespaceSupported?: boolean): CompletionItem[] {
+export function listComponents(_root: string): CompletionItem[] {
   // log('listComponents');
   const root = path.resolve(_root);
   const scriptEntry = path.join(root, 'app', 'components');
@@ -545,7 +538,7 @@ export function listComponents(_root: string, addonName?: string, isNamespaceSup
   const paths = [...jsPaths, ...hbsPaths, ...addonComponentsPaths, ...addonTemplatesPaths];
 
   const items = paths.map((filePath: string) => {
-    const label = addonName && isNamespaceSupported ? `${addonName}$${pureComponentName(filePath)}` : pureComponentName(filePath);
+    const label = pureComponentName(filePath);
 
     return {
       kind: CompletionItemKind.Class,

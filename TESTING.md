@@ -41,3 +41,10 @@ tests with coverage (single coverage for all unit and integration tests).
 The `nyc` process which we spawn for running the server did not seem to collect
 coverage metrics for the server code, unless instrumented using an additional
 step before the actual tests are run.
+
+
+### Errors
+
+Error: Header must provide a Content-Length property
+
+- remove "console.log" from code base.

@@ -1877,9 +1877,9 @@ exports[`integration Diffent commands handle "els.getRelatedFiles" command 1`] =
 Object {
   "component": Object {
     "hello": Array [
-      "tests/integration/components/hello-test.js",
       "app/components/hello/component.js",
       "app/components/hello/template.hbs",
+      "tests/integration/components/hello-test.js",
     ],
   },
 }
@@ -1897,9 +1897,9 @@ exports[`integration Diffent commands handle "els.getRelatedFiles" command with 
 Object {
   "component": Object {
     "hello": Array [
-      "tests/integration/components/hello-test.js",
       "app/components/hello/index.hbs",
       "app/components/hello/index.js",
+      "tests/integration/components/hello-test.js",
     ],
   },
 }
@@ -2208,8 +2208,8 @@ Object {
   "registry": Object {
     "component": Object {
       "darling": Array [
-        "tests/integration/components/darling/component-test.js",
         "app/components/darling.ts",
+        "tests/integration/components/darling/component-test.js",
       ],
       "hello": Array [
         "app/components/hello.hbs",
@@ -2239,8 +2239,8 @@ Object {
   "registry": Object {
     "component": Object {
       "darling": Array [
-        "tests/integration/components/darling/component-test.js",
         "app/components/darling.ts",
+        "tests/integration/components/darling/component-test.js",
       ],
       "hello": Array [
         "app/components/hello.ts",

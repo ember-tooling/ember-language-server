@@ -42,7 +42,8 @@ export function normalizeToNamedBlockName(name: string) {
 }
 
 // https://github.com/rwjblue/ember-angle-bracket-invocation-polyfill/blob/master/lib/ast-transform.js#L33
-export function normalizeToClassicComponent(name: string) {
+export function normalizeToClassicComponent(rawName: string) {
+  const name = rawName.split('$').pop() || '';
   const ALPHA = /[A-Za-z]/;
 
   return name

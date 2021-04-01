@@ -3,7 +3,6 @@ import * as t from '@babel/types';
 import { Definition, Location } from 'vscode-languageserver/node';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../../utils/definition-helpers';
-import { getAppRootFromConfig, mProjectRoot } from '../../utils/common-helpers';
 import {
   isRouteLookup,
   isTransformReference,
@@ -65,18 +64,16 @@ class PathResolvers {
   addonServicePaths(root: string, serviceName: string) {
     return getAddonPathsForType(root, 'services', serviceName);
   }
-  addonImportPaths(root: string, pathName: string, appName: string) {
-    return getAddonImport(root, pathName, appName);
+  addonImportPaths(root: string, pathName: string) {
+    return getAddonImport(root, pathName);
   }
-  classicImportPaths(root: string, pathName: string, appName: string) {
+  classicImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
 
     pathParts.shift();
-    const appParams = [root, appName, 'app', ...pathParts];
-    const testParams = [root, appName, 'tests', ...pathParts];
-    const rootParams = [root, appName, ...pathParts];
+    const appParams = [root, 'app', ...pathParts];
 
-    return joinPaths(...appParams).concat(joinPaths(...testParams).concat(joinPaths(...rootParams)));
+    return joinPaths(...appParams);
   }
   muImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
@@ -93,7 +90,7 @@ export default class CoreScriptDefinitionProvider {
   constructor() {
     this.resolvers = new PathResolvers();
   }
-  guessPathForImport(root: string, uri: string, importPath: string, appName?: string) {
+  guessPathForImport(root: string, uri: string, importPath: string) {
     if (!uri) {
       return null;
     }
@@ -106,12 +103,12 @@ export default class CoreScriptDefinitionProvider {
         guessedPaths.push(pathLocation);
       });
     } else {
-      this.resolvers[`classic${fnName}Paths`](root, importPath, appName).forEach((pathLocation: string) => {
+      this.resolvers[`classic${fnName}Paths`](root, importPath).forEach((pathLocation: string) => {
         guessedPaths.push(pathLocation);
       });
     }
 
-    this.resolvers.addonImportPaths(root, importPath, appName as string).forEach((pathLocation: string) => {
+    this.resolvers.addonImportPaths(root, importPath).forEach((pathLocation: string) => {
       guessedPaths.push(pathLocation);
     });
 
@@ -186,11 +183,8 @@ export default class CoreScriptDefinitionProvider {
       definitions = this.guessPathForImport(root, uri, ((astPath.node as unknown) as t.StringLiteral).value) || [];
     } else if (isImportSpecifier(astPath)) {
       const pathName: string = ((astPath.parentFromLevel(2) as unknown) as any).source.value;
-      const appName = await getAppRootFromConfig(server);
 
-      const parentRoot = mProjectRoot(server.projectRoots, root, appName);
-
-      definitions = this.guessPathForImport(parentRoot, uri, pathName, appName) || [];
+      definitions = this.guessPathForImport(root, uri, pathName) || [];
     } else if (isServiceInjection(astPath)) {
       let serviceName = ((astPath.node as unknown) as t.Identifier).name;
       const args = astPath.parent.value.arguments;

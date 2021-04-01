@@ -4,7 +4,6 @@ import * as memoize from 'memoizee';
 import { log, logError, logInfo } from '../../utils/logger';
 import Server from '../../server';
 import { Project } from '../../project-roots';
-import { getAppRootFromConfig, mProjectRoot } from '../../utils/common-helpers';
 import * as t from '@babel/types';
 import {
   isStoreModelLookup,
@@ -37,10 +36,6 @@ export default class ScriptCompletionProvider {
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     const focusPath = params.focusPath;
 
-    const appRoot = await getAppRootFromConfig(params.server);
-
-    root = mProjectRoot(params.server.projectRoots, root, appRoot);
-
     if (params.type !== 'script') {
       return params.results;
     }
@@ -54,7 +49,7 @@ export default class ScriptCompletionProvider {
         mListModels(root).forEach((model: CompletionItem) => {
           completions.push(model);
         });
-        mGetProjectAddonsInfo(root, appRoot).filter((item: CompletionItem) => {
+        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'model') {
             completions.push(item);
           }
@@ -64,7 +59,7 @@ export default class ScriptCompletionProvider {
         mListRoutes(root).forEach((model: CompletionItem) => {
           completions.push(model);
         });
-        mGetProjectAddonsInfo(root, appRoot).filter((item: CompletionItem) => {
+        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'route') {
             completions.push(item);
           }
@@ -74,7 +69,7 @@ export default class ScriptCompletionProvider {
         mListServices(root).forEach((model: CompletionItem) => {
           completions.push(model);
         });
-        mGetProjectAddonsInfo(root, appRoot).filter((item: CompletionItem) => {
+        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'service') {
             completions.push(item);
           }
@@ -116,7 +111,7 @@ export default class ScriptCompletionProvider {
         mListTransforms(root).forEach((model: CompletionItem) => {
           completions.push(model);
         });
-        mGetProjectAddonsInfo(root, appRoot).filter((item: CompletionItem) => {
+        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
           if (item.detail === 'transform') {
             completions.push(item);
           }

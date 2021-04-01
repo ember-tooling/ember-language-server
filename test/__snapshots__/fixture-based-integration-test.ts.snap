@@ -1,28 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`With \`batman project\` initialized on server Completion request returns all angle-bracket in a element expression for in repo addons with batman syntax 1`] = `
-Array [
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Foo$Bar",
-    "textEdit": Object {
-      "newText": "Foo$Bar",
-      "range": Object {
-        "end": Object {
-          "character": 2,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 1,
-        },
-      },
-    },
-  },
-]
-`;
-
 exports[`With \`full-project\` initialized on server Completion request returns all angle-bracket in a element expression 1`] = `
 Array [
   Object {

@@ -15,7 +15,7 @@ import {
   isELSAddonRoot,
 } from './utils/layout-helpers';
 import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem } from './utils/registry-api';
-import { ProjectProviders, collectProjectProviders, initBuiltinProviders } from './utils/addon-api';
+import { ProjectProviders, collectProjectProviders, initBuiltinProviders, AddonMeta } from './utils/addon-api';
 import Server from './server';
 import { Diagnostic, FileChangeType } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -33,6 +33,7 @@ export class Project {
   private podMatcher!: PodMatcher;
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
+  addonsMeta: AddonMeta[] = [];
   executors: Executors = {};
   watchers: Watcher[] = [];
   destructors: Destructor[] = [];
@@ -99,6 +100,7 @@ export class Project {
   }
   constructor(public readonly root: string, addons: string[]) {
     this.providers = collectProjectProviders(root, addons);
+    this.addonsMeta = this.providers.addonsMeta.filter((el) => el.root !== this.root);
     this.builtinProviders = initBuiltinProviders();
     const maybePrefix = getPodModulePrefix(root);
 
