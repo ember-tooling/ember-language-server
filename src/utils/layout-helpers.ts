@@ -377,7 +377,7 @@ export function getProjectAddonsInfo(root: string, appName?: string) {
     }
 
     if (version === 1) {
-      const addonName = packagePath.split('/').pop();
+      const addonName = info.name;
       const extractedData = [
         ...listComponents(packagePath, addonName, isNamespaceSupported),
         ...listRoutes(packagePath),
