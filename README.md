@@ -23,8 +23,9 @@ All features currently only work in Ember CLI application that use the default c
   - Component imports (from addons)
   - Namespace components (batman syntax)
 
-- Route autocompletion in `link-to`
+- Route autocompletion in `link-to` and `<LinkTo>` components.
 - Diagnostics for `ember-template-lint` (if it is included in a project)
+- `ember-template-lint` template fixes support (if exists).
 - Workspaces support
 
 ## Editor Plugins
