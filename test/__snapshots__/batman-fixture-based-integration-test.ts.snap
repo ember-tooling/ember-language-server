@@ -1,5 +1,100 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`With \`batman project\` initialized on server Completion request returns all angle-bracket components with same name from different namespaces 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "AnotherAwesomeComponent",
+    "textEdit": Object {
+      "newText": "AnotherAwesomeComponent",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "MyAwesomeComponent",
+    "textEdit": Object {
+      "newText": "MyAwesomeComponent",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Nested::NestedComponent",
+    "textEdit": Object {
+      "newText": "Nested::NestedComponent",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Boo$Bar",
+    "textEdit": Object {
+      "newText": "Boo$Bar",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Foo$Bar",
+    "textEdit": Object {
+      "newText": "Foo$Bar",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
 exports[`With \`batman project\` initialized on server Completion request returns all angle-bracket in a element expression for in repo addons with batman syntax 1`] = `
 Array [
   Object {
@@ -36,7 +131,7 @@ Array [
         "line": 0,
       },
     },
-    "uri": "/lib/foo/addon/templates/components/bar.hbs",
+    "uri": "/lib/boo/addon/templates/components/bar.hbs",
   },
 ]
 `;
@@ -54,7 +149,7 @@ Array [
         "line": 0,
       },
     },
-    "uri": "/lib/foo/app/components/bar.js",
+    "uri": "/lib/foo/addon/components/bar.js",
   },
 ]
 `;

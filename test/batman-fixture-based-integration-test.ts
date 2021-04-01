@@ -63,6 +63,25 @@ describe('With `batman project` initialized on server', () => {
 
       expect(response).toMatchSnapshot();
     });
+
+    it('returns all angle-bracket components with same name from different namespaces', async () => {
+      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'batman', 'app', 'templates', 'same-component-name.hbs');
+      const params = {
+        textDocument: {
+          uri: URI.file(applicationTemplatePath).toString(),
+        },
+        position: {
+          line: 0,
+          character: 1,
+        },
+      };
+
+      openFile(connection, applicationTemplatePath);
+
+      const response = await connection.sendRequest(CompletionRequest.method, params);
+
+      expect(response).toMatchSnapshot();
+    });
   });
 
   describe('Definition request', () => {

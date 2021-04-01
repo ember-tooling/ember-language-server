@@ -345,8 +345,8 @@ export default class TemplateCompletionProvider {
 
     if (this.hasNamespaceSupport) {
       const registry = this.server.getRegistry(this.project.root);
-
-      completions.forEach((item) => {
+      const extraCompletions: CompletionItem[] = [];
+      const filteredCompletions = completions.filter((item) => {
         if (item.detail === 'component') {
           const paths = registry.component[normalizeToClassicComponent(item.label)] || [];
           const roots = this.project.addonsMeta
@@ -356,13 +356,27 @@ export default class TemplateCompletionProvider {
             .sort((a, b) => {
               return b.root.length - a.root.length;
             });
-          const closestRoot: null | string = roots.length ? roots[0].name : null;
 
-          if (closestRoot !== null) {
-            item.label = `${normalizeToAngleBracketComponent(closestRoot)}$${item.label}`;
+          roots.forEach((r) => {
+            extraCompletions.push({
+              ...item,
+              ...{
+                label: `${normalizeToAngleBracketComponent(r.name)}$${item.label}`,
+              },
+            });
+          });
+
+          if (roots.length) {
+            return false;
+          } else {
+            return true;
           }
         }
+
+        return true;
       });
+
+      return [...filteredCompletions, ...extraCompletions];
     }
 
     return completions;

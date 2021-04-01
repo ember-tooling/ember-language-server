@@ -49,7 +49,8 @@
   },
   "ember-addon": {
     "paths": [
-      "lib/foo"
+      "lib/foo",
+	  "lib/boo"
     ]
   }
 }

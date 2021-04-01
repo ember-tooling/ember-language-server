@@ -1,0 +1,9 @@
+{
+    "name": "boo",
+    "keywords": [
+      "ember-addon"
+    ],
+    "dependencies": {
+    
+    }
+  }
