@@ -52,7 +52,7 @@ describe('integration', function () {
   describe('Initialize request', () => {
     it('returns an initialize request', async () => {
       jest.setTimeout(15000);
-      const response = await initServer(connection);
+      const response = await initServer(connection, 'full-project');
 
       expect(response.serverInfo.version.split('.').length).toEqual(3);
       delete response.serverInfo.version;

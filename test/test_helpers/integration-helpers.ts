@@ -189,9 +189,9 @@ export function makeAddonPackage(name, config, addonConfig = undefined) {
   return JSON.stringify(pack);
 }
 
-export function initServer(connection: MessageConnection) {
+export function initServer(connection: MessageConnection, projectName: string) {
   const params = {
-    rootUri: URI.file(path.join(__dirname, '..', 'fixtures', 'full-project')).toString(),
+    rootUri: URI.file(path.join(__dirname, '..', 'fixtures', projectName)).toString(),
     capabilities: {},
     initializationOptions: {
       isELSTesting: true,

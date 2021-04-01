@@ -113,6 +113,7 @@ describe('definition-helpers', function () {
         'angle-completion',
         'application',
         'definition',
+        'inrepo-addon-completion',
         'test-route',
         'nested.nested-route',
         'test-route',

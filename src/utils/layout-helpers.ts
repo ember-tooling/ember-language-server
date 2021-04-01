@@ -31,6 +31,15 @@ export const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
   maxAge: 600000,
 }); // 1 second
 
+const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
+  length: 1,
+  maxAge: 600000,
+});
+const mProjectInRepoAddonsRoots = memoize(getProjectInRepoAddonsRoots, {
+  length: 1,
+  maxAge: 600000,
+});
+
 export const isAddonRoot = memoize(isProjectAddonRoot, {
   length: 1,
   maxAge: 600000,
@@ -347,12 +356,16 @@ export function hasAddonFolderInPath(name: string) {
   return name.includes(path.sep + 'addon' + path.sep) || name.includes(path.sep + 'addon-test-support' + path.sep);
 }
 
-export function getProjectAddonsInfo(root: string) {
+export function getProjectAddonsInfo(root: string, appName?: string) {
+  const childAppRoot = appName ? mProjectInRepoAddonsRoots(path.join(root, appName)) : [];
+
   const roots = ([] as string[])
-    .concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root) as any)
+    .concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root), childAppRoot as any)
     .filter((pathItem: any) => typeof pathItem === 'string');
   // log('roots', roots);
   const meta: any = [];
+
+  const isNamespaceSupported = hasNamespaceSupport(root);
 
   roots.forEach((packagePath: string) => {
     const info = getPackageJSON(packagePath);
@@ -364,9 +377,9 @@ export function getProjectAddonsInfo(root: string) {
     }
 
     if (version === 1) {
-      // log('isEmberAddon', packagePath);
+      const addonName = packagePath.split('/').pop();
       const extractedData = [
-        ...listComponents(packagePath),
+        ...listComponents(packagePath, addonName, isNamespaceSupported),
         ...listRoutes(packagePath),
         ...listHelpers(packagePath),
         ...listModels(packagePath),
@@ -482,7 +495,13 @@ export function builtinModifiers(): CompletionItem[] {
   ];
 }
 
-export function listComponents(_root: string): CompletionItem[] {
+function hasNamespaceSupport(root: string) {
+  const pack = getPackageJSON(root);
+
+  return hasDep(pack, 'ember-holy-futuristic-template-namespacing-batman');
+}
+
+export function listComponents(_root: string, addonName?: string, isNamespaceSupported?: boolean): CompletionItem[] {
   // log('listComponents');
   const root = path.resolve(_root);
   const scriptEntry = path.join(root, 'app', 'components');
@@ -523,12 +542,14 @@ export function listComponents(_root: string): CompletionItem[] {
     addToRegistry(pureComponentName(p), 'component', [path.join(templateEntry, p)]);
   });
 
-  const paths = [...jsPaths, ...hbsPaths];
+  const paths = [...jsPaths, ...hbsPaths, ...addonComponentsPaths, ...addonTemplatesPaths];
 
   const items = paths.map((filePath: string) => {
+    const label = addonName && isNamespaceSupported ? `${addonName}$${pureComponentName(filePath)}` : pureComponentName(filePath);
+
     return {
       kind: CompletionItemKind.Class,
-      label: pureComponentName(filePath),
+      label,
       detail: 'component',
     };
   });

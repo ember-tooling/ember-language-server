@@ -16,17 +16,6 @@ const mProjectInRepoAddonsRoots = memoize(getProjectInRepoAddonsRoots, {
   maxAge: 600000,
 });
 
-export const mProjectRoot = memoize(getProjectParentRoot);
-
-/**
- * Find the top level package.json of the project.
- */
-export function getProjectParentRoot(root: string, appRoot: string) {
-  const indexOfAppRoot = root.indexOf(`/${appRoot}`);
-
-  return appRoot && indexOfAppRoot > -1 ? root.slice(0, indexOfAppRoot) : root;
-}
-
 export function pathsToLocations(...paths: string[]): Location[] {
   return paths.filter(fs.existsSync).map((modulePath) => {
     return Location.create(URI.file(modulePath).toString(), Range.create(0, 0, 0, 0));

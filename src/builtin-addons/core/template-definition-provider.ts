@@ -6,8 +6,7 @@ import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { isLinkToTarget, isLinkComponentRouteTarget, isOutlet } from './../../utils/ast-helpers';
 import ASTPath from './../../glimmer-utils';
 import { getGlobalRegistry, getRegistryForRoot } from './../../utils/registry-api';
-import { mProjectRoot } from '../../utils/definition-helpers';
-import { getAppRootFromConfig } from '../../utils/common-helpers';
+import { getAppRootFromConfig, mProjectRoot } from '../../utils/common-helpers';
 import { normalizeToClassicComponent } from '../../utils/normalizers';
 import { isTemplatePath, isTestFile, getComponentNameFromURI, isModuleUnificationApp, getPodModulePrefix } from './../../utils/layout-helpers';
 
@@ -111,7 +110,7 @@ export default class TemplateDefinitionProvider {
     const uri = params.textDocument.uri;
     const appRoot = await getAppRootFromConfig(params.server);
 
-    root = mProjectRoot(root, appRoot);
+    root = mProjectRoot(params.server.projectRoots, root, appRoot);
 
     const focusPath = params.focusPath;
     let definitions: Location[] = params.results;

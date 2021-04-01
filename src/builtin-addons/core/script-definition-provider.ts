@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as t from '@babel/types';
 import { Definition, Location } from 'vscode-languageserver/node';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
-import { pathsToLocations, getAddonPathsForType, getAddonImport, mProjectRoot } from '../../utils/definition-helpers';
-import { getAppRootFromConfig } from '../../utils/common-helpers';
+import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../../utils/definition-helpers';
+import { getAppRootFromConfig, mProjectRoot } from '../../utils/common-helpers';
 import {
   isRouteLookup,
   isTransformReference,
@@ -188,7 +188,7 @@ export default class CoreScriptDefinitionProvider {
       const pathName: string = ((astPath.parentFromLevel(2) as unknown) as any).source.value;
       const appName = await getAppRootFromConfig(server);
 
-      const parentRoot = mProjectRoot(root, appName);
+      const parentRoot = mProjectRoot(server.projectRoots, root, appName);
 
       definitions = this.guessPathForImport(parentRoot, uri, pathName, appName) || [];
     } else if (isServiceInjection(astPath)) {
