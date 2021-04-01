@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/lifeart/ember-language-server/compare/v1.1.0...v1.2.0) (2021-04-01)
+
+
+### Features
+
+* Namespace components (batman syntax) ([2ea63d9](https://github.com/lifeart/ember-language-server/commit/2ea63d9adda05f82d0db129640fc5989add02607))
+
 # [1.1.0](https://github.com/lifeart/ember-language-server/compare/v1.0.5...v1.1.0) (2021-02-02)
 
 
