@@ -186,13 +186,21 @@ export default class Server {
 
         if (item) {
           const normalizedItem = normalizeMatchNaming(item);
-          const registryResults: string[] = (this.getRegistry(project.root)[normalizedItem.type][normalizedItem.name] || []).sort();
+          const registryResults: string[] = [];
+
+          project.roots.forEach((root) => {
+            (this.getRegistry(root)[normalizedItem.type][normalizedItem.name] || []).forEach((item) => {
+              if (!registryResults.includes(item)) {
+                registryResults.push(item);
+              }
+            });
+          });
 
           if (!includeMeta) {
-            return registryResults;
+            return registryResults.sort();
           }
 
-          return registryResults.map((filePath) => {
+          return registryResults.sort().map((filePath) => {
             return {
               path: filePath,
               meta: project.matchPathToType(filePath),
