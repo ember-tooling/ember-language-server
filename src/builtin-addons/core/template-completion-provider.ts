@@ -176,12 +176,22 @@ export default class TemplateCompletionProvider {
 
     return scopedValues;
   }
-  getParentComponentYields(root: string, focusPath: ASTNode & { tag: string }) {
+  getParentComponentYields(focusPath: ASTNode & { tag: string }) {
     if (focusPath.type !== 'ElementNode') {
       return [];
     }
 
-    const paths = provideComponentTemplatePaths(root, focusPath.tag).filter((p) => fs.existsSync(p));
+    const paths: string[] = [];
+
+    this.project.roots.forEach((projectRoot) => {
+      const scopedPaths = provideComponentTemplatePaths(projectRoot, focusPath.tag).filter((p) => fs.existsSync(p));
+
+      scopedPaths.forEach((p) => {
+        if (!paths.includes(p)) {
+          paths.push(p);
+        }
+      });
+    });
 
     if (!paths.length) {
       return [];
@@ -215,7 +225,7 @@ export default class TemplateCompletionProvider {
       if (isNamedBlockName(focusPath)) {
         log('isNamedBlockName');
         // <:main>
-        const yields = this.getParentComponentYields(root, focusPath.parent);
+        const yields = this.getParentComponentYields(focusPath.parent);
 
         completions.push(...yields);
       } else if (isAngleComponentPath(focusPath) && !isNamedBlockName(focusPath)) {
@@ -237,7 +247,18 @@ export default class TemplateCompletionProvider {
           !maybeComponentName.includes('.');
 
         if (isValidComponent) {
-          const tpls: string[] = provideComponentTemplatePaths(root, maybeComponentName);
+          const tpls: string[] = [];
+
+          this.project.roots.forEach((pRoot) => {
+            const localtpls = provideComponentTemplatePaths(pRoot, maybeComponentName);
+
+            localtpls.forEach((item) => {
+              if (!tpls.includes(item)) {
+                tpls.push(item);
+              }
+            });
+          });
+
           const existingTpls = tpls.filter(fs.existsSync);
 
           if (existingTpls.length) {

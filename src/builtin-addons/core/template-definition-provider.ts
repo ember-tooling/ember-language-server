@@ -124,7 +124,7 @@ export default class TemplateDefinitionProvider {
       definitions = this.provideComponentDefinition(root, componentName, addonName);
     } else if (this.isAngleComponent(focusPath)) {
       // <FooBar />
-      definitions = this.provideAngleBrackedComponentDefinition(root, focusPath);
+      definitions = this.provideAngleBrackedComponentDefinition(focusPath);
       // {{#foo-bar}} {{/foo-bar}}
     } else if (this.isComponentWithBlock(focusPath)) {
       definitions = this.provideBlockComponentDefinition(root, focusPath);
@@ -205,16 +205,26 @@ export default class TemplateDefinitionProvider {
 
     return paths;
   }
-  provideLikelyComponentTemplatePath(root: string, rawComponentName: string): Location[] {
+  provideLikelyComponentTemplatePath(rawComponentName: string): Location[] {
     // Check for batman syntax <Foo$Bar>
     const { addonName, componentName } = getComponentAndAddonName(rawComponentName);
 
-    const paths = this._provideLikelyRawComponentTemplatePaths(root, componentName, addonName);
+    const paths: string[] = [];
+
+    this.project.roots.forEach((root) => {
+      const localPaths = this._provideLikelyRawComponentTemplatePaths(root, componentName, addonName);
+
+      localPaths.forEach((p) => {
+        if (!paths.includes(p)) {
+          paths.push(p);
+        }
+      });
+    });
 
     return pathsToLocations(...(paths.length > 1 ? paths.filter((postfix: string) => isTemplatePath(postfix)) : paths));
   }
-  provideAngleBrackedComponentDefinition(root: string, focusPath: ASTPath) {
-    return this.provideLikelyComponentTemplatePath(root, (focusPath.node as ASTv1.ElementNode).tag);
+  provideAngleBrackedComponentDefinition(focusPath: ASTPath) {
+    return this.provideLikelyComponentTemplatePath((focusPath.node as ASTv1.ElementNode).tag);
   }
   provideBlockComponentDefinition(root: string, focusPath: ASTPath): Location[] {
     const maybeComponentName = ((focusPath.node as ASTv1.BlockStatement).path as ASTv1.PathExpression).original;
