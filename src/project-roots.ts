@@ -41,6 +41,15 @@ export class Project {
   initIssues: Error[] = [];
   files: Map<string, { version: number }> = new Map();
   podModulePrefix = '';
+  get roots() {
+    const mainRoot = this.root;
+    const otherRoots = this.addonsMeta.map((meta) => meta.root);
+    // because all registry searches based on "startsWith", we could omit roots in same namespace,
+    // like {root/a, root/b}, because we will get results of it from {root} itself
+    const differentRoots = otherRoots.filter((root) => !root.startsWith(mainRoot));
+
+    return [mainRoot, ...differentRoots];
+  }
   matchPathToType(filePath: string) {
     return this.classicMatcher.metaFromPath(filePath) || this.podMatcher.metaFromPath(filePath);
   }

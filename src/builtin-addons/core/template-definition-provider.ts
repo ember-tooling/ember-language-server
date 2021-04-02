@@ -39,7 +39,7 @@ function getComponentAndAddonName(rawComponentName: string) {
 export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component', name: string, root: string): string[] {
   const absRoot = path.normalize(root);
   const registry = getGlobalRegistry();
-  const bucket: any = registry[type].get(name) || new Set();
+  const bucket: Set<string> = registry[type].get(name) || new Set();
 
   return Array.from(bucket).filter((el: string) => path.normalize(el).includes(absRoot) && !isTestFile(path.normalize(el)) && fs.existsSync(el)) as string[];
 }
@@ -180,9 +180,6 @@ export default class TemplateDefinitionProvider {
   }
   provideRouteDefinition(root: string, routeName: string): Location[] {
     return provideRouteDefinition(root, routeName);
-  }
-  _provideComponentTemplatePaths(root: string, rawComponentName: string) {
-    return provideComponentTemplatePaths(root, rawComponentName);
   }
   _provideLikelyRawComponentTemplatePaths(root: string, rawComponentName: string, addonName: string) {
     const maybeComponentName = normalizeToClassicComponent(rawComponentName);
