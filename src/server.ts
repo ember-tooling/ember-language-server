@@ -81,8 +81,37 @@ export default class Server {
   getUsages(normalizedToken: string, resultType: MatchResultType): Usage[] {
     return findRelatedFiles(normalizedToken, resultType);
   }
-  getRegistry(rawRoot: string) {
-    return getRegistryForRoot(path.resolve(rawRoot));
+  getRegistry(rawRoot: string | string[]) {
+    if (Array.isArray(rawRoot)) {
+      const roots = rawRoot.slice(0);
+      const mainRegistry = getRegistryForRoot(roots.pop() as string);
+
+      roots.forEach((root) => {
+        const subRegistry = getRegistryForRoot(root);
+
+        Object.keys(subRegistry).forEach((keyName) => {
+          const collection: { [key: string]: string[] } = subRegistry[keyName as keyof typeof subRegistry];
+
+          Object.keys(collection).forEach((itemName) => {
+            if (!Array.isArray(mainRegistry[keyName as keyof typeof mainRegistry][itemName])) {
+              mainRegistry[keyName as keyof typeof mainRegistry][itemName] = [];
+            }
+
+            const rootRef = mainRegistry[keyName as keyof typeof mainRegistry][itemName];
+
+            collection[itemName].forEach((filePath) => {
+              if (!rootRef.includes(filePath)) {
+                rootRef.push(filePath);
+              }
+            });
+          });
+        });
+      });
+
+      return mainRegistry;
+    } else {
+      return getRegistryForRoot(rawRoot);
+    }
   }
 
   documentSymbolProviders: DocumentSymbolProvider[] = [new JSDocumentSymbolProvider(), new HBSDocumentSymbolProvider()];
