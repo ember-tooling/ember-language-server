@@ -20,7 +20,7 @@ import Server from './server';
 import { Diagnostic, FileChangeType } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { PodMatcher, ClassicPathMatcher } from './utils/path-matcher';
-export type Executor = (server: Server, command: string, args: any[]) => Promise<any>;
+export type Executor = (server: Server, command: string, args: unknown[]) => Promise<unknown>;
 export type Destructor = (project: Project) => void;
 export type Linter = (document: TextDocument) => Promise<Diagnostic[] | null>;
 export type Watcher = (uri: string, change: FileChangeType) => void;

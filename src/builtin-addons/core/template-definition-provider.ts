@@ -314,8 +314,8 @@ export default class TemplateDefinitionProvider {
   }
 
   provideComponentDefinition(root: string, maybeComponentName: string, addonName: string): Location[] {
-    const helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map((pathParts: any) => {
-      return path.join(...pathParts.filter((part: any) => !!part));
+    const helpers = getAbstractHelpersParts(root, 'app', maybeComponentName).map((pathParts: string[]) => {
+      return path.join(...pathParts.filter((part: string) => !!part));
     });
 
     let paths = [...getPathsForComponentScripts(root, maybeComponentName), ...getPathsForComponentTemplates(root, maybeComponentName), ...helpers].filter(

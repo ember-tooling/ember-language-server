@@ -57,7 +57,7 @@ export function pathsToLocationsWithPosition(paths: string[], findMe: string) {
   });
 }
 
-export function getAbstractHelpersParts(root: string, prefix: string, maybeComponentName: string) {
+export function getAbstractHelpersParts(root: string, prefix: string, maybeComponentName: string): string[][] {
   return [
     [root, prefix, 'helpers', `${maybeComponentName}.js`],
     [root, prefix, 'helpers', `${maybeComponentName}.ts`],

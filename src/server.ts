@@ -134,7 +134,7 @@ export default class Server {
       this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
     }
 
-    this.executors['els.setConfig'] = async (_, __, [config]) => {
+    this.executors['els.setConfig'] = async (_, __, [config]: [{ local: { addons: string[] } }]) => {
       this.projectRoots.setLocalAddons(config.local.addons);
 
       if (this.lazyInit) {
@@ -142,7 +142,7 @@ export default class Server {
       }
     };
 
-    this.executors['els.registerProjectPath'] = async (_, __, [projectPath]) => {
+    this.executors['els.registerProjectPath'] = async (_, __, [projectPath]: [string]) => {
       return this.projectRoots.onProjectAdd(projectPath);
     };
 
@@ -150,7 +150,7 @@ export default class Server {
       return this.runAddonLinters(document);
     };
 
-    this.executors['els.reloadProject'] = async (_, __, [projectPath]) => {
+    this.executors['els.reloadProject'] = async (_, __, [projectPath]: [string]) => {
       if (projectPath) {
         const project = this.projectRoots.projectForPath(projectPath);
 
@@ -212,7 +212,7 @@ export default class Server {
       return [];
     };
 
-    this.executors['els.getKindUsages'] = async (_, __, [filePath]) => {
+    this.executors['els.getKindUsages'] = async (_, __, [filePath]: [string]) => {
       const fullPath = path.resolve(filePath);
       const project = this.projectRoots.projectForPath(filePath);
 
@@ -439,7 +439,7 @@ export default class Server {
     return results;
   }
 
-  private async onDidChangeContent(change: TextDocumentChangeEvent<any>) {
+  private async onDidChangeContent(change: TextDocumentChangeEvent<TextDocument>) {
     // this.setStatusText('did-change');
 
     const lintResults = await this.templateLinter.lint(change.document);
