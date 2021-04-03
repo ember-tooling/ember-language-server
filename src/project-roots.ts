@@ -257,6 +257,7 @@ export default class ProjectRoots {
       return {
         initIssues: project.initIssues,
         providers: project.providers,
+        addonsMeta: project.addonsMeta,
         registry: this.server.getRegistry(project.root),
       };
     }
@@ -271,6 +272,7 @@ export default class ProjectRoots {
       return {
         initIssues: project.initIssues,
         providers: project.providers,
+        addonsMeta: project.addonsMeta,
         registry: this.server.getRegistry(project.root),
       };
     } catch (e) {
