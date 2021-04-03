@@ -56,6 +56,7 @@ export interface PackageInfo {
   dependencies?: UnknownConfig;
   'ember-addon'?: {
     version?: number;
+    paths?: string[];
     before?: string | string[];
     after?: string | string[];
   };
@@ -139,45 +140,74 @@ export function isELSAddonRoot(root: string) {
   return hasEmberLanguageServerExtension(pack);
 }
 
+function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
+  const packageData = getPackageJSON(root);
+  const emberAddonPaths: string[] = (packageData['ember-addon'] && packageData['ember-addon'].paths) || [];
+
+  if (roots.length) {
+    if (!isEmberAddon(packageData)) {
+      return [];
+    }
+  }
+
+  const recursiveRoots: string[] = roots.slice(0);
+
+  emberAddonPaths
+    .map((relativePath) => path.normalize(path.join(root, relativePath)))
+    .filter((packageRoot: string) => {
+      return isProjectAddonRoot(packageRoot);
+    })
+    .forEach((validRoot: string) => {
+      const packInfo = getPackageJSON(validRoot);
+
+      // we don't need to go deeper if package itself not an ember-addon or els-extension
+      if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
+        return;
+      }
+
+      if (!recursiveRoots.includes(validRoot)) {
+        recursiveRoots.push(validRoot);
+        getRecursiveInRepoAddonRoots(validRoot, recursiveRoots).forEach((relatedRoot: string) => {
+          if (!recursiveRoots.includes(relatedRoot)) {
+            recursiveRoots.push(relatedRoot);
+          }
+        });
+      }
+    });
+
+  return recursiveRoots.sort();
+}
+
 export function getProjectInRepoAddonsRoots(root: string) {
-  const prefix = isModuleUnificationApp(root) ? 'packages' : 'lib';
-  const addons = safeWalkSync(path.join(root, prefix), {
-    directories: true,
-    globs: ['**/package.json'],
-  });
-  const engineAddons = safeWalkSync(path.join(root, 'engines'), {
-    directories: true,
-    globs: ['**/package.json'],
-  });
   const roots: string[] = [];
 
-  addons
-    .map((relativePath: string) => {
-      return path.dirname(path.join(root, prefix, relativePath));
-    })
-    .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
-    .forEach((validRoot: string) => {
-      roots.push(validRoot);
-      getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
-        if (!roots.includes(relatedRoot)) {
-          roots.push(relatedRoot);
-        }
-      });
+  if (isModuleUnificationApp(root)) {
+    const prefix = 'packages';
+    const addons = safeWalkSync(path.join(root, prefix), {
+      directories: true,
+      globs: ['**/package.json'],
     });
 
-  engineAddons
-    .map((relativePath: string) => {
-      return path.dirname(path.join(root, 'engines', relativePath));
-    })
-    .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
-    .forEach((validRoot: string) => {
-      roots.push(validRoot);
-      getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
-        if (!roots.includes(relatedRoot)) {
-          roots.push(relatedRoot);
-        }
+    addons
+      .map((relativePath: string) => {
+        return path.dirname(path.join(root, prefix, relativePath));
+      })
+      .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
+      .forEach((validRoot: string) => {
+        roots.push(validRoot);
+        getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
+          if (!roots.includes(relatedRoot)) {
+            roots.push(relatedRoot);
+          }
+        });
       });
+  } else {
+    getRecursiveInRepoAddonRoots(root, []).forEach((resolvedRoot) => {
+      if (!roots.includes(resolvedRoot)) {
+        roots.push(resolvedRoot);
+      }
     });
+  }
 
   return roots;
 }

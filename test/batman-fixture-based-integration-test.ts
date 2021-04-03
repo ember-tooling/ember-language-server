@@ -45,6 +45,7 @@ describe('With `batman project` initialized on server', () => {
   });
 
   describe('Completion request', () => {
+    jest.setTimeout(15000);
     it('returns all angle-bracket in a element expression for in repo addons with batman syntax', async () => {
       const applicationTemplatePath = path.join(__dirname, 'fixtures', 'batman', 'app', 'templates', 'batman-completion.hbs');
       const params = {

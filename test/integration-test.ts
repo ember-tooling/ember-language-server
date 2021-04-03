@@ -148,6 +148,55 @@ describe('integration', function () {
 
       expect(result).toMatchSnapshot();
     });
+    it('go to definition from app to in repo addon', async () => {
+      const result = await getResult(
+        DefinitionRequest.method,
+        connection,
+        {
+          app: {
+            components: {
+              'hello.js': 'import Bar from "biz/components/bar"',
+              darling: {
+                'index.js': '',
+              },
+            },
+          },
+          lib: {
+            biz: {
+              addon: {
+                components: {
+                  'bar.js': '',
+                },
+              },
+              'package.json': JSON.stringify({
+                name: 'biz',
+                keywords: ['ember-addon'],
+                dependencies: {},
+              }),
+              'index.js': `/* eslint-env node */
+              'use strict';
+              
+              module.exports = {
+                name: 'biz',
+              
+                isDevelopingAddon() {
+                  return true;
+                }
+              };`,
+            },
+          },
+          'package.json': JSON.stringify({
+            'ember-addon': {
+              paths: ['lib/biz'],
+            },
+          }),
+        },
+        'app/components/hello.js',
+        { line: 0, character: 8 }
+      );
+
+      expect(result).toMatchSnapshot();
+    });
     it('go to local template-only component in module', async () => {
       const result = await getResult(
         DefinitionRequest.method,

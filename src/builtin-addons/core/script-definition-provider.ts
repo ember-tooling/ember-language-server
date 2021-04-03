@@ -184,7 +184,11 @@ export default class CoreScriptDefinitionProvider {
     } else if (isImportSpecifier(astPath)) {
       const pathName: string = ((astPath.parentFromLevel(2) as unknown) as any).source.value;
 
-      definitions = this.guessPathForImport(root, uri, pathName) || [];
+      server.projectRoots.projects.forEach((projectRoot) => {
+        const potentialPaths = this.guessPathForImport(projectRoot.root, uri, pathName) || [];
+
+        definitions = definitions.concat(potentialPaths);
+      });
     } else if (isServiceInjection(astPath)) {
       let serviceName = ((astPath.node as unknown) as t.Identifier).name;
       const args = astPath.parent.value.arguments;

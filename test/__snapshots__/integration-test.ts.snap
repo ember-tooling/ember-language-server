@@ -2203,6 +2203,39 @@ Object {
 }
 `;
 
+exports[`integration Go to definition works for all supported cases go to definition from app to in repo addon 1`] = `
+Object {
+  "registry": Object {
+    "component": Object {
+      "bar": Array [
+        "lib/biz/addon/components/bar.js",
+      ],
+      "darling": Array [
+        "app/components/darling/index.js",
+      ],
+      "hello": Array [
+        "app/components/hello.js",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/lib/biz/addon/components/bar.js",
+    },
+  ],
+}
+`;
+
 exports[`integration Go to definition works for all supported cases go to definition from handlebars template working if we have test for component 1`] = `
 Object {
   "registry": Object {
