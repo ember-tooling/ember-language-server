@@ -112,7 +112,7 @@ export default class TemplateCompletionProvider {
             return detail === 'component';
           })
         )
-        .map((item: any) => {
+        .map((item: CompletionItem) => {
           return Object.assign({}, item, {
             label: normalizeToAngleBracketComponent(item.label),
           });
@@ -262,7 +262,7 @@ export default class TemplateCompletionProvider {
           const existingTpls = tpls.filter(fs.existsSync);
 
           if (existingTpls.length) {
-            const existingAttributes = focusPath.parent.attributes.map((attr: any) => attr.name).filter((name: string) => isArgumentName(name));
+            const existingAttributes = focusPath.parent.attributes.map((attr: ASTv1.AttrNode) => attr.name).filter((name: string) => isArgumentName(name));
             const content = fs.readFileSync(existingTpls[0], 'utf8');
             const candidates = this.getLocalPathExpressionCandidates(root, tpls[0], content);
             const preResults: CompletionItem[] = [];

@@ -439,7 +439,7 @@ export default class Server {
     return results;
   }
 
-  private async onDidChangeContent(change: TextDocumentChangeEvent<any>) {
+  private async onDidChangeContent(change: TextDocumentChangeEvent<TextDocument>) {
     // this.setStatusText('did-change');
 
     const lintResults = await this.templateLinter.lint(change.document);

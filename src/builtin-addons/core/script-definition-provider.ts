@@ -153,13 +153,13 @@ export default class CoreScriptDefinitionProvider {
     let definitions: Location[] = results;
     const astPath = focusPath;
 
+    const project = server.projectRoots.projectForUri(uri);
+
+    if (!project) {
+      return results;
+    }
+
     if (isTemplateElement(astPath)) {
-      const project = server.projectRoots.projectForUri(uri);
-
-      if (!project) {
-        return results;
-      }
-
       const templateResults = await server.definitionProvider.template.handle(
         {
           textDocument,
@@ -182,10 +182,10 @@ export default class CoreScriptDefinitionProvider {
     } else if (isImportPathDeclaration(astPath)) {
       definitions = this.guessPathForImport(root, uri, ((astPath.node as unknown) as t.StringLiteral).value) || [];
     } else if (isImportSpecifier(astPath)) {
-      const pathName: string = ((astPath.parentFromLevel(2) as unknown) as any).source.value;
+      const pathName: string = ((astPath.parentFromLevel(2) as unknown) as t.ImportDeclaration).source.value;
 
-      server.projectRoots.projects.forEach((projectRoot) => {
-        const potentialPaths = this.guessPathForImport(projectRoot.root, uri, pathName) || [];
+      project.roots.forEach((projectRoot) => {
+        const potentialPaths = this.guessPathForImport(projectRoot, uri, pathName) || [];
 
         definitions = definitions.concat(potentialPaths);
       });
