@@ -52,6 +52,7 @@ import { getRegistryForRoot, addToRegistry, REGISTRY_KIND, normalizeMatchNaming 
 import { Usage, findRelatedFiles } from './utils/usages-api';
 import { URI } from 'vscode-uri';
 import { MatchResultType } from './utils/path-matcher';
+import { FileChangeType } from 'vscode-languageserver/node';
 
 export default class Server {
   initializers: any[] = [];
@@ -265,6 +266,7 @@ export default class Server {
     this.connection.onInitialize(this.onInitialize.bind(this));
     this.connection.onInitialized(this.onInitialized.bind(this));
     this.documents.onDidChangeContent(this.onDidChangeContent.bind(this));
+    this.documents.onDidOpen(this.onDidChangeContent.bind(this));
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
     this.connection.onDefinition(this.definitionProvider.handler);
@@ -456,6 +458,12 @@ export default class Server {
     addonResults.forEach((result) => {
       results.push(result);
     });
+
+    const project = this.projectRoots.projectForUri(change.document.uri);
+
+    if (project) {
+      project.trackChange(change.document.uri, FileChangeType.Changed);
+    }
 
     this.connection.sendDiagnostics({ uri: change.document.uri, diagnostics: results });
   }
