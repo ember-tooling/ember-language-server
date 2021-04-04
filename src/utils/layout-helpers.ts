@@ -127,6 +127,22 @@ export function resolvePackageRoot(root: string, addonName: string, packagesFold
   return false;
 }
 
+/**
+ * Returns true if file path starts with the given root path.
+ * There are cases where the root path might be
+ * 'foo/bar/biz' and 'foo/bar/biz-bar'. The startsWith/includes will always
+ * return true for both these roots. Hence having a stricter check will help
+ * @param rootPath root path
+ * @param filePath file path
+ * @returns boolean
+ */
+export function isRootStartingWithFilePath(rootPath: string, filePath: string) {
+  const filePathParts = normalizedPath(filePath).split('/');
+  const rootParts = normalizedPath(rootPath).split('/');
+
+  return rootParts.every((item: string, idx: number) => filePathParts[idx] === item);
+}
+
 export function isProjectAddonRoot(root: string) {
   const pack = getPackageJSON(root);
   const hasIndexJs = fs.existsSync(path.join(root, 'index.js'));

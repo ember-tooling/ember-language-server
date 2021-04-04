@@ -1,4 +1,5 @@
 import { filter } from 'fuzzaldrin';
+import { generateNamespacedComponentsHashMap } from '../../../src/builtin-addons/core/template-completion-provider';
 
 describe('filter util', function () {
   it('able to return some results if search term is empty', function () {
@@ -16,5 +17,39 @@ describe('filter util', function () {
         maxResults: 1,
       })
     ).toEqual([{ label: '1' }]);
+  });
+});
+
+describe('generateNamespacedComponentsHashMap', function () {
+  it('[Angle brackets] returns the expected namespaced map', function () {
+    const mockAddonMetaArr = [
+      { name: '@company/foo', root: 'blah/bar/dummy/@company/foo' },
+      { name: 'biz', root: 'blah/baz/diz/biz' },
+    ];
+
+    const server: any = {
+      getRegistry(root) {
+        return { component: { foo: ['blah/baz/diz/biz/components/foo.js'] } };
+      },
+    };
+
+    expect(generateNamespacedComponentsHashMap(mockAddonMetaArr, server, true)).toEqual({ Foo: ['Biz$Foo'] });
+
+    console.log('suchita doshi', generateNamespacedComponentsHashMap(mockAddonMetaArr, server, true));
+  });
+
+  it('[Mustache] returns the expected namespaced map', function () {
+    const mockAddonMetaArr = [
+      { name: '@company/test', root: 'blah/bar/dummy/@company/test' },
+      { name: 'biz', root: 'blah/baz/diz/biz' },
+    ];
+
+    const server: any = {
+      getRegistry(root) {
+        return { component: { foo: ['blah/bar/dummy/@company/test/components/foo.js'] } };
+      },
+    };
+
+    expect(generateNamespacedComponentsHashMap(mockAddonMetaArr, server, false)).toEqual({ foo: ['test$foo'] });
   });
 });

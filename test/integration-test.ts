@@ -1235,6 +1235,96 @@ describe('integration', function () {
       expect(result).toMatchSnapshot();
     });
 
+    it('support child project addon calling parent project addon', async () => {
+      const result = await getResult(
+        CompletionRequest.method,
+        connection,
+        {
+          'full-project': {
+            app: {
+              templates: {
+                'hello.hbs': '',
+              },
+            },
+            lib: {
+              biz: {
+                addon: {
+                  templates: {
+                    components: {
+                      'bar.hbs': '<Fo',
+                    },
+                  },
+                },
+                'package.json': JSON.stringify({
+                  name: 'biz',
+                  keywords: ['ember-addon'],
+                  dependencies: {},
+                  'ember-addon': {
+                    paths: ['../../../lib/foo'],
+                  },
+                }),
+                'index.js': `/* eslint-env node */
+                'use strict';
+                
+                module.exports = {
+                  name: 'biz',
+                
+                  isDevelopingAddon() {
+                    return true;
+                  }
+                };`,
+              },
+            },
+            'package.json': JSON.stringify({
+              dependencies: { 'ember-holy-futuristic-template-namespacing-batman': '^1.0.2' },
+              'ember-addon': {
+                paths: ['lib/biz'],
+              },
+            }),
+          },
+          lib: {
+            foo: {
+              addon: {
+                templates: {
+                  components: {
+                    'bar.hbs': '',
+                  },
+                },
+              },
+              app: {
+                components: {
+                  'bar.js': 'Class Foo{}',
+                },
+              },
+              'package.json': JSON.stringify({
+                name: 'foo',
+                keywords: ['ember-addon'],
+                dependencies: {},
+              }),
+              'index.js': `/* eslint-env node */
+              'use strict';
+              
+              module.exports = {
+                name: 'foo',
+              
+                isDevelopingAddon() {
+                  return true;
+                }
+              };`,
+            },
+          },
+          'package.json': JSON.stringify({
+            dependencies: { 'ember-holy-futuristic-template-namespacing-batman': '^1.0.2' },
+          }),
+        },
+        'lib/biz/addon/templates/components/bar.hbs',
+        { line: 0, character: 2 },
+        'full-project'
+      );
+
+      expect(result).toMatchSnapshot();
+    });
+
     it('support collocated components in mustache arguments', async () => {
       const result = await getResult(
         CompletionRequest.method,
