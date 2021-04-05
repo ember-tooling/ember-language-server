@@ -31,6 +31,7 @@ const emberCompletionItems: EmberCompletionItem[] = [
   new EmberCompletionItem('fn', HelperItem, ['MustachePath', 'SubExpressionPath'], '3.12.0'),
   new EmberCompletionItem('hash', HelperItem, ['SubExpressionPath']),
   new EmberCompletionItem('has-block', HelperItem, ['SubExpressionPath']),
+  new EmberCompletionItem('has-block-params', HelperItem, ['SubExpressionPath']),
   new EmberCompletionItem('if', HelperItem, ['BlockPath', 'MustachePath', 'SubExpressionPath']),
   new EmberCompletionItem('input', ComponentItem, ['MustachePath']),
   new EmberCompletionItem('link-to', ComponentItem, ['MustachePath']),

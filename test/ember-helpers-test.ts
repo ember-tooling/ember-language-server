@@ -10,7 +10,7 @@ describe('ember-helpers', function () {
   });
 
   it('should provide all subexpression helper', function () {
-    expect(emberSubExpressionItems).toHaveLength(13);
+    expect(emberSubExpressionItems).toHaveLength(14);
   });
 
   it('should provide all element-modifiers', function () {

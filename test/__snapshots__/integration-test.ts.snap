@@ -1404,6 +1404,27 @@ Array [
   Object {
     "detail": "Ember",
     "kind": 3,
+    "label": "has-block-params",
+    "textEdit": Object {
+      "newText": "has-block-params",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
     "label": "if",
     "textEdit": Object {
       "newText": "if",
@@ -1713,6 +1734,27 @@ Array [
     "label": "has-block",
     "textEdit": Object {
       "newText": "has-block",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "has-block-params",
+    "textEdit": Object {
+      "newText": "has-block-params",
       "range": Object {
         "end": Object {
           "character": 13,
