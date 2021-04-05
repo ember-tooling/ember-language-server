@@ -4,7 +4,7 @@ import { TextDocumentPositionParams, Definition, Location } from 'vscode-languag
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { toPosition } from './../estree-utils';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
-import { Project } from '../project-roots';
+import { Project } from '../project';
 
 export default class ScriptDefinitionProvider {
   constructor(private server: Server) {}

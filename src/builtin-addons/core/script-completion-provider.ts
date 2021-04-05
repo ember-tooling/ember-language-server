@@ -3,7 +3,7 @@ import { CompletionFunctionParams } from '../../utils/addon-api';
 import * as memoize from 'memoizee';
 import { log, logError, logInfo } from '../../utils/logger';
 import Server from '../../server';
-import { Project } from '../../project-roots';
+import { Project } from '../../project';
 import * as t from '@babel/types';
 import {
   isStoreModelLookup,

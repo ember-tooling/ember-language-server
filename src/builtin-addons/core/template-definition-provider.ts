@@ -21,7 +21,7 @@ import {
 import * as memoize from 'memoizee';
 import { URI } from 'vscode-uri';
 import { ASTv1 } from '@glimmer/syntax';
-import { Project } from '../../project-roots';
+import { Project } from '../../project';
 import Server from '../../server';
 
 const mAddonPathsForComponentTemplates = memoize(getAddonPathsForComponentTemplates, { length: 2, maxAge: 600000 });

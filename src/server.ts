@@ -37,7 +37,8 @@ import {
   TextDocumentChangeEvent,
 } from 'vscode-languageserver/node';
 
-import ProjectRoots, { Project, Executors } from './project-roots';
+import ProjectRoots from './project-roots';
+import { Project, Executors } from './project';
 import DefinitionProvider from './definition-providers/entry';
 import TemplateLinter from './template-linter';
 import DocumentSymbolProvider from './symbols/document-symbol-provider';
@@ -409,7 +410,7 @@ export default class Server {
         },
         completionProvider: {
           resolveProvider: true,
-          triggerCharacters: ['.', '::', '=', '/', '{{', '(', '<', '@', 'this.', '<:'],
+          triggerCharacters: ['.', '::', '$', '=', '/', '{{', '(', '<', '@', 'this.', '<:'],
         },
       },
     };

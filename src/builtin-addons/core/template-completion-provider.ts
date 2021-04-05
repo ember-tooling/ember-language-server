@@ -11,7 +11,7 @@ import { provideComponentTemplatePaths } from './template-definition-provider';
 import { log, logInfo, logError } from '../../utils/logger';
 import ASTPath, { getLocalScope } from '../../glimmer-utils';
 import Server from '../../server';
-import { Project } from '../../project-roots';
+import { Project } from '../../project';
 import {
   isLinkToTarget,
   isComponentArgumentName,

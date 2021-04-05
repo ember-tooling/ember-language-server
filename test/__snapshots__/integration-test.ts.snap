@@ -326,6 +326,8 @@ Object {
   "registry": Object {
     "component": Object {
       "bar": Array [
+        "../lib/foo/addon/templates/components/bar.hbs",
+        "../lib/foo/app/components/bar.js",
         "lib/biz/addon/templates/components/bar.hbs",
       ],
     },
@@ -2678,6 +2680,7 @@ Object {
       "triggerCharacters": Array [
         ".",
         "::",
+        "$",
         "=",
         "/",
         "{{",

@@ -1,7 +1,7 @@
 import { AddonAPI, CodeActionFunctionParams } from '../../../utils/addon-api';
 import { Command, CodeAction } from 'vscode-languageserver/node';
 import Server from '../../../server';
-import { Project } from '../../../project-roots';
+import { Project } from '../../../project';
 import { SourceLocation } from 'estree';
 import { getExtension } from '../../../utils/file-extension';
 import { searchAndExtractHbs } from '@lifeart/ember-extract-inline-templates';

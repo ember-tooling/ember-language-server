@@ -3,7 +3,7 @@ import * as walkSync from 'walk-sync';
 import * as fs from 'fs';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
-import { Project } from '../project-roots';
+import { Project } from '../project';
 import { addToRegistry, normalizeMatchNaming } from './registry-api';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];

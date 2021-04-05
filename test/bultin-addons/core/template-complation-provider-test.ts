@@ -34,8 +34,6 @@ describe('generateNamespacedComponentsHashMap', function () {
     };
 
     expect(generateNamespacedComponentsHashMap(mockAddonMetaArr, server, true)).toEqual({ Foo: ['Biz$Foo'] });
-
-    console.log('suchita doshi', generateNamespacedComponentsHashMap(mockAddonMetaArr, server, true));
   });
 
   it('[Mustache] returns the expected namespaced map', function () {

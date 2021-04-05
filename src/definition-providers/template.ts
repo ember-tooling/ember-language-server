@@ -6,7 +6,7 @@ import { toPosition } from './../estree-utils';
 import Server from './../server';
 import ASTPath from './../glimmer-utils';
 import { preprocess } from '@glimmer/syntax';
-import { Project } from '../project-roots';
+import { Project } from '../project';
 import { parseScriptFile } from 'ember-meta-explorer';
 export default class TemplateDefinitionProvider {
   constructor(private server: Server) {}
