@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/lifeart/ember-language-server/compare/v1.3.0...v1.4.0) (2021-04-05)
+
+
+### Features
+
+* add has block params into builtin helper, extended in-repo-addons support ([#224](https://github.com/lifeart/ember-language-server/issues/224)) ([acd71a0](https://github.com/lifeart/ember-language-server/commit/acd71a00a9e264e0e261b43e1b4afb7d138423cc))
+
 # [1.3.0](https://github.com/lifeart/ember-language-server/compare/v1.2.0...v1.3.0) (2021-04-01)
 
 
