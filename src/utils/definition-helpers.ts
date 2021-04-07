@@ -71,11 +71,14 @@ export function getAbstractParts(root: string, prefix: string, collection: strin
   ];
 }
 
-export function getAbstractPartsWithTemplates(root: string, prefix: string, collection: string, name: string) {
+export function getAbstractPartsWithTemplates(root: string, prefix: string, collection: string[]) {
+  const importParts = [...collection];
+  const name = importParts.pop();
+
   return [
-    [root, prefix, collection, `${name}.js`],
-    [root, prefix, collection, `${name}.ts`],
-    [root, prefix, collection, `${name}.hbs`],
+    [root, prefix, ...importParts, `${name}.js`],
+    [root, prefix, ...importParts, `${name}.ts`],
+    [root, prefix, ...importParts, `${name}.hbs`],
   ];
 }
 
@@ -173,9 +176,9 @@ export function getAddonImport(root: string, importPath: string) {
 
     const addonPaths: string[][] = [];
     const possibleLocations = [
-      [rootPath, 'app', ...importParts],
-      [rootPath, 'addon', ...importParts],
-      [rootPath, ...importParts],
+      [rootPath, 'app', importParts],
+      [rootPath, 'addon', importParts],
+      [rootPath, '', importParts],
     ];
 
     possibleLocations.forEach((locationArr: Parameters<typeof getAbstractPartsWithTemplates>) => {
