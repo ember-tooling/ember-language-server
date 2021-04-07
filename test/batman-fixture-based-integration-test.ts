@@ -1,7 +1,7 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import { URI } from 'vscode-uri';
-import { startServer, initServer, reloadProjects, openFile, normalizeUri } from './test_helpers/integration-helpers';
+import { startServer, initServer, reloadProjects, openFile, normalizeUri, fsProjectToJSON } from './test_helpers/integration-helpers';
 import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 
 import { CompletionRequest, DefinitionRequest } from 'vscode-languageserver-protocol/node';
@@ -88,6 +88,8 @@ describe('With `batman project` initialized on server', () => {
   describe('Definition request', () => {
     it('return proper component location from batman syntax component name', async () => {
       const base = path.join(__dirname, 'fixtures', 'batman');
+
+      fsProjectToJSON(base);
       const applicationTemplatePath = path.join(base, 'app', 'templates', 'batman-definition.hbs');
       const params = {
         textDocument: {
