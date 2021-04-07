@@ -16,6 +16,7 @@ import {
 import { normalizeServiceName } from '../../utils/normalizers';
 import { isModuleUnificationApp, podModulePrefixForRoot } from './../../utils/layout-helpers';
 import { provideRouteDefinition } from './template-definition-provider';
+import { logInfo } from '../../utils/logger';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 
@@ -182,6 +183,7 @@ export default class CoreScriptDefinitionProvider {
     } else if (isImportPathDeclaration(astPath)) {
       definitions = this.guessPathForImport(root, uri, ((astPath.node as unknown) as t.StringLiteral).value) || [];
     } else if (isImportSpecifier(astPath)) {
+      logInfo(`Handle script import for Project "${project.name}"`);
       const pathName: string = ((astPath.parentFromLevel(2) as unknown) as t.ImportDeclaration).source.value;
 
       project.roots.forEach((projectRoot) => {

@@ -108,6 +108,9 @@ export class Project {
   get packageJSON() {
     return getPackageJSON(this.root);
   }
+  get name() {
+    return this.packageJSON.name;
+  }
   constructor(public readonly root: string, addons: string[]) {
     this.providers = collectProjectProviders(root, addons);
     this.addonsMeta = this.providers.addonsMeta.filter((el) => el.root !== this.root);
