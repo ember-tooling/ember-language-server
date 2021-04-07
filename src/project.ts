@@ -1,7 +1,15 @@
 import { PodMatcher, ClassicPathMatcher } from './utils/path-matcher';
 import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem } from './utils/registry-api';
-import { ProjectProviders, collectProjectProviders, initBuiltinProviders, AddonMeta } from './utils/addon-api';
-import { getPodModulePrefix, findTestsForProject, findAddonItemsForProject, findAppItemsForProject, isRootStartingWithFilePath } from './utils/layout-helpers';
+import { ProjectProviders, collectProjectProviders, initBuiltinProviders, AddonMeta, DependencyMeta } from './utils/addon-api';
+import {
+  getPodModulePrefix,
+  findTestsForProject,
+  findAddonItemsForProject,
+  findAppItemsForProject,
+  isRootStartingWithFilePath,
+  getDepIfExists,
+  getPackageJSON,
+} from './utils/layout-helpers';
 import Server from './server';
 import { Diagnostic, FileChangeType } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -23,6 +31,7 @@ export class Project {
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
   addonsMeta: AddonMeta[] = [];
+  dependenciesMeta: DependencyMeta[] = [];
   executors: Executors = {};
   watchers: Watcher[] = [];
   destructors: Destructor[] = [];
@@ -96,9 +105,29 @@ export class Project {
   addWatcher(cb: Watcher) {
     this.watchers.push(cb);
   }
+  get packageJSON() {
+    return getPackageJSON(this.root);
+  }
   constructor(public readonly root: string, addons: string[]) {
     this.providers = collectProjectProviders(root, addons);
     this.addonsMeta = this.providers.addonsMeta.filter((el) => el.root !== this.root);
+
+    // for now, let's collect only interesting deps
+    const interestingDeps = ['ember-cli', 'ember-source', 'ember-template-lint', 'typescript', '@embroider/core'];
+
+    const pkg = this.packageJSON;
+
+    interestingDeps.forEach((dep) => {
+      const version = getDepIfExists(pkg, dep);
+
+      if (version !== null) {
+        this.dependenciesMeta.push({
+          name: dep,
+          version,
+        });
+      }
+    });
+
     this.builtinProviders = initBuiltinProviders();
     const maybePrefix = getPodModulePrefix(root);
 

@@ -5,6 +5,7 @@ import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { Project } from '../project';
 import { addToRegistry, normalizeMatchNaming } from './registry-api';
+import { clean, coerce, valid } from 'semver';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 
@@ -46,14 +47,15 @@ export const isAddonRoot = memoize(isProjectAddonRoot, {
 });
 
 type UnknownConfig = Record<string, unknown>;
+type StringConfig = Record<string, string>;
 
 export interface PackageInfo {
   keywords?: string[];
   name?: string;
   'ember-language-server'?: UnknownConfig;
-  peerDependencies?: UnknownConfig;
-  devDependencies?: UnknownConfig;
-  dependencies?: UnknownConfig;
+  peerDependencies?: StringConfig;
+  devDependencies?: StringConfig;
+  dependencies?: StringConfig;
   'ember-addon'?: {
     version?: number;
     paths?: string[];
@@ -283,7 +285,7 @@ export function listGlimmerNativeComponents(root: string) {
   }
 }
 
-function hasDep(pack: any, depName: string) {
+function hasDep(pack: PackageInfo, depName: string) {
   if (pack.dependencies && pack.dependencies[depName]) {
     return true;
   }
@@ -297,6 +299,18 @@ function hasDep(pack: any, depName: string) {
   }
 
   return false;
+}
+
+export function getDepIfExists(pack: PackageInfo, depName: string): string | null {
+  if (!hasDep(pack, depName)) {
+    return null;
+  }
+
+  const version: string = pack?.dependencies?.[depName] ?? pack?.devDependencies?.[depName] ?? pack?.peerDependencies?.[depName] ?? '';
+
+  const cleanVersion = clean(version);
+
+  return valid(coerce(cleanVersion));
 }
 
 export function isGlimmerNativeProject(root: string) {

@@ -320,6 +320,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
 }
 
 export type AddonMeta = { root: string; name: string };
+export type DependencyMeta = { name: string; version: string };
 export interface ProjectProviders {
   definitionProviders: DefinitionResolveFunction[];
   referencesProviders: ReferenceResolveFunction[];
