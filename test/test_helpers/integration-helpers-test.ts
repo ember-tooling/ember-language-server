@@ -42,6 +42,30 @@ describe('normalizeToFs', () => {
 
     expect(normalizeToFs(files)).toStrictEqual(expectedObj);
   });
+
+  it('support corner case', () => {
+    const files = {
+      'full-project/app/components': {
+        'foo.hbs': '',
+        'bar.hbs': '',
+      },
+      'full-project/package.json': '',
+    };
+
+    const expectedObj = {
+      'full-project': {
+        'package.json': '',
+        app: {
+          components: {
+            'foo.hbs': '',
+            'bar.hbs': '',
+          },
+        },
+      },
+    };
+
+    expect(normalizeToFs(files)).toStrictEqual(expectedObj);
+  });
 });
 
 describe('flattenFsProject', () => {

@@ -5,7 +5,7 @@ import { createTempDir } from 'broccoli-test-helper';
 import { URI } from 'vscode-uri';
 import { MessageConnection } from 'vscode-jsonrpc/node';
 import * as spawn from 'cross-spawn';
-import { set } from 'lodash';
+import { set, merge, get } from 'lodash';
 
 import {
   DidOpenTextDocumentNotification,
@@ -124,14 +124,32 @@ export function normalizeToFs(files: RecursiveRecord<string | RecursiveRecord<st
       const fileName = parts.pop();
 
       if (parts.length) {
-        set(newShape, parts.join('.'), {
+        const valueToMerge = {
           [fileName]: value,
-        });
+        };
+        const valuePath = parts.join('.');
+        const existingValueOnPath = get(newShape, valuePath, {});
+
+        set(newShape, valuePath, merge(existingValueOnPath, valueToMerge));
       } else {
         newShape[fileName] = value;
       }
     } else {
-      set(newShape, parts.join('.'), value);
+      let entry = newShape;
+
+      parts.forEach((p, index) => {
+        const isLast = index === parts.length - 1;
+
+        if (!(p in entry)) {
+          entry[p] = {};
+        }
+
+        if (isLast) {
+          merge(entry[p], value);
+        } else {
+          entry = entry[p];
+        }
+      });
     }
   });
 
@@ -142,7 +160,7 @@ export async function createProject(
   files,
   connection: MessageConnection,
   projectName?: string
-): Promise<{ normalizedPath: string; result: UnknownResult; destroy(): void }> {
+): Promise<{ normalizedPath: string; originalPath: string; result: UnknownResult; destroy(): void }> {
   const dir = await createTempDir();
 
   dir.write(normalizeToFs(files));
@@ -159,6 +177,7 @@ export async function createProject(
 
   return {
     normalizedPath,
+    originalPath: path.normalize(dir.path()),
     result,
     destroy: async () => {
       await dir.dispose();
@@ -178,8 +197,13 @@ export function textDocument(modelPath, position = { line: 0, character: 0 }) {
 }
 
 export async function getResult(reqType, connection: MessageConnection, files, fileToInspect, position, projectName?: string) {
-  const { normalizedPath, destroy, result } = await createProject(files, connection, projectName);
-  const modelPath = path.join(normalizedPath, fileToInspect);
+  const { normalizedPath, originalPath, destroy, result } = await createProject(files, connection, projectName);
+  const modelPath = path.join(originalPath, fileToInspect);
+
+  if (!fs.existsSync(modelPath)) {
+    throw new Error(`Unabe to find file path to inspect in file system. - ${fileToInspect}`);
+  }
+
   const params = textDocument(modelPath, position);
 
   openFile(connection, modelPath);

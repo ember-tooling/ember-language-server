@@ -1372,7 +1372,7 @@ describe('integration', function () {
             dependencies: { 'ember-holy-futuristic-template-namespacing-batman': '^1.0.2' },
           }),
         },
-        'lib/biz/addon/templates/components/bar.hbs',
+        'full-project/lib/biz/addon/templates/components/bar.hbs',
         { line: 0, character: 2 },
         'full-project'
       );
@@ -1486,6 +1486,35 @@ describe('integration', function () {
     );
 
     expect(result.response).toMatchSnapshot();
+  });
+
+  describe('Project class resolution, based on fs path and file structure', () => {
+    it('able to resolve main project if top-level addon is registered', async () => {
+      const files = {
+        'full-project/app/components': {
+          'foo.hbs': '',
+          'bar.hbs': '',
+        },
+        'full-project/package.json': JSON.stringify({
+          name: 'full-project',
+          'ember-addon': {
+            paths: ['../lib'],
+          },
+        }),
+        lib: {
+          'package.json': JSON.stringify({
+            name: 'my-addon',
+            keywords: ['ember-addon'],
+          }),
+          'index.js': '',
+          'addon/components/item.hbs': '<',
+        },
+      };
+
+      const result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', { line: 0, character: 1 }, 'full-project');
+
+      expect(result.response.length).toBe(3);
+    });
   });
 
   describe('Autocomplete works for broken templates', () => {
