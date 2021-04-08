@@ -147,7 +147,7 @@ export default class ProjectRoots {
     });
 
     const rawRoot = projectRoots
-      .filter((root) => isRootStartingWithFilePath(filePath, root))
+      .filter((root) => isRootStartingWithFilePath(root, filePath))
       .reduce((a, b) => {
         return a.length > b.length ? a : b;
       }, '');
