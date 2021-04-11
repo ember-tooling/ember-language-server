@@ -156,33 +156,71 @@ export function normalizeToFs(files: RecursiveRecord<string | RecursiveRecord<st
   return newShape;
 }
 
-export async function createProject(
-  files,
-  connection: MessageConnection,
-  projectName?: string
-): Promise<{ normalizedPath: string; originalPath: string; result: UnknownResult; destroy(): void }> {
-  const dir = await createTempDir();
-
-  dir.write(normalizeToFs(files));
-  const normalizedPath = projectName ? path.normalize(path.join(dir.path(), projectName)) : path.normalize(dir.path());
-
+async function _buildResult(connection: MessageConnection, normalizedPath: string) {
   const params = {
     command: 'els.registerProjectPath',
     arguments: [normalizedPath],
   };
 
-  const result = (await connection.sendRequest(ExecuteCommandRequest.type, params)) as {
+  return (await connection.sendRequest(ExecuteCommandRequest.type, params)) as {
     registry: Registry;
   };
+}
 
-  return {
-    normalizedPath,
-    originalPath: path.normalize(dir.path()),
-    result,
-    destroy: async () => {
-      await dir.dispose();
-    },
-  };
+export async function createProject(
+  files,
+  connection: MessageConnection,
+  projectName?: string | string[],
+  config?: { local: { addons: string[]; ignoredProjects: string[] } }
+): Promise<{ normalizedPath: string | string[]; originalPath: string; result: UnknownResult | UnknownResult[]; destroy(): void }> {
+  const dir = await createTempDir();
+
+  dir.write(normalizeToFs(files));
+
+  if (config && Array.isArray(config.local.ignoredProjects)) {
+    const ignoredProjects = config.local.ignoredProjects;
+
+    const configParams = {
+      command: 'els.setConfig',
+      arguments: [{ local: { addons: [], ignoredProjects: ignoredProjects } }],
+    };
+
+    await connection.sendRequest(ExecuteCommandRequest.type, configParams);
+  }
+
+  if (Array.isArray(projectName)) {
+    const resultsArr = [];
+    const normalizedPaths = [];
+
+    for (let i = 0; i < projectName.length; i++) {
+      const currProject = projectName[i];
+      const normalizedPath = currProject ? path.normalize(path.join(dir.path(), currProject)) : path.normalize(dir.path());
+
+      normalizedPaths.push(normalizedPath);
+      resultsArr.push(await _buildResult(connection, normalizedPath));
+    }
+
+    return {
+      normalizedPath: normalizedPaths,
+      originalPath: path.normalize(dir.path()),
+      result: resultsArr,
+      destroy: async () => {
+        await dir.dispose();
+      },
+    };
+  } else {
+    const normalizedPath = projectName ? path.normalize(path.join(dir.path(), projectName)) : path.normalize(dir.path());
+    const result = await _buildResult(connection, normalizedPath);
+
+    return {
+      normalizedPath,
+      originalPath: path.normalize(dir.path()),
+      result,
+      destroy: async () => {
+        await dir.dispose();
+      },
+    };
+  }
 }
 
 export function textDocument(modelPath, position = { line: 0, character: 0 }) {
@@ -196,8 +234,24 @@ export function textDocument(modelPath, position = { line: 0, character: 0 }) {
   return params;
 }
 
-export async function getResult(reqType, connection: MessageConnection, files, fileToInspect, position, projectName?: string) {
-  const { normalizedPath, originalPath, destroy, result } = await createProject(files, connection, projectName);
+function _buildResponse(response: unknown, normalizedPath: string, result: UnknownResult) {
+  return {
+    response: normalizeUri(response, normalizedPath),
+    registry: normalizeRegistry(normalizedPath, result.registry as Registry),
+    addonsMeta: normalizeAddonsMeta(normalizedPath, result.addonsMeta as { name: string; root: string }[]),
+  };
+}
+
+export async function getResult(
+  reqType,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position,
+  projectName?: string | string[],
+  config?: { local: { addons: string[]; ignoredProjects: string[] } }
+) {
+  const { normalizedPath, originalPath, destroy, result } = await createProject(files, connection, projectName, config);
   const modelPath = path.join(originalPath, fileToInspect);
 
   if (!fs.existsSync(modelPath)) {
@@ -211,11 +265,17 @@ export async function getResult(reqType, connection: MessageConnection, files, f
 
   await destroy();
 
-  return {
-    response: normalizeUri(response, normalizedPath),
-    registry: normalizeRegistry(normalizedPath, result.registry as Registry),
-    addonsMeta: normalizeAddonsMeta(normalizedPath, result.addonsMeta as { name: string; root: string }[]),
-  };
+  if (Array.isArray(projectName)) {
+    const resultsArr = [];
+
+    for (let i = 0; i < projectName.length; i++) {
+      resultsArr.push(_buildResponse(response, normalizedPath[i], result[i]));
+    }
+
+    return resultsArr;
+  }
+
+  return _buildResponse(response, normalizedPath as string, result as UnknownResult);
 }
 
 export function openFile(connection: MessageConnection, filePath: string) {

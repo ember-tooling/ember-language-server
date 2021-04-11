@@ -1515,6 +1515,82 @@ describe('integration', function () {
 
       expect(result.response.length).toBe(3);
     });
+
+    it('without ignoring main project returns one only top level result', async () => {
+      const files = {
+        'child-project/app/components': {
+          'foo.hbs': '',
+          'bar.hbs': '',
+        },
+        'child-project/package.json': JSON.stringify({
+          name: 'child-project',
+          'ember-addon': {
+            paths: ['../lib'],
+          },
+        }),
+        lib: {
+          'package.json': JSON.stringify({
+            name: 'my-addon',
+            keywords: ['ember-addon'],
+          }),
+          'index.js': '',
+          'addon/components/item.hbs': '<',
+        },
+        'package.json': JSON.stringify({
+          name: 'parent-project',
+          'ember-addon': {
+            paths: ['lib'],
+          },
+        }),
+      };
+
+      const result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', { line: 0, character: 1 }, [
+        '',
+        'child-project',
+      ]);
+
+      expect(result.length).toBe(2);
+      expect(result[0].response.length).toBe(1);
+    });
+
+    it('able to ignore main project in favor of child project', async () => {
+      const files = {
+        'child-project/app/components': {
+          'foo.hbs': '',
+          'bar.hbs': '',
+        },
+        'child-project/package.json': JSON.stringify({
+          name: 'child-project',
+          'ember-addon': {
+            paths: ['../lib'],
+          },
+        }),
+        lib: {
+          'package.json': JSON.stringify({
+            name: 'my-addon',
+            keywords: ['ember-addon'],
+          }),
+          'index.js': '',
+          'addon/components/item.hbs': '<',
+        },
+        'package.json': JSON.stringify({
+          name: 'parent-project',
+        }),
+      };
+
+      const result = await getResult(
+        CompletionRequest.method,
+        connection,
+        files,
+        'lib/addon/components/item.hbs',
+        { line: 0, character: 1 },
+        ['', 'child-project'],
+        { local: { addons: [], ignoredProjects: ['parent-project'] } }
+      );
+
+      expect(result.length).toBe(2);
+      expect(result[0].response.length).toBe(3);
+    });
   });
 
   describe('Autocomplete works for broken templates', () => {

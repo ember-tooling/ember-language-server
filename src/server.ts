@@ -136,8 +136,9 @@ export default class Server {
       this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
     }
 
-    this.executors['els.setConfig'] = async (_, __, [config]: [{ local: { addons: string[] } }]) => {
+    this.executors['els.setConfig'] = async (_, __, [config]: [{ local: { addons: string[]; ignoredProjects: string[] } }]) => {
       this.projectRoots.setLocalAddons(config.local.addons);
+      this.projectRoots.setIgnoredProjects(config.local.ignoredProjects);
 
       if (this.lazyInit) {
         this.executeInitializers();

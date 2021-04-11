@@ -18,6 +18,7 @@ export default class ProjectRoots {
   projects = new Map<string, Project>();
 
   localAddons: string[] = [];
+  ignoredProjects: string[] = [];
 
   reloadProjects() {
     Array.from(this.projects).forEach(([root]) => {
@@ -50,6 +51,10 @@ export default class ProjectRoots {
         }
       }
     });
+  }
+
+  setIgnoredProjects(ignoredProjects: string[]) {
+    this.ignoredProjects = ignoredProjects;
   }
 
   findProjectsInsideRoot(workspaceRoot: string) {
@@ -138,13 +143,21 @@ export default class ProjectRoots {
     */
     const rootMap: { [key: string]: string } = {};
 
-    const projectRoots = (Array.from(this.projects.keys()) || []).map((root) => {
-      const lowerName = root.toLowerCase();
+    const projectRoots = (Array.from(this.projects.keys()) || [])
+      .map((root) => {
+        const projectName = this.projects.get(root)?.name;
 
-      rootMap[lowerName] = root;
+        if (projectName && this.ignoredProjects.includes(projectName)) {
+          return;
+        }
 
-      return lowerName;
-    });
+        const lowerName = root.toLowerCase();
+
+        rootMap[lowerName] = root;
+
+        return lowerName;
+      })
+      .filter((item) => item !== undefined) as string[];
 
     const rawRoot = projectRoots
       .filter((root) => isRootStartingWithFilePath(root, filePath))
@@ -167,9 +180,9 @@ export default class ProjectRoots {
         ====================
         it's safe to do, because root will be non empty if addon already registered as Project
       */
-      const fistSubRoot = Array.from(this.projects.values()).find((project) => {
-        return project.roots.some((subRoot) => isRootStartingWithFilePath(subRoot.toLocaleLowerCase(), filePath));
-      });
+      const fistSubRoot = Array.from(this.projects.values())
+        .filter((project) => project.name && !this.ignoredProjects.includes(project.name))
+        .find((project) => project.roots.some((subRoot) => isRootStartingWithFilePath(subRoot.toLocaleLowerCase(), filePath)));
 
       if (fistSubRoot) {
         return fistSubRoot;
