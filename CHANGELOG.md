@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/lifeart/ember-language-server/compare/v1.4.0...v1.5.0) (2021-04-11)
+
+
+### Features
+
+* ability to ignore LS initialization on unneeded projects ([#242](https://github.com/lifeart/ember-language-server/issues/242)) ([fc5acf4](https://github.com/lifeart/ember-language-server/commit/fc5acf436d8db679aa2790fec6426f9fdab3ee81))
+
 # [1.4.0](https://github.com/lifeart/ember-language-server/compare/v1.3.0...v1.4.0) (2021-04-05)
 
 
