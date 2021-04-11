@@ -27,6 +27,7 @@ All features currently only work in Ember CLI application that use the default c
 - Diagnostics for `ember-template-lint` (if it is included in a project)
 - `ember-template-lint` template fixes support (if exists).
 - Workspaces support
+- Supports Ignoring of LS initialization on unneeded projects by using `ignoredProjects` config option
 
 ## Editor Plugins
 
