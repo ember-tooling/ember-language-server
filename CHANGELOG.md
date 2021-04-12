@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/lifeart/ember-language-server/compare/v1.5.0...v1.6.0) (2021-04-12)
+
+
+### Features
+
+* Support jump to definition from parent to child app and tests ([#234](https://github.com/lifeart/ember-language-server/issues/234)) ([24f33e5](https://github.com/lifeart/ember-language-server/commit/24f33e5b7bb2fa1b0c918af3e1ce0b2ca683f12f))
+
 # [1.5.0](https://github.com/lifeart/ember-language-server/compare/v1.4.0...v1.5.0) (2021-04-11)
 
 
