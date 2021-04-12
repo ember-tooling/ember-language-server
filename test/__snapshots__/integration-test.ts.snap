@@ -2798,6 +2798,54 @@ Object {
 }
 `;
 
+exports[`integration Project class resolution, based on fs path and file structure support parent project addon calling child project 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "biz",
+      "root": "lib/biz",
+    },
+    Object {
+      "name": "foo",
+      "root": "../lib/foo",
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "bar": Array [
+        "../lib/foo/addon/components/bar.js",
+        "lib/biz/addon/components/bar.js",
+      ],
+    },
+    "helper": Object {
+      "blah": Array [
+        "tests/helpers/blah.js",
+      ],
+    },
+    "routePath": Object {
+      "hello": Array [
+        "app/templates/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/tests/helpers/blah.js",
+    },
+  ],
+}
+`;
+
 exports[`integration autocomplete works for angle component slots 1`] = `
 Array [
   Object {

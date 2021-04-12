@@ -76,6 +76,11 @@ class PathResolvers {
 
     return joinPaths(...appParams);
   }
+
+  resolveTestScopeImport(root: string, pathName: string) {
+    return joinPaths(path.join(root, pathName));
+  }
+
   muImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
 
@@ -185,12 +190,30 @@ export default class CoreScriptDefinitionProvider {
     } else if (isImportSpecifier(astPath)) {
       logInfo(`Handle script import for Project "${project.name}"`);
       const pathName: string = ((astPath.parentFromLevel(2) as unknown) as t.ImportDeclaration).source.value;
+      const pathParts = pathName.split('/');
+      let maybeAppName = pathParts.shift();
 
-      project.roots.forEach((projectRoot) => {
-        const potentialPaths = this.guessPathForImport(projectRoot, uri, pathName) || [];
+      if (maybeAppName && maybeAppName.startsWith('@')) {
+        maybeAppName = maybeAppName + '/' + pathParts.shift();
+      }
 
-        definitions = definitions.concat(potentialPaths);
-      });
+      let potentialPaths: Location[];
+      const addonInfo = project.addonsMeta.find(({ name }) => pathName.startsWith(name + '/tests'));
+
+      // If the start of the pathname is same as the project name, then use that as the root.
+      if (project.name === maybeAppName && pathName.startsWith(project.name + '/tests')) {
+        const importPaths = this.resolvers.resolveTestScopeImport(project.root, pathParts.join(path.sep));
+
+        potentialPaths = pathsToLocations(...importPaths);
+      } else if (addonInfo) {
+        const importPaths = this.resolvers.resolveTestScopeImport(addonInfo.root, pathName);
+
+        potentialPaths = pathsToLocations(...importPaths);
+      } else {
+        potentialPaths = this.guessPathForImport(project.root, uri, pathName) || [];
+      }
+
+      definitions = definitions.concat(potentialPaths);
     } else if (isServiceInjection(astPath)) {
       let serviceName = ((astPath.node as unknown) as t.Identifier).name;
       const args = astPath.parent.value.arguments;

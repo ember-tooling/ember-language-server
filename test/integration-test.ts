@@ -1591,6 +1591,58 @@ describe('integration', function () {
       expect(result.length).toBe(2);
       expect(result[0].response.length).toBe(3);
     });
+
+    it('support parent project addon calling child project', async () => {
+      const result = await getResult(
+        DefinitionRequest.method,
+        connection,
+        {
+          'full-project': {
+            'app/templates/hello.hbs': '',
+            'tests/helpers/blah.js': '',
+            lib: {
+              biz: {
+                'addon/components/bar.js': '',
+                'package.json': JSON.stringify({
+                  name: 'biz',
+                  keywords: ['ember-addon'],
+                  dependencies: {},
+                  'ember-addon': {
+                    paths: ['../../../lib/foo'],
+                  },
+                }),
+                'index.js': '',
+              },
+            },
+            'package.json': JSON.stringify({
+              name: 'full-project',
+              dependencies: { 'ember-holy-futuristic-template-namespacing-batman': '^1.0.2' },
+              'ember-addon': {
+                paths: ['lib/biz'],
+              },
+            }),
+          },
+          lib: {
+            foo: {
+              addon: {
+                'components/bar.js': 'import Blah from "full-project/tests/helpers/blah"',
+              },
+              'package.json': JSON.stringify({
+                name: 'foo',
+                keywords: ['ember-addon'],
+                dependencies: {},
+              }),
+              'index.js': '',
+            },
+          },
+        },
+        'lib/foo/addon/components/bar.js',
+        { line: 0, character: 8 },
+        'full-project'
+      );
+
+      expect(result).toMatchSnapshot();
+    });
   });
 
   describe('Autocomplete works for broken templates', () => {
