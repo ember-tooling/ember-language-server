@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/lifeart/ember-language-server/compare/v1.7.0...v1.7.1) (2021-04-14)
+
+
+### Bug Fixes
+
+* update debounce implementation ([#250](https://github.com/lifeart/ember-language-server/issues/250)) ([4675e19](https://github.com/lifeart/ember-language-server/commit/4675e19fff57c5ac862c8ae50fb7c0bf7dc5f1fd))
+
 # [1.7.0](https://github.com/lifeart/ember-language-server/compare/v1.6.0...v1.7.0) (2021-04-14)
 
 
