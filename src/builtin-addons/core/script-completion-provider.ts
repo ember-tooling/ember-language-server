@@ -1,4 +1,4 @@
-import { CompletionItem } from 'vscode-languageserver/node';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { CompletionFunctionParams } from '../../utils/addon-api';
 import * as memoize from 'memoizee';
 import { log, logError, logInfo } from '../../utils/logger';
@@ -22,13 +22,32 @@ const mListServices = memoize(listServices, { length: 1, maxAge: 60000 });
 const mListTransforms = memoize(listTransforms, { length: 1, maxAge: 60000 });
 
 export default class ScriptCompletionProvider {
+  meta: { [key: string]: boolean } = {
+    modelsRegistryInitialized: false,
+    routesRegistryInitialized: false,
+    servicesRegistryInitialized: false,
+    projectAddonsInfoInitialized: false,
+    transformsRegistryInitialized: false,
+  };
+  server!: Server;
+  project!: Project;
+  enableRegistryCache(value: string) {
+    if (this.server.flags.hasExternalFileWatcher) {
+      this.meta[value] = true;
+    }
+  }
   async initRegistry(_: Server, project: Project) {
+    this.project = project;
+    this.server = _;
+
     if (project.flags.enableEagerRegistryInitialization) {
       try {
         const initStartTime = Date.now();
 
         mListModels(project.root);
+        this.enableRegistryCache('modelsRegistryInitialized');
         mListServices(project.root);
+        this.enableRegistryCache('servicesRegistryInitialized');
         logInfo(project.root + ': script registry initialized in ' + (Date.now() - initStartTime) + 'ms');
       } catch (e) {
         logError(e);
@@ -50,33 +69,69 @@ export default class ScriptCompletionProvider {
     try {
       if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
         log('isStoreModelLookup || isModelReference');
-        mListModels(root).forEach((model: CompletionItem) => {
-          completions.push(model);
-        });
-        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
-          if (item.detail === 'model') {
-            completions.push(item);
-          }
+
+        if (!this.meta.modelsRegistryInitialized) {
+          mListModels(root);
+          this.enableRegistryCache('modelsRegistryInitialized');
+        }
+
+        if (!this.meta.projectAddonsInfoInitialized) {
+          mGetProjectAddonsInfo(root);
+          this.enableRegistryCache('projectAddonsInfoInitialized');
+        }
+
+        const registry = this.server.getRegistry(this.project.roots);
+
+        Object.keys(registry.model).forEach((rawModelName) => {
+          completions.push({
+            kind: CompletionItemKind.Class,
+            detail: 'model',
+            label: rawModelName,
+          });
         });
       } else if (isRouteLookup(focusPath)) {
         log('isRouteLookup');
-        mListRoutes(root).forEach((model: CompletionItem) => {
-          completions.push(model);
-        });
-        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
-          if (item.detail === 'route') {
-            completions.push(item);
-          }
+
+        if (!this.meta.routesRegistryInitialized) {
+          mListRoutes(root);
+          this.enableRegistryCache('routesRegistryInitialized');
+        }
+
+        if (!this.meta.projectAddonsInfoInitialized) {
+          mGetProjectAddonsInfo(root);
+          this.enableRegistryCache('projectAddonsInfoInitialized');
+        }
+
+        const registry = this.server.getRegistry(this.project.roots);
+
+        Object.keys(registry.routePath).forEach((rawRouteName) => {
+          completions.push({
+            kind: CompletionItemKind.File,
+            detail: 'route',
+            label: rawRouteName,
+          });
         });
       } else if (isNamedServiceInjection(focusPath)) {
         log('isNamedServiceInjection');
-        mListServices(root).forEach((model: CompletionItem) => {
-          completions.push(model);
-        });
-        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
-          if (item.detail === 'service') {
-            completions.push(item);
-          }
+
+        if (!this.meta.servicesRegistryInitialized) {
+          mListServices(root);
+          this.enableRegistryCache('servicesRegistryInitialized');
+        }
+
+        if (!this.meta.projectAddonsInfoInitialized) {
+          mGetProjectAddonsInfo(root);
+          this.enableRegistryCache('projectAddonsInfoInitialized');
+        }
+
+        const registry = this.server.getRegistry(this.project.roots);
+
+        Object.keys(registry.service).forEach((rawServiceName) => {
+          completions.push({
+            kind: CompletionItemKind.Class,
+            detail: 'service',
+            label: rawServiceName,
+          });
         });
       } else if (isComputedPropertyArgument(focusPath)) {
         log('isComputedPropertyArgument');
@@ -112,13 +167,25 @@ export default class ScriptCompletionProvider {
         });
       } else if (isTransformReference(focusPath)) {
         log('isTransformReference');
-        mListTransforms(root).forEach((model: CompletionItem) => {
-          completions.push(model);
-        });
-        mGetProjectAddonsInfo(root).filter((item: CompletionItem) => {
-          if (item.detail === 'transform') {
-            completions.push(item);
-          }
+
+        if (!this.meta.transformsRegistryInitialized) {
+          mListTransforms(root);
+          this.enableRegistryCache('transformsRegistryInitialized');
+        }
+
+        if (!this.meta.projectAddonsInfoInitialized) {
+          mGetProjectAddonsInfo(root);
+          this.enableRegistryCache('projectAddonsInfoInitialized');
+        }
+
+        const registry = this.server.getRegistry(this.project.roots);
+
+        Object.keys(registry.transform).forEach((rawTransformName) => {
+          completions.push({
+            kind: CompletionItemKind.Function,
+            detail: 'transform',
+            label: rawTransformName,
+          });
         });
       }
     } catch (e) {

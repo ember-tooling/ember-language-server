@@ -262,7 +262,7 @@ export default class Server {
       return null;
     }
   }
-  private clientCapabilities!: ClientCapabilities;
+  clientCapabilities!: ClientCapabilities;
   constructor() {
     // Make the text document manager listen on the connection
     // for open, change and close text document events
@@ -346,6 +346,9 @@ export default class Server {
       });
     }
   }
+  flags = {
+    hasExternalFileWatcher: false,
+  };
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
   private onInitialize({ rootUri, rootPath, workspaceFolders, initializationOptions, capabilities }: InitializeParams): InitializeResult {
@@ -359,6 +362,7 @@ export default class Server {
     if (initializationOptions && initializationOptions.editor && initializationOptions.editor === 'vscode') {
       logInfo('lazy init enabled, waiting for config from VSCode');
       this.lazyInit = true;
+      this.flags.hasExternalFileWatcher = true;
     }
 
     if (initializationOptions && initializationOptions.isELSTesting) {
