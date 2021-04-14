@@ -272,7 +272,7 @@ export default class Server {
     this.documents.listen(this.connection);
 
     this.onDidChangeContent = this.onDidChangeContent.bind(this);
-    this._onDidChangeContent = this._onDidChangeContent.bind(this);
+    this._onDidChangeContent = debounce(this._onDidChangeContent.bind(this), 250);
 
     // Bind event handlers
     this.connection.onInitialize(this.onInitialize.bind(this));
@@ -461,7 +461,7 @@ export default class Server {
 
   private async onDidChangeContent(change: TextDocumentChangeEvent<TextDocument>) {
     this.lastChangeEvent = change;
-    debounce(this._onDidChangeContent, 250);
+    this._onDidChangeContent();
   }
 
   private async _onDidChangeContent() {
