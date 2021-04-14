@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/lifeart/ember-language-server/compare/v1.6.0...v1.7.0) (2021-04-14)
+
+
+### Features
+
+* Improve linting speed & ability to disable default linting ([#244](https://github.com/lifeart/ember-language-server/issues/244)) ([472c0fe](https://github.com/lifeart/ember-language-server/commit/472c0fe86b4194dbb70bf0c5764d4e64bf3bb2a0))
+
 # [1.6.0](https://github.com/lifeart/ember-language-server/compare/v1.5.0...v1.6.0) (2021-04-12)
 
 
