@@ -1567,6 +1567,53 @@ Array [
       "SubExpressionPath",
     ],
   },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "helper",
+    "textEdit": Object {
+      "newText": "helper",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+    ],
+    "version": "3.27.0",
+  },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "modifier",
+    "textEdit": Object {
+      "newText": "modifier",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+      "ModifierPath",
+    ],
+    "version": "3.27.0",
+  },
 ]
 `;
 
@@ -1915,6 +1962,53 @@ Array [
       "SubExpressionPath",
     ],
   },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "helper",
+    "textEdit": Object {
+      "newText": "helper",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+    ],
+    "version": "3.27.0",
+  },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "modifier",
+    "textEdit": Object {
+      "newText": "modifier",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+      "ModifierPath",
+    ],
+    "version": "3.27.0",
+  },
 ]
 `;
 
@@ -1969,6 +2063,30 @@ Object {
       "usableIn": Array [
         "ModifierPath",
       ],
+    },
+    Object {
+      "detail": "Ember 3.27.0",
+      "kind": 3,
+      "label": "modifier",
+      "textEdit": Object {
+        "newText": "modifier",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
+        },
+      },
+      "usableIn": Array [
+        "SubExpressionPath",
+        "MustachePath",
+        "ModifierPath",
+      ],
+      "version": "3.27.0",
     },
     Object {
       "detail": "modifier",

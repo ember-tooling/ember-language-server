@@ -589,6 +589,53 @@ Array [
       "SubExpressionPath",
     ],
   },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "helper",
+    "textEdit": Object {
+      "newText": "helper",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+    ],
+    "version": "3.27.0",
+  },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "modifier",
+    "textEdit": Object {
+      "newText": "modifier",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+      "ModifierPath",
+    ],
+    "version": "3.27.0",
+  },
 ]
 `;
 

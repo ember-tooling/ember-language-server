@@ -6,14 +6,14 @@ describe('ember-helpers', function () {
   });
 
   it('should provide all non-block helper', function () {
-    expect(emberMustacheItems).toHaveLength(19);
+    expect(emberMustacheItems).toHaveLength(21);
   });
 
   it('should provide all subexpression helper', function () {
-    expect(emberSubExpressionItems).toHaveLength(14);
+    expect(emberSubExpressionItems).toHaveLength(16);
   });
 
   it('should provide all element-modifiers', function () {
-    expect(emberModifierItems).toHaveLength(1);
+    expect(emberModifierItems).toHaveLength(2);
   });
 });

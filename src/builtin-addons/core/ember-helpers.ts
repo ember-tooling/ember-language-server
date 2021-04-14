@@ -48,6 +48,8 @@ const emberCompletionItems: EmberCompletionItem[] = [
   new EmberCompletionItem('unbound', HelperItem, ['MustachePath', 'SubExpressionPath']),
   new EmberCompletionItem('unless', HelperItem, ['BlockPath', 'MustachePath', 'SubExpressionPath']),
   new EmberCompletionItem('with', HelperItem, ['BlockPath']),
+  new EmberCompletionItem('helper', HelperItem, ['SubExpressionPath', 'MustachePath'], '3.27.0'),
+  new EmberCompletionItem('modifier', HelperItem, ['SubExpressionPath', 'MustachePath', 'ModifierPath'], '3.27.0'),
 ];
 
 function filterConfigs(type: UsableIn): EmberCompletionItem[] {
