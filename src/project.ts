@@ -160,23 +160,10 @@ export class Project {
     logInfo(`Ember CLI project: ${this.root} unloaded`);
     logInfo('--------------------');
   }
+  flags = {
+    enableEagerRegistryInitialization: true,
+  };
   init(server: Server) {
-    this.builtinProviders.initFunctions.forEach((initFn) => {
-      try {
-        const initResult = initFn(server, this);
-
-        if (typeof initResult === 'function') {
-          this.destructors.push(initResult);
-        }
-      } catch (e) {
-        logError(e);
-        this.initIssues.push(e);
-      }
-    });
-    // prefer explicit registry tree building
-    findTestsForProject(this);
-    findAppItemsForProject(this);
-    findAddonItemsForProject(this);
     this.providers.initFunctions.forEach((initFn) => {
       try {
         const initResult = initFn(server, this);
@@ -189,6 +176,26 @@ export class Project {
         this.initIssues.push(e);
       }
     });
+
+    this.builtinProviders.initFunctions.forEach((initFn) => {
+      try {
+        const initResult = initFn(server, this);
+
+        if (typeof initResult === 'function') {
+          this.destructors.push(initResult);
+        }
+      } catch (e) {
+        logError(e);
+        this.initIssues.push(e);
+      }
+    });
+
+    if (this.flags.enableEagerRegistryInitialization) {
+      // prefer explicit registry tree building
+      findTestsForProject(this);
+      findAppItemsForProject(this);
+      findAddonItemsForProject(this);
+    }
 
     if (this.providers.info.length) {
       logInfo('--------------------');

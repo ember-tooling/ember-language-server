@@ -136,20 +136,25 @@ export default class TemplateCompletionProvider {
   server!: Server;
   hasNamespaceSupport = false;
   async initRegistry(_: Server, project: Project) {
-    try {
-      this.project = project;
-      this.server = _;
-      this.hasNamespaceSupport = hasNamespaceSupport(project.root);
-      const initStartTime = Date.now();
+    this.project = project;
+    this.server = _;
+    this.hasNamespaceSupport = hasNamespaceSupport(project.root);
 
-      mListHelpers(project.root);
-      mListModifiers(project.root);
-      mListRoutes(project.root);
-      mListComponents(project.root);
-      mGetProjectAddonsInfo(project.root);
-      logInfo(project.root + ': registry initialized in ' + (Date.now() - initStartTime) + 'ms');
-    } catch (e) {
-      logError(e);
+    if (project.flags.enableEagerRegistryInitialization) {
+      try {
+        const initStartTime = Date.now();
+
+        mListHelpers(project.root);
+        mListModifiers(project.root);
+        mListRoutes(project.root);
+        mListComponents(project.root);
+        mGetProjectAddonsInfo(project.root);
+        logInfo(project.root + ': registry initialized in ' + (Date.now() - initStartTime) + 'ms');
+      } catch (e) {
+        logError(e);
+      }
+    } else {
+      logInfo('EagerRegistryInitialization is disabled for "' + project.name + '" (template-completion-provider)');
     }
   }
   getAllAngleBracketComponents(root: string, uri: string) {

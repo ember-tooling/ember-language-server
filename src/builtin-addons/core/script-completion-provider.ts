@@ -23,14 +23,18 @@ const mListTransforms = memoize(listTransforms, { length: 1, maxAge: 60000 });
 
 export default class ScriptCompletionProvider {
   async initRegistry(_: Server, project: Project) {
-    try {
-      const initStartTime = Date.now();
+    if (project.flags.enableEagerRegistryInitialization) {
+      try {
+        const initStartTime = Date.now();
 
-      mListModels(project.root);
-      mListServices(project.root);
-      logInfo(project.root + ': script registry initialized in ' + (Date.now() - initStartTime) + 'ms');
-    } catch (e) {
-      logError(e);
+        mListModels(project.root);
+        mListServices(project.root);
+        logInfo(project.root + ': script registry initialized in ' + (Date.now() - initStartTime) + 'ms');
+      } catch (e) {
+        logError(e);
+      }
+    } else {
+      logInfo('EagerRegistryInitialization is disabled for "' + project.name + '" (script-completion-provider)');
     }
   }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
