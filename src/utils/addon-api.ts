@@ -6,6 +6,7 @@ import {
   PackageInfo,
   ADDON_CONFIG_KEY,
   hasEmberLanguageServerExtension,
+  addonVersion,
 } from './layout-helpers';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import * as path from 'path';
@@ -196,6 +197,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
       addonsMeta.push({
         name: info.name,
         root: packagePath,
+        version: addonVersion(info),
       });
     }
 
@@ -224,7 +226,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
     codeActionProviders: CodeActionResolveFunction[];
     initFunctions: InitFunction[];
     info: string[];
-    addonsMeta: { name: string; root: string }[];
+    addonsMeta: AddonMeta[];
   } = {
     definitionProviders: [],
     referencesProviders: [],
@@ -319,7 +321,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
   return result;
 }
 
-export type AddonMeta = { root: string; name: string };
+export type AddonMeta = { root: string; name: string; version: null | 1 | 2 };
 export type DependencyMeta = { name: string; version: string };
 export interface ProjectProviders {
   definitionProviders: DefinitionResolveFunction[];

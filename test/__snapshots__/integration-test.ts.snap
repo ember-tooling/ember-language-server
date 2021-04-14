@@ -6,18 +6,22 @@ Object {
     Object {
       "name": "addon1",
       "root": "node_modules/addon1",
+      "version": null,
     },
     Object {
       "name": "addon2",
       "root": "node_modules/addon2",
+      "version": null,
     },
     Object {
       "name": "addon3",
       "root": "node_modules/addon3",
+      "version": null,
     },
     Object {
       "name": "addon4",
       "root": "node_modules/addon4",
+      "version": null,
     },
   ],
   "registry": Object {
@@ -87,6 +91,7 @@ Object {
     Object {
       "name": "provider",
       "root": "node_modules/provider",
+      "version": null,
     },
   ],
   "registry": Object {
@@ -110,6 +115,7 @@ Object {
     Object {
       "name": "provider",
       "root": "node_modules/provider",
+      "version": null,
     },
   ],
   "registry": Object {
@@ -146,6 +152,7 @@ Object {
     Object {
       "name": "provider",
       "root": "node_modules/provider",
+      "version": null,
     },
   ],
   "registry": Object {
@@ -179,6 +186,7 @@ Object {
     Object {
       "name": "provider",
       "root": "node_modules/provider",
+      "version": null,
     },
   ],
   "registry": Object {
@@ -212,6 +220,7 @@ Object {
     Object {
       "name": "provider",
       "root": "node_modules/provider",
+      "version": null,
     },
   ],
   "registry": Object {
@@ -317,10 +326,12 @@ Object {
     Object {
       "name": "biz",
       "root": "lib/biz",
+      "version": 1,
     },
     Object {
       "name": "foo",
       "root": "../lib/foo",
+      "version": 1,
     },
   ],
   "registry": Object {
@@ -743,6 +754,7 @@ Object {
     Object {
       "name": "provider",
       "root": "node_modules/provider",
+      "version": null,
     },
   ],
   "registry": Object {
@@ -776,6 +788,7 @@ Object {
     Object {
       "name": "provider",
       "root": "node_modules/provider",
+      "version": null,
     },
   ],
   "registry": Object {
@@ -2378,6 +2391,7 @@ Object {
     Object {
       "name": "biz",
       "root": "lib/biz",
+      "version": 1,
     },
   ],
   "registry": Object {
@@ -2417,6 +2431,7 @@ Object {
     Object {
       "name": "biz",
       "root": "lib/biz",
+      "version": 1,
     },
   ],
   "registry": Object {
@@ -2804,10 +2819,12 @@ Object {
     Object {
       "name": "biz",
       "root": "lib/biz",
+      "version": 1,
     },
     Object {
       "name": "foo",
       "root": "../lib/foo",
+      "version": 1,
     },
   ],
   "registry": Object {

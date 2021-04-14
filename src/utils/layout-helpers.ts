@@ -158,6 +158,26 @@ export function isELSAddonRoot(root: string) {
   return hasEmberLanguageServerExtension(pack);
 }
 
+export function cached(_proto: unknown, prop: string, desc: PropertyDescriptor) {
+  const values = new WeakMap();
+
+  return {
+    get() {
+      if (!values.has(this)) {
+        values.set(this, {});
+      }
+
+      const objects = values.get(this);
+
+      if (!(prop in objects)) {
+        objects[prop] = desc.get?.call(this);
+      }
+
+      return objects[prop];
+    },
+  };
+}
+
 function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
   const packageData = getPackageJSON(root);
   const emberAddonPaths: string[] = (packageData['ember-addon'] && packageData['ember-addon'].paths) || [];
@@ -384,7 +404,7 @@ export function isEmberAddon(info: PackageInfo) {
   return info.keywords && info.keywords.includes('ember-addon');
 }
 
-function addonVersion(info: PackageInfo) {
+export function addonVersion(info: PackageInfo) {
   if (!isEmberAddon(info)) {
     return null;
   }

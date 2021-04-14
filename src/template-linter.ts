@@ -37,8 +37,17 @@ function setCwd(cwd: string) {
 
 export default class TemplateLinter {
   private _linterCache = new Map<Project, any>();
+  private _isEnabled = true;
 
   constructor(private server: Server) {}
+
+  disable() {
+    this._isEnabled = false;
+  }
+
+  enable() {
+    this._isEnabled = true;
+  }
 
   private getProjectForDocument(textDocument: TextDocument) {
     const ext = getExtension(textDocument);
@@ -81,6 +90,10 @@ export default class TemplateLinter {
     }
   }
   async lint(textDocument: TextDocument): Promise<Diagnostic[] | undefined> {
+    if (this._isEnabled === false) {
+      return;
+    }
+
     const cwd = process.cwd();
     const project = this.getProjectForDocument(textDocument);
 

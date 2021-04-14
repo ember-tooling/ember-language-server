@@ -9,6 +9,8 @@ import {
   isRootStartingWithFilePath,
   getDepIfExists,
   getPackageJSON,
+  cached,
+  PackageInfo,
 } from './utils/layout-helpers';
 import Server from './server';
 import { Diagnostic, FileChangeType } from 'vscode-languageserver/node';
@@ -39,6 +41,7 @@ export class Project {
   initIssues: Error[] = [];
   files: Map<string, { version: number }> = new Map();
   podModulePrefix = '';
+  @cached
   get roots() {
     const mainRoot = this.root;
     const otherRoots = this.addonsMeta.map((meta) => meta.root);
@@ -105,7 +108,8 @@ export class Project {
   addWatcher(cb: Watcher) {
     this.watchers.push(cb);
   }
-  get packageJSON() {
+  @cached
+  get packageJSON(): PackageInfo {
     return getPackageJSON(this.root);
   }
   get name() {
