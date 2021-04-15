@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/lifeart/ember-language-server/compare/v1.7.1...v1.8.0) (2021-04-15)
+
+
+### Features
+
+* improve template-completion caching ([#248](https://github.com/lifeart/ember-language-server/issues/248)) ([afb2d8d](https://github.com/lifeart/ember-language-server/commit/afb2d8de6086fe3f3f93dac363fb66e79f7784f7))
+
 ## [1.7.1](https://github.com/lifeart/ember-language-server/compare/v1.7.0...v1.7.1) (2021-04-14)
 
 
