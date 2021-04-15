@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/lifeart/ember-language-server/compare/v1.8.0...v1.9.0) (2021-04-15)
+
+
+### Features
+
+* ember-template-lint severity converter (support different severity kinds) ([be3e923](https://github.com/lifeart/ember-language-server/commit/be3e9235b5385c8c89d53861df684fc12f87ad0b))
+
 # [1.8.0](https://github.com/lifeart/ember-language-server/compare/v1.7.1...v1.8.0) (2021-04-15)
 
 
