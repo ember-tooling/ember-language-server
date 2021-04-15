@@ -490,7 +490,11 @@ export default class Server {
       project.trackChange(change.document.uri, FileChangeType.Changed);
     }
 
-    this.connection.sendDiagnostics({ version: change.document.version, uri: change.document.uri, diagnostics: addonResults });
+    this.connection.sendDiagnostics({
+      version: change.document.version,
+      uri: change.document.uri,
+      diagnostics: [...(lintResults || []), ...(addonResults || [])],
+    });
   }
 
   private onDidChangeWatchedFiles(items: DidChangeWatchedFilesParams) {
