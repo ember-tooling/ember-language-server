@@ -135,6 +135,20 @@ export default class TemplateCompletionProvider {
   project!: Project;
   server!: Server;
   hasNamespaceSupport = false;
+  meta = {
+    projectAddonsInfoInitialized: false,
+    helpersRegistryInitialized: false,
+    modifiersRegistryInitialized: false,
+    componentsRegistryInitialized: false,
+    podComponentsRegistryInitialized: false,
+    muComponentsRegistryInitialized: false,
+    routesRegistryInitialized: false,
+  };
+  enableRegistryCache(value: keyof typeof TemplateCompletionProvider.prototype['meta']) {
+    if (this.server.flags.hasExternalFileWatcher) {
+      this.meta[value] = true;
+    }
+  }
   async initRegistry(_: Server, project: Project) {
     this.project = project;
     this.server = _;
@@ -145,10 +159,20 @@ export default class TemplateCompletionProvider {
         const initStartTime = Date.now();
 
         mListHelpers(project.root);
+        this.enableRegistryCache('helpersRegistryInitialized');
+
         mListModifiers(project.root);
+        this.enableRegistryCache('modifiersRegistryInitialized');
+
         mListRoutes(project.root);
+        this.enableRegistryCache('routesRegistryInitialized');
+
         mListComponents(project.root);
+        this.enableRegistryCache('componentsRegistryInitialized');
+
         mGetProjectAddonsInfo(project.root);
+        this.enableRegistryCache('projectAddonsInfoInitialized');
+
         logInfo(project.root + ': registry initialized in ' + (Date.now() - initStartTime) + 'ms');
       } catch (e) {
         logError(e);
@@ -160,15 +184,38 @@ export default class TemplateCompletionProvider {
   getAllAngleBracketComponents(root: string, uri: string) {
     const items: CompletionItem[] = [];
 
+    if (!this.meta.projectAddonsInfoInitialized) {
+      mGetProjectAddonsInfo(root);
+      this.enableRegistryCache('projectAddonsInfoInitialized');
+    }
+
+    if (!this.meta.muComponentsRegistryInitialized) {
+      mListMUComponents(root);
+      this.enableRegistryCache('muComponentsRegistryInitialized');
+    }
+
+    if (!this.meta.componentsRegistryInitialized) {
+      mListComponents(root);
+      this.enableRegistryCache('componentsRegistryInitialized');
+    }
+
+    if (!this.meta.podComponentsRegistryInitialized) {
+      mListPodsComponents(root);
+      this.enableRegistryCache('podComponentsRegistryInitialized');
+    }
+
+    const registry = this.server.getRegistry(this.project.roots);
+
     return uniqBy(
       items
         .concat(
-          mListMUComponents(root),
-          mListComponents(root),
-          mListPodsComponents(root),
           mListMURouteLevelComponents(root, uri),
-          mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
-            return detail === 'component';
+          Object.keys(registry.component).map((rawName) => {
+            return {
+              label: rawName,
+              kind: CompletionItemKind.Class,
+              detail: 'component',
+            };
           })
         )
         .map((item: CompletionItem) => {
@@ -185,39 +232,103 @@ export default class TemplateCompletionProvider {
     return candidates;
   }
   getMustachePathCandidates(root: string) {
+    if (!this.meta.projectAddonsInfoInitialized) {
+      mGetProjectAddonsInfo(root);
+      this.enableRegistryCache('projectAddonsInfoInitialized');
+    }
+
+    if (!this.meta.muComponentsRegistryInitialized) {
+      mListMUComponents(root);
+      this.enableRegistryCache('muComponentsRegistryInitialized');
+    }
+
+    if (!this.meta.componentsRegistryInitialized) {
+      mListComponents(root);
+      this.enableRegistryCache('componentsRegistryInitialized');
+    }
+
+    if (!this.meta.podComponentsRegistryInitialized) {
+      mListPodsComponents(root);
+      this.enableRegistryCache('podComponentsRegistryInitialized');
+    }
+
+    if (!this.meta.helpersRegistryInitialized) {
+      mListHelpers(root);
+      this.enableRegistryCache('helpersRegistryInitialized');
+    }
+
+    const registry = this.server.getRegistry(this.project.roots);
+
     const candidates: CompletionItem[] = [
-      ...mListComponents(root),
-      ...mListMUComponents(root),
-      ...mListPodsComponents(root),
-      ...mListHelpers(root),
-      ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
-        return detail === 'component' || detail === 'helper';
+      ...Object.keys(registry.component).map((rawName) => {
+        return {
+          label: rawName,
+          kind: CompletionItemKind.Class,
+          detail: 'component',
+        };
+      }),
+      ...Object.keys(registry.helper).map((rawName) => {
+        return {
+          label: rawName,
+          kind: CompletionItemKind.Function,
+          detail: 'helper',
+        };
       }),
     ];
 
     return candidates;
   }
-  getBlockPathCandidates(root: string) {
-    const candidates: CompletionItem[] = [
-      ...mListComponents(root),
-      ...mListMUComponents(root),
-      ...mListPodsComponents(root),
-      ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
-        return detail === 'component';
-      }),
-    ];
+  getBlockPathCandidates(root: string): CompletionItem[] {
+    if (!this.meta.projectAddonsInfoInitialized) {
+      mGetProjectAddonsInfo(root);
+      this.enableRegistryCache('projectAddonsInfoInitialized');
+    }
 
-    return candidates;
+    if (!this.meta.muComponentsRegistryInitialized) {
+      mListMUComponents(root);
+      this.enableRegistryCache('muComponentsRegistryInitialized');
+    }
+
+    if (!this.meta.componentsRegistryInitialized) {
+      mListComponents(root);
+      this.enableRegistryCache('componentsRegistryInitialized');
+    }
+
+    if (!this.meta.podComponentsRegistryInitialized) {
+      mListPodsComponents(root);
+      this.enableRegistryCache('podComponentsRegistryInitialized');
+    }
+
+    const registry = this.server.getRegistry(this.project.roots);
+
+    return Object.keys(registry.component).map((rawName) => {
+      return {
+        label: rawName,
+        kind: CompletionItemKind.Class,
+        detail: 'component',
+      };
+    });
   }
   getSubExpressionPathCandidates(root: string) {
-    const candidates: CompletionItem[] = [
-      ...mListHelpers(root),
-      ...mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
-        return detail === 'helper';
-      }),
-    ];
+    if (!this.meta.helpersRegistryInitialized) {
+      mListHelpers(root);
+      this.enableRegistryCache('helpersRegistryInitialized');
+    }
 
-    return candidates;
+    if (!this.meta.projectAddonsInfoInitialized) {
+      mGetProjectAddonsInfo(root);
+      this.enableRegistryCache('projectAddonsInfoInitialized');
+    }
+
+    const registry = this.server.getRegistry(this.project.roots);
+
+    return Object.keys(registry.helper).map((helperName) => {
+      return {
+        label: helperName,
+        kind: CompletionItemKind.Function,
+        detail: 'helper',
+      };
+    });
   }
   getScopedValues(focusPath: ASTPath) {
     const scopedValues = getLocalScope(focusPath).map(({ name, node, path }) => {
@@ -406,18 +517,67 @@ export default class TemplateCompletionProvider {
       } else if (isLinkToTarget(focusPath)) {
         // {{link-to "name" "target?"}}, {{#link-to "target?"}} {{/link-to}}
         log('isLinkToTarget');
-        completions.push(...uniqBy(mListRoutes(root), 'label'));
+
+        if (!this.meta.routesRegistryInitialized) {
+          mListRoutes(root);
+          this.enableRegistryCache('routesRegistryInitialized');
+        }
+
+        const registry = this.server.getRegistry(this.project.roots);
+
+        const results = Object.keys(registry.routePath).map((name) => {
+          return {
+            label: name,
+            kind: CompletionItemKind.File,
+            detail: 'route',
+          };
+        });
+
+        completions.push(...results);
       } else if (isLinkComponentRouteTarget(focusPath)) {
         // <LinkTo @route="foo.." />
         log('isLinkComponentRouteTarget');
-        completions.push(...uniqBy(mListRoutes(root), 'label'));
-      } else if (isModifierPath(focusPath)) {
-        log('isModifierPath');
-        const addonModifiers = mGetProjectAddonsInfo(root).filter(({ detail }: { detail: string }) => {
-          return detail === 'modifier';
+
+        if (!this.meta.routesRegistryInitialized) {
+          mListRoutes(root);
+          this.enableRegistryCache('routesRegistryInitialized');
+        }
+
+        const registry = this.server.getRegistry(this.project.roots);
+
+        const results = Object.keys(registry.routePath).map((name) => {
+          return {
+            label: name,
+            kind: CompletionItemKind.File,
+            detail: 'route',
+          };
         });
 
-        completions.push(...uniqBy([...emberModifierItems, ...mListModifiers(root), ...addonModifiers, ...builtinModifiers()], 'label'));
+        completions.push(...results);
+      } else if (isModifierPath(focusPath)) {
+        log('isModifierPath');
+
+        if (!this.meta.modifiersRegistryInitialized) {
+          mListModifiers(root);
+          this.enableRegistryCache('modifiersRegistryInitialized');
+        }
+
+        if (!this.meta.projectAddonsInfoInitialized) {
+          mGetProjectAddonsInfo(root);
+          this.enableRegistryCache('projectAddonsInfoInitialized');
+        }
+
+        const registry = this.server.getRegistry(this.project.roots);
+
+        const resolvedModifiers = Object.keys(registry.modifier).map((name) => {
+          return {
+            label: name,
+            kind: CompletionItemKind.Function,
+            detail: 'modifier',
+          };
+        });
+
+        completions.push(...uniqBy([...emberModifierItems, ...resolvedModifiers, ...builtinModifiers()], 'label'));
       }
     } catch (e) {
       log('error', e);

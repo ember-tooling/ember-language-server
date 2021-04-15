@@ -821,9 +821,9 @@ Array [
   Object {
     "detail": "component",
     "kind": 7,
-    "label": "darling",
+    "label": "hello",
     "textEdit": Object {
-      "newText": "darling",
+      "newText": "hello",
       "range": Object {
         "end": Object {
           "character": 2,
@@ -839,9 +839,9 @@ Array [
   Object {
     "detail": "component",
     "kind": 7,
-    "label": "hello",
+    "label": "darling",
     "textEdit": Object {
-      "newText": "hello",
+      "newText": "darling",
       "range": Object {
         "end": Object {
           "character": 2,
@@ -938,9 +938,9 @@ Array [
   Object {
     "detail": "component",
     "kind": 7,
-    "label": "Darling",
+    "label": "Hello",
     "textEdit": Object {
-      "newText": "Darling",
+      "newText": "Hello",
       "range": Object {
         "end": Object {
           "character": 1,
@@ -956,9 +956,9 @@ Array [
   Object {
     "detail": "component",
     "kind": 7,
-    "label": "Hello",
+    "label": "Darling",
     "textEdit": Object {
-      "newText": "Hello",
+      "newText": "Darling",
       "range": Object {
         "end": Object {
           "character": 1,
@@ -1196,11 +1196,11 @@ Object {
     Object {
       "detail": "component",
       "kind": 7,
-      "label": "darling",
+      "label": "hello",
       "textEdit": Object {
-        "newText": "darling}}
+        "newText": "hello}}
   
-{{/darling}}",
+{{/hello}}",
         "range": Object {
           "end": Object {
             "character": 3,
@@ -1216,11 +1216,11 @@ Object {
     Object {
       "detail": "component",
       "kind": 7,
-      "label": "hello",
+      "label": "darling",
       "textEdit": Object {
-        "newText": "hello}}
+        "newText": "darling}}
   
-{{/hello}}",
+{{/darling}}",
         "range": Object {
           "end": Object {
             "character": 3,
@@ -2286,192 +2286,6 @@ Object {
 }
 `;
 
-exports[`integration GlimmerNative able to provide glimmer-native component 1`] = `
-Object {
-  "addonsMeta": Array [],
-  "registry": Object {
-    "component": Object {
-      "hello": Array [
-        "app/components/hello.hbs",
-      ],
-    },
-  },
-  "response": Array [
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Hello",
-      "textEdit": Object {
-        "newText": "Hello",
-        "range": Object {
-          "end": Object {
-            "character": 1,
-            "line": 0,
-          },
-          "start": Object {
-            "character": 1,
-            "line": 0,
-          },
-        },
-      },
-    },
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Button",
-      "textEdit": Object {
-        "newText": "Button",
-        "range": Object {
-          "end": Object {
-            "character": 1,
-            "line": 0,
-          },
-          "start": Object {
-            "character": 1,
-            "line": 0,
-          },
-        },
-      },
-    },
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "ListView",
-      "textEdit": Object {
-        "newText": "ListView",
-        "range": Object {
-          "end": Object {
-            "character": 1,
-            "line": 0,
-          },
-          "start": Object {
-            "character": 1,
-            "line": 0,
-          },
-        },
-      },
-    },
-  ],
-}
-`;
-
-exports[`integration GlimmerX able to provide list of locally defined components 1`] = `
-Object {
-  "addonsMeta": Array [],
-  "registry": Object {},
-  "response": Array [
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "App",
-      "textEdit": Object {
-        "newText": "App",
-        "range": Object {
-          "end": Object {
-            "character": 20,
-            "line": 1,
-          },
-          "start": Object {
-            "character": 20,
-            "line": 1,
-          },
-        },
-      },
-    },
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Button",
-      "textEdit": Object {
-        "newText": "Button",
-        "range": Object {
-          "end": Object {
-            "character": 20,
-            "line": 1,
-          },
-          "start": Object {
-            "character": 20,
-            "line": 1,
-          },
-        },
-      },
-    },
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Ball",
-      "textEdit": Object {
-        "newText": "Ball",
-        "range": Object {
-          "end": Object {
-            "character": 20,
-            "line": 1,
-          },
-          "start": Object {
-            "character": 20,
-            "line": 1,
-          },
-        },
-      },
-    },
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Border",
-      "textEdit": Object {
-        "newText": "Border",
-        "range": Object {
-          "end": Object {
-            "character": 20,
-            "line": 1,
-          },
-          "start": Object {
-            "character": 20,
-            "line": 1,
-          },
-        },
-      },
-    },
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Bus",
-      "textEdit": Object {
-        "newText": "Bus",
-        "range": Object {
-          "end": Object {
-            "character": 20,
-            "line": 1,
-          },
-          "start": Object {
-            "character": 20,
-            "line": 1,
-          },
-        },
-      },
-    },
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Table",
-      "textEdit": Object {
-        "newText": "Table",
-        "range": Object {
-          "end": Object {
-            "character": 20,
-            "line": 1,
-          },
-          "start": Object {
-            "character": 20,
-            "line": 1,
-          },
-        },
-      },
-    },
-  ],
-}
-`;
-
 exports[`integration Go to definition works for all supported cases go to component from typescripted inline template 1`] = `
 Object {
   "addonsMeta": Array [],
@@ -2979,6 +2793,83 @@ Object {
     },
   ],
 }
+`;
+
+exports[`integration Project class resolution, based on fs path and file structure without ignoring main project returns one only top level result 1`] = `
+Array [
+  Object {
+    "addonsMeta": Array [],
+    "registry": Object {
+      "component": Object {
+        "item": Array [
+          "addon/components/item.hbs",
+        ],
+      },
+    },
+    "response": Array [
+      Object {
+        "detail": "component",
+        "kind": 7,
+        "label": "Item",
+        "textEdit": Object {
+          "newText": "Item",
+          "range": Object {
+            "end": Object {
+              "character": 1,
+              "line": 0,
+            },
+            "start": Object {
+              "character": 1,
+              "line": 0,
+            },
+          },
+        },
+      },
+    ],
+  },
+  Object {
+    "addonsMeta": Array [
+      Object {
+        "name": "my-addon",
+        "root": "../lib",
+        "version": 1,
+      },
+    ],
+    "registry": Object {
+      "component": Object {
+        "bar": Array [
+          "app/components/bar.hbs",
+        ],
+        "foo": Array [
+          "app/components/foo.hbs",
+        ],
+        "item": Array [
+          "../lib/addon/components/item.hbs",
+        ],
+      },
+    },
+    "response": Array [
+      Object {
+        "detail": "component",
+        "kind": 7,
+        "label": "Item",
+        "textEdit": Object {
+          "newText": "Item",
+          "range": Object {
+            "end": Object {
+              "character": 1,
+              "line": 0,
+            },
+            "start": Object {
+              "character": 1,
+              "line": 0,
+            },
+          },
+        },
+      },
+    ],
+  },
+]
 `;
 
 exports[`integration autocomplete works for angle component slots 1`] = `

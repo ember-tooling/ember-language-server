@@ -175,10 +175,10 @@ describe('integration', function () {
               }),
               'index.js': `/* eslint-env node */
               'use strict';
-              
+
               module.exports = {
                 name: 'biz',
-              
+
                 isDevelopingAddon() {
                   return true;
                 }
@@ -230,10 +230,10 @@ describe('integration', function () {
               }),
               'index.js': `/* eslint-env node */
               'use strict';
-              
+
               module.exports = {
                 name: 'biz',
-              
+
                 isDevelopingAddon() {
                   return true;
                 }
@@ -470,32 +470,6 @@ describe('integration', function () {
     });
   });
 
-  describe('GlimmerX', () => {
-    it('able to provide list of locally defined components', async () => {
-      const result = await getResult(
-        CompletionRequest.method,
-        connection,
-        {
-          'Button.ts': '',
-          'Button-test.ts': '',
-          'App.js': 'import hbs from "htmlbars-inline-precompile";\nexport default hbs`<`',
-          Components: {
-            'Table.js': '',
-            'Border.ts': '',
-            'Border.test.ts': '',
-            'Ball.jsx': '',
-            'Bus.hbs': '',
-          },
-          'package.json': JSON.stringify({ dependencies: { '@glimmerx/core': true } }),
-        },
-        'App.js',
-        { line: 1, character: 20 }
-      );
-
-      expect(result).toMatchSnapshot();
-    });
-  });
-
   describe('DocumentSymbolProvider', () => {
     it('able to provide symbols for script document', async () => {
       const result = await getResult(
@@ -556,50 +530,6 @@ describe('integration', function () {
           app: {
             components: {
               'hello.hbs': '{{',
-            },
-          },
-        },
-        'app/components/hello.hbs',
-        { line: 0, character: 1 }
-      );
-
-      expect(result).toMatchSnapshot();
-    });
-  });
-
-  describe('GlimmerNative', () => {
-    it('able to provide glimmer-native component', async () => {
-      const result = await getResult(
-        CompletionRequest.method,
-        connection,
-        {
-          app: {
-            components: {
-              'hello.hbs': '<',
-            },
-          },
-          'package.json': JSON.stringify({ dependencies: { 'glimmer-native': true } }),
-          node_modules: {
-            'glimmer-native': {
-              dist: {
-                'index.js': 'module.exports = () => {};',
-                src: {
-                  glimmer: {
-                    'native-components': {
-                      ListView: {
-                        'component.js': '',
-                      },
-                      Button: {
-                        'template.js': '',
-                      },
-                    },
-                  },
-                },
-              },
-              'package.json': JSON.stringify({
-                name: 'glimmer-native',
-                main: 'dist/index.js',
-              }),
             },
           },
         },
@@ -1320,10 +1250,10 @@ describe('integration', function () {
                 }),
                 'index.js': `/* eslint-env node */
                 'use strict';
-                
+
                 module.exports = {
                   name: 'biz',
-                
+
                   isDevelopingAddon() {
                     return true;
                   }
@@ -1358,10 +1288,10 @@ describe('integration', function () {
               }),
               'index.js': `/* eslint-env node */
               'use strict';
-              
+
               module.exports = {
                 name: 'foo',
-              
+
                 isDevelopingAddon() {
                   return true;
                 }
@@ -1544,13 +1474,19 @@ describe('integration', function () {
         }),
       };
 
-      const result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', { line: 0, character: 1 }, [
-        '',
+      let result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', { line: 0, character: 1 }, [
+        'lib',
         'child-project',
       ]);
 
+      expect(result).toMatchSnapshot();
       expect(result.length).toBe(2);
       expect(result[0].response.length).toBe(1);
+      expect(result[1].response.length).toBe(1);
+
+      result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', { line: 0, character: 1 }, ['child-project']);
+
+      expect(result[0].response.length).toBe(3);
     });
 
     it('able to ignore main project in favor of child project', async () => {

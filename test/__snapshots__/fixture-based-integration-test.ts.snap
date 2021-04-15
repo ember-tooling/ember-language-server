@@ -87,6 +87,24 @@ Array [
   Object {
     "detail": "component",
     "kind": 7,
+    "label": "bar",
+    "textEdit": Object {
+      "newText": "bar",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
     "label": "another-awesome-component",
     "textEdit": Object {
       "newText": "another-awesome-component",
@@ -144,24 +162,6 @@ Array [
     "label": "some-helper",
     "textEdit": Object {
       "newText": "some-helper",
-      "range": Object {
-        "end": Object {
-          "character": 2,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 1,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "bar",
-    "textEdit": Object {
-      "newText": "bar",
       "range": Object {
         "end": Object {
           "character": 2,

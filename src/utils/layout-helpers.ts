@@ -250,7 +250,7 @@ export function getProjectInRepoAddonsRoots(root: string) {
   return roots;
 }
 
-export function listGlimmerXComponents(root: string) {
+export function listGlimmerXComponents(root: string): CompletionItem[] {
   try {
     const jsPaths = safeWalkSync(root, {
       directories: false,
@@ -278,28 +278,6 @@ export function listGlimmerXComponents(root: string) {
           detail: 'component',
         };
       });
-  } catch (e) {
-    return [];
-  }
-}
-
-export function listGlimmerNativeComponents(root: string) {
-  try {
-    const possiblePath = resolvePackageRoot(root, 'glimmer-native', 'node_modules');
-
-    if (!possiblePath) {
-      return [];
-    }
-
-    const components = fs.readdirSync(path.join(possiblePath, 'dist', 'src', 'glimmer', 'native-components'));
-
-    return components.map((name) => {
-      return {
-        kind: CompletionItemKind.Class,
-        label: name,
-        detail: 'component',
-      };
-    });
   } catch (e) {
     return [];
   }
@@ -468,16 +446,7 @@ export function getProjectAddonsInfo(root: string) {
     }
   });
 
-  // log('meta', meta);
-  if (isGlimmerNativeProject(root)) {
-    meta.push(listGlimmerNativeComponents(root));
-  }
-
-  if (isGlimmerXProject(root)) {
-    meta.push(listGlimmerXComponents(root));
-  }
-
-  const normalizedResult: any[] = meta.reduce((arrs: any[], item: any[]) => {
+  const normalizedResult: CompletionItem[] = meta.reduce((arrs: CompletionItem[], item: CompletionItem[]) => {
     if (!item.length) {
       return arrs;
     }

@@ -5,7 +5,7 @@ import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import { URI } from 'vscode-uri';
 import * as fs from 'fs';
-import { isGlimmerNativeProject, isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath } from './utils/layout-helpers';
+import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath } from './utils/layout-helpers';
 
 import Server from './server';
 
@@ -70,7 +70,7 @@ export default class ProjectRoots {
 
       if (filePath.endsWith('package.json')) {
         try {
-          if (isGlimmerNativeProject(fullPath) || isGlimmerXProject(fullPath)) {
+          if (isGlimmerXProject(fullPath)) {
             this.onProjectAdd(fullPath);
           }
         } catch (e) {
