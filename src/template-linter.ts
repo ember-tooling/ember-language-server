@@ -17,6 +17,7 @@ export interface TemplateLinterError {
   fatal?: boolean;
   moduleId: string;
   rule?: string;
+  filePath: string;
   severity: number;
   message: string;
   isFixable?: boolean;

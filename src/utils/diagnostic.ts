@@ -31,9 +31,37 @@ export function toHbsSource(templateNode: ITemplateNode): string {
   return output;
 }
 
+function convertEmberTemplateLintSeverity(value: number): DiagnosticSeverity {
+  // lint values
+  const TODO_SEVERITY = -1;
+  const IGNORE_SEVERITY = 0;
+  const WARNING_SEVERITY = 1;
+  const ERROR_SEVERITY = 2;
+
+  if (value === TODO_SEVERITY) {
+    return DiagnosticSeverity.Hint;
+  } else if (value === ERROR_SEVERITY) {
+    return DiagnosticSeverity.Error;
+  } else if (value === WARNING_SEVERITY) {
+    return DiagnosticSeverity.Warning;
+  } else if (value === IGNORE_SEVERITY) {
+    return DiagnosticSeverity.Information;
+  }
+
+  return DiagnosticSeverity.Error;
+}
+
+function severityForError(error: TemplateLinterError): DiagnosticSeverity {
+  if (error.rule) {
+    return convertEmberTemplateLintSeverity(error.severity);
+  } else {
+    return DiagnosticSeverity.Error;
+  }
+}
+
 export function toDiagnostic(source: string, error: TemplateLinterError): Diagnostic {
   const result = {
-    severity: DiagnosticSeverity.Error,
+    severity: severityForError(error),
     range: toRange(source, error),
     message: toMessage(error),
     code: error.rule || 'syntax',
