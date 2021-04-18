@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/lifeart/ember-language-server/compare/v1.9.0...v1.10.0) (2021-04-18)
+
+
+### Features
+
+* Support `workspace/didChangeConfiguration` event ([#254](https://github.com/lifeart/ember-language-server/issues/254)) ([05d97cb](https://github.com/lifeart/ember-language-server/commit/05d97cb291f840f7d92b6c08f7deb79e33bee218))
+
 # [1.9.0](https://github.com/lifeart/ember-language-server/compare/v1.8.0...v1.9.0) (2021-04-15)
 
 
