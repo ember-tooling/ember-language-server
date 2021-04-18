@@ -6,3 +6,6 @@ dist/
 coverage
 inst/
 .nyc_output
+
+# Debug Logging
+debug.log

@@ -55,9 +55,10 @@ import { URI } from 'vscode-uri';
 import { MatchResultType } from './utils/path-matcher';
 import { FileChangeType } from 'vscode-languageserver/node';
 import { debounce } from 'lodash';
+import { Config, Initializer } from './types';
 
 export default class Server {
-  initializers: any[] = [];
+  initializers: Initializer[] = [];
   lazyInit = false;
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
   // also supports stdio via command line flag
@@ -117,6 +118,22 @@ export default class Server {
     }
   }
 
+  setConfiguration(config: Config) {
+    if (config.addons) {
+      this.projectRoots.setLocalAddons(config.addons);
+    }
+
+    if (config.ignoredProjects) {
+      this.projectRoots.setIgnoredProjects(config.ignoredProjects);
+    }
+
+    if (config.useBuiltinLinting === false) {
+      this.templateLinter.disable();
+    } else if (config.useBuiltinLinting === true) {
+      this.templateLinter.enable();
+    }
+  }
+
   documentSymbolProviders: DocumentSymbolProvider[] = [new JSDocumentSymbolProvider(), new HBSDocumentSymbolProvider()];
 
   templateCompletionProvider: TemplateCompletionProvider = new TemplateCompletionProvider(this);
@@ -129,7 +146,7 @@ export default class Server {
   referenceProvider: ReferenceProvider = new ReferenceProvider(this);
   codeActionProvider: CodeActionProvider = new CodeActionProvider(this);
   executeInitializers() {
-    this.initializers.forEach((cb: any) => cb());
+    this.initializers.forEach((cb) => cb());
     this.initializers = [];
   }
   private onInitialized() {
@@ -137,15 +154,8 @@ export default class Server {
       this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
     }
 
-    this.executors['els.setConfig'] = async (_, __, [config]: [{ local: { addons: string[]; ignoredProjects: string[]; useBuiltinLinting: boolean } }]) => {
-      this.projectRoots.setLocalAddons(config.local.addons);
-      this.projectRoots.setIgnoredProjects(config.local.ignoredProjects);
-
-      if (config.local.useBuiltinLinting === false) {
-        this.templateLinter.disable();
-      } else if (config.local.useBuiltinLinting === true) {
-        this.templateLinter.enable();
-      }
+    this.executors['els.setConfig'] = async (_, __, [config]: [{ local: Config }]) => {
+      this.setConfiguration(config.local);
 
       if (this.lazyInit) {
         this.executeInitializers();
@@ -280,6 +290,7 @@ export default class Server {
     this.documents.onDidChangeContent(this.onDidChangeContent);
     this.documents.onDidOpen(this.onDidChangeContent);
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
+    this.connection.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
     this.connection.onDefinition(this.definitionProvider.handler);
     this.connection.onCompletion(this.onCompletion.bind(this));
@@ -527,6 +538,10 @@ export default class Server {
     //  * The file got deleted.
     //  */
     // const Deleted = 3;
+  }
+
+  private onDidChangeConfiguration({ settings }: { settings: Config }) {
+    this.setConfiguration(settings);
   }
 
   private async onReference(params: ReferenceParams): Promise<Location[]> {
