@@ -34,7 +34,7 @@ All features currently only work in Ember CLI application that use the default c
 * VSCode: [Unstable Ember Language Server](https://github.com/lifeart/vscode-ember)
 * Neo (Vim): [coc-ember](https://github.com/NullVoxPopuli/coc-ember)
 
-## Addons
+## Addons available for install
 
 * [els-addon-glint](https://github.com/lifeart/els-addon-glint) - Glint integration addon.
 * [els-a11y-addon](https://github.com/lifeart/els-a11y-addon) - Ember Language Server a11y addon.
@@ -43,3 +43,10 @@ All features currently only work in Ember CLI application that use the default c
 * [ember-fast-cli](https://github.com/lifeart/ember-fast-cli) - Addon for Ember-cli commands execution.
 * [els-component-extraction-addon](https://github.com/lifeart/els-component-extraction-addon) - Component extraction addon.
 * [els-intl-addon](https://github.com/lifeart/els-intl-addon) - Ember-Intl, Ember-i18n autocomplete.
+
+Addon notes:
+
+- all addons could be added as dev-dependency for a project
+- dev-dependency installation allow us to have independent versions of addons for different projects
+- for global addon installation check LS settings in your editor (you have to specify path to addon root in LS config)
+- you could [build](https://github.com/lifeart/ember-language-server/wiki/Addon-API) your project-sepecific addon
