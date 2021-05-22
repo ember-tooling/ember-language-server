@@ -99,15 +99,33 @@ export function findRelatedFiles(token: string, tokenType: MatchResultType = 'co
   return results;
 }
 
-export function updateTemplateTokens(kind: UsageType, normalizedName: string, file: string | null) {
-  if (file === null) {
-    delete TEMPLATE_TOKENS[kind][normalizedName];
+const tokenQueue: [UsageType, string, string][] = [];
 
+let extractionTimeout: NodeJS.Timeout;
+
+function scheduleTokensExtraction(kind: UsageType, normalizedName: string, file: string) {
+  tokenQueue.push([kind, normalizedName, file]);
+
+  clearTimeout(extractionTimeout);
+  extractionTimeout = setTimeout(extractTokens, 100);
+}
+
+function extractTokens() {
+  if (!tokenQueue.length) {
     return;
   }
 
+  const item = tokenQueue.shift();
+
+  if (item === undefined) {
+    return;
+  }
+
+  const [kind, normalizedName, file]: [UsageType, string, string] = item;
+
   try {
-    const tokens = extractTokensFromTemplate(fs.readFileSync(file, 'utf8'));
+    const content = fs.readFileSync(file, 'utf8');
+    const tokens = extractTokensFromTemplate(content);
 
     TEMPLATE_TOKENS[kind][normalizedName] = {
       source: file,
@@ -115,5 +133,17 @@ export function updateTemplateTokens(kind: UsageType, normalizedName: string, fi
     };
   } catch (e) {
     //
+  } finally {
+    setTimeout(extractTokens, 16);
   }
+}
+
+export function updateTemplateTokens(kind: UsageType, normalizedName: string, file: string | null) {
+  if (file === null) {
+    delete TEMPLATE_TOKENS[kind][normalizedName];
+
+    return;
+  }
+
+  scheduleTokensExtraction(kind, normalizedName, file);
 }

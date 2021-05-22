@@ -24,13 +24,16 @@ const knownRegistryKeys = ['transform', 'helper', 'component', 'routePath', 'mod
 describe('addToRegistry - it able to add different kinds to registry', () => {
   const files = [];
 
-  it('able to add different file types to same kind', () => {
+  it('able to add different file types to same kind', async () => {
     const file1 = createFile('foo-bar.hbs', '<div><Boo /></div>');
     const file2 = createFile('foo-bar.js', '');
     const file3 = createFile('foo-bar.css', '');
 
     files.push(file1, file2, file3);
     addToRegistry('foo-bar', 'component', files);
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     expect(getRegistryForRoot(path.resolve(dir.path()))['component']['foo-bar'].length).toBe(3);
     expect(findRelatedFiles('boo').length).toBe(1);
   });
