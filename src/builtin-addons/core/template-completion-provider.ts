@@ -147,6 +147,10 @@ export default class TemplateCompletionProvider {
   enableRegistryCache(value: keyof typeof TemplateCompletionProvider.prototype['meta']) {
     if (this.server.flags.hasExternalFileWatcher) {
       this.meta[value] = true;
+    } else {
+      this.server.connection.console.warn(
+        'Unable to user global registry state, falling back to cache api, to fix this message install [els-addon-file-watcher]'
+      );
     }
   }
   async initRegistry(_: Server, project: Project) {
