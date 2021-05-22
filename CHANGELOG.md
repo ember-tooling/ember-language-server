@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/lifeart/ember-language-server/compare/v1.10.0...v1.11.0) (2021-05-22)
+
+
+### Features
+
+* Performance improvement. Delay template tokenization on startup ([#263](https://github.com/lifeart/ember-language-server/issues/263)) ([26515a7](https://github.com/lifeart/ember-language-server/commit/26515a7278b74aeb92650b90636d42ecc967354c))
+
 # [1.10.0](https://github.com/lifeart/ember-language-server/compare/v1.9.0...v1.10.0) (2021-04-18)
 
 
