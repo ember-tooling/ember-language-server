@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/lifeart/ember-language-server/compare/v1.12.0...v1.13.0) (2021-05-23)
+
+
+### Features
+
+* remove pure component name lookup prior to path matcher ([#270](https://github.com/lifeart/ember-language-server/issues/270)) ([5ca77fc](https://github.com/lifeart/ember-language-server/commit/5ca77fcf2b89e8132dccdf8f26c48e57f12fd21e))
+
 # [1.12.0](https://github.com/lifeart/ember-language-server/compare/v1.11.0...v1.12.0) (2021-05-23)
 
 
