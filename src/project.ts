@@ -44,10 +44,14 @@ export class Project {
   @cached
   get roots() {
     const mainRoot = this.root;
-    const otherRoots = this.addonsMeta.map((meta) => meta.root);
+    const otherRoots = this.addonsMeta.filter((addon) => addon.version !== null).map((meta) => meta.root);
+    const ignoredParts = ['node_modules'];
+    const filteredRoots = otherRoots.filter((el) => {
+      return ignoredParts.every((part) => !el.includes(part));
+    });
     // because all registry searches based on "startsWith", we could omit roots in same namespace,
     // like {root/a, root/b}, because we will get results of it from {root} itself
-    const differentRoots = otherRoots.filter((root) => !isRootStartingWithFilePath(root, mainRoot));
+    const differentRoots = filteredRoots.filter((root) => !isRootStartingWithFilePath(root, mainRoot));
 
     return [mainRoot, ...differentRoots];
   }
