@@ -8,7 +8,7 @@ import { URI } from 'vscode-uri';
 import { isModuleUnificationApp, podModulePrefixForRoot, hasAddonFolderInPath, getProjectAddonsRoots, getProjectInRepoAddonsRoots } from './layout-helpers';
 
 const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
-  length: 1,
+  length: 3,
   maxAge: 600000,
 });
 const mProjectInRepoAddonsRoots = memoize(getProjectInRepoAddonsRoots, {

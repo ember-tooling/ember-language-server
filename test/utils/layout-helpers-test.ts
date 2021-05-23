@@ -4,9 +4,7 @@ import {
   safeWalkSync,
   resolvePackageRoot,
   getPackageJSON,
-  pureComponentName,
   listPodsComponents,
-  listMUComponents,
   listComponents,
   listHelpers,
   listRoutes,
@@ -18,6 +16,7 @@ import * as path from 'path';
 
 import { initFileStructure } from './../test_helpers/integration-helpers';
 import { getRegistryForRoot } from '../../src/utils/registry-api';
+import { BaseProject } from '../../src/base-project';
 
 describe('definition-helpers', function () {
   describe('isMuApp()', function () {
@@ -57,26 +56,17 @@ describe('definition-helpers', function () {
     });
   });
 
-  describe('pureComponentName()', function () {
-    it('return component name without extension and layout postix', function () {
-      expect(pureComponentName('/foo/bar-baz.js')).toEqual('foo/bar-baz');
-      expect(pureComponentName('/foo/bar-baz.ts')).toEqual('foo/bar-baz');
-      expect(pureComponentName('/foo/bar-baz/component.js')).toEqual('foo/bar-baz');
-      expect(pureComponentName('/foo/bar-baz/component.ts')).toEqual('foo/bar-baz');
-      expect(pureComponentName('/foo/bar-baz/template.hbs')).toEqual('foo/bar-baz');
-      expect(pureComponentName('/foo/bar-baz.hbs')).toEqual('foo/bar-baz');
-      expect(pureComponentName('foo/bar-baz.hbs')).toEqual('foo/bar-baz');
-    });
-  });
-
   describe('listPodsComponents()', function () {
     it('return expected list of components for pods project', function () {
       const root = path.join(__dirname, './../fixtures/pod-project');
 
-      listPodsComponents(root);
+      const project = new BaseProject(root);
+
+      listPodsComponents(project);
+
       const keys = Object.keys(getRegistryForRoot(root).component);
 
-      const hasAllComponentsInRegistry = ['foo-bar-js', 'foo-bar-js', 'foo-bar-ts'].every((el) => {
+      const hasAllComponentsInRegistry = ['foo-bar-js', 'foo-bar-ts'].every((el) => {
         return keys.includes(el);
       });
 
@@ -84,19 +74,11 @@ describe('definition-helpers', function () {
     });
   });
 
-  describe('listMUComponents()', function () {
-    it('return expected list of components for mu project', function () {
-      const components = listMUComponents(path.join(__dirname, './../fixtures/mu-project'));
-
-      expect(components.map(({ label }: { label: string }) => label)).toEqual(['foo-bar-js', 'foo-bar-js', 'foo-bar-ts']);
-    });
-  });
-
   describe('listComponents()', function () {
     it('return expected list of components for classic project', function () {
       const root = path.join(__dirname, './../fixtures/full-project');
 
-      listComponents(root);
+      listComponents(new BaseProject(root));
 
       const keys = Object.keys(getRegistryForRoot(root).component);
 
@@ -112,9 +94,17 @@ describe('definition-helpers', function () {
 
   describe('listHelpers()', function () {
     it('return expected list of helpers for classic project', function () {
-      const components = listHelpers(path.join(__dirname, './../fixtures/full-project'));
+      const root = path.join(__dirname, './../fixtures/full-project');
 
-      expect(components.map(({ label }: { label: string }) => label)).toEqual(['some-helper']);
+      let keys = Object.keys(getRegistryForRoot(root).helper);
+
+      expect(keys.includes('some-helper')).toBe(false);
+
+      listHelpers(new BaseProject(root));
+
+      keys = Object.keys(getRegistryForRoot(root).helper);
+
+      expect(keys.includes('some-helper')).toBe(true);
     });
   });
 
@@ -122,7 +112,7 @@ describe('definition-helpers', function () {
     it('return expected list of routes for classic project', function () {
       const root = path.join(__dirname, './../fixtures/full-project');
 
-      listRoutes(root);
+      listRoutes(new BaseProject(root));
 
       const keys = Object.keys(getRegistryForRoot(root).routePath);
 

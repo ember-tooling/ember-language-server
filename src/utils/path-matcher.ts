@@ -85,6 +85,10 @@ export class ClassicPathMatcher {
       fullName = fullName.replace('-test', '');
     }
 
+    if (fullName.startsWith('./')) {
+      fullName = fullName.replace('./', '');
+    }
+
     return fullName;
   }
   metaFromPath(rawAbsoluteAbsPath: string): MatchResult | null {
@@ -159,6 +163,10 @@ export class PodMatcher extends ClassicPathMatcher {
 
     if (fullName.startsWith(componentFolderPath)) {
       fullName = fullName.replace(componentFolderPath, '');
+    }
+
+    if (fullName.startsWith('./')) {
+      fullName = fullName.replace('./', '');
     }
 
     return fullName;

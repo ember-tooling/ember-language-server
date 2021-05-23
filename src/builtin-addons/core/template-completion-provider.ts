@@ -5,8 +5,7 @@ import { uniqBy } from 'lodash';
 import * as memoize from 'memoizee';
 import * as fs from 'fs';
 import { emberBlockItems, emberMustacheItems, emberSubExpressionItems, emberModifierItems } from './ember-helpers';
-import { templateContextLookup } from './template-context-provider';
-import { provideComponentTemplatePaths } from './template-definition-provider';
+import { getPathsFromRegistry, provideComponentTemplatePaths } from './template-definition-provider';
 
 import { log, logInfo, logError } from '../../utils/logger';
 import ASTPath, { getLocalScope } from '../../glimmer-utils';
@@ -29,7 +28,6 @@ import {
 } from '../../utils/ast-helpers';
 import {
   listComponents,
-  listMUComponents,
   listPodsComponents,
   listHelpers,
   listRoutes,
@@ -38,23 +36,19 @@ import {
   mGetProjectAddonsInfo,
   hasNamespaceSupport,
   isRootStartingWithFilePath,
+  isScriptPath,
+  isTestFile,
 } from '../../utils/layout-helpers';
 
 import { normalizeToAngleBracketComponent } from '../../utils/normalizers';
 import { getTemplateBlocks } from '../../utils/template-tokens-collector';
 import { ASTNode } from 'ast-types';
 import { ASTv1 } from '@glimmer/syntax';
+import { URI } from 'vscode-uri';
+import { componentsContextData } from './template-context-provider';
 
-const mTemplateContextLookup = memoize(templateContextLookup, {
-  length: 3,
-  maxAge: 60000,
-}); // 1 second
 const mListModifiers = memoize(listModifiers, { length: 1, maxAge: 60000 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
-const mListMUComponents = memoize(listMUComponents, {
-  length: 1,
-  maxAge: 60000,
-}); // 1 second
 const mListPodsComponents = memoize(listPodsComponents, {
   length: 1,
   maxAge: 60000,
@@ -141,7 +135,6 @@ export default class TemplateCompletionProvider {
     modifiersRegistryInitialized: false,
     componentsRegistryInitialized: false,
     podComponentsRegistryInitialized: false,
-    muComponentsRegistryInitialized: false,
     routesRegistryInitialized: false,
   };
   enableRegistryCache(value: keyof typeof TemplateCompletionProvider.prototype['meta']) {
@@ -162,16 +155,16 @@ export default class TemplateCompletionProvider {
       try {
         const initStartTime = Date.now();
 
-        mListHelpers(project.root);
+        mListHelpers(project);
         this.enableRegistryCache('helpersRegistryInitialized');
 
-        mListModifiers(project.root);
+        mListModifiers(project);
         this.enableRegistryCache('modifiersRegistryInitialized');
 
-        mListRoutes(project.root);
+        mListRoutes(project);
         this.enableRegistryCache('routesRegistryInitialized');
 
-        mListComponents(project.root);
+        mListComponents(project);
         this.enableRegistryCache('componentsRegistryInitialized');
 
         mGetProjectAddonsInfo(project.root);
@@ -193,18 +186,13 @@ export default class TemplateCompletionProvider {
       this.enableRegistryCache('projectAddonsInfoInitialized');
     }
 
-    if (!this.meta.muComponentsRegistryInitialized) {
-      mListMUComponents(root);
-      this.enableRegistryCache('muComponentsRegistryInitialized');
-    }
-
     if (!this.meta.componentsRegistryInitialized) {
-      mListComponents(root);
+      mListComponents(this.project);
       this.enableRegistryCache('componentsRegistryInitialized');
     }
 
     if (!this.meta.podComponentsRegistryInitialized) {
-      mListPodsComponents(root);
+      mListPodsComponents(this.project);
       this.enableRegistryCache('podComponentsRegistryInitialized');
     }
 
@@ -230,8 +218,21 @@ export default class TemplateCompletionProvider {
       'label'
     );
   }
+  templateContextLookup(root: string, rawCurrentFilePath: string, templateContent: string): CompletionItem[] {
+    const fsPath = URI.parse(rawCurrentFilePath).fsPath;
+    const componentName = this.project.matchPathToType(fsPath)?.name;
+
+    // todo - add branching for route templates support
+    if (!componentName) {
+      return [];
+    }
+
+    const maybeScripts = getPathsFromRegistry('component', componentName, root).filter((el) => !isTestFile(el) && isScriptPath(el));
+
+    return componentsContextData(maybeScripts, templateContent);
+  }
   getLocalPathExpressionCandidates(root: string, uri: string, originalText: string) {
-    const candidates: CompletionItem[] = [...mTemplateContextLookup(root, uri, originalText)];
+    const candidates: CompletionItem[] = [...this.templateContextLookup(root, uri, originalText)];
 
     return candidates;
   }
@@ -241,23 +242,18 @@ export default class TemplateCompletionProvider {
       this.enableRegistryCache('projectAddonsInfoInitialized');
     }
 
-    if (!this.meta.muComponentsRegistryInitialized) {
-      mListMUComponents(root);
-      this.enableRegistryCache('muComponentsRegistryInitialized');
-    }
-
     if (!this.meta.componentsRegistryInitialized) {
-      mListComponents(root);
+      mListComponents(this.project);
       this.enableRegistryCache('componentsRegistryInitialized');
     }
 
     if (!this.meta.podComponentsRegistryInitialized) {
-      mListPodsComponents(root);
+      mListPodsComponents(this.project);
       this.enableRegistryCache('podComponentsRegistryInitialized');
     }
 
     if (!this.meta.helpersRegistryInitialized) {
-      mListHelpers(root);
+      mListHelpers(this.project);
       this.enableRegistryCache('helpersRegistryInitialized');
     }
 
@@ -288,18 +284,13 @@ export default class TemplateCompletionProvider {
       this.enableRegistryCache('projectAddonsInfoInitialized');
     }
 
-    if (!this.meta.muComponentsRegistryInitialized) {
-      mListMUComponents(root);
-      this.enableRegistryCache('muComponentsRegistryInitialized');
-    }
-
     if (!this.meta.componentsRegistryInitialized) {
-      mListComponents(root);
+      mListComponents(this.project);
       this.enableRegistryCache('componentsRegistryInitialized');
     }
 
     if (!this.meta.podComponentsRegistryInitialized) {
-      mListPodsComponents(root);
+      mListPodsComponents(this.project);
       this.enableRegistryCache('podComponentsRegistryInitialized');
     }
 
@@ -313,14 +304,14 @@ export default class TemplateCompletionProvider {
       };
     });
   }
-  getSubExpressionPathCandidates(root: string) {
+  getSubExpressionPathCandidates() {
     if (!this.meta.helpersRegistryInitialized) {
-      mListHelpers(root);
+      mListHelpers(this.project);
       this.enableRegistryCache('helpersRegistryInitialized');
     }
 
     if (!this.meta.projectAddonsInfoInitialized) {
-      mGetProjectAddonsInfo(root);
+      mGetProjectAddonsInfo(this.project.root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
     }
 
@@ -504,7 +495,7 @@ export default class TemplateCompletionProvider {
       } else if (isSubExpressionPath(focusPath)) {
         // {{foo-bar name=(subexpr? )}}
         log('isSubExpressionPath');
-        const candidates = this.getSubExpressionPathCandidates(root);
+        const candidates = this.getSubExpressionPathCandidates();
 
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
@@ -523,7 +514,7 @@ export default class TemplateCompletionProvider {
         log('isLinkToTarget');
 
         if (!this.meta.routesRegistryInitialized) {
-          mListRoutes(root);
+          mListRoutes(this.project);
           this.enableRegistryCache('routesRegistryInitialized');
         }
 
@@ -543,7 +534,7 @@ export default class TemplateCompletionProvider {
         log('isLinkComponentRouteTarget');
 
         if (!this.meta.routesRegistryInitialized) {
-          mListRoutes(root);
+          mListRoutes(this.project);
           this.enableRegistryCache('routesRegistryInitialized');
         }
 
@@ -562,7 +553,7 @@ export default class TemplateCompletionProvider {
         log('isModifierPath');
 
         if (!this.meta.modifiersRegistryInitialized) {
-          mListModifiers(root);
+          mListModifiers(this.project);
           this.enableRegistryCache('modifiersRegistryInitialized');
         }
 
