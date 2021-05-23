@@ -1,4 +1,5 @@
 import * as path from 'path';
+import { isStyleFile, isTemplatePath, isTestFile } from './layout-helpers';
 
 export type MatchResultType =
   | 'helper'
@@ -90,9 +91,9 @@ export class ClassicPathMatcher {
     const rawAbsPath = path.relative(this.root, path.resolve(rawAbsoluteAbsPath));
     const normalizedAbsPath = rawAbsPath.split(path.sep).join('/');
     const absPath = '/' + normalizedAbsPath;
-    const isTest = absPath.includes('/tests/');
-    const isTemplate = absPath.endsWith('.hbs');
-    const isStyle = absPath.endsWith('.css') || absPath.endsWith('.less') || absPath.endsWith('.scss');
+    const isTest = isTestFile(absPath);
+    const isTemplate = isTemplatePath(absPath);
+    const isStyle = isStyleFile(absPath);
     const kind = isStyle ? 'style' : isTemplate ? 'template' : isTest ? 'test' : 'script';
     const isAddon = absPath.includes('/addon/');
     const isInRepoAddon = absPath.includes('/lib/') || absPath.includes('/engines/');

@@ -10,7 +10,6 @@ import {
   listComponents,
   listHelpers,
   listRoutes,
-  getComponentNameFromURI,
   getProjectInRepoAddonsRoots,
   getProjectAddonsRoots,
   isRootStartingWithFilePath,
@@ -18,6 +17,7 @@ import {
 import * as path from 'path';
 
 import { initFileStructure } from './../test_helpers/integration-helpers';
+import { getRegistryForRoot } from '../../src/utils/registry-api';
 
 describe('definition-helpers', function () {
   describe('isMuApp()', function () {
@@ -71,9 +71,16 @@ describe('definition-helpers', function () {
 
   describe('listPodsComponents()', function () {
     it('return expected list of components for pods project', function () {
-      const components = listPodsComponents(path.join(__dirname, './../fixtures/pod-project'));
+      const root = path.join(__dirname, './../fixtures/pod-project');
 
-      expect(components.map(({ label }: { label: string }) => label)).toEqual(['foo-bar-js', 'foo-bar-js', 'foo-bar-ts']);
+      listPodsComponents(root);
+      const keys = Object.keys(getRegistryForRoot(root).component);
+
+      const hasAllComponentsInRegistry = ['foo-bar-js', 'foo-bar-js', 'foo-bar-ts'].every((el) => {
+        return keys.includes(el);
+      });
+
+      expect(hasAllComponentsInRegistry).toEqual(true);
     });
   });
 
@@ -87,14 +94,19 @@ describe('definition-helpers', function () {
 
   describe('listComponents()', function () {
     it('return expected list of components for classic project', function () {
-      const components = listComponents(path.join(__dirname, './../fixtures/full-project'));
+      const root = path.join(__dirname, './../fixtures/full-project');
 
-      expect(components.map(({ label }: { label: string }) => label)).toEqual([
-        'another-awesome-component',
-        'my-awesome-component',
-        'another-awesome-component',
-        'nested/nested-component',
-      ]);
+      listComponents(root);
+
+      const keys = Object.keys(getRegistryForRoot(root).component);
+
+      const hasAllComponentsInRegistry = ['another-awesome-component', 'my-awesome-component', 'another-awesome-component', 'nested/nested-component'].every(
+        (el) => {
+          return keys.includes(el);
+        }
+      );
+
+      expect(hasAllComponentsInRegistry).toBe(true);
     });
   });
 
@@ -108,9 +120,13 @@ describe('definition-helpers', function () {
 
   describe('listRoutes()', function () {
     it('return expected list of routes for classic project', function () {
-      const components = listRoutes(path.join(__dirname, './../fixtures/full-project'));
+      const root = path.join(__dirname, './../fixtures/full-project');
 
-      expect(components.map(({ label }: { label: string }) => label)).toEqual([
+      listRoutes(root);
+
+      const keys = Object.keys(getRegistryForRoot(root).routePath);
+
+      const hasAllRoutesInRegistry = [
         'angle-completion',
         'application',
         'definition',
@@ -118,31 +134,11 @@ describe('definition-helpers', function () {
         'test-route',
         'nested.nested-route',
         'test-route',
-      ]);
-    });
-  });
+      ].every((el) => {
+        return keys.includes(el);
+      });
 
-  describe('getComponentNameFromURI()', function () {
-    it('return correct component name from component template URI', function () {
-      const root = __dirname;
-      const uri = 'file://' + path.join(__dirname, 'components', 'foo-bar', 'template.hbs');
-      const component = getComponentNameFromURI(root, uri);
-
-      expect(component).toEqual('foo-bar');
-    });
-    it('return correct component name from route scoped component template URI', function () {
-      const root = __dirname;
-      const uri = 'file://' + path.join(__dirname, 'routes', 'hello', '-components', 'foo-bar.hbs');
-      const component = getComponentNameFromURI(root, uri);
-
-      expect(component).toEqual('foo-bar');
-    });
-    it('return correct component name from route template URI', function () {
-      const root = __dirname;
-      const uri = 'file://' + path.join(__dirname, 'templates', 'foo-bar.hbs');
-      const component = getComponentNameFromURI(root, uri);
-
-      expect(component).toEqual(null);
+      expect(hasAllRoutesInRegistry).toBe(true);
     });
   });
 

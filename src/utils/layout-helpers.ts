@@ -398,12 +398,26 @@ export function isTemplatePath(filePath: string) {
   return filePath.endsWith('.hbs');
 }
 
+export function isScriptPath(filePath: string) {
+  if (isTestFile(filePath)) {
+    return false;
+  }
+
+  return filePath.endsWith('.js') || filePath.endsWith('.ts');
+}
+
 export function normalizedPath(filePath: string) {
   if (filePath.includes('\\')) {
     return filePath.split('\\').join('/');
   } else {
     return filePath;
   }
+}
+
+export function isStyleFile(filePath: string) {
+  const ext = ['css', 'less', 'scss'];
+
+  return ext.includes(filePath.split('.').pop() as string);
 }
 
 export function isTestFile(filePath: string) {
@@ -414,10 +428,8 @@ export function hasAddonFolderInPath(name: string) {
   return name.includes(path.sep + 'addon' + path.sep) || name.includes(path.sep + 'addon-test-support' + path.sep);
 }
 
-export function getProjectAddonsInfo(root: string) {
+export function getProjectAddonsInfo(root: string): void {
   const roots = ([] as string[]).concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root)).filter((pathItem: unknown) => typeof pathItem === 'string');
-  // log('roots', roots);
-  const meta: CompletionItem[][] = [];
 
   roots.forEach((packagePath: string) => {
     const info = getPackageJSON(packagePath);
@@ -429,34 +441,18 @@ export function getProjectAddonsInfo(root: string) {
     }
 
     if (version === 1) {
-      const extractedData = [
-        ...listComponents(packagePath),
-        ...listRoutes(packagePath),
-        ...listHelpers(packagePath),
-        ...listModels(packagePath),
-        ...listTransforms(packagePath),
-        ...listServices(packagePath),
-        ...listModifiers(packagePath),
-      ];
-
-      // log('extractedData', extractedData);
-      if (extractedData.length) {
-        meta.push(extractedData);
-      }
+      listComponents(packagePath);
+      listRoutes(packagePath);
+      listHelpers(packagePath);
+      listModels(packagePath);
+      listTransforms(packagePath);
+      listServices(packagePath);
+      listModifiers(packagePath);
     }
   });
-
-  const normalizedResult: CompletionItem[] = meta.reduce((arrs: CompletionItem[], item: CompletionItem[]) => {
-    if (!item.length) {
-      return arrs;
-    }
-
-    return arrs.concat(item);
-  }, []);
-
-  return normalizedResult;
 }
 
+// todo - remove pureComponent name usage here prior to project.matchPathToType
 export function pureComponentName(relativePath: string) {
   const ext = path.extname(relativePath); // .hbs
 
@@ -479,11 +475,11 @@ export function pureComponentName(relativePath: string) {
   }
 }
 
-export function listPodsComponents(root: string): CompletionItem[] {
+export function listPodsComponents(root: string): void {
   const podModulePrefix = podModulePrefixForRoot(root);
 
   if (podModulePrefix === null) {
-    return [];
+    return;
   }
 
   const entryPath = path.resolve(path.join(root, 'app', podModulePrefix, 'components'));
@@ -493,18 +489,9 @@ export function listPodsComponents(root: string): CompletionItem[] {
     globs: ['**/*.{js,ts,hbs,css,less,scss}'],
   });
 
-  const items = jsPaths.map((filePath: string) => {
+  jsPaths.forEach((filePath: string) => {
     addToRegistry(pureComponentName(filePath), 'component', [path.join(entryPath, filePath)]);
-
-    return {
-      kind: CompletionItemKind.Class,
-      label: pureComponentName(filePath),
-      detail: 'component',
-    };
   });
-
-  // log('pods-items', items);
-  return items;
 }
 
 export function listMUComponents(root: string): CompletionItem[] {
@@ -543,7 +530,7 @@ export function hasNamespaceSupport(root: string) {
   return hasDep(pack, 'ember-holy-futuristic-template-namespacing-batman');
 }
 
-export function listComponents(_root: string): CompletionItem[] {
+export function listComponents(_root: string): void {
   // log('listComponents');
   const root = path.resolve(_root);
   const scriptEntry = path.join(root, 'app', 'components');
@@ -583,20 +570,6 @@ export function listComponents(_root: string): CompletionItem[] {
   hbsPaths.forEach((p) => {
     addToRegistry(pureComponentName(p), 'component', [path.join(templateEntry, p)]);
   });
-
-  const paths = [...jsPaths, ...hbsPaths, ...addonComponentsPaths, ...addonTemplatesPaths];
-
-  const items = paths.map((filePath: string) => {
-    const label = pureComponentName(filePath);
-
-    return {
-      kind: CompletionItemKind.Class,
-      label,
-      detail: 'component',
-    };
-  });
-
-  return items;
 }
 
 function findRegistryItemsForProject(project: Project, prefix: string, globs: string[]): void {
@@ -676,7 +649,7 @@ export function listTransforms(root: string): CompletionItem[] {
   return listCollection(root, 'app', 'transforms', CompletionItemKind.Function, 'transform');
 }
 
-export function listRoutes(_root: string): CompletionItem[] {
+export function listRoutes(_root: string): void {
   const root = path.resolve(_root);
   const scriptEntry = path.join(root, 'app', 'routes');
   const templateEntry = path.join(root, 'app', 'templates');
@@ -700,53 +673,27 @@ export function listRoutes(_root: string): CompletionItem[] {
     globs: ['**/*.{js,ts}'],
   });
 
-  let items: any[] = [];
+  templatePaths.forEach((filePath) => {
+    const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
 
-  items = items.concat(
-    templatePaths.map((filePath) => {
-      const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
+    addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
+  });
 
-      addToRegistry(label, 'routePath', [path.join(templateEntry, filePath)]);
+  paths.forEach((filePath) => {
+    const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
 
-      return {
-        kind: CompletionItemKind.File,
-        label,
-        detail: 'route',
-      };
-    })
-  );
+    addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
 
-  items = items.concat(
-    paths.map((filePath) => {
-      const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
-
-      addToRegistry(label, 'routePath', [path.join(scriptEntry, filePath)]);
-
-      return {
-        kind: CompletionItemKind.File,
-        label,
-        detail: 'route',
-      };
-    })
-  );
+    return {
+      kind: CompletionItemKind.File,
+      label,
+      detail: 'route',
+    };
+  });
 
   controllers.forEach((filePath) => {
     const label = filePath.replace(path.extname(filePath), '').replace(/\//g, '.');
 
     addToRegistry(label, 'routePath', [path.join(controllersEntry, filePath)]);
   });
-
-  return items;
-}
-
-export function getComponentNameFromURI(root: string, uri: string) {
-  const fileName = uri.replace('file://', '').replace(root, '');
-  const splitter = fileName.includes(path.sep + '-components' + path.sep) ? '/-components/' : '/components/';
-  const maybeComponentName = fileName.split(path.sep).join('/').split(splitter)[1];
-
-  if (!maybeComponentName) {
-    return null;
-  }
-
-  return pureComponentName(maybeComponentName);
 }

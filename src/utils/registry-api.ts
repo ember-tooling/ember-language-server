@@ -1,5 +1,5 @@
 import { updateTemplateTokens, UsageType } from './usages-api';
-import { normalizeRoutePath } from './layout-helpers';
+import { isRootStartingWithFilePath, isTemplatePath, normalizeRoutePath } from './layout-helpers';
 import { MatchResult } from './path-matcher';
 import * as path from 'path';
 
@@ -60,7 +60,7 @@ export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, 
       files.forEach((file) => {
         regItem.delete(file);
 
-        if (file.endsWith('.hbs')) {
+        if (isTemplatePath(file)) {
           updateTemplateTokens(kind as UsageType, normalizedName, null);
         }
       });
@@ -75,6 +75,7 @@ export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, 
 export function getRegistryForRoot(rawRoot: string) {
   const root = path.resolve(rawRoot);
   const lowRoot = root.toLowerCase();
+
   const registryForRoot: {
     [key in REGISTRY_KIND]: {
       [key: string]: string[];
@@ -97,7 +98,7 @@ export function getRegistryForRoot(rawRoot: string) {
       const items: string[] = [];
 
       paths.forEach((normalizedPath) => {
-        if (normalizedPath.toLowerCase().startsWith(lowRoot)) {
+        if (isRootStartingWithFilePath(lowRoot, normalizedPath.toLowerCase())) {
           items.push(normalizedPath);
         }
       });
@@ -129,7 +130,7 @@ export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files
 
         regItem.add(file);
 
-        if ((kind === 'component' || kind === 'routePath') && file.endsWith('.hbs')) {
+        if ((kind === 'component' || kind === 'routePath') && isTemplatePath(file)) {
           updateTemplateTokens(kind, normalizedName, file);
         }
       });

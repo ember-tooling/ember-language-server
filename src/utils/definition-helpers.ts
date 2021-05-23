@@ -57,13 +57,6 @@ export function pathsToLocationsWithPosition(paths: string[], findMe: string) {
   });
 }
 
-export function getAbstractHelpersParts(root: string, prefix: string, maybeComponentName: string): string[][] {
-  return [
-    [root, prefix, 'helpers', `${maybeComponentName}.js`],
-    [root, prefix, 'helpers', `${maybeComponentName}.ts`],
-  ];
-}
-
 export function getAbstractParts(root: string, prefix: string, collection: string, name: string) {
   return [
     [root, prefix, collection, `${name}.js`],
@@ -226,59 +219,6 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
     getAbstractParts(rootPath, 'addon', collection, name).forEach((parts: any) => {
       addonPaths.push(parts);
     });
-    const validPaths = addonPaths
-      .map((pathArr: string[]): string => {
-        return path.join(...pathArr.filter((part: any) => !!part));
-      })
-      .filter(fs.existsSync);
-
-    if (validPaths.length) {
-      hasValidPath = true;
-      existingPaths = validPaths;
-    }
-  });
-
-  const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
-
-  if (addonFolderFiles.length) {
-    return addonFolderFiles;
-  }
-
-  return existingPaths;
-}
-
-export function getAddonPathsForComponentTemplates(root: string, maybeComponentName: string) {
-  const items: string[] = [];
-  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
-  let existingPaths: string[] = [];
-  let hasValidPath = false;
-
-  roots.forEach((rootPath: string) => {
-    if (hasValidPath) {
-      return;
-    }
-
-    const addonPaths: string[][] = [];
-
-    getAbstractComponentScriptsParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractComponentScriptsParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractComponentTemplatesParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractComponentTemplatesParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractHelpersParts(rootPath, 'app', maybeComponentName).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-    getAbstractHelpersParts(rootPath, 'addon', maybeComponentName).forEach((parts: any) => {
-      addonPaths.push(parts);
-    });
-
     const validPaths = addonPaths
       .map((pathArr: string[]): string => {
         return path.join(...pathArr.filter((part: any) => !!part));
