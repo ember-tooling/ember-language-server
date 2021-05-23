@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/lifeart/ember-language-server/compare/v1.11.0...v1.12.0) (2021-05-23)
+
+
+### Features
+
+* registry based template definition logic ([#267](https://github.com/lifeart/ember-language-server/issues/267)) ([fa21a74](https://github.com/lifeart/ember-language-server/commit/fa21a7418f29a19bbda5860d6eb4b78b875874b3))
+
 # [1.11.0](https://github.com/lifeart/ember-language-server/compare/v1.10.0...v1.11.0) (2021-05-22)
 
 
