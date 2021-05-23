@@ -87,11 +87,11 @@ function tokensFromType(node: ASTv1.BaseNode, scopedTokens: string[]) {
   };
 
   if (node.type in tokensMap) {
-    return (tokensMap as any)[node.type](node);
+    return tokensMap[node.type as keyof typeof tokensMap](node as never);
   }
 }
 
-function addTokens(tokensSet: Set<string>, node: any, scopedTokens: any, nativeTokens: string[] = []) {
+function addTokens(tokensSet: Set<string>, node: ASTv1.Node, scopedTokens: string[], nativeTokens: string[] = []) {
   const maybeTokens = tokensFromType(node, scopedTokens);
 
   (Array.isArray(maybeTokens) ? maybeTokens : [maybeTokens]).forEach((maybeToken: string) => {
