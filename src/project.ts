@@ -36,7 +36,7 @@ export class Project extends BaseProject {
   watchers: Watcher[] = [];
   destructors: Destructor[] = [];
   linters: Linter[] = [];
-  initIssues: Error[] = [];
+  initIssues: string[] = [];
   files: Map<string, { version: number }> = new Map();
   @cached
   get roots() {
@@ -162,7 +162,7 @@ export class Project extends BaseProject {
         }
       } catch (e) {
         logError(e);
-        this.initIssues.push(e);
+        this.initIssues.push(e.toString());
       }
     });
 
@@ -175,7 +175,7 @@ export class Project extends BaseProject {
         }
       } catch (e) {
         logError(e);
-        this.initIssues.push(e);
+        this.initIssues.push(e.toString());
       }
     });
 
@@ -193,6 +193,16 @@ export class Project extends BaseProject {
         logInfo('    ' + addonName);
       });
       logInfo('--------------------');
+    }
+
+    if (this.initIssues.length) {
+      logInfo('---- Found init issues: -----');
+
+      this.initIssues.forEach((issue) => {
+        logInfo('--------------------');
+        logInfo(issue);
+        logInfo('--------------------');
+      });
     }
   }
 }

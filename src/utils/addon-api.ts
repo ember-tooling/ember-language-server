@@ -136,6 +136,14 @@ function requireUncached(module: string) {
     }
   } catch (e) {
     logError(e);
+
+    return {
+      onInit() {
+        const err = e.toString();
+
+        throw new Error('Unable to require els-addon by path: ' + module + ', reason: ' + err);
+      },
+    };
   }
 
   return result;
