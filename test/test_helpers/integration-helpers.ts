@@ -6,6 +6,9 @@ import { URI } from 'vscode-uri';
 import { MessageConnection } from 'vscode-jsonrpc/node';
 import * as spawn from 'cross-spawn';
 import { set, merge, get } from 'lodash';
+import { AddonMeta } from '../../src/utils/addon-api';
+import { CompletionItem } from 'vscode-languageserver/node';
+import { DefinitionRequest, DocumentSymbol, DocumentSymbolRequest, ReferencesRequest } from 'vscode-languageserver-protocol/node';
 
 import {
   DidOpenTextDocumentNotification,
@@ -13,6 +16,7 @@ import {
   ExecuteCommandRequest,
   Definition,
   DidOpenTextDocumentParams,
+  CompletionRequest,
 } from 'vscode-languageserver-protocol/node';
 
 export function startServer() {
@@ -156,7 +160,7 @@ export function normalizeToFs(files: RecursiveRecord<string | RecursiveRecord<st
   return newShape;
 }
 
-async function _buildResult(connection: MessageConnection, normalizedPath: string) {
+async function registerProject(connection: MessageConnection, normalizedPath: string) {
   const params = {
     command: 'els.registerProjectPath',
     arguments: [normalizedPath],
@@ -167,26 +171,38 @@ async function _buildResult(connection: MessageConnection, normalizedPath: strin
   };
 }
 
+export async function setServerConfig(connection: MessageConnection, config = { local: { addons: [], ignoredProjects: [] } }) {
+  const configParams = {
+    command: 'els.setConfig',
+    arguments: [config],
+  };
+
+  await connection.sendRequest(ExecuteCommandRequest.type, configParams);
+}
+
+export async function createProject(
+  files: unknown,
+  connection: MessageConnection,
+  projectName: string[]
+): Promise<{ normalizedPath: string[]; originalPath: string; result: UnknownResult[]; destroy(): Promise<void> }>;
+export async function createProject(
+  files: unknown,
+  connection: MessageConnection,
+  projectName: string
+): Promise<{ normalizedPath: string; originalPath: string; result: UnknownResult; destroy(): Promise<void> }>;
+export async function createProject(
+  files: unknown,
+  connection: MessageConnection
+): Promise<{ normalizedPath: string; originalPath: string; result: UnknownResult; destroy(): Promise<void> }>;
+
 export async function createProject(
   files,
   connection: MessageConnection,
-  projectName?: string | string[],
-  config?: { local: { addons: string[]; ignoredProjects: string[] } }
-): Promise<{ normalizedPath: string | string[]; originalPath: string; result: UnknownResult | UnknownResult[]; destroy(): void }> {
+  projectName?: string | string[]
+): Promise<{ normalizedPath: unknown; originalPath: string; result: UnknownResult | UnknownResult[]; destroy(): Promise<void> }> {
   const dir = await createTempDir();
 
   dir.write(normalizeToFs(files));
-
-  if (config && Array.isArray(config.local.ignoredProjects)) {
-    const ignoredProjects = config.local.ignoredProjects;
-
-    const configParams = {
-      command: 'els.setConfig',
-      arguments: [{ local: { addons: [], ignoredProjects: ignoredProjects } }],
-    };
-
-    await connection.sendRequest(ExecuteCommandRequest.type, configParams);
-  }
 
   if (Array.isArray(projectName)) {
     const resultsArr = [];
@@ -197,7 +213,19 @@ export async function createProject(
       const normalizedPath = currProject ? path.normalize(path.join(dir.path(), currProject)) : path.normalize(dir.path());
 
       normalizedPaths.push(normalizedPath);
-      resultsArr.push(await _buildResult(connection, normalizedPath));
+
+      const projectData = await registerProject(connection, normalizedPath);
+
+      // project may be not created, because it's marked as ignored
+      if (projectData) {
+        resultsArr.push(projectData);
+      } else {
+        resultsArr.push({
+          registry: {},
+          addonsMeta: [],
+          response: null,
+        });
+      }
     }
 
     return {
@@ -210,7 +238,7 @@ export async function createProject(
     };
   } else {
     const normalizedPath = projectName ? path.normalize(path.join(dir.path(), projectName)) : path.normalize(dir.path());
-    const result = await _buildResult(connection, normalizedPath);
+    const result = await registerProject(connection, normalizedPath);
 
     return {
       normalizedPath,
@@ -234,24 +262,102 @@ export function textDocument(modelPath, position = { line: 0, character: 0 }) {
   return params;
 }
 
-function _buildResponse(response: unknown, normalizedPath: string, result: UnknownResult) {
-  return {
-    response: normalizeUri(response, normalizedPath),
+interface IResponse<T> {
+  initIssues?: string[];
+  response: T;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  registry: object;
+  addonsMeta: AddonMeta[];
+}
+
+function _buildResponse<T>(response: T, normalizedPath: string, result: UnknownResult): IResponse<T> {
+  const content: IResponse<T> = {
+    response: normalizeUri(response as Record<string, unknown>, normalizedPath),
     registry: normalizeRegistry(normalizedPath, result.registry as Registry),
-    addonsMeta: normalizeAddonsMeta(normalizedPath, result.addonsMeta as { name: string; root: string }[]),
+    addonsMeta: normalizeAddonsMeta(normalizedPath, result.addonsMeta as AddonMeta[]),
   };
+
+  if (Array.isArray(result.initIssues) && result.initIssues.length) {
+    content.initIssues = result.initIssues;
+  }
+
+  return content;
 }
 
 export async function getResult(
-  reqType,
+  reqType: typeof CompletionRequest.method,
   connection: MessageConnection,
   files,
   fileToInspect,
   position,
-  projectName?: string | string[],
-  config?: { local: { addons: string[]; ignoredProjects: string[] } }
-) {
-  const { normalizedPath, originalPath, destroy, result } = await createProject(files, connection, projectName, config);
+  projectName: string[]
+): Promise<IResponse<CompletionItem[]>[]>;
+export async function getResult(
+  reqType: typeof CompletionRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position,
+  projectName: string
+): Promise<IResponse<CompletionItem[]>>;
+export async function getResult(
+  reqType: typeof CompletionRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position
+): Promise<IResponse<CompletionItem[]>>;
+
+export async function getResult(
+  reqType: typeof DefinitionRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position,
+  projectName?: string[]
+): Promise<IResponse<Definition[]>[]>;
+export async function getResult(
+  reqType: typeof DefinitionRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position,
+  projectName?: string
+): Promise<IResponse<Definition>>;
+export async function getResult(
+  reqType: typeof DefinitionRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position
+): Promise<IResponse<Definition[]>>;
+
+export async function getResult(
+  reqType: typeof DocumentSymbolRequest.type,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position
+): Promise<IResponse<DocumentSymbol[]>>;
+
+export async function getResult(
+  reqType: typeof ReferencesRequest.type,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position
+): Promise<IResponse<Location[]>>;
+
+export async function getResult(
+  reqType: unknown,
+  connection: MessageConnection,
+  files,
+  fileToInspect,
+  position,
+  projectName?: string[] | string
+): Promise<IResponse<unknown> | IResponse<unknown>[]> {
+  const { normalizedPath, originalPath, destroy, result } = await createProject(files, connection, projectName);
+
   const modelPath = path.join(originalPath, fileToInspect);
 
   if (!fs.existsSync(modelPath)) {
@@ -261,12 +367,12 @@ export async function getResult(
   const params = textDocument(modelPath, position);
 
   openFile(connection, modelPath);
-  const response = await connection.sendRequest(reqType, params);
+  const response = await connection.sendRequest(reqType as never, params);
 
   await destroy();
 
   if (Array.isArray(projectName)) {
-    const resultsArr = [];
+    const resultsArr: IResponse<unknown>[] = [];
 
     for (let i = 0; i < projectName.length; i++) {
       resultsArr.push(_buildResponse(response, normalizedPath[i], result[i]));
@@ -298,7 +404,7 @@ function replaceTempUriPart(uri: string, base: string) {
   return fsPath.split(basePath).pop();
 }
 
-export function normalizeAddonsMeta(root: string, addonsMeta: { root: string; name: string }[]) {
+export function normalizeAddonsMeta(root: string, addonsMeta: AddonMeta[]) {
   return addonsMeta.map((el) => {
     el.root = normalizePath(path.relative(root, el.root));
 
@@ -323,7 +429,7 @@ export function normalizeRegistry(root: string, registry: Registry) {
   return normalizedRegistry;
 }
 
-export function normalizeUri(objects: Definition, base?: string) {
+export function normalizeUri(objects: null | unknown[] | Record<string, unknown>, base?: string) {
   if (objects === null) {
     return objects;
   }
@@ -333,7 +439,7 @@ export function normalizeUri(objects: Definition, base?: string) {
       // objects.uri = replaceDynamicUriPart(objects.uri);
 
       if (base) {
-        objects.uri = replaceTempUriPart(objects.uri, base);
+        objects.uri = replaceTempUriPart(objects.uri as string, base);
       }
     }
 
@@ -345,7 +451,7 @@ export function normalizeUri(objects: Definition, base?: string) {
       return object;
     }
 
-    return normalizeUri(object, base);
+    return normalizeUri(object as Record<string, unknown>, base);
   });
 }
 
@@ -380,7 +486,7 @@ export function makeAddonPackage(name, config, addonConfig = undefined) {
   return JSON.stringify(pack);
 }
 
-export function initServer(connection: MessageConnection, projectName: string) {
+export function initServer(connection: MessageConnection, projectName: string): Promise<{ serverInfo: { name: string; version: string } }> {
   const params = {
     rootUri: URI.file(path.join(__dirname, '..', 'fixtures', projectName)).toString(),
     capabilities: {},
@@ -389,5 +495,5 @@ export function initServer(connection: MessageConnection, projectName: string) {
     },
   };
 
-  return connection.sendRequest(InitializeRequest.type, params);
+  return connection.sendRequest(InitializeRequest.type as never, params);
 }

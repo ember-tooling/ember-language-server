@@ -5,7 +5,7 @@ import { logError, logInfo } from './utils/logger';
 import * as walkSync from 'walk-sync';
 import { URI } from 'vscode-uri';
 import * as fs from 'fs';
-import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath } from './utils/layout-helpers';
+import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath, getPackageJSON } from './utils/layout-helpers';
 
 import Server from './server';
 
@@ -24,6 +24,26 @@ export default class ProjectRoots {
     Array.from(this.projects).forEach(([root]) => {
       this.reloadProject(root);
     });
+  }
+
+  isIgnoredProject(name: string) {
+    if (typeof name === 'undefined') {
+      return false;
+    }
+
+    if (this.ignoredProjects.includes(name)) {
+      return true;
+    }
+
+    const hasReverseIgnore = this.ignoredProjects.filter((el) => el.startsWith('!'));
+
+    if (!hasReverseIgnore.length) {
+      return false;
+    }
+
+    const allowedProjectName = `!${name}`;
+
+    return !hasReverseIgnore.includes(allowedProjectName);
   }
 
   reloadProject(projectRoot: string) {
@@ -104,6 +124,36 @@ export default class ProjectRoots {
     }
 
     try {
+      const info = getPackageJSON(projectPath);
+
+      if (!info.name) {
+        logInfo(`Unable to get project name from package.json at ${projectPath}`);
+      }
+
+      if (this.isIgnoredProject(info.name as string)) {
+        logInfo('--------------------');
+        logInfo(`Skipping "${info.name}" initialization, because it's marked as ignored in uELS settings.`);
+        logInfo(`Skipped path: ${projectPath}`);
+        logInfo('If you use this addon/engine/project in host app, not marked as ignored, all LS features will work for it.');
+        logInfo('--------------------');
+
+        return {
+          initIssues: [`Unable to create project "${info.name}", because it ignored according to config: [${this.ignoredProjects.join(',')}]`],
+          providers: {
+            definitionProviders: [],
+            referencesProviders: [],
+            completionProviders: [],
+            codeActionProviders: [],
+            initFunctions: [],
+            info: [],
+            addonsMeta: [],
+          },
+          addonsMeta: [],
+          name: info.name,
+          registry: {},
+        };
+      }
+
       const project = new Project(projectPath, this.localAddons);
 
       this.projects.set(projectPath, project);
@@ -120,7 +170,21 @@ export default class ProjectRoots {
     } catch (e) {
       logError(e);
 
-      return false;
+      return {
+        initIssues: [e.toString()],
+        providers: {
+          definitionProviders: [],
+          referencesProviders: [],
+          completionProviders: [],
+          codeActionProviders: [],
+          initFunctions: [],
+          info: [],
+          addonsMeta: [],
+        },
+        addonsMeta: [],
+        name: `[${projectPath}]`,
+        registry: {},
+      };
     }
   }
 

@@ -14,6 +14,7 @@ import {
   normalizePath,
   Registry,
   UnknownResult,
+  setServerConfig,
 } from './test_helpers/integration-helpers';
 import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 
@@ -50,8 +51,8 @@ describe('integration', function () {
   });
 
   describe('Initialize request', () => {
+    jest.setTimeout(15000);
     it('returns an initialize request', async () => {
-      jest.setTimeout(15000);
       const response = await initServer(connection, 'full-project');
 
       expect(response.serverInfo.version.split('.').length).toEqual(3);
@@ -1514,21 +1515,112 @@ describe('integration', function () {
         }),
       };
 
-      const result = await getResult(
-        CompletionRequest.method,
-        connection,
-        files,
-        'lib/addon/components/item.hbs',
-        { line: 0, character: 1 },
-        ['', 'child-project'],
-        { local: { addons: [], ignoredProjects: ['parent-project'] } }
-      );
+      await setServerConfig(connection, { local: { addons: [], ignoredProjects: ['parent-project'] } });
+
+      const result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', { line: 0, character: 1 }, [
+        '',
+        'child-project',
+      ]);
 
       expect(result.length).toBe(2);
       expect(result[0].response.length).toBe(3);
+
+      await setServerConfig(connection);
+    });
+
+    it('reverse ignore working as expected', async () => {
+      const files = {
+        'first-project': {
+          'app/components': {
+            'foo.hbs': '<',
+            'bar.hbs': '',
+          },
+          'package.json': JSON.stringify({
+            name: 'first-project',
+            'ember-addon': {
+              paths: ['../lib'],
+            },
+          }),
+        },
+        'second-project': {
+          'app/components/baz.hbs': '<',
+          'package.json': JSON.stringify({
+            name: 'second-project',
+            'ember-addon': {
+              paths: ['../lib'],
+            },
+          }),
+        },
+        lib: {
+          'package.json': JSON.stringify({
+            name: 'my-addon',
+            keywords: ['ember-addon'],
+          }),
+          'index.js': '',
+          'addon/components/item.hbs': '<',
+        },
+      };
+
+      await setServerConfig(connection, { local: { addons: [], ignoredProjects: ['!first-project'] } });
+      const projects = ['first-project', 'second-project'];
+      const pos = { line: 0, character: 1 };
+
+      let result = await getResult(CompletionRequest.method, connection, files, 'first-project/app/components/foo.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(3);
+
+      result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(3);
+
+      result = await getResult(CompletionRequest.method, connection, files, 'second-project/app/components/baz.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(0);
+
+      await setServerConfig(connection, { local: { addons: [], ignoredProjects: ['!second-project'] } });
+
+      result = await getResult(CompletionRequest.method, connection, files, 'first-project/app/components/foo.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(0);
+
+      result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(2);
+
+      result = await getResult(CompletionRequest.method, connection, files, 'second-project/app/components/baz.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(2);
+
+      await setServerConfig(connection, { local: { addons: [], ignoredProjects: ['!second-project', '!first-project'] } });
+
+      result = await getResult(CompletionRequest.method, connection, files, 'first-project/app/components/foo.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(3);
+
+      result = await getResult(CompletionRequest.method, connection, files, 'second-project/app/components/baz.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(2);
+
+      await setServerConfig(connection, { local: { addons: [], ignoredProjects: ['second-project', 'first-project'] } });
+
+      result = await getResult(CompletionRequest.method, connection, files, 'first-project/app/components/foo.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(0);
+
+      result = await getResult(CompletionRequest.method, connection, files, 'lib/addon/components/item.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(0);
+
+      result = await getResult(CompletionRequest.method, connection, files, 'second-project/app/components/baz.hbs', pos, projects);
+
+      expect(result[0].response.length).toBe(0);
+
+      await setServerConfig(connection);
     });
 
     it('support parent project addon calling child project', async () => {
+      await setServerConfig(connection);
+
       const result = await getResult(
         DefinitionRequest.method,
         connection,

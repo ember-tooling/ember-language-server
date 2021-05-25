@@ -110,6 +110,12 @@ function scheduleTokensExtraction(kind: UsageType, normalizedName: string, file:
   extractionTimeout = setTimeout(extractTokens, 100);
 }
 
+export async function waitForTokensToBeCollected() {
+  while (tokenQueue.length) {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+}
+
 function extractTokens() {
   if (!tokenQueue.length) {
     return;

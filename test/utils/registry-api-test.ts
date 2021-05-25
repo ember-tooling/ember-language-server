@@ -1,5 +1,5 @@
 import { addToRegistry, getRegistryForRoot, normalizeMatchNaming, removeFromRegistry } from '../../src/utils/registry-api';
-import { findRelatedFiles } from '../../src/utils/usages-api';
+import { findRelatedFiles, waitForTokensToBeCollected } from '../../src/utils/usages-api';
 import { createTempDir } from 'broccoli-test-helper';
 import * as path from 'path';
 let dir = null;
@@ -31,10 +31,8 @@ describe('addToRegistry - it able to add different kinds to registry', () => {
 
     files.push(file1, file2, file3);
     addToRegistry('foo-bar', 'component', files);
-
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
     expect(getRegistryForRoot(path.resolve(dir.path()))['component']['foo-bar'].length).toBe(3);
+    await waitForTokensToBeCollected();
     expect(findRelatedFiles('boo').length).toBe(1);
   });
   it('able to remove items from registry', () => {

@@ -1,4 +1,4 @@
-import { updateTemplateTokens, closestParentRoutePath, findRelatedFiles } from '../../src/utils/usages-api';
+import { updateTemplateTokens, closestParentRoutePath, findRelatedFiles, waitForTokensToBeCollected } from '../../src/utils/usages-api';
 import { createTempDir } from 'broccoli-test-helper';
 import * as path from 'path';
 let dir = null;
@@ -30,7 +30,7 @@ describe('Usages API', () => {
 
     updateTemplateTokens('component', 'foo', createFile('foo.hbs', '<FooBar />'));
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForTokensToBeCollected();
 
     expect(findRelatedFiles('foo-bar').length).toBe(1);
 
@@ -44,7 +44,7 @@ describe('Usages API', () => {
     updateTemplateTokens('component', 'foo', createFile('foo.hbs', '<FooBar />'));
     updateTemplateTokens('routePath', 'boo', createFile('boo.hbs', '{{foo-bar}}'));
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForTokensToBeCollected();
 
     expect(findRelatedFiles('foo-bar').length).toBe(2);
 
@@ -56,42 +56,42 @@ describe('Usages API', () => {
   it('should return usages for closest routes (upper)', async () => {
     expect(findRelatedFiles('foo/bar/baz', 'template').length).toBe(0);
     updateTemplateTokens('routePath', 'foo.bar', createFile('bar.hbs', ''));
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForTokensToBeCollected();
     expect(findRelatedFiles('foo/bar/baz', 'template').length).toBe(1);
     updateTemplateTokens('routePath', 'foo.bar', null);
   });
   it('should return usages for closest available routes (upper)', async () => {
     expect(findRelatedFiles('foo/bar/baz', 'template').length).toBe(0);
     updateTemplateTokens('routePath', 'foo', createFile('bar.hbs', ''));
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForTokensToBeCollected();
     expect(findRelatedFiles('foo/bar/baz', 'template').length).toBe(1);
     updateTemplateTokens('routePath', 'foo', null);
   });
   it('should return usages for closest available routes, in index case', async () => {
     expect(findRelatedFiles('index', 'template').length).toBe(0);
     updateTemplateTokens('routePath', 'application', createFile('bar.hbs', ''));
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForTokensToBeCollected();
     expect(findRelatedFiles('index', 'template').length).toBe(1);
     updateTemplateTokens('routePath', 'application', null);
   });
   it('should return usages for closest available routes, in loading case', async () => {
     expect(findRelatedFiles('index-loading', 'template').length).toBe(0);
     updateTemplateTokens('routePath', 'index', createFile('bar.hbs', ''));
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForTokensToBeCollected();
     expect(findRelatedFiles('index-loading', 'template').length).toBe(1);
     updateTemplateTokens('routePath', 'index', null);
   });
   it('should return usages for closest available routes, in error case', async () => {
     expect(findRelatedFiles('index-error', 'template').length).toBe(0);
     updateTemplateTokens('routePath', 'index', createFile('bar.hbs', ''));
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForTokensToBeCollected();
     expect(findRelatedFiles('index-error', 'template').length).toBe(1);
     updateTemplateTokens('routePath', 'index', null);
   });
   it('should return root template for case if no parents by path', async () => {
     expect(findRelatedFiles('groups-loading', 'template').length).toBe(0);
     updateTemplateTokens('routePath', 'application', createFile('bar.hbs', ''));
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForTokensToBeCollected();
     expect(findRelatedFiles('groups-loading', 'template').length).toBe(1);
     updateTemplateTokens('routePath', 'application', null);
   });
