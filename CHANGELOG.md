@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/lifeart/ember-language-server/compare/v1.14.0...v1.15.0) (2021-05-25)
+
+
+### Features
+
+* addons lookup for top-level registry ([#279](https://github.com/lifeart/ember-language-server/issues/279)) ([988f88b](https://github.com/lifeart/ember-language-server/commit/988f88b5304ebc4587d7d55e9c2b2adb8bd67896))
+
 # [1.14.0](https://github.com/lifeart/ember-language-server/compare/v1.13.0...v1.14.0) (2021-05-25)
 
 
