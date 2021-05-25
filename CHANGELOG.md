@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/lifeart/ember-language-server/compare/v1.13.0...v1.14.0) (2021-05-25)
+
+
+### Features
+
+* completely skip ignored project initialization ([#274](https://github.com/lifeart/ember-language-server/issues/274)) ([723a762](https://github.com/lifeart/ember-language-server/commit/723a762dc007820d4934dcb810edda71eec0d3ad))
+
 # [1.13.0](https://github.com/lifeart/ember-language-server/compare/v1.12.0...v1.13.0) (2021-05-23)
 
 
