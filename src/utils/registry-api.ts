@@ -72,15 +72,17 @@ export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, 
   }
 }
 
-export function getRegistryForRoot(rawRoot: string) {
+export type IRegistry = {
+  [key in REGISTRY_KIND]: {
+    [key: string]: string[];
+  };
+};
+
+export function getRegistryForRoot(rawRoot: string): IRegistry {
   const root = path.resolve(rawRoot);
   const lowRoot = root.toLowerCase();
 
-  const registryForRoot: {
-    [key in REGISTRY_KIND]: {
-      [key: string]: string[];
-    };
-  } = {
+  const registryForRoot: IRegistry = {
     transform: {},
     helper: {},
     component: {},

@@ -32,6 +32,7 @@ export function initBuiltinProviders(): ProjectProviders {
       templateCompletion.initRegistry.bind(templateCompletion),
       scriptCompletion.initRegistry.bind(scriptCompletion),
       templateDefinition.onInit.bind(templateDefinition),
+      scriptDefinition.onInit.bind(scriptDefinition),
     ],
     info: [],
     addonsMeta: [],

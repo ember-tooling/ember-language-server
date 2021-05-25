@@ -42,19 +42,17 @@ export class Project extends BaseProject {
   get roots() {
     const mainRoot = this.root;
     const otherRoots = this.addonsMeta.filter((addon) => addon.version !== null).map((meta) => meta.root);
-    const ignoredParts = ['node_modules'];
-    const filteredRoots = otherRoots.filter((el) => {
-      return ignoredParts.every((part) => !el.includes(part));
-    });
     // because all registry searches based on "startsWith", we could omit roots in same namespace,
     // like {root/a, root/b}, because we will get results of it from {root} itself
-    const differentRoots = filteredRoots.filter((root) => !isRootStartingWithFilePath(root, mainRoot));
+    const differentRoots = otherRoots.filter((root) => !isRootStartingWithFilePath(root, mainRoot));
 
     return [mainRoot, ...differentRoots];
   }
+  registryVersion = 0;
   trackChange(uri: string, change: FileChangeType) {
     // prevent leaks
     if (this.files.size > 10000) {
+      this.registryVersion++;
       logError('too many files for project ' + this.root);
       this.files.clear();
     }
@@ -74,6 +72,7 @@ export class Project extends BaseProject {
     }
 
     if (change === 3) {
+      this.registryVersion++;
       this.files.delete(filePath);
 
       if (normalizedItem) {
@@ -85,6 +84,7 @@ export class Project extends BaseProject {
       }
 
       if (!this.files.has(filePath)) {
+        this.registryVersion++;
         this.files.set(filePath, { version: 0 });
       }
 

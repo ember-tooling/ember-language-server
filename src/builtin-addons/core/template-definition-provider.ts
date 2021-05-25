@@ -4,7 +4,7 @@ import { Definition, Location } from 'vscode-languageserver/node';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { isLinkToTarget, isLinkComponentRouteTarget, isOutlet } from './../../utils/ast-helpers';
 import ASTPath from './../../glimmer-utils';
-import { getRegistryForRoot } from './../../utils/registry-api';
+import { IRegistry } from './../../utils/registry-api';
 import { normalizeToClassicComponent } from '../../utils/normalizers';
 import { isTemplatePath, isTestFile, isScriptPath } from './../../utils/layout-helpers';
 
@@ -26,17 +26,15 @@ function getComponentAndAddonName(rawComponentName: string) {
   return { addonName: normalizeToClassicComponent(addonName), componentName };
 }
 
-export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component' | 'routePath', name: string, root: string): string[] {
-  const absRoot = path.normalize(root);
-  const registry = getRegistryForRoot(absRoot);
+export function getPathsFromRegistry(type: 'helper' | 'modifier' | 'component' | 'routePath', name: string, registry: IRegistry): string[] {
   const bucket: string[] = registry[type][name] || [];
 
   return bucket.filter((el: string) => !isStyleFile(path.normalize(el)) && !isTestFile(path.normalize(el))) as string[];
 }
 
-export function provideComponentTemplatePaths(root: string, rawComponentName: string) {
+export function provideComponentTemplatePaths(registry: IRegistry, rawComponentName: string) {
   const maybeComponentName = normalizeToClassicComponent(rawComponentName);
-  const items = getPathsFromRegistry('component', maybeComponentName, root);
+  const items = getPathsFromRegistry('component', maybeComponentName, registry);
 
   if (items.length) {
     const results = items.filter((el) => isTemplatePath(el));
@@ -51,20 +49,30 @@ export function provideComponentTemplatePaths(root: string, rawComponentName: st
   }
 }
 
-export function provideRouteDefinition(root: string, routeName: string): Location[] {
-  const items = getPathsFromRegistry('routePath', routeName, root).filter((el) => !isTestFile(el));
+export function provideRouteDefinition(registry: IRegistry, routeName: string): Location[] {
+  const items = getPathsFromRegistry('routePath', routeName, registry).filter((el) => !isTestFile(el));
 
   return pathsToLocations(...items);
 }
 
 export default class TemplateDefinitionProvider {
+  _registry!: IRegistry;
+  _registryVersion = -1;
+  get registry(): IRegistry {
+    if (this._registryVersion !== this.project.registryVersion) {
+      this._registry = this.server.getRegistry(this.project.roots);
+      this._registryVersion = this.project.registryVersion;
+    }
+
+    return this._registry;
+  }
   server!: Server;
   project!: Project;
   async onInit(server: Server, project: Project) {
     this.server = server;
     this.project = project;
   }
-  async onDefinition(root: string, params: DefinitionFunctionParams): Promise<Definition | null> {
+  async onDefinition(_: string, params: DefinitionFunctionParams): Promise<Definition | null> {
     const uri = params.textDocument.uri;
 
     const focusPath = params.focusPath;
@@ -75,35 +83,35 @@ export default class TemplateDefinitionProvider {
     }
 
     if (isOutlet(focusPath)) {
-      definitions = this.provideChildRouteDefinitions(root, uri);
+      definitions = this.provideChildRouteDefinitions(uri);
     } else if (this.maybeClassicComponentName(focusPath)) {
       const { addonName, componentName } = getComponentAndAddonName(this.extractValueForMaybeClassicComponentName(focusPath));
 
       // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
-      definitions = this.provideComponentDefinition(root, componentName, addonName);
+      definitions = this.provideComponentDefinition(componentName, addonName);
     } else if (this.isAngleComponent(focusPath)) {
       // <FooBar />
       definitions = this.provideAngleBrackedComponentDefinition(focusPath);
       // {{#foo-bar}} {{/foo-bar}}
     } else if (this.isComponentWithBlock(focusPath)) {
-      definitions = this.provideBlockComponentDefinition(root, focusPath);
+      definitions = this.provideBlockComponentDefinition(focusPath);
       // {{action "fooBar"}}, (action "fooBar"), (action this.fooBar), this.someProperty
     } else if (this.isActionName(focusPath) || this.isLocalProperty(focusPath)) {
-      definitions = this.providePropertyDefinition(root, focusPath, uri);
+      definitions = this.providePropertyDefinition(focusPath, uri);
       // {{foo-bar}}
     } else if (this.isComponentOrHelperName(focusPath)) {
-      definitions = this.provideMustacheDefinition(root, focusPath);
+      definitions = this.provideMustacheDefinition(focusPath);
       // <FooBar @somePropertyToFindUsage="" />
     } else if (isLinkComponentRouteTarget(focusPath)) {
       // <LinkTo @route="name" />
-      definitions = this.provideRouteDefinition(root, (focusPath.node as ASTv1.TextNode).chars);
+      definitions = this.provideRouteDefinition((focusPath.node as ASTv1.TextNode).chars);
     } else if (this.isAnglePropertyAttribute(focusPath)) {
-      definitions = this.provideAngleBracketComponentAttributeUsage(root, focusPath);
+      definitions = this.provideAngleBracketComponentAttributeUsage(focusPath);
       // {{hello propertyUsageToFind=someValue}}
     } else if (this.isHashPairKey(focusPath)) {
-      definitions = this.provideHashPropertyUsage(root, focusPath);
+      definitions = this.provideHashPropertyUsage(focusPath);
     } else if (isLinkToTarget(focusPath)) {
-      definitions = this.provideRouteDefinition(root, (focusPath.node as ASTv1.PathExpression).original);
+      definitions = this.provideRouteDefinition((focusPath.node as ASTv1.PathExpression).original);
     }
 
     return definitions;
@@ -137,12 +145,12 @@ export default class TemplateDefinitionProvider {
       return false;
     }
   }
-  provideRouteDefinition(root: string, routeName: string): Location[] {
-    return provideRouteDefinition(root, routeName);
+  provideRouteDefinition(routeName: string): Location[] {
+    return provideRouteDefinition(this.registry, routeName);
   }
-  _provideLikelyRawComponentTemplatePaths(root: string, rawComponentName: string, addonName: string) {
+  _provideLikelyRawComponentTemplatePaths(rawComponentName: string, addonName: string) {
     const maybeComponentName = normalizeToClassicComponent(rawComponentName);
-    let paths = getPathsFromRegistry('component', maybeComponentName, root);
+    let paths = getPathsFromRegistry('component', maybeComponentName, this.registry);
 
     if (addonName) {
       const addonMeta = this.project.addonsMeta.find((el) => el.name === addonName);
@@ -162,12 +170,10 @@ export default class TemplateDefinitionProvider {
 
     const paths: Set<string> = new Set();
 
-    this.project.roots.forEach((root) => {
-      const localPaths = this._provideLikelyRawComponentTemplatePaths(root, componentName, addonName);
+    const localPaths = this._provideLikelyRawComponentTemplatePaths(componentName, addonName);
 
-      localPaths.forEach((p) => {
-        paths.add(p);
-      });
+    localPaths.forEach((p) => {
+      paths.add(p);
     });
 
     return pathsToLocations(...(paths.size > 1 ? Array.from(paths).filter((postfix: string) => isTemplatePath(postfix)) : Array.from(paths)));
@@ -175,19 +181,18 @@ export default class TemplateDefinitionProvider {
   provideAngleBrackedComponentDefinition(focusPath: ASTPath) {
     return this.provideLikelyComponentTemplatePath((focusPath.node as ASTv1.ElementNode).tag);
   }
-  provideBlockComponentDefinition(root: string, focusPath: ASTPath): Location[] {
+  provideBlockComponentDefinition(focusPath: ASTPath): Location[] {
     const maybeComponentName = normalizeToClassicComponent(((focusPath.node as ASTv1.BlockStatement).path as ASTv1.PathExpression).original);
 
-    const paths = getPathsFromRegistry('component', maybeComponentName, root).filter((el) => isTemplatePath(el));
+    const paths = getPathsFromRegistry('component', maybeComponentName, this.registry).filter((el) => isTemplatePath(el));
 
     // mAddonPathsForComponentTemplates
     return pathsToLocationsWithPosition(paths, '{{yield');
   }
 
-  provideChildRouteDefinitions(root: string, uri: string): Location[] {
+  provideChildRouteDefinitions(uri: string): Location[] {
     const rawPath = URI.parse(uri).fsPath.toLowerCase();
-    const absRoot = path.normalize(root);
-    const registry = getRegistryForRoot(absRoot);
+    const registry = this.registry;
     const allPaths = registry.routePath;
     let pathName: string | null = null;
     const paths: string[] = [];
@@ -226,7 +231,7 @@ export default class TemplateDefinitionProvider {
     interestingPaths.forEach((p) => {
       const registryItem = registry.routePath[p] || [];
       const items = registryItem.filter((el: string) => {
-        return path.normalize(el).includes(absRoot) && !isTestFile(path.normalize(el)) && isTemplatePath(el);
+        return !isTestFile(path.normalize(el)) && isTemplatePath(el);
       });
 
       if (items.length) {
@@ -237,7 +242,7 @@ export default class TemplateDefinitionProvider {
     return pathsToLocations(...files);
   }
 
-  providePropertyDefinition(root: string, focusPath: ASTPath, uri: string): Location[] {
+  providePropertyDefinition(focusPath: ASTPath, uri: string): Location[] {
     const rawPath = URI.parse(uri).fsPath;
 
     if (!rawPath) {
@@ -253,17 +258,17 @@ export default class TemplateDefinitionProvider {
     }
 
     const maybeComponentName = normalizeToClassicComponent(data.name);
-    const paths = getPathsFromRegistry('component', maybeComponentName, root).filter((el) => isScriptPath(el));
+    const paths = getPathsFromRegistry('component', maybeComponentName, this.registry).filter((el) => isScriptPath(el));
 
     const text = (focusPath.node as ASTv1.PathExpression).original;
 
     return pathsToLocationsWithPosition(paths, text.replace('this.', '').split('.')[0]);
   }
 
-  provideComponentDefinition(root: string, rawComponentName: string, addonName: string): Location[] {
+  provideComponentDefinition(rawComponentName: string, addonName: string): Location[] {
     const maybeComponentName = normalizeToClassicComponent(rawComponentName);
 
-    let paths = [...getPathsFromRegistry('component', maybeComponentName, root), ...getPathsFromRegistry('helper', maybeComponentName, root)];
+    let paths = [...getPathsFromRegistry('component', maybeComponentName, this.registry), ...getPathsFromRegistry('helper', maybeComponentName, this.registry)];
 
     if (addonName) {
       const addonMeta = this.project.addonsMeta.find((el) => el.name === addonName);
@@ -277,7 +282,7 @@ export default class TemplateDefinitionProvider {
 
     return pathsToLocations(...(paths.length > 1 ? paths.filter(isTemplatePath) : paths));
   }
-  provideMustacheDefinition(root: string, focusPath: ASTPath) {
+  provideMustacheDefinition(focusPath: ASTPath) {
     const maybeComponentName =
       focusPath.node.type === 'ElementNode'
         ? normalizeToClassicComponent((focusPath.node as ASTv1.ElementNode).tag)
@@ -285,16 +290,16 @@ export default class TemplateDefinitionProvider {
 
     const { addonName, componentName } = getComponentAndAddonName(maybeComponentName);
 
-    return this.provideComponentDefinition(root, componentName, addonName);
+    return this.provideComponentDefinition(componentName, addonName);
   }
-  provideHashPropertyUsage(root: string, focusPath: ASTPath): Location[] {
+  provideHashPropertyUsage(focusPath: ASTPath): Location[] {
     const parentPath = focusPath.parentPath;
 
     if (parentPath && parentPath.parent && parentPath.parent.path) {
       const maybeComponentName = parentPath.parent.path.original;
 
       if (!maybeComponentName.includes('.') && maybeComponentName.includes('-')) {
-        const paths = getPathsFromRegistry('component', maybeComponentName, root).filter((postfix: string) => isTemplatePath(postfix));
+        const paths = getPathsFromRegistry('component', maybeComponentName, this.registry).filter((postfix: string) => isTemplatePath(postfix));
 
         return pathsToLocationsWithPosition(paths, '@' + (focusPath.node as ASTv1.HashPair).key);
       }
@@ -302,10 +307,10 @@ export default class TemplateDefinitionProvider {
 
     return [];
   }
-  provideAngleBracketComponentAttributeUsage(root: string, focusPath: ASTPath): Location[] {
+  provideAngleBracketComponentAttributeUsage(focusPath: ASTPath): Location[] {
     const maybeComponentName = normalizeToClassicComponent(focusPath.parent.tag);
 
-    const paths = getPathsFromRegistry('component', maybeComponentName, root).filter((postfix: string) => isTemplatePath(postfix));
+    const paths = getPathsFromRegistry('component', maybeComponentName, this.registry).filter((postfix: string) => isTemplatePath(postfix));
 
     return pathsToLocationsWithPosition(paths, (focusPath.node as ASTv1.AttrNode).name);
   }

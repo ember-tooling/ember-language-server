@@ -17,6 +17,9 @@ import { normalizeServiceName } from '../../utils/normalizers';
 import { isModuleUnificationApp, podModulePrefixForRoot } from './../../utils/layout-helpers';
 import { provideRouteDefinition } from './template-definition-provider';
 import { logInfo } from '../../utils/logger';
+import { Project } from '../../project';
+import Server from '../../server';
+import { IRegistry } from '../../utils/registry-api';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 
@@ -95,6 +98,22 @@ export default class CoreScriptDefinitionProvider {
   private resolvers!: PathResolvers;
   constructor() {
     this.resolvers = new PathResolvers();
+  }
+  _registry!: IRegistry;
+  _registryVersion = -1;
+  get registry(): IRegistry {
+    if (this._registryVersion !== this.project.registryVersion) {
+      this._registry = this.server.getRegistry(this.project.roots);
+      this._registryVersion = this.project.registryVersion;
+    }
+
+    return this._registry;
+  }
+  server!: Server;
+  project!: Project;
+  async onInit(server: Server, project: Project) {
+    this.server = server;
+    this.project = project;
   }
   guessPathForImport(root: string, uri: string, importPath: string) {
     if (!uri) {
@@ -230,7 +249,7 @@ export default class CoreScriptDefinitionProvider {
     } else if (isRouteLookup(astPath)) {
       const routePath = ((astPath.node as unknown) as t.StringLiteral).value;
 
-      definitions = provideRouteDefinition(root, routePath);
+      definitions = provideRouteDefinition(this.registry, routePath);
     }
 
     return definitions || [];

@@ -46,6 +46,7 @@ import { ASTNode } from 'ast-types';
 import { ASTv1 } from '@glimmer/syntax';
 import { URI } from 'vscode-uri';
 import { componentsContextData } from './template-context-provider';
+import { IRegistry } from '../../utils/registry-api';
 
 const mListModifiers = memoize(listModifiers, { length: 1, maxAge: 60000 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
@@ -126,6 +127,16 @@ function isArgumentName(name: string) {
 }
 
 export default class TemplateCompletionProvider {
+  _registry!: IRegistry;
+  _registryVersion = -1;
+  get registry(): IRegistry {
+    if (this._registryVersion !== this.project.registryVersion) {
+      this._registry = this.server.getRegistry(this.project.roots);
+      this._registryVersion = this.project.registryVersion;
+    }
+
+    return this._registry;
+  }
   project!: Project;
   server!: Server;
   hasNamespaceSupport = false;
@@ -218,7 +229,7 @@ export default class TemplateCompletionProvider {
       'label'
     );
   }
-  templateContextLookup(root: string, rawCurrentFilePath: string, templateContent: string): CompletionItem[] {
+  templateContextLookup(rawCurrentFilePath: string, templateContent: string): CompletionItem[] {
     const fsPath = URI.parse(rawCurrentFilePath).fsPath;
     const componentName = this.project.matchPathToType(fsPath)?.name;
 
@@ -227,12 +238,12 @@ export default class TemplateCompletionProvider {
       return [];
     }
 
-    const maybeScripts = getPathsFromRegistry('component', componentName, root).filter((el) => !isTestFile(el) && isScriptPath(el));
+    const maybeScripts = getPathsFromRegistry('component', componentName, this.registry).filter((el) => !isTestFile(el) && isScriptPath(el));
 
     return componentsContextData(maybeScripts, templateContent);
   }
-  getLocalPathExpressionCandidates(root: string, uri: string, originalText: string) {
-    const candidates: CompletionItem[] = [...this.templateContextLookup(root, uri, originalText)];
+  getLocalPathExpressionCandidates(uri: string, originalText: string) {
+    const candidates: CompletionItem[] = [...this.templateContextLookup(uri, originalText)];
 
     return candidates;
   }
@@ -348,14 +359,12 @@ export default class TemplateCompletionProvider {
 
     const paths: string[] = [];
 
-    this.project.roots.forEach((projectRoot) => {
-      const scopedPaths = provideComponentTemplatePaths(projectRoot, focusPath.tag).filter((p) => fs.existsSync(p));
+    const scopedPaths = provideComponentTemplatePaths(this.registry, focusPath.tag).filter((p) => fs.existsSync(p));
 
-      scopedPaths.forEach((p) => {
-        if (!paths.includes(p)) {
-          paths.push(p);
-        }
-      });
+    scopedPaths.forEach((p) => {
+      if (!paths.includes(p)) {
+        paths.push(p);
+      }
     });
 
     if (!paths.length) {
@@ -414,14 +423,12 @@ export default class TemplateCompletionProvider {
         if (isValidComponent) {
           const tpls: string[] = [];
 
-          this.project.roots.forEach((pRoot) => {
-            const localtpls = provideComponentTemplatePaths(pRoot, maybeComponentName);
+          const localtpls = provideComponentTemplatePaths(this.registry, maybeComponentName);
 
-            localtpls.forEach((item) => {
-              if (!tpls.includes(item)) {
-                tpls.push(item);
-              }
-            });
+          localtpls.forEach((item) => {
+            if (!tpls.includes(item)) {
+              tpls.push(item);
+            }
           });
 
           const existingTpls = tpls.filter(fs.existsSync);
@@ -429,7 +436,7 @@ export default class TemplateCompletionProvider {
           if (existingTpls.length) {
             const existingAttributes = focusPath.parent.attributes.map((attr: ASTv1.AttrNode) => attr.name).filter((name: string) => isArgumentName(name));
             const content = fs.readFileSync(existingTpls[0], 'utf8');
-            const candidates = this.getLocalPathExpressionCandidates(root, tpls[0], content);
+            const candidates = this.getLocalPathExpressionCandidates(tpls[0], content);
             const preResults: CompletionItem[] = [];
 
             candidates.forEach((obj: CompletionItem) => {
@@ -452,14 +459,14 @@ export default class TemplateCompletionProvider {
       } else if (isLocalPathExpression(focusPath)) {
         // {{foo-bar this.na?}}
         log('isLocalPathExpression');
-        const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText).filter((el) => {
+        const candidates = this.getLocalPathExpressionCandidates(uri, originalText).filter((el) => {
           return el.label.startsWith('this.');
         });
 
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isArgumentPathExpression(focusPath)) {
         // {{@ite..}}
-        const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText).filter((el) => {
+        const candidates = this.getLocalPathExpressionCandidates(uri, originalText).filter((el) => {
           return isArgumentName(el.label);
         });
 
@@ -468,7 +475,7 @@ export default class TemplateCompletionProvider {
         // {{foo-bar?}}
         log('isMustachePath');
         const candidates = this.getMustachePathCandidates(root);
-        const localCandidates = this.getLocalPathExpressionCandidates(root, uri, originalText);
+        const localCandidates = this.getLocalPathExpressionCandidates(uri, originalText);
 
         if (isScopedPathExpression(focusPath)) {
           const scopedValues = this.getScopedValues(focusPath);
@@ -506,7 +513,7 @@ export default class TemplateCompletionProvider {
           completions.push(...uniqBy(scopedValues, 'label'));
         }
 
-        const candidates = this.getLocalPathExpressionCandidates(root, uri, originalText);
+        const candidates = this.getLocalPathExpressionCandidates(uri, originalText);
 
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isLinkToTarget(focusPath)) {
