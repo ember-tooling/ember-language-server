@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/lifeart/ember-language-server/compare/v1.18.0...v1.19.0) (2021-05-26)
+
+
+### Features
+
+* use single registry for autocomplete ([#286](https://github.com/lifeart/ember-language-server/issues/286)) ([58e18a8](https://github.com/lifeart/ember-language-server/commit/58e18a8158e96ffbb711d18f1458bb2341911bf8))
+
 # [1.18.0](https://github.com/lifeart/ember-language-server/compare/v1.17.0...v1.18.0) (2021-05-26)
 
 
