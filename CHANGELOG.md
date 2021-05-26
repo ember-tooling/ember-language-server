@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/lifeart/ember-language-server/compare/v1.15.0...v1.16.0) (2021-05-26)
+
+
+### Features
+
+* Simplify registry getters (perf improvements) ([#282](https://github.com/lifeart/ember-language-server/issues/282)) ([a24a7c2](https://github.com/lifeart/ember-language-server/commit/a24a7c2460a58eaf322d8feb135de2fbe46206f6))
+
 # [1.15.0](https://github.com/lifeart/ember-language-server/compare/v1.14.0...v1.15.0) (2021-05-25)
 
 
