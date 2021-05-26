@@ -1,3 +1,11 @@
+# [1.20.0](https://github.com/lifeart/ember-language-server/compare/v1.19.0...v1.20.0) (2021-05-26)
+
+
+### Features
+
+* documentation for !project syntax ([ab5922f](https://github.com/lifeart/ember-language-server/commit/ab5922f40aec09420954b9c56202957d64ded57a))
+* punch-ci ([828e733](https://github.com/lifeart/ember-language-server/commit/828e73385bc04ccf3bfdce2b6dc39c95733bd286))
+
 # [1.19.0](https://github.com/lifeart/ember-language-server/compare/v1.18.0...v1.19.0) (2021-05-26)
 
 
