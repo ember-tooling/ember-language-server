@@ -56,15 +56,8 @@ export function provideRouteDefinition(registry: IRegistry, routeName: string): 
 }
 
 export default class TemplateDefinitionProvider {
-  _registry!: IRegistry;
-  _registryVersion = -1;
   get registry(): IRegistry {
-    if (this._registryVersion !== this.project.registryVersion) {
-      this._registry = this.server.getRegistry(this.project.roots);
-      this._registryVersion = this.project.registryVersion;
-    }
-
-    return this._registry;
+    return this.project.registry;
   }
   server!: Server;
   project!: Project;

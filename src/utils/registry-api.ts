@@ -78,10 +78,13 @@ export type IRegistry = {
   };
 };
 
-export function getRegistryForRoot(rawRoot: string): IRegistry {
-  const root = path.resolve(rawRoot);
-  const lowRoot = root.toLowerCase();
+export function getRegistryForRoots(rawRoots: string[]) {
+  return _getRegistryForRoots(rawRoots);
+}
 
+function _getRegistryForRoots(rawRoots: string[]) {
+  const roots = rawRoots.map((rawRoot) => path.resolve(rawRoot));
+  const lowRoot = roots.map((root) => root.toLowerCase());
   const registryForRoot: IRegistry = {
     transform: {},
     helper: {},
@@ -91,6 +94,7 @@ export function getRegistryForRoot(rawRoot: string): IRegistry {
     service: {},
     modifier: {},
   };
+
   const registry = getGlobalRegistry();
 
   Object.keys(registry).forEach((key: REGISTRY_KIND) => {
@@ -100,7 +104,11 @@ export function getRegistryForRoot(rawRoot: string): IRegistry {
       const items: string[] = [];
 
       paths.forEach((normalizedPath) => {
-        if (isRootStartingWithFilePath(lowRoot, normalizedPath.toLowerCase())) {
+        if (
+          lowRoot.some((lowRoot) => {
+            return isRootStartingWithFilePath(lowRoot, normalizedPath.toLowerCase());
+          })
+        ) {
           items.push(normalizedPath);
         }
       });
@@ -112,6 +120,10 @@ export function getRegistryForRoot(rawRoot: string): IRegistry {
   });
 
   return registryForRoot;
+}
+
+export function getRegistryForRoot(rawRoot: string): IRegistry {
+  return _getRegistryForRoots([rawRoot]);
 }
 
 export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {

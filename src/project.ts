@@ -1,4 +1,4 @@
-import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem } from './utils/registry-api';
+import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem, IRegistry, getRegistryForRoots } from './utils/registry-api';
 import { ProjectProviders, collectProjectProviders, AddonMeta, DependencyMeta } from './utils/addon-api';
 import {
   findTestsForProject,
@@ -49,6 +49,16 @@ export class Project extends BaseProject {
     return [mainRoot, ...differentRoots];
   }
   registryVersion = 0;
+  _registry!: IRegistry;
+  _registryVersion = -1;
+  get registry(): IRegistry {
+    if (this._registryVersion !== this.registryVersion) {
+      this._registry = getRegistryForRoots(this.roots);
+      this._registryVersion = this.registryVersion;
+    }
+
+    return this._registry;
+  }
   trackChange(uri: string, change: FileChangeType) {
     // prevent leaks
     if (this.files.size > 10000) {

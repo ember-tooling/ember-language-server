@@ -15,6 +15,7 @@ import {
   closestScriptNodeParent,
 } from '../../utils/ast-helpers';
 import { listRoutes, listModels, listServices, mGetProjectAddonsInfo, listTransforms } from '../../utils/layout-helpers';
+import { IRegistry } from '../../utils/registry-api';
 
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
 const mListModels = memoize(listModels, { length: 1, maxAge: 60000 });
@@ -39,6 +40,9 @@ export default class ScriptCompletionProvider {
         'Unable to user global registry state, falling back to cache api, to fix this message install [els-addon-file-watcher]'
       );
     }
+  }
+  get registry(): IRegistry {
+    return this.project.registry;
   }
   async initRegistry(_: Server, project: Project) {
     this.project = project;
@@ -84,7 +88,7 @@ export default class ScriptCompletionProvider {
           this.enableRegistryCache('projectAddonsInfoInitialized');
         }
 
-        const registry = this.server.getRegistry(this.project.roots);
+        const registry = this.registry;
 
         Object.keys(registry.model).forEach((rawModelName) => {
           completions.push({
@@ -106,7 +110,7 @@ export default class ScriptCompletionProvider {
           this.enableRegistryCache('projectAddonsInfoInitialized');
         }
 
-        const registry = this.server.getRegistry(this.project.roots);
+        const registry = this.registry;
 
         Object.keys(registry.routePath).forEach((rawRouteName) => {
           completions.push({
@@ -128,7 +132,7 @@ export default class ScriptCompletionProvider {
           this.enableRegistryCache('projectAddonsInfoInitialized');
         }
 
-        const registry = this.server.getRegistry(this.project.roots);
+        const registry = this.registry;
 
         Object.keys(registry.service).forEach((rawServiceName) => {
           completions.push({
@@ -182,7 +186,7 @@ export default class ScriptCompletionProvider {
           this.enableRegistryCache('projectAddonsInfoInitialized');
         }
 
-        const registry = this.server.getRegistry(this.project.roots);
+        const registry = this.registry;
 
         Object.keys(registry.transform).forEach((rawTransformName) => {
           completions.push({

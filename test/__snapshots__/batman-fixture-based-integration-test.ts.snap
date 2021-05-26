@@ -5,42 +5,6 @@ Array [
   Object {
     "detail": "component",
     "kind": 7,
-    "label": "Boo$Bar",
-    "textEdit": Object {
-      "newText": "Boo$Bar",
-      "range": Object {
-        "end": Object {
-          "character": 1,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 0,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
-    "label": "Foo$Bar",
-    "textEdit": Object {
-      "newText": "Foo$Bar",
-      "range": Object {
-        "end": Object {
-          "character": 1,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 0,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "component",
-    "kind": 7,
     "label": "AnotherAwesomeComponent",
     "textEdit": Object {
       "newText": "AnotherAwesomeComponent",
@@ -80,6 +44,42 @@ Array [
     "label": "Nested::NestedComponent",
     "textEdit": Object {
       "newText": "Nested::NestedComponent",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Boo$Bar",
+    "textEdit": Object {
+      "newText": "Boo$Bar",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Foo$Bar",
+    "textEdit": Object {
+      "newText": "Foo$Bar",
       "range": Object {
         "end": Object {
           "character": 1,

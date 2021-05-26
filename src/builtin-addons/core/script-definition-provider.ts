@@ -99,15 +99,8 @@ export default class CoreScriptDefinitionProvider {
   constructor() {
     this.resolvers = new PathResolvers();
   }
-  _registry!: IRegistry;
-  _registryVersion = -1;
   get registry(): IRegistry {
-    if (this._registryVersion !== this.project.registryVersion) {
-      this._registry = this.server.getRegistry(this.project.roots);
-      this._registryVersion = this.project.registryVersion;
-    }
-
-    return this._registry;
+    return this.project.registry;
   }
   server!: Server;
   project!: Project;

@@ -49,7 +49,7 @@ import { CodeActionProvider } from './code-action-provider/entry';
 import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
-import { getRegistryForRoot, addToRegistry, REGISTRY_KIND, normalizeMatchNaming, IRegistry } from './utils/registry-api';
+import { getRegistryForRoot, addToRegistry, REGISTRY_KIND, normalizeMatchNaming, IRegistry, getRegistryForRoots } from './utils/registry-api';
 import { Usage, findRelatedFiles } from './utils/usages-api';
 import { URI } from 'vscode-uri';
 import { MatchResultType } from './utils/path-matcher';
@@ -87,32 +87,7 @@ export default class Server {
   }
   getRegistry(rawRoot: string | string[]): IRegistry {
     if (Array.isArray(rawRoot)) {
-      const roots = rawRoot.slice(0);
-      const mainRegistry = getRegistryForRoot(roots.pop() as string);
-
-      roots.forEach((root) => {
-        const subRegistry = getRegistryForRoot(root);
-
-        Object.keys(subRegistry).forEach((keyName) => {
-          const collection: { [key: string]: string[] } = subRegistry[keyName as keyof typeof subRegistry];
-
-          Object.keys(collection).forEach((itemName) => {
-            if (!Array.isArray(mainRegistry[keyName as keyof typeof mainRegistry][itemName])) {
-              mainRegistry[keyName as keyof typeof mainRegistry][itemName] = [];
-            }
-
-            const rootRef = mainRegistry[keyName as keyof typeof mainRegistry][itemName];
-
-            collection[itemName].forEach((filePath) => {
-              if (!rootRef.includes(filePath)) {
-                rootRef.push(filePath);
-              }
-            });
-          });
-        });
-      });
-
-      return mainRegistry;
+      return getRegistryForRoots(rawRoot);
     } else {
       return getRegistryForRoot(rawRoot);
     }
