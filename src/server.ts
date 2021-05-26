@@ -56,7 +56,7 @@ import { MatchResultType } from './utils/path-matcher';
 import { FileChangeType } from 'vscode-languageserver/node';
 import { debounce } from 'lodash';
 import { Config, Initializer } from './types';
-import { isFileBelongsToRoots } from './utils/layout-helpers';
+import { isFileBelongsToRoots, mGetProjectAddonsInfo } from './utils/layout-helpers';
 
 export default class Server {
   initializers: Initializer[] = [];
@@ -156,6 +156,9 @@ export default class Server {
           path: filePath,
         };
       }
+
+      mGetProjectAddonsInfo(project.root);
+      project.invalidateRegistry();
 
       return {
         projectName: project.name,

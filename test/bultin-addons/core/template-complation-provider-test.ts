@@ -23,8 +23,8 @@ describe('filter util', function () {
 describe('generateNamespacedComponentsHashMap', function () {
   it('[Angle brackets] returns the expected namespaced map', function () {
     const mockAddonMetaArr = [
-      { name: '@company/foo', root: 'blah/bar/dummy/@company/foo' },
-      { name: 'biz', root: 'blah/baz/diz/biz' },
+      { name: '@company/foo', version: 1, root: 'blah/bar/dummy/@company/foo' },
+      { name: 'biz', version: 1, root: 'blah/baz/diz/biz' },
     ];
 
     const server: any = {
@@ -38,8 +38,8 @@ describe('generateNamespacedComponentsHashMap', function () {
 
   it('[Mustache] returns the expected namespaced map', function () {
     const mockAddonMetaArr = [
-      { name: '@company/test', root: 'blah/bar/dummy/@company/test' },
-      { name: 'biz', root: 'blah/baz/diz/biz' },
+      { name: '@company/test', version: 1, root: 'blah/bar/dummy/@company/test' },
+      { name: 'biz', version: 1, root: 'blah/baz/diz/biz' },
     ];
 
     const server: any = {

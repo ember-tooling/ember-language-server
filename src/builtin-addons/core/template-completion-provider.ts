@@ -71,6 +71,10 @@ export function generateNamespacedComponentsHashMap(addonsMeta: Array<AddonMeta>
 
   // Iterate over the addons meta
   addonsMeta.forEach((addonData: AddonMeta) => {
+    if (addonData.version !== 1) {
+      return;
+    }
+
     // Get the component registry based on the addon root.
     // The component registry is a map where the file name is the key and the value are
     // potential file paths.
@@ -174,6 +178,8 @@ export default class TemplateCompletionProvider {
         mGetProjectAddonsInfo(project.root);
         this.enableRegistryCache('projectAddonsInfoInitialized');
 
+        this.project.invalidateRegistry();
+
         logInfo(project.root + ': registry initialized in ' + (Date.now() - initStartTime) + 'ms');
       } catch (e) {
         logError(e);
@@ -188,6 +194,7 @@ export default class TemplateCompletionProvider {
     if (!this.meta.projectAddonsInfoInitialized) {
       mGetProjectAddonsInfo(root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
+      this.project.invalidateRegistry();
     }
 
     if (!this.meta.componentsRegistryInitialized) {
@@ -200,7 +207,7 @@ export default class TemplateCompletionProvider {
       this.enableRegistryCache('podComponentsRegistryInitialized');
     }
 
-    const registry = this.server.getRegistry(this.project.roots);
+    const registry = this.project.registry;
 
     return uniqBy(
       items
@@ -244,6 +251,7 @@ export default class TemplateCompletionProvider {
     if (!this.meta.projectAddonsInfoInitialized) {
       mGetProjectAddonsInfo(root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
+      this.project.invalidateRegistry();
     }
 
     if (!this.meta.componentsRegistryInitialized) {
@@ -261,7 +269,7 @@ export default class TemplateCompletionProvider {
       this.enableRegistryCache('helpersRegistryInitialized');
     }
 
-    const registry = this.server.getRegistry(this.project.roots);
+    const registry = this.project.registry;
 
     const candidates: CompletionItem[] = [
       ...Object.keys(registry.component).map((rawName) => {
@@ -286,6 +294,7 @@ export default class TemplateCompletionProvider {
     if (!this.meta.projectAddonsInfoInitialized) {
       mGetProjectAddonsInfo(root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
+      this.project.invalidateRegistry();
     }
 
     if (!this.meta.componentsRegistryInitialized) {
@@ -298,7 +307,7 @@ export default class TemplateCompletionProvider {
       this.enableRegistryCache('podComponentsRegistryInitialized');
     }
 
-    const registry = this.server.getRegistry(this.project.roots);
+    const registry = this.project.registry;
 
     return Object.keys(registry.component).map((rawName) => {
       return {
@@ -317,9 +326,10 @@ export default class TemplateCompletionProvider {
     if (!this.meta.projectAddonsInfoInitialized) {
       mGetProjectAddonsInfo(this.project.root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
+      this.project.invalidateRegistry();
     }
 
-    const registry = this.server.getRegistry(this.project.roots);
+    const registry = this.project.registry;
 
     return Object.keys(registry.helper).map((helperName) => {
       return {
@@ -518,7 +528,7 @@ export default class TemplateCompletionProvider {
           this.enableRegistryCache('routesRegistryInitialized');
         }
 
-        const registry = this.server.getRegistry(this.project.roots);
+        const registry = this.project.registry;
 
         const results = Object.keys(registry.routePath).map((name) => {
           return {
@@ -538,7 +548,7 @@ export default class TemplateCompletionProvider {
           this.enableRegistryCache('routesRegistryInitialized');
         }
 
-        const registry = this.server.getRegistry(this.project.roots);
+        const registry = this.project.registry;
 
         const results = Object.keys(registry.routePath).map((name) => {
           return {
@@ -560,9 +570,10 @@ export default class TemplateCompletionProvider {
         if (!this.meta.projectAddonsInfoInitialized) {
           mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
+          this.project.invalidateRegistry();
         }
 
-        const registry = this.server.getRegistry(this.project.roots);
+        const registry = this.project.registry;
 
         const resolvedModifiers = Object.keys(registry.modifier).map((name) => {
           return {

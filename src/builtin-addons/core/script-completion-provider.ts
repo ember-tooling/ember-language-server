@@ -86,6 +86,7 @@ export default class ScriptCompletionProvider {
         if (!this.meta.projectAddonsInfoInitialized) {
           mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
+          this.project.invalidateRegistry();
         }
 
         const registry = this.registry;
@@ -108,6 +109,7 @@ export default class ScriptCompletionProvider {
         if (!this.meta.projectAddonsInfoInitialized) {
           mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
+          this.project.invalidateRegistry();
         }
 
         const registry = this.registry;
@@ -130,6 +132,7 @@ export default class ScriptCompletionProvider {
         if (!this.meta.projectAddonsInfoInitialized) {
           mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
+          this.project.invalidateRegistry();
         }
 
         const registry = this.registry;
@@ -184,6 +187,7 @@ export default class ScriptCompletionProvider {
         if (!this.meta.projectAddonsInfoInitialized) {
           mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
+          this.project.invalidateRegistry();
         }
 
         const registry = this.registry;
