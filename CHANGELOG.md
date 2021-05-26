@@ -1,3 +1,10 @@
+# [1.21.0](https://github.com/lifeart/ember-language-server/compare/v1.20.0...v1.21.0) (2021-05-26)
+
+
+### Features
+
+* Happy features ([#288](https://github.com/lifeart/ember-language-server/issues/288)) ([fedd5c0](https://github.com/lifeart/ember-language-server/commit/fedd5c04be8056790de21f15ddd1b0953e15a96f))
+
 # [1.20.0](https://github.com/lifeart/ember-language-server/compare/v1.19.0...v1.20.0) (2021-05-26)
 
 
