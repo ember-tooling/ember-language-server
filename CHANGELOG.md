@@ -1,3 +1,10 @@
+# [1.18.0](https://github.com/lifeart/ember-language-server/compare/v1.17.0...v1.18.0) (2021-05-26)
+
+
+### Features
+
+* adds els.getProjectRegistry and els.getLegacyTemplateTokens commands ([#285](https://github.com/lifeart/ember-language-server/issues/285)) ([f199511](https://github.com/lifeart/ember-language-server/commit/f1995114e878b2fd0459b4dc9cfe5c1182bf7364))
+
 # [1.17.0](https://github.com/lifeart/ember-language-server/compare/v1.16.0...v1.17.0) (2021-05-26)
 
 
