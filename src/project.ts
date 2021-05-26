@@ -44,7 +44,7 @@ export class Project extends BaseProject {
     const otherRoots = this.addonsMeta.filter((addon) => addon.version !== null).map((meta) => meta.root);
     // because all registry searches based on "startsWith", we could omit roots in same namespace,
     // like {root/a, root/b}, because we will get results of it from {root} itself
-    const differentRoots = otherRoots.filter((root) => !isRootStartingWithFilePath(root, mainRoot));
+    const differentRoots = otherRoots.filter((root) => !isRootStartingWithFilePath(mainRoot, root));
 
     return [mainRoot, ...differentRoots];
   }
