@@ -2166,6 +2166,34 @@ Object {
 }
 `;
 
+exports[`integration Diffent commands handle "els.getLegacyTemplateTokens" command 1`] = `
+Object {
+  "component": Object {
+    "hello": Object {
+      "source": "app/components/hello/index.hbs",
+      "tokens": Array [
+        "foo",
+        "my-component",
+        "another/my/component",
+      ],
+    },
+  },
+  "routePath": Object {},
+}
+`;
+
+exports[`integration Diffent commands handle "els.getProjectRegistry" command 1`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "app/components/hello/index.hbs",
+      "app/components/hello/index.js",
+      "tests/integration/components/hello-test.js",
+    ],
+  },
+}
+`;
+
 exports[`integration Diffent commands handle "els.getRelatedFiles" command 1`] = `
 Object {
   "component": Object {

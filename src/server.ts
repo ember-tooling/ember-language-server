@@ -50,12 +50,13 @@ import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import { getRegistryForRoot, addToRegistry, REGISTRY_KIND, normalizeMatchNaming, IRegistry, getRegistryForRoots } from './utils/registry-api';
-import { Usage, findRelatedFiles } from './utils/usages-api';
+import { Usage, findRelatedFiles, waitForTokensToBeCollected, getAllTemplateTokens, ITemplateTokens } from './utils/usages-api';
 import { URI } from 'vscode-uri';
 import { MatchResultType } from './utils/path-matcher';
 import { FileChangeType } from 'vscode-languageserver/node';
 import { debounce } from 'lodash';
 import { Config, Initializer } from './types';
+import { isFileBelongsToRoots } from './utils/layout-helpers';
 
 export default class Server {
   initializers: Initializer[] = [];
@@ -145,6 +146,61 @@ export default class Server {
       return this.runAddonLinters(document);
     };
 
+    this.executors['els.getProjectRegistry'] = async (_, __, [filePath]: [string]) => {
+      const fullPath = path.resolve(filePath);
+      const project = this.projectRoots.projectForPath(fullPath);
+
+      if (!project) {
+        return {
+          msg: 'Unable to find project by given file path, try to register it first, using els.registerProjectPath command',
+          path: filePath,
+        };
+      }
+
+      return {
+        projectName: project.name,
+        root: project.root,
+        roots: project.roots,
+        registry: project.registry,
+      };
+    };
+
+    this.executors['els.getLegacyTemplateTokens'] = async (_, __, [projectPath]: [string]) => {
+      const project = this.projectRoots.projectForPath(projectPath);
+
+      if (!project) {
+        return {
+          msg: 'Unable to find project for path',
+          path: projectPath,
+        };
+      }
+
+      await waitForTokensToBeCollected();
+
+      const allTokens = getAllTemplateTokens();
+      const projectTokens: ITemplateTokens = {
+        component: {},
+        routePath: {},
+      };
+
+      Object.keys(allTokens).forEach((key: keyof ITemplateTokens) => {
+        Object.keys(allTokens[key]).forEach((pathName) => {
+          const meta = allTokens[key][pathName];
+
+          if (isFileBelongsToRoots(project.roots, meta.source)) {
+            projectTokens[key][pathName] = meta;
+          }
+        });
+      });
+
+      return {
+        projectName: project.name,
+        root: project.root,
+        roots: project.roots,
+        tokens: projectTokens,
+      };
+    };
+
     this.executors['els.reloadProject'] = async (_, __, [projectPath]: [string]) => {
       if (projectPath) {
         const project = this.projectRoots.projectForPath(projectPath);
@@ -181,15 +237,7 @@ export default class Server {
 
         if (item) {
           const normalizedItem = normalizeMatchNaming(item);
-          const registryResults: string[] = [];
-
-          project.roots.forEach((root) => {
-            (this.getRegistry(root)[normalizedItem.type][normalizedItem.name] || []).forEach((item) => {
-              if (!registryResults.includes(item)) {
-                registryResults.push(item);
-              }
-            });
-          });
+          const registryResults: string[] = project.registry[normalizedItem.type][normalizedItem.name] || [];
 
           if (!includeMeta) {
             return registryResults.sort();

@@ -19,6 +19,7 @@ import {
 import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 
 import { CompletionRequest, DefinitionRequest, DocumentSymbolRequest, ExecuteCommandRequest, ReferencesRequest } from 'vscode-languageserver-protocol/node';
+import { ITemplateTokens } from '../src/utils/usages-api';
 
 describe('integration', function () {
   let connection: MessageConnection;
@@ -466,6 +467,86 @@ describe('integration', function () {
           };
         })
       ).toMatchSnapshot();
+
+      await project.destroy();
+    });
+
+    it('handle "els.getProjectRegistry" command', async () => {
+      const project = await createProject(
+        {
+          'package.json': JSON.stringify({
+            name: 'my-project',
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '',
+                'index.js': '',
+              },
+            },
+          },
+          tests: {
+            integration: {
+              components: {
+                'hello-test.js': '',
+              },
+            },
+          },
+        },
+        connection
+      );
+
+      const result: { registry: Registry; projectName: string } = await connection.sendRequest((ExecuteCommandRequest.type as unknown) as string, {
+        command: 'els.getProjectRegistry',
+        arguments: [project.normalizedPath],
+      });
+
+      expect(normalizeRegistry(project.normalizedPath, result.registry)).toMatchSnapshot();
+
+      expect(result.projectName).toBe('my-project');
+
+      await project.destroy();
+    });
+
+    it('handle "els.getLegacyTemplateTokens" command', async () => {
+      const project = await createProject(
+        {
+          'package.json': JSON.stringify({
+            name: 'my-project',
+          }),
+          app: {
+            components: {
+              hello: {
+                'index.hbs': '{{component "foo"}} <MyComponent /> <Another::My::Component />',
+                'index.js': '',
+              },
+            },
+          },
+          tests: {
+            integration: {
+              components: {
+                'hello-test.js': '',
+              },
+            },
+          },
+        },
+        connection
+      );
+
+      const data: { tokens: ITemplateTokens } = await connection.sendRequest((ExecuteCommandRequest.type as unknown) as string, {
+        command: 'els.getLegacyTemplateTokens',
+        arguments: [project.normalizedPath],
+      });
+
+      const result = data.tokens;
+
+      Object.keys(result).forEach((kind) => {
+        Object.keys(result[kind]).forEach((item) => {
+          result[kind][item].source = normalizePath(path.relative(project.normalizedPath, result[kind][item].source));
+        });
+      });
+
+      expect(result).toMatchSnapshot();
 
       await project.destroy();
     });

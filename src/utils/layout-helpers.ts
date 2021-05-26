@@ -140,6 +140,10 @@ export function isRootStartingWithFilePath(rootPath: string, filePath: string) {
   return rootParts.every((item: string, idx: number) => filePathParts[idx] === item);
 }
 
+export function isFileBelongsToRoots(roots: string[], filePath: string) {
+  return roots.some((root) => isRootStartingWithFilePath(root, filePath));
+}
+
 export function isProjectAddonRoot(root: string) {
   const pack = getPackageJSON(root);
   const hasIndexJs = fs.existsSync(path.join(root, 'index.js'));

@@ -119,7 +119,7 @@ export default class ProjectRoots {
         providers: project.providers,
         addonsMeta: project.addonsMeta,
         name: project.name,
-        registry: this.server.getRegistry(project.roots),
+        registry: project.registry,
       };
     }
 
@@ -165,7 +165,7 @@ export default class ProjectRoots {
         providers: project.providers,
         addonsMeta: project.addonsMeta,
         name: project.name,
-        registry: this.server.getRegistry(project.roots),
+        registry: project.registry,
       };
     } catch (e) {
       logError(e);

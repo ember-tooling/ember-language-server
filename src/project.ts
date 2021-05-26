@@ -48,9 +48,9 @@ export class Project extends BaseProject {
 
     return [mainRoot, ...differentRoots];
   }
-  registryVersion = 0;
-  _registry!: IRegistry;
-  _registryVersion = -1;
+  private registryVersion = 0;
+  private _registry!: IRegistry;
+  private _registryVersion = -1;
   get registry(): IRegistry {
     if (this._registryVersion !== this.registryVersion) {
       logInfo(`${this.name} registry version mismatch [${this._registryVersion}, ${this.registryVersion}], regenerating...`);
