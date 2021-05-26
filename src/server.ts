@@ -49,7 +49,16 @@ import { CodeActionProvider } from './code-action-provider/entry';
 import { log, setConsole, logError, logInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
-import { getRegistryForRoot, addToRegistry, REGISTRY_KIND, normalizeMatchNaming, IRegistry, getRegistryForRoots } from './utils/registry-api';
+import {
+  getRegistryForRoot,
+  addToRegistry,
+  REGISTRY_KIND,
+  normalizeMatchNaming,
+  IRegistry,
+  getRegistryForRoots,
+  disableTemplateTokensCollection,
+  enableTemplateTokensCollection,
+} from './utils/registry-api';
 import { Usage, findRelatedFiles, waitForTokensToBeCollected, getAllTemplateTokens, ITemplateTokens } from './utils/usages-api';
 import { URI } from 'vscode-uri';
 import { MatchResultType } from './utils/path-matcher';
@@ -57,6 +66,10 @@ import { FileChangeType } from 'vscode-languageserver/node';
 import { debounce } from 'lodash';
 import { Config, Initializer } from './types';
 import { isFileBelongsToRoots, mGetProjectAddonsInfo } from './utils/layout-helpers';
+
+export interface IServerConfig {
+  local: Config;
+}
 
 export default class Server {
   initializers: Initializer[] = [];
@@ -108,6 +121,12 @@ export default class Server {
     } else if (config.useBuiltinLinting === true) {
       this.templateLinter.enable();
     }
+
+    if (config.collectTemplateTokens === false) {
+      disableTemplateTokensCollection();
+    } else if (config.collectTemplateTokens === true) {
+      enableTemplateTokensCollection();
+    }
   }
 
   documentSymbolProviders: DocumentSymbolProvider[] = [new JSDocumentSymbolProvider(), new HBSDocumentSymbolProvider()];
@@ -130,7 +149,7 @@ export default class Server {
       this.connection.workspace.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this));
     }
 
-    this.executors['els.setConfig'] = async (_, __, [config]: [{ local: Config }]) => {
+    this.executors['els.setConfig'] = async (_, __, [config]: [IServerConfig]) => {
       this.setConfiguration(config.local);
 
       if (this.lazyInit) {

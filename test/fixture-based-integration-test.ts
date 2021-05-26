@@ -4,7 +4,7 @@ import { URI } from 'vscode-uri';
 import { startServer, initServer, reloadProjects, openFile, normalizeUri } from './test_helpers/integration-helpers';
 import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 
-import { CompletionRequest, DefinitionRequest } from 'vscode-languageserver-protocol/node';
+import { CompletionRequest, Definition, DefinitionRequest } from 'vscode-languageserver-protocol/node';
 
 describe('With `full-project` initialized on server', () => {
   let connection: MessageConnection;
@@ -158,7 +158,7 @@ describe('With `full-project` initialized on server', () => {
 
       openFile(connection, definitionTemplatePath);
 
-      let response = await connection.sendRequest(DefinitionRequest.method, params);
+      let response: Definition[] = await connection.sendRequest(DefinitionRequest.method, params);
 
       response = normalizeUri(response, base);
       expect(response).toMatchSnapshot();
@@ -179,7 +179,7 @@ describe('With `full-project` initialized on server', () => {
 
       openFile(connection, definitionTemplatePath);
 
-      let response = await connection.sendRequest(DefinitionRequest.method, params);
+      let response: Definition[] = await connection.sendRequest(DefinitionRequest.method, params);
 
       response = normalizeUri(response, base);
       expect(response).toMatchSnapshot();
@@ -200,7 +200,7 @@ describe('With `full-project` initialized on server', () => {
 
       openFile(connection, modelPath);
 
-      let response = await connection.sendRequest(DefinitionRequest.method, params);
+      let response: Definition[] = await connection.sendRequest(DefinitionRequest.method, params);
 
       response = normalizeUri(response, base);
       expect(response).toMatchSnapshot();
@@ -221,7 +221,7 @@ describe('With `full-project` initialized on server', () => {
 
       openFile(connection, modelPath);
 
-      let response = await connection.sendRequest(DefinitionRequest.method, params);
+      let response: Definition[] = await connection.sendRequest(DefinitionRequest.method, params);
 
       response = normalizeUri(response, base);
       expect(response).toMatchSnapshot();
@@ -242,7 +242,7 @@ describe('With `full-project` initialized on server', () => {
 
       openFile(connection, modelPath);
 
-      let response = await connection.sendRequest(DefinitionRequest.method, params);
+      let response: Definition[] = await connection.sendRequest(DefinitionRequest.method, params);
 
       response = normalizeUri(response, base);
       expect(response).toMatchSnapshot();

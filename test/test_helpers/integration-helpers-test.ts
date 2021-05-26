@@ -10,7 +10,8 @@ describe('normalizeToFs', () => {
       },
     };
 
-    expect(normalizeToFs(files)).toStrictEqual(JSON.parse(JSON.stringify(files)));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(normalizeToFs(files as any)).toStrictEqual(JSON.parse(JSON.stringify(files)));
   });
   it('support new case', () => {
     const expectedObj = {

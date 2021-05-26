@@ -175,6 +175,7 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/pods/foo/modifier.js')).toEqual(null);
     expect(m('foo/bar/app/pods/foo/transform.js')).toEqual(null);
     expect(m('foo/bar/app/pods/foo/service.js')).toEqual(null);
+    expect(m('app/styles/components/ui/meta-attribute__date-range__x-table-form/style.less')).toEqual(null);
   });
   it('ignores', () => {
     expect(m('foo/bar/tmp/app/components/foo/index.ts')).toEqual(null);

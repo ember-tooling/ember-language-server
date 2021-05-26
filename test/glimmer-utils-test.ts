@@ -1,5 +1,5 @@
 import { Position } from 'vscode-languageserver';
-import { preprocess } from '@glimmer/syntax';
+import { ASTv1, preprocess } from '@glimmer/syntax';
 
 import ASTPath, { getLocalScope, maybeComponentNameForPath, sourceForNode, focusedBlockParamName, maybeBlockParamDefinition } from '../src/glimmer-utils';
 import { toPosition } from '../src/estree-utils';
@@ -62,14 +62,14 @@ describe('glimmer-utils', function () {
               `;
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(2, 2)));
 
-      expect(astPath.node.tag).toEqual('Component');
+      expect((astPath.node as ASTv1.ElementNode).tag).toEqual('Component');
       expect(sourceForNode(astPath.node, input)).toEqual(input.trim());
     });
     it('works as expected for MustachePaths', function () {
       const input = ['<Component as |items|>', '{{#let items as |item bar|}}', '{{items}}', '{{/let}}', '</Component>'].join('\n');
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(2, 3)));
 
-      expect(astPath.node.original).toEqual('items');
+      expect((astPath.node as ASTv1.PathExpression).original).toEqual('items');
       expect(sourceForNode(astPath.node, input)).toEqual('items');
     });
   });

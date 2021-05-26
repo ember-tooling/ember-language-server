@@ -1,10 +1,10 @@
 import { extractTokensFromTemplate, getTemplateBlocks } from '../../src/utils/template-tokens-collector';
 
-function t(tpl) {
+function t(tpl: string) {
   return extractTokensFromTemplate(tpl);
 }
 
-function tok(tpl) {
+function tok(tpl: string) {
   return getTemplateBlocks(tpl);
 }
 

@@ -94,6 +94,12 @@ export class ClassicPathMatcher {
   metaFromPath(rawAbsoluteAbsPath: string): MatchResult | null {
     const rawAbsPath = path.relative(this.root, path.resolve(rawAbsoluteAbsPath));
     const normalizedAbsPath = rawAbsPath.split(path.sep).join('/');
+
+    // likely it's not a case for classic path matcher
+    if (normalizedAbsPath.includes('__')) {
+      return null;
+    }
+
     const absPath = '/' + normalizedAbsPath;
     const isTest = isTestFile(absPath);
     const isTemplate = isTemplatePath(absPath);

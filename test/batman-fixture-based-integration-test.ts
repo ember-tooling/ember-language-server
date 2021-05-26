@@ -4,7 +4,7 @@ import { URI } from 'vscode-uri';
 import { startServer, initServer, reloadProjects, openFile, normalizeUri, fsProjectToJSON } from './test_helpers/integration-helpers';
 import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 
-import { CompletionRequest, DefinitionRequest } from 'vscode-languageserver-protocol/node';
+import { CompletionRequest, Definition, DefinitionRequest } from 'vscode-languageserver-protocol/node';
 
 describe('With `batman project` initialized on server', () => {
   let connection: MessageConnection;
@@ -103,7 +103,7 @@ describe('With `batman project` initialized on server', () => {
 
       openFile(connection, applicationTemplatePath);
 
-      let response = await connection.sendRequest(DefinitionRequest.method, params);
+      let response: Definition[] = await connection.sendRequest(DefinitionRequest.method, params);
 
       response = normalizeUri(response, base);
 
@@ -126,7 +126,7 @@ describe('With `batman project` initialized on server', () => {
 
     openFile(connection, applicationTemplatePath);
 
-    let response = await connection.sendRequest(DefinitionRequest.method, params);
+    let response: Definition[] = await connection.sendRequest(DefinitionRequest.method, params);
 
     response = normalizeUri(response, base);
 

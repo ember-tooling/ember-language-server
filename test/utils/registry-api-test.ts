@@ -1,7 +1,16 @@
-import { addToRegistry, getRegistryForRoot, normalizeMatchNaming, removeFromRegistry } from '../../src/utils/registry-api';
+import {
+  addToRegistry,
+  getRegistryForRoot,
+  normalizeMatchNaming,
+  removeFromRegistry,
+  enableTemplateTokensCollection,
+  disableTemplateTokensCollection,
+  canCollectTemplateTokens,
+} from '../../src/utils/registry-api';
 import { findRelatedFiles, waitForTokensToBeCollected } from '../../src/utils/usages-api';
 import { createTempDir } from 'broccoli-test-helper';
 import * as path from 'path';
+import { MatchResult } from '../../src/utils/path-matcher';
 let dir = null;
 
 beforeAll(async () => {
@@ -59,15 +68,15 @@ describe('addToRegistry - it able to add different kinds to registry', () => {
 
 describe('normalizeMatchNaming - must normalize naming from mater to registry format', () => {
   it('normalize special keys', () => {
-    expect(normalizeMatchNaming({ type: 'route', name: 'foo/bar' })).toEqual({
+    expect(normalizeMatchNaming({ type: 'route', name: 'foo/bar' } as MatchResult)).toEqual({
       type: 'routePath',
       name: 'foo.bar',
     });
-    expect(normalizeMatchNaming({ type: 'controller', name: 'foo/bar' })).toEqual({
+    expect(normalizeMatchNaming({ type: 'controller', name: 'foo/bar' } as MatchResult)).toEqual({
       type: 'routePath',
       name: 'foo.bar',
     });
-    expect(normalizeMatchNaming({ type: 'template', name: 'foo/bar' })).toEqual({
+    expect(normalizeMatchNaming({ type: 'template', name: 'foo/bar' } as MatchResult)).toEqual({
       type: 'routePath',
       name: 'foo.bar',
     });
@@ -75,11 +84,25 @@ describe('normalizeMatchNaming - must normalize naming from mater to registry fo
   it('skip normalization for other keys', () => {
     const name = 'foo-bar';
 
-    knownRegistryKeys.forEach((keyName) => {
-      expect(normalizeMatchNaming({ name, type: keyName as any })).toEqual({
+    knownRegistryKeys.forEach((keyName: unknown) => {
+      expect(normalizeMatchNaming({ name, type: keyName } as MatchResult)).toEqual({
         name,
         type: keyName,
       });
     });
+  });
+});
+
+describe('templateTokens collection toggling', () => {
+  it('should be enabled by default', () => {
+    expect(canCollectTemplateTokens()).toBe(true);
+  });
+  it('should be able to disable, using disableTemplateTokensCollection', () => {
+    disableTemplateTokensCollection();
+    expect(canCollectTemplateTokens()).toBe(false);
+  });
+  it('should be able to enable, using enableTemplateTokensCollection', () => {
+    enableTemplateTokensCollection();
+    expect(canCollectTemplateTokens()).toBe(true);
   });
 });

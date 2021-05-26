@@ -10,6 +10,20 @@ export function getGlobalRegistry() {
   return GLOBAL_REGISTRY;
 }
 
+let _templateTokensCollectionEnabled = true;
+
+export function disableTemplateTokensCollection() {
+  _templateTokensCollectionEnabled = false;
+}
+
+export function enableTemplateTokensCollection() {
+  _templateTokensCollectionEnabled = true;
+}
+
+export function canCollectTemplateTokens() {
+  return _templateTokensCollectionEnabled;
+}
+
 const GLOBAL_REGISTRY: {
   transform: GLOBAL_REGISTRY_ITEM;
   helper: GLOBAL_REGISTRY_ITEM;
@@ -60,7 +74,7 @@ export function removeFromRegistry(normalizedName: string, kind: REGISTRY_KIND, 
       files.forEach((file) => {
         regItem.delete(file);
 
-        if (isTemplatePath(file)) {
+        if (isTemplatePath(file) && canCollectTemplateTokens()) {
           updateTemplateTokens(kind as UsageType, normalizedName, null);
         }
       });
@@ -159,7 +173,7 @@ export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files
 
         regItem.add(file);
 
-        if ((kind === 'component' || kind === 'routePath') && isTemplatePath(file)) {
+        if (canCollectTemplateTokens() && (kind === 'component' || kind === 'routePath') && isTemplatePath(file)) {
           updateTemplateTokens(kind, normalizedName, file);
         }
       });
