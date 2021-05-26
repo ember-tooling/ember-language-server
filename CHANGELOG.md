@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/lifeart/ember-language-server/compare/v1.16.0...v1.17.0) (2021-05-26)
+
+
+### Features
+
+* add laziness into registry fields ([#284](https://github.com/lifeart/ember-language-server/issues/284)) ([9267328](https://github.com/lifeart/ember-language-server/commit/926732843a098ee84f5eb919b72af82a25f8fbab))
+
 # [1.16.0](https://github.com/lifeart/ember-language-server/compare/v1.15.0...v1.16.0) (2021-05-26)
 
 
