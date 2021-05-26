@@ -99,24 +99,39 @@ function _getRegistryForRoots(rawRoots: string[]) {
 
   Object.keys(registry).forEach((key: REGISTRY_KIND) => {
     registryForRoot[key] = {};
+    const data: Record<string, string[]> = {};
+    let hasData = false;
 
-    for (const [itemName, paths] of registry[key].entries()) {
-      const items: string[] = [];
+    Object.defineProperty(registryForRoot, key, {
+      enumerable: true,
+      get() {
+        if (hasData === false) {
+          for (const [itemName, paths] of registry[key].entries()) {
+            const items: string[] = [];
 
-      paths.forEach((normalizedPath) => {
-        if (
-          lowRoot.some((lowRoot) => {
-            return isRootStartingWithFilePath(lowRoot, normalizedPath.toLowerCase());
-          })
-        ) {
-          items.push(normalizedPath);
+            paths.forEach((normalizedPath) => {
+              const kindPath = normalizedPath.toLowerCase();
+
+              if (
+                lowRoot.some((lowRoot) => {
+                  return isRootStartingWithFilePath(lowRoot, kindPath);
+                })
+              ) {
+                items.push(normalizedPath);
+              }
+            });
+
+            if (items.length) {
+              data[itemName] = items;
+            }
+          }
+
+          hasData = true;
         }
-      });
 
-      if (items.length) {
-        registryForRoot[key][itemName] = items;
-      }
-    }
+        return data;
+      },
+    });
   });
 
   return registryForRoot;
