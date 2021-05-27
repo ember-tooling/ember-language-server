@@ -155,6 +155,20 @@ export function getRegistryForRoot(rawRoot: string): IRegistry {
   return _getRegistryForRoots([rawRoot]);
 }
 
+export function existsInRegistry(name: string, kind: REGISTRY_KIND, file: string) {
+  const regItem = GLOBAL_REGISTRY[kind];
+
+  if (!regItem) {
+    return false;
+  }
+
+  if (!regItem.has(name)) {
+    return false;
+  }
+
+  return regItem.get(name)?.has(path.resolve(file));
+}
+
 export function addToRegistry(normalizedName: string, kind: REGISTRY_KIND, files: string[]) {
   if (!(kind in GLOBAL_REGISTRY)) {
     return;

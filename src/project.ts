@@ -1,4 +1,12 @@
-import { addToRegistry, removeFromRegistry, normalizeMatchNaming, NormalizedRegistryItem, IRegistry, getRegistryForRoots } from './utils/registry-api';
+import {
+  addToRegistry,
+  removeFromRegistry,
+  normalizeMatchNaming,
+  NormalizedRegistryItem,
+  IRegistry,
+  getRegistryForRoots,
+  existsInRegistry,
+} from './utils/registry-api';
 import { ProjectProviders, collectProjectProviders, AddonMeta, DependencyMeta } from './utils/addon-api';
 import {
   findTestsForProject,
@@ -95,11 +103,15 @@ export class Project extends BaseProject {
       }
     } else {
       if (normalizedItem) {
+        if (!existsInRegistry(normalizedItem.name, normalizedItem.type, filePath)) {
+          this.registryVersion++;
+        }
+
+        // we still call it, because for template case, we have to update it's tokens
         addToRegistry(normalizedItem.name, normalizedItem.type, [filePath]);
       }
 
       if (!this.files.has(filePath)) {
-        this.registryVersion++;
         this.files.set(filePath, { version: 0 });
       }
 
