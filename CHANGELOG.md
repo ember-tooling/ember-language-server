@@ -1,3 +1,10 @@
+# [1.22.0](https://github.com/lifeart/ember-language-server/compare/v1.21.0...v1.22.0) (2021-05-27)
+
+
+### Features
+
+* improve project registry invalidation logic ([#290](https://github.com/lifeart/ember-language-server/issues/290)) ([be54957](https://github.com/lifeart/ember-language-server/commit/be54957513e6a2155a222a45dd805c8ee1c3197a))
+
 # [1.21.0](https://github.com/lifeart/ember-language-server/compare/v1.20.0...v1.21.0) (2021-05-26)
 
 
