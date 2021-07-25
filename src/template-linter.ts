@@ -102,7 +102,13 @@ export default class TemplateLinter {
       return;
     }
 
-    const sources = this.sourcesForDocument(textDocument);
+    let sources = [];
+
+    try {
+      sources = this.sourcesForDocument(textDocument);
+    } catch (e) {
+      return;
+    }
 
     if (!sources.length) {
       return;
