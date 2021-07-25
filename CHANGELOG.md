@@ -1,3 +1,10 @@
+## [1.22.1](https://github.com/lifeart/ember-language-server/compare/v1.22.0...v1.22.1) (2021-07-25)
+
+
+### Bug Fixes
+
+* try catch for sources lookup during linting ([#294](https://github.com/lifeart/ember-language-server/issues/294)) ([42bac34](https://github.com/lifeart/ember-language-server/commit/42bac34f11746526211447dd36bd148b956b8636))
+
 # [1.22.0](https://github.com/lifeart/ember-language-server/compare/v1.21.0...v1.22.0) (2021-05-27)
 
 
