@@ -2,10 +2,8 @@
 
 import * as path from 'path';
 import { logError, logInfo } from './utils/logger';
-import * as walkSync from 'walk-sync';
 import { URI } from 'vscode-uri';
-import * as fs from 'fs';
-import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath, getPackageJSON } from './utils/layout-helpers';
+import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath, safeWalkSync, asyncGetPackageJSON } from './utils/layout-helpers';
 
 import Server from './server';
 
@@ -20,10 +18,12 @@ export default class ProjectRoots {
   localAddons: string[] = [];
   ignoredProjects: string[] = [];
 
-  reloadProjects() {
-    Array.from(this.projects).forEach(([root]) => {
-      this.reloadProject(root);
+  async reloadProjects() {
+    const queue = Array.from(this.projects).map(([root]) => {
+      return this.reloadProject(root);
     });
+
+    await Promise.all(queue);
   }
 
   isIgnoredProject(name: string) {
@@ -46,9 +46,9 @@ export default class ProjectRoots {
     return !hasReverseIgnore.includes(allowedProjectName);
   }
 
-  reloadProject(projectRoot: string) {
+  async reloadProject(projectRoot: string) {
     this.removeProject(projectRoot);
-    this.onProjectAdd(projectRoot);
+    await this.onProjectAdd(projectRoot);
   }
 
   removeProject(projectRoot: string) {
@@ -61,36 +61,38 @@ export default class ProjectRoots {
     this.projects.delete(projectRoot);
   }
 
-  setLocalAddons(paths: string[]) {
-    paths.forEach((element: string) => {
+  async setLocalAddons(paths: string[]) {
+    for (const element of paths) {
       const addonPath = path.resolve(element);
+      const hasFile = await this.server.fs.exists(addonPath);
+      const isAddonRoot = await isELSAddonRoot(addonPath);
 
-      if (fs.existsSync(addonPath) && isELSAddonRoot(addonPath)) {
+      if (hasFile && isAddonRoot) {
         if (!this.localAddons.includes(addonPath)) {
           this.localAddons.push(addonPath);
         }
       }
-    });
+    }
   }
 
   setIgnoredProjects(ignoredProjects: string[]) {
     this.ignoredProjects = ignoredProjects;
   }
 
-  findProjectsInsideRoot(workspaceRoot: string) {
-    const roots = walkSync(workspaceRoot, {
+  async findProjectsInsideRoot(workspaceRoot: string) {
+    const roots = await safeWalkSync(workspaceRoot, {
       directories: false,
       globs: ['**/ember-cli-build.js', '**/package.json'],
       ignore: ['**/.git/**', '**/bower_components/**', '**/dist/**', '**/node_modules/**', '**/tmp/**'],
     });
 
-    roots.forEach((rootPath: string) => {
+    roots.forEach(async (rootPath: string) => {
       const filePath = path.join(workspaceRoot, rootPath);
       const fullPath = path.dirname(filePath);
 
       if (filePath.endsWith('package.json')) {
         try {
-          if (isGlimmerXProject(fullPath)) {
+          if (await isGlimmerXProject(fullPath)) {
             this.onProjectAdd(fullPath);
           }
         } catch (e) {
@@ -105,10 +107,10 @@ export default class ProjectRoots {
   async initialize(workspaceRoot: string) {
     this.workspaceRoot = workspaceRoot;
 
-    this.findProjectsInsideRoot(this.workspaceRoot);
+    await this.findProjectsInsideRoot(this.workspaceRoot);
   }
 
-  onProjectAdd(rawPath: string) {
+  async onProjectAdd(rawPath: string) {
     const projectPath = path.resolve(URI.parse(rawPath).fsPath);
 
     if (this.projects.has(projectPath)) {
@@ -124,7 +126,7 @@ export default class ProjectRoots {
     }
 
     try {
-      const info = getPackageJSON(projectPath);
+      const info = await asyncGetPackageJSON(projectPath);
 
       if (!info.name) {
         logInfo(`Unable to get project name from package.json at ${projectPath}`);
@@ -154,11 +156,13 @@ export default class ProjectRoots {
         };
       }
 
-      const project = new Project(projectPath, this.localAddons);
+      const project = new Project(projectPath, this.localAddons, info);
+
+      await project.initialize();
 
       this.projects.set(projectPath, project);
       logInfo(`Ember CLI project added at ${projectPath}`);
-      project.init(this.server);
+      await project.init(this.server);
 
       return {
         initIssues: project.initIssues,

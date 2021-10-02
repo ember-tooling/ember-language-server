@@ -8,7 +8,6 @@ import { URI } from 'vscode-uri';
 import { log, logError } from './utils/logger';
 import * as findUp from 'find-up';
 import * as path from 'path';
-import * as fs from 'fs';
 
 import Server from './server';
 import { Project } from './project';
@@ -177,11 +176,11 @@ export default class TemplateLinter {
       let nodePath = Files.resolveGlobalNodePath();
 
       // vs-code-online fix (we don't have global path, but it returned)
-      if (!nodePath || !fs.existsSync(nodePath)) {
+      if (!nodePath || !(await this.server.fs.exists(nodePath))) {
         // easy fix case
         nodePath = 'node_modules';
 
-        if (!fs.existsSync(path.join(project.root, nodePath))) {
+        if (!(await this.server.fs.exists(path.join(project.root, nodePath)))) {
           return;
         }
       }

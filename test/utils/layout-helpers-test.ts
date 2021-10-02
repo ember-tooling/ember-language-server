@@ -1,9 +1,8 @@
 import {
-  isMuApp,
   getPodModulePrefix,
   safeWalkSync,
   resolvePackageRoot,
-  getPackageJSON,
+  asyncGetPackageJSON,
   listPodsComponents,
   listComponents,
   listHelpers,
@@ -19,15 +18,6 @@ import { getRegistryForRoot } from '../../src/utils/registry-api';
 import { BaseProject } from '../../src/base-project';
 
 describe('definition-helpers', function () {
-  describe('isMuApp()', function () {
-    it('return true for paths, containing "src/ui"', function () {
-      expect(isMuApp(path.join(__dirname, './../fixtures/mu-project'))).toEqual(true);
-    });
-    it('return false for paths, without "src/ui"', function () {
-      expect(isMuApp(path.join(__dirname, './../fixtures/full-project'))).toEqual(false);
-    });
-  });
-
   describe('getPodModulePrefix()', function () {
     it('return pod relative pod prefix for projects with podModulePrefix in evironment.js', function () {
       expect(getPodModulePrefix(path.join(__dirname, './../fixtures/pod-project'))).toEqual('pods');
@@ -38,31 +28,36 @@ describe('definition-helpers', function () {
   });
 
   describe('safeWalkSync()', function () {
-    it('return empty array if entry path does not exists', function () {
-      expect(safeWalkSync(path.join(__dirname, './../fixtures/-non-existing-path'), {})).toEqual([]);
+    it('return empty array if entry path does not exists', async function () {
+      expect(await safeWalkSync(path.join(__dirname, './../fixtures/-non-existing-path'), {})).toEqual([]);
     });
   });
 
   describe('resolvePackageRoot()', function () {
-    it('return package root folder', function () {
-      expect(resolvePackageRoot(__dirname, 'lodash')).toContain(path.sep + 'lodash');
-      expect(resolvePackageRoot(__dirname, 'memoizee')).toContain(path.sep + 'memoizee');
+    it('return package root folder', async function () {
+      const resultOne = await resolvePackageRoot(__dirname, 'lodash');
+
+      expect(resultOne).toContain(path.sep + 'lodash');
+
+      const resultTwo = await resolvePackageRoot(__dirname, 'memoizee');
+
+      expect(resultTwo).toContain(path.sep + 'memoizee');
     });
   });
 
-  describe('getPackageJSON()', function () {
-    it('return package json object', function () {
-      expect(getPackageJSON(path.join(__dirname, './../fixtures/full-project')).name).toEqual('full-project');
+  describe('asyncGetPackageJSON()', function () {
+    it('return package json object', async function () {
+      expect((await asyncGetPackageJSON(path.join(__dirname, './../fixtures/full-project'))).name).toEqual('full-project');
     });
   });
 
   describe('listPodsComponents()', function () {
-    it('return expected list of components for pods project', function () {
+    it('return expected list of components for pods project', async function () {
       const root = path.join(__dirname, './../fixtures/pod-project');
 
       const project = new BaseProject(root);
 
-      listPodsComponents(project);
+      await listPodsComponents(project);
 
       const keys = Object.keys(getRegistryForRoot(root).component);
 
@@ -75,10 +70,10 @@ describe('definition-helpers', function () {
   });
 
   describe('listComponents()', function () {
-    it('return expected list of components for classic project', function () {
+    it('return expected list of components for classic project', async function () {
       const root = path.join(__dirname, './../fixtures/full-project');
 
-      listComponents(new BaseProject(root));
+      await listComponents(new BaseProject(root));
 
       const keys = Object.keys(getRegistryForRoot(root).component);
 
@@ -93,14 +88,14 @@ describe('definition-helpers', function () {
   });
 
   describe('listHelpers()', function () {
-    it('return expected list of helpers for classic project', function () {
+    it('return expected list of helpers for classic project', async function () {
       const root = path.join(__dirname, './../fixtures/full-project');
 
       let keys = Object.keys(getRegistryForRoot(root).helper);
 
       expect(keys.includes('some-helper')).toBe(false);
 
-      listHelpers(new BaseProject(root));
+      await listHelpers(new BaseProject(root));
 
       keys = Object.keys(getRegistryForRoot(root).helper);
 
@@ -109,10 +104,10 @@ describe('definition-helpers', function () {
   });
 
   describe('listRoutes()', function () {
-    it('return expected list of routes for classic project', function () {
+    it('return expected list of routes for classic project', async function () {
       const root = path.join(__dirname, './../fixtures/full-project');
 
-      listRoutes(new BaseProject(root));
+      await listRoutes(new BaseProject(root));
 
       const keys = Object.keys(getRegistryForRoot(root).routePath);
 
@@ -133,24 +128,18 @@ describe('definition-helpers', function () {
   });
 
   describe('getProjectInRepoAddonsRoots()', function () {
-    it('must discover in-repo addons for classic structure', function () {
+    it('must discover in-repo addons for classic structure', async function () {
       const root = path.join(__dirname, './../fixtures/project-with-in-repo-addons');
-      const items = getProjectInRepoAddonsRoots(root);
+      const items = await getProjectInRepoAddonsRoots(root);
 
       expect(items.length).toEqual(2);
-    });
-    it('must discover in-repo addons for MU structure', function () {
-      const root = path.join(__dirname, './../fixtures/mu-project-with-in-repo-addons');
-      const items = getProjectInRepoAddonsRoots(root);
-
-      expect(items.length).toEqual(1);
     });
   });
 
   describe('getProjectAddonsRoots()', function () {
-    it('must resolve all related to project addons', function () {
+    it('must resolve all related to project addons', async function () {
       const root = path.join(__dirname, './../fixtures/full-project');
-      const items = getProjectAddonsRoots(root, [], 'hope_modules');
+      const items = await getProjectAddonsRoots(root, [], 'hope_modules');
 
       expect(items.length).toEqual(2);
     });
@@ -185,7 +174,7 @@ describe('definition-helpers', function () {
         },
       });
 
-      const items = getProjectAddonsRoots(path.join(info.path, 'packages', 'touchstone'));
+      const items = await getProjectAddonsRoots(path.join(info.path, 'packages', 'touchstone'));
 
       expect(items.length).toEqual(1);
       expect(items[0].split(path.sep).join('/').split('node_modules/')[1]).toEqual('@skylight/anvil');

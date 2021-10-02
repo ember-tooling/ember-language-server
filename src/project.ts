@@ -14,7 +14,6 @@ import {
   findAppItemsForProject,
   isRootStartingWithFilePath,
   getDepIfExists,
-  getPackageJSON,
   cached,
   PackageInfo,
 } from './utils/layout-helpers';
@@ -46,6 +45,7 @@ export class Project extends BaseProject {
   linters: Linter[] = [];
   initIssues: string[] = [];
   files: Map<string, { version: number }> = new Map();
+  addons!: string[];
   @cached
   get roots() {
     const mainRoot = this.root;
@@ -133,22 +133,26 @@ export class Project extends BaseProject {
   addWatcher(cb: Watcher) {
     this.watchers.push(cb);
   }
+  _packageJSON!: PackageInfo;
   @cached
   get packageJSON(): PackageInfo {
-    return getPackageJSON(this.root);
+    return this._packageJSON;
   }
   get name() {
     return this.packageJSON.name;
   }
-  constructor(public readonly root: string, addons: string[] = []) {
-    super(root);
-    this.providers = collectProjectProviders(root, addons);
+  async initialize() {
+    this.providers = await collectProjectProviders(this.root, this.addons);
     this.addonsMeta = this.providers.addonsMeta.filter((el) => el.root !== this.root);
-
+    this.builtinProviders = initBuiltinProviders();
+  }
+  constructor(public readonly root: string, addons: string[] = [], pkg: PackageInfo = {}) {
+    super(root);
+    this.addons = addons;
+    this.addonsMeta = [];
+    this._packageJSON = pkg;
     // for now, let's collect only interesting deps
     const interestingDeps = ['ember-cli', 'ember-source', 'ember-template-lint', 'typescript', '@embroider/core'];
-
-    const pkg = this.packageJSON;
 
     interestingDeps.forEach((dep) => {
       const version = getDepIfExists(pkg, dep);
@@ -160,8 +164,6 @@ export class Project extends BaseProject {
         });
       }
     });
-
-    this.builtinProviders = initBuiltinProviders();
   }
   unload() {
     this.initIssues = [];
@@ -179,7 +181,7 @@ export class Project extends BaseProject {
   flags = {
     enableEagerRegistryInitialization: true,
   };
-  init(server: Server) {
+  async init(server: Server) {
     this.providers.initFunctions.forEach((initFn) => {
       try {
         const initResult = initFn(server, this);
@@ -208,9 +210,9 @@ export class Project extends BaseProject {
 
     if (this.flags.enableEagerRegistryInitialization) {
       // prefer explicit registry tree building
-      findTestsForProject(this);
-      findAppItemsForProject(this);
-      findAddonItemsForProject(this);
+      await findTestsForProject(this);
+      await findAppItemsForProject(this);
+      await findAddonItemsForProject(this);
     }
 
     if (this.providers.info.length) {

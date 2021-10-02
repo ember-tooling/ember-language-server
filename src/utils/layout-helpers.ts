@@ -1,15 +1,21 @@
 import * as memoize from 'memoizee';
 import * as walkSync from 'walk-sync';
-import * as fs from 'fs';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { addToRegistry, normalizeMatchNaming } from './registry-api';
 import { clean, coerce, valid } from 'semver';
 import { BaseProject } from '../base-project';
+import { fsProvider } from '../fs-provider';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 
 export const ADDON_CONFIG_KEY = 'ember-language-server';
+
+export async function asyncFilter<T>(arr: T[], predicate: (value: unknown) => Promise<boolean | undefined>): Promise<T[]> {
+  const results = await Promise.all(arr.map((e) => predicate(e)));
+
+  return arr.filter((_v, index) => results[index]) as T[];
+}
 
 export function normalizeRoutePath(name: string) {
   return name.split('/').join('.');
@@ -19,10 +25,6 @@ export function hasEmberLanguageServerExtension(info: PackageInfo) {
   return info[ADDON_CONFIG_KEY] !== undefined;
 }
 
-export const isModuleUnificationApp = memoize(isMuApp, {
-  length: 1,
-  maxAge: 60000,
-});
 export const podModulePrefixForRoot = memoize(getPodModulePrefix, {
   length: 1,
   maxAge: 60000,
@@ -31,11 +33,6 @@ export const mGetProjectAddonsInfo = memoize(getProjectAddonsInfo, {
   length: 1,
   maxAge: 600000,
 }); // 1 second
-
-export const isAddonRoot = memoize(isProjectAddonRoot, {
-  length: 1,
-  maxAge: 600000,
-});
 
 type UnknownConfig = Record<string, unknown>;
 type StringConfig = Record<string, string>;
@@ -55,20 +52,16 @@ export interface PackageInfo {
   };
 }
 
-export function isMuApp(root: string) {
-  return fs.existsSync(path.join(root, 'src', 'ui'));
-}
-
-export function safeWalkSync(filePath: string | false, opts: any) {
+export async function safeWalkSync(filePath: string | false, opts: any) {
   if (!filePath) {
     return [];
   }
 
-  if (!fs.existsSync(filePath)) {
+  if (!(await fsProvider().exists(filePath))) {
     return [];
   }
 
-  return walkSync(filePath, opts);
+  return walkSync(filePath, { ...opts, fs: fsProvider() });
 }
 
 export function getPodModulePrefix(root: string): string | null {
@@ -100,7 +93,7 @@ export function getPodModulePrefix(root: string): string | null {
   return podModulePrefix.trim().length > 0 ? podModulePrefix : null;
 }
 
-export function resolvePackageRoot(root: string, addonName: string, packagesFolder = 'node_modules') {
+export async function resolvePackageRoot(root: string, addonName: string, packagesFolder = 'node_modules'): Promise<string | false> {
   const roots = root.split(path.sep);
 
   while (roots.length) {
@@ -108,9 +101,9 @@ export function resolvePackageRoot(root: string, addonName: string, packagesFold
     const maybePath = path.join(prefix, packagesFolder, addonName);
     const linkedPath = path.join(prefix, addonName);
 
-    if (fs.existsSync(path.join(maybePath, 'package.json'))) {
+    if (await fsProvider().exists(path.join(maybePath, 'package.json'))) {
       return maybePath;
-    } else if (fs.existsSync(path.join(linkedPath, 'package.json'))) {
+    } else if (await fsProvider().exists(path.join(linkedPath, 'package.json'))) {
       return linkedPath;
     }
 
@@ -144,15 +137,15 @@ export function isFileBelongsToRoots(roots: string[], filePath: string) {
   return roots.some((root) => isRootStartingWithFilePath(root, filePath));
 }
 
-export function isProjectAddonRoot(root: string) {
-  const pack = getPackageJSON(root);
-  const hasIndexJs = fs.existsSync(path.join(root, 'index.js'));
+async function isProjectAddonRoot(root: string) {
+  const pack = await asyncGetPackageJSON(root);
+  const hasIndexJs = await fsProvider().exists(path.join(root, 'index.js'));
 
   return isEmberAddon(pack) && hasIndexJs;
 }
 
-export function isELSAddonRoot(root: string) {
-  const pack = getPackageJSON(root);
+export async function isELSAddonRoot(root: string) {
+  const pack = await asyncGetPackageJSON(root);
 
   return hasEmberLanguageServerExtension(pack);
 }
@@ -177,8 +170,8 @@ export function cached(_proto: unknown, prop: string, desc: PropertyDescriptor) 
   };
 }
 
-function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
-  const packageData = getPackageJSON(root);
+async function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
+  const packageData = await asyncGetPackageJSON(root);
   const emberAddonPaths: string[] = (packageData['ember-addon'] && packageData['ember-addon'].paths) || [];
 
   if (roots.length) {
@@ -189,97 +182,37 @@ function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
 
   const recursiveRoots: string[] = roots.slice(0);
 
-  emberAddonPaths
-    .map((relativePath) => path.normalize(path.join(root, relativePath)))
-    .filter((packageRoot: string) => {
-      return isProjectAddonRoot(packageRoot);
-    })
-    .forEach((validRoot: string) => {
-      const packInfo = getPackageJSON(validRoot);
+  const normalizedPaths = emberAddonPaths.map((relativePath) => path.normalize(path.join(root, relativePath)));
 
-      // we don't need to go deeper if package itself not an ember-addon or els-extension
-      if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
-        return;
-      }
+  const validPaths = await asyncFilter(normalizedPaths, isProjectAddonRoot);
 
-      if (!recursiveRoots.includes(validRoot)) {
-        recursiveRoots.push(validRoot);
-        getRecursiveInRepoAddonRoots(validRoot, recursiveRoots).forEach((relatedRoot: string) => {
-          if (!recursiveRoots.includes(relatedRoot)) {
-            recursiveRoots.push(relatedRoot);
-          }
-        });
-      }
-    });
+  for (const validRoot of validPaths) {
+    const packInfo = await asyncGetPackageJSON(validRoot);
+
+    // we don't need to go deeper if package itself not an ember-addon or els-extension
+    if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
+      continue;
+    }
+
+    if (!recursiveRoots.includes(validRoot)) {
+      recursiveRoots.push(validRoot);
+      const items = await getRecursiveInRepoAddonRoots(validRoot, recursiveRoots);
+
+      items.forEach((relatedRoot: string) => {
+        if (!recursiveRoots.includes(relatedRoot)) {
+          recursiveRoots.push(relatedRoot);
+        }
+      });
+    }
+  }
 
   return recursiveRoots.sort();
 }
 
-export function getProjectInRepoAddonsRoots(root: string) {
-  const roots: string[] = [];
+export async function getProjectInRepoAddonsRoots(root: string): Promise<string[]> {
+  const roots: string[] = await getRecursiveInRepoAddonRoots(root, []);
 
-  if (isModuleUnificationApp(root)) {
-    const prefix = 'packages';
-    const addons = safeWalkSync(path.join(root, prefix), {
-      directories: true,
-      globs: ['**/package.json'],
-    });
-
-    addons
-      .map((relativePath: string) => {
-        return path.dirname(path.join(root, prefix, relativePath));
-      })
-      .filter((packageRoot: string) => isProjectAddonRoot(packageRoot))
-      .forEach((validRoot: string) => {
-        roots.push(validRoot);
-        getProjectAddonsRoots(validRoot, roots).forEach((relatedRoot: string) => {
-          if (!roots.includes(relatedRoot)) {
-            roots.push(relatedRoot);
-          }
-        });
-      });
-  } else {
-    getRecursiveInRepoAddonRoots(root, []).forEach((resolvedRoot) => {
-      if (!roots.includes(resolvedRoot)) {
-        roots.push(resolvedRoot);
-      }
-    });
-  }
-
-  return roots;
-}
-
-export function listGlimmerXComponents(root: string): CompletionItem[] {
-  try {
-    const jsPaths = safeWalkSync(root, {
-      directories: false,
-      globs: ['**/*.{js,ts,jsx,hbs}'],
-      ignore: ['dist', 'lib', 'node_modules', 'tmp', 'cache', '.*', '.cache', '.git', '.*.{js,ts,jsx,hbs,gbx}'],
-    });
-
-    return jsPaths
-      .map((p) => {
-        const fileName = p.split('/').pop();
-
-        if (fileName === undefined) {
-          return '';
-        }
-
-        return fileName.slice(0, fileName.lastIndexOf('.'));
-      })
-      .filter((p) => {
-        return p.length && p.charAt(0) === p.charAt(0).toUpperCase() && !p.endsWith('-test') && !p.endsWith('.test');
-      })
-      .map((name) => {
-        return {
-          kind: CompletionItemKind.Class,
-          label: name,
-          detail: 'component',
-        };
-      });
-  } catch (e) {
-    return [];
-  }
+  return Array.from(new Set(roots));
 }
 
 function hasDep(pack: PackageInfo, depName: string) {
@@ -310,20 +243,14 @@ export function getDepIfExists(pack: PackageInfo, depName: string): string | nul
   return valid(coerce(cleanVersion));
 }
 
-export function isGlimmerNativeProject(root: string) {
-  const pack = getPackageJSON(root);
-
-  return hasDep(pack, 'glimmer-native');
-}
-
-export function isGlimmerXProject(root: string) {
-  const pack = getPackageJSON(root);
+export async function isGlimmerXProject(root: string) {
+  const pack = await asyncGetPackageJSON(root);
 
   return hasDep(pack, '@glimmerx/core') || hasDep(pack, 'glimmer-lite-core');
 }
 
-export function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
-  const pack = getPackageJSON(root);
+export async function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
+  const pack = await asyncGetPackageJSON(root);
 
   if (resolvedItems.length) {
     if (!isEmberAddon(pack)) {
@@ -331,45 +258,58 @@ export function getProjectAddonsRoots(root: string, resolvedItems: string[] = []
     }
   }
 
-  // log('getPackageJSON', pack);
   const items = resolvedItems.length
     ? [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.peerDependencies || {})]
     : [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.peerDependencies || {}), ...Object.keys(pack.devDependencies || {})];
   // log('items', items);
 
-  const roots = items
-    .map((item: string) => {
-      return resolvePackageRoot(root, item, packageFolderName);
+  const rawRoots = await Promise.all(
+    items.map(async (item: string) => {
+      return await resolvePackageRoot(root, item, packageFolderName);
     })
-    .filter((p: string | boolean) => {
-      return p !== false;
-    });
+  );
+
+  const roots = rawRoots.filter((p: string | boolean) => {
+    return p !== false;
+  }) as string[];
+
   const recursiveRoots: string[] = resolvedItems.slice(0);
 
-  roots.forEach((rootItem: string) => {
-    const packInfo = getPackageJSON(rootItem);
+  const packages = await Promise.all(roots.map((root) => asyncGetPackageJSON(root)));
+
+  for (const rootItem of roots) {
+    const packInfo = packages[roots.indexOf(rootItem)];
 
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
-      return;
+      continue;
     }
 
     if (!recursiveRoots.includes(rootItem)) {
       recursiveRoots.push(rootItem);
-      getProjectAddonsRoots(rootItem, recursiveRoots, packageFolderName).forEach((item: string) => {
+      const addonRoots = await getProjectAddonsRoots(rootItem, recursiveRoots, packageFolderName);
+
+      addonRoots.forEach((item: string) => {
         if (!recursiveRoots.includes(item)) {
           recursiveRoots.push(item);
         }
       });
     }
-  });
+  }
 
   return recursiveRoots;
 }
 
-export function getPackageJSON(file: string): PackageInfo {
+export async function asyncGetPackageJSON(file: string): Promise<PackageInfo> {
+  const content = await asyncGetJSON(path.join(file, 'package.json'));
+
+  return content;
+}
+
+export async function asyncGetJSON(filePath: string): Promise<PackageInfo> {
   try {
-    const result = JSON.parse(fs.readFileSync(path.join(file, 'package.json'), 'utf8'));
+    const content = await fsProvider().readFile(filePath);
+    const result = JSON.parse(content);
 
     return result;
   } catch (e) {
@@ -427,35 +367,36 @@ export function hasAddonFolderInPath(name: string) {
   return name.includes(path.sep + 'addon' + path.sep) || name.includes(path.sep + 'addon-test-support' + path.sep);
 }
 
-export function getProjectAddonsInfo(root: string): void {
-  const roots = ([] as string[])
-    .concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root))
-    .filter((pathItem: unknown) => typeof pathItem === 'string');
+export async function getProjectAddonsInfo(root: string): Promise<void> {
+  const [projectAddonsRoots, projectInRepoAddonsRoots] = await Promise.all([getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root)]);
+  const roots = ([] as string[]).concat(projectAddonsRoots, projectInRepoAddonsRoots).filter((pathItem: unknown) => typeof pathItem === 'string');
 
-  roots.forEach((packagePath: string) => {
-    const info = getPackageJSON(packagePath);
+  for (const packagePath of roots) {
+    const info = await asyncGetPackageJSON(packagePath);
     // log('info', info);
     const version = addonVersion(info);
 
     if (version === null) {
-      return;
+      continue;
     }
 
     if (version === 1) {
       const localProject = new BaseProject(packagePath);
 
-      listComponents(localProject);
-      listRoutes(localProject);
-      listHelpers(localProject);
-      listModels(localProject);
-      listTransforms(localProject);
-      listServices(localProject);
-      listModifiers(localProject);
+      await Promise.all([
+        listComponents(localProject),
+        listRoutes(localProject),
+        listHelpers(localProject),
+        listModels(localProject),
+        listTransforms(localProject),
+        listServices(localProject),
+        listModifiers(localProject),
+      ]);
     }
-  });
+  }
 }
 
-export function listPodsComponents(project: BaseProject): void {
+export async function listPodsComponents(project: BaseProject): Promise<void> {
   const podModulePrefix = podModulePrefixForRoot(project.root);
 
   if (podModulePrefix === null) {
@@ -464,7 +405,7 @@ export function listPodsComponents(project: BaseProject): void {
 
   const entryPath = path.resolve(path.join(project.root, 'app', podModulePrefix, 'components'));
 
-  const jsPaths = safeWalkSync(entryPath, {
+  const jsPaths = await safeWalkSync(entryPath, {
     directories: false,
     globs: ['**/*.{js,ts,hbs,css,less,scss}'],
   });
@@ -488,24 +429,24 @@ export function builtinModifiers(): CompletionItem[] {
   ];
 }
 
-export function hasNamespaceSupport(root: string) {
-  const pack = getPackageJSON(root);
+export async function hasNamespaceSupport(root: string) {
+  const pack = await asyncGetPackageJSON(root);
 
   return hasDep(pack, 'ember-holy-futuristic-template-namespacing-batman');
 }
 
-export function listComponents(project: BaseProject): void {
+export async function listComponents(project: BaseProject): Promise<void> {
   // log('listComponents');
   const root = path.resolve(project.root);
   const scriptEntry = path.join(root, 'app', 'components');
   const templateEntry = path.join(root, 'app', 'templates', 'components');
   const addonComponents = path.join(root, 'addon', 'components');
   const addonTemplates = path.join(root, 'addon', 'templates', 'components');
-  const addonComponentsPaths = safeWalkSync(addonComponents, {
+  const addonComponentsPaths = await safeWalkSync(addonComponents, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}'],
   });
-  const addonTemplatesPaths = safeWalkSync(addonTemplates, {
+  const addonTemplatesPaths = await safeWalkSync(addonTemplates, {
     directories: false,
     globs: ['**/*.{js,ts,hbs}'],
   });
@@ -527,7 +468,7 @@ export function listComponents(project: BaseProject): void {
     }
   });
 
-  const jsPaths = safeWalkSync(scriptEntry, {
+  const jsPaths = await safeWalkSync(scriptEntry, {
     directories: false,
     globs: ['**/*.{js,ts,hbs,css,less,scss}'],
   });
@@ -541,7 +482,7 @@ export function listComponents(project: BaseProject): void {
     }
   });
 
-  const hbsPaths = safeWalkSync(templateEntry, {
+  const hbsPaths = await safeWalkSync(templateEntry, {
     directories: false,
     globs: ['**/*.hbs'],
   });
@@ -556,9 +497,9 @@ export function listComponents(project: BaseProject): void {
   });
 }
 
-function findRegistryItemsForProject(project: BaseProject, prefix: string, globs: string[]): void {
+async function findRegistryItemsForProject(project: BaseProject, prefix: string, globs: string[]): Promise<void> {
   const entry = path.resolve(path.join(project.root, prefix));
-  const paths = safeWalkSync(entry, {
+  const paths = await safeWalkSync(entry, {
     directories: false,
     globs,
   });
@@ -575,26 +516,26 @@ function findRegistryItemsForProject(project: BaseProject, prefix: string, globs
   });
 }
 
-export function findTestsForProject(project: BaseProject) {
-  findRegistryItemsForProject(project, 'tests', ['**/*.{js,ts}']);
+export async function findTestsForProject(project: BaseProject) {
+  await findRegistryItemsForProject(project, 'tests', ['**/*.{js,ts}']);
 }
 
-export function findAppItemsForProject(project: BaseProject) {
-  findRegistryItemsForProject(project, 'app', ['**/*.{js,ts,css,less,sass,hbs}']);
+export async function findAppItemsForProject(project: BaseProject) {
+  await findRegistryItemsForProject(project, 'app', ['**/*.{js,ts,css,less,sass,hbs}']);
 }
 
-export function findAddonItemsForProject(project: BaseProject) {
-  findRegistryItemsForProject(project, 'addon', ['**/*.{js,ts,css,less,sass,hbs}']);
+export async function findAddonItemsForProject(project: BaseProject) {
+  await findRegistryItemsForProject(project, 'addon', ['**/*.{js,ts,css,less,sass,hbs}']);
 }
 
-function listCollection(
+async function listCollection(
   project: BaseProject,
   prefix: 'app' | 'addon',
   collectionName: 'transforms' | 'modifiers' | 'services' | 'models' | 'helpers',
   detail: 'transform' | 'service' | 'model' | 'helper' | 'modifier'
 ) {
   const entry = path.resolve(path.join(project.root, prefix, collectionName));
-  const paths = safeWalkSync(entry, {
+  const paths = await safeWalkSync(entry, {
     directories: false,
     globs: ['**/*.{js,ts}'],
   });
@@ -609,46 +550,48 @@ function listCollection(
   });
 }
 
-export function listModifiers(project: BaseProject): void {
+export async function listModifiers(project: BaseProject): Promise<void> {
   return listCollection(project, 'app', 'modifiers', 'modifier');
 }
 
-export function listModels(project: BaseProject): void {
+export async function listModels(project: BaseProject): Promise<void> {
   return listCollection(project, 'app', 'models', 'model');
 }
 
-export function listServices(project: BaseProject): void {
+export async function listServices(project: BaseProject): Promise<void> {
   return listCollection(project, 'app', 'services', 'service');
 }
 
-export function listHelpers(project: BaseProject): void {
+export async function listHelpers(project: BaseProject): Promise<void> {
   return listCollection(project, 'app', 'helpers', 'helper');
 }
 
-export function listTransforms(project: BaseProject): void {
+export async function listTransforms(project: BaseProject): Promise<void> {
   return listCollection(project, 'app', 'transforms', 'transform');
 }
 
-export function listRoutes(project: BaseProject): void {
+export async function listRoutes(project: BaseProject): Promise<void> {
   const root = path.resolve(project.root);
   const scriptEntry = path.join(root, 'app', 'routes');
   const templateEntry = path.join(root, 'app', 'templates');
   const controllersEntry = path.join(root, 'app', 'controllers');
-  const paths = safeWalkSync(scriptEntry, {
+  const paths = await safeWalkSync(scriptEntry, {
     directories: false,
     globs: ['**/*.{js,ts}'],
   });
 
-  const templatePaths = safeWalkSync(templateEntry, {
-    directories: false,
-    globs: ['**/*.hbs'],
-  }).filter((name: string) => {
+  const templatePaths = (
+    await safeWalkSync(templateEntry, {
+      directories: false,
+      globs: ['**/*.hbs'],
+    })
+  ).filter((name: string) => {
     const skipEndings = ['-loading', '-error', '/loading', '/error'];
 
     return !name.startsWith('components/') && skipEndings.filter((ending: string) => name.endsWith(ending + '.hbs')).length === 0;
   });
 
-  const controllers = safeWalkSync(controllersEntry, {
+  const controllers = await safeWalkSync(controllersEntry, {
     directories: false,
     globs: ['**/*.{js,ts}'],
   });

@@ -14,7 +14,7 @@ import {
   isImportSpecifier,
 } from './../../utils/ast-helpers';
 import { normalizeServiceName } from '../../utils/normalizers';
-import { isModuleUnificationApp, podModulePrefixForRoot } from './../../utils/layout-helpers';
+import { asyncFilter, podModulePrefixForRoot } from './../../utils/layout-helpers';
 import { provideRouteDefinition } from './template-definition-provider';
 import { logInfo } from '../../utils/logger';
 import { Project } from '../../project';
@@ -26,6 +26,7 @@ type ItemType = 'Model' | 'Transform' | 'Service';
 // barking on 'LayoutCollectorFn' is defined but never used  @typescript-eslint/no-unused-vars
 // eslint-disable-line
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
+type AsyncLayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => Promise<string[]>;
 
 function joinPaths(...args: string[]) {
   return ['.ts', '.js'].map((extName: string) => {
@@ -37,7 +38,7 @@ function joinPaths(...args: string[]) {
 }
 
 class PathResolvers {
-  [key: string]: LayoutCollectorFn;
+  [key: string]: LayoutCollectorFn | AsyncLayoutCollectorFn;
   muModelPaths(root: string, modelName: string) {
     return joinPaths(root, 'src', 'data', 'models', modelName, 'model');
   }
@@ -65,11 +66,11 @@ class PathResolvers {
   podServicePaths(root: string, modelName: string, podPrefix: string) {
     return joinPaths(root, 'app', podPrefix, modelName, 'service');
   }
-  addonServicePaths(root: string, serviceName: string) {
-    return getAddonPathsForType(root, 'services', serviceName);
+  async addonServicePaths(root: string, serviceName: string): Promise<string[]> {
+    return await getAddonPathsForType(root, 'services', serviceName);
   }
-  addonImportPaths(root: string, pathName: string) {
-    return getAddonImport(root, pathName);
+  async addonImportPaths(root: string, pathName: string) {
+    return await getAddonImport(root, pathName);
   }
   classicImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
@@ -108,7 +109,7 @@ export default class CoreScriptDefinitionProvider {
     this.server = server;
     this.project = project;
   }
-  guessPathForImport(root: string, uri: string, importPath: string) {
+  async guessPathForImport(root: string, uri: string, importPath: string) {
     if (!uri) {
       return null;
     }
@@ -116,49 +117,45 @@ export default class CoreScriptDefinitionProvider {
     const guessedPaths: string[] = [];
     const fnName = 'Import';
 
-    if (isModuleUnificationApp(root)) {
-      this.resolvers[`mu${fnName}Paths`](root, importPath).forEach((pathLocation: string) => {
-        guessedPaths.push(pathLocation);
-      });
-    } else {
-      this.resolvers[`classic${fnName}Paths`](root, importPath).forEach((pathLocation: string) => {
-        guessedPaths.push(pathLocation);
-      });
-    }
-
-    this.resolvers.addonImportPaths(root, importPath).forEach((pathLocation: string) => {
+    (await this.resolvers[`classic${fnName}Paths`](root, importPath)).forEach((pathLocation: string) => {
       guessedPaths.push(pathLocation);
     });
 
-    return pathsToLocations(...guessedPaths);
+    const addonImports = await this.resolvers.addonImportPaths(root, importPath);
+
+    addonImports.forEach((pathLocation: string) => {
+      guessedPaths.push(pathLocation);
+    });
+
+    const existingPaths = await asyncFilter(guessedPaths, this.server.fs.exists);
+
+    return pathsToLocations(...existingPaths);
   }
-  guessPathsForType(root: string, fnName: ItemType, typeName: string) {
+  async guessPathsForType(root: string, fnName: ItemType, typeName: string) {
     const guessedPaths: string[] = [];
 
-    if (isModuleUnificationApp(root)) {
-      this.resolvers[`mu${fnName}Paths`](root, typeName).forEach((pathLocation: string) => {
-        guessedPaths.push(pathLocation);
-      });
-    } else {
-      this.resolvers[`classic${fnName}Paths`](root, typeName).forEach((pathLocation: string) => {
-        guessedPaths.push(pathLocation);
-      });
-      const podPrefix = podModulePrefixForRoot(root);
+    (await this.resolvers[`classic${fnName}Paths`](root, typeName)).forEach((pathLocation: string) => {
+      guessedPaths.push(pathLocation);
+    });
+    const podPrefix = podModulePrefixForRoot(root);
 
-      if (podPrefix) {
-        this.resolvers[`pod${fnName}Paths`](root, typeName, podPrefix).forEach((pathLocation: string) => {
-          guessedPaths.push(pathLocation);
-        });
-      }
+    if (podPrefix) {
+      (await this.resolvers[`pod${fnName}Paths`](root, typeName, podPrefix)).forEach((pathLocation: string) => {
+        guessedPaths.push(pathLocation);
+      });
     }
 
     if (fnName === 'Service') {
-      this.resolvers.addonServicePaths(root, typeName).forEach((item: string) => {
+      const paths = await this.resolvers.addonServicePaths(root, typeName);
+
+      paths.forEach((item: string) => {
         guessedPaths.push(item);
       });
     }
 
-    return pathsToLocations(...guessedPaths);
+    const existingPaths = await asyncFilter(guessedPaths, this.server.fs.exists);
+
+    return pathsToLocations(...existingPaths);
   }
   async onDefinition(root: string, params: DefinitionFunctionParams): Promise<Definition | null> {
     const { textDocument, focusPath, type, results, server, position } = params;
@@ -192,13 +189,13 @@ export default class CoreScriptDefinitionProvider {
     } else if (isModelReference(astPath)) {
       const modelName = ((astPath.node as unknown) as t.StringLiteral).value;
 
-      definitions = this.guessPathsForType(root, 'Model', modelName);
+      definitions = await this.guessPathsForType(root, 'Model', modelName);
     } else if (isTransformReference(astPath)) {
       const transformName = ((astPath.node as unknown) as t.StringLiteral).value;
 
-      definitions = this.guessPathsForType(root, 'Transform', transformName);
+      definitions = await this.guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
-      definitions = this.guessPathForImport(root, uri, ((astPath.node as unknown) as t.StringLiteral).value) || [];
+      definitions = (await this.guessPathForImport(root, uri, ((astPath.node as unknown) as t.StringLiteral).value)) || [];
     } else if (isImportSpecifier(astPath)) {
       logInfo(`Handle script import for Project "${project.name}"`);
       const pathName: string = ((astPath.parentFromLevel(2) as unknown) as t.ImportDeclaration).source.value;
@@ -215,14 +212,16 @@ export default class CoreScriptDefinitionProvider {
       // If the start of the pathname is same as the project name, then use that as the root.
       if (project.name === maybeAppName && pathName.startsWith(project.name + '/tests')) {
         const importPaths = this.resolvers.resolveTestScopeImport(project.root, pathParts.join(path.sep));
+        const existingPaths = await asyncFilter(importPaths, this.server.fs.exists);
 
-        potentialPaths = pathsToLocations(...importPaths);
+        potentialPaths = pathsToLocations(...existingPaths);
       } else if (addonInfo) {
         const importPaths = this.resolvers.resolveTestScopeImport(addonInfo.root, pathName);
+        const existingPaths = await asyncFilter(importPaths, this.server.fs.exists);
 
-        potentialPaths = pathsToLocations(...importPaths);
+        potentialPaths = pathsToLocations(...existingPaths);
       } else {
-        potentialPaths = this.guessPathForImport(project.root, uri, pathName) || [];
+        potentialPaths = (await this.guessPathForImport(project.root, uri, pathName)) || [];
       }
 
       definitions = definitions.concat(potentialPaths);
@@ -234,15 +233,15 @@ export default class CoreScriptDefinitionProvider {
         serviceName = args[0].value;
       }
 
-      definitions = this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
+      definitions = await this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
     } else if (isNamedServiceInjection(astPath)) {
       const serviceName = ((astPath.node as unknown) as t.StringLiteral).value;
 
-      definitions = this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
+      definitions = await this.guessPathsForType(root, 'Service', normalizeServiceName(serviceName));
     } else if (isRouteLookup(astPath)) {
       const routePath = ((astPath.node as unknown) as t.StringLiteral).value;
 
-      definitions = provideRouteDefinition(this.registry, routePath);
+      definitions = await provideRouteDefinition(this.registry, routePath, this.server.fs);
     }
 
     return definitions || [];

@@ -1,12 +1,12 @@
-import * as fs from 'fs';
 import * as util from 'util';
 import { resolve } from 'path';
 
 import { RemoteConsole } from 'vscode-languageserver/node';
+import { fsProvider } from '../fs-provider';
 
 // Log debugging to the ELS package root, if possible
 const debug = process.env.ELS_DEBUG || false;
-const log_file = debug ? fs.createWriteStream(resolve(__dirname, '../../debug.log'), { flags: 'w' }) : null;
+const log_file = debug ? fsProvider().createWriteStream(resolve(__dirname, '../../debug.log'), { flags: 'w' }) : null;
 
 let remoteConsole: RemoteConsole | null = null;
 

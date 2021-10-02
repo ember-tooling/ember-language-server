@@ -1,11 +1,11 @@
 import * as path from 'path';
-import * as fs from 'fs';
 import * as memoize from 'memoizee';
 import { Location, Range } from 'vscode-languageserver/node';
 
 import { URI } from 'vscode-uri';
 
-import { isModuleUnificationApp, podModulePrefixForRoot, hasAddonFolderInPath, getProjectAddonsRoots, getProjectInRepoAddonsRoots } from './layout-helpers';
+import { podModulePrefixForRoot, hasAddonFolderInPath, getProjectAddonsRoots, getProjectInRepoAddonsRoots, asyncFilter } from './layout-helpers';
+import { fsProvider } from '../fs-provider';
 
 const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
   length: 3,
@@ -17,7 +17,7 @@ const mProjectInRepoAddonsRoots = memoize(getProjectInRepoAddonsRoots, {
 });
 
 export function pathsToLocations(...paths: string[]): Location[] {
-  return paths.filter(fs.existsSync).map((modulePath) => {
+  return paths.map((modulePath) => {
     return Location.create(URI.file(modulePath).toString(), Range.create(0, 0, 0, 0));
   });
 }
@@ -48,13 +48,15 @@ export function getFirstTextPostion(text: string, content: string) {
   return [startLine, startCharacter];
 }
 
-export function pathsToLocationsWithPosition(paths: string[], findMe: string) {
-  return paths.filter(fs.existsSync).map((fileName: string) => {
-    const text = fs.readFileSync(fileName, 'utf8');
+export async function pathsToLocationsWithPosition(paths: string[], findMe: string): Promise<Location[]> {
+  const results = paths.map(async (fileName: string) => {
+    const text = await fsProvider().readFile(fileName);
     const [startLine, startCharacter] = getFirstTextPostion(text, findMe);
 
     return Location.create(URI.file(fileName).toString(), Range.create(startLine, startCharacter, startLine, startCharacter + findMe.length));
   });
+
+  return Promise.all(results);
 }
 
 export function getAbstractParts(root: string, prefix: string, collection: string, name: string) {
@@ -98,20 +100,15 @@ export function getAbstractComponentTemplatesParts(root: string, prefix: string,
 export function getPathsForComponentScripts(root: string, maybeComponentName: string): string[] {
   const podModulePrefix = podModulePrefixForRoot(root);
   let podComponentsScriptsParts: string[][] = [];
-  let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
 
   if (podModulePrefix) {
     podComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app/' + podModulePrefix, maybeComponentName);
   }
 
-  if (isModuleUnificationApp(root)) {
-    muComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'src/ui', maybeComponentName);
-  } else {
-    classicComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app', maybeComponentName);
-  }
+  classicComponentsScriptsParts = getAbstractComponentScriptsParts(root, 'app', maybeComponentName);
 
-  const paths = [...muComponentsScriptsParts, ...podComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
+  const paths = [...podComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
     return path.join(...pathParts.filter((part: string) => !!part));
   });
 
@@ -121,27 +118,22 @@ export function getPathsForComponentScripts(root: string, maybeComponentName: st
 export function getPathsForComponentTemplates(root: string, maybeComponentName: string): string[] {
   const podModulePrefix = podModulePrefixForRoot(root);
   let podComponentsScriptsParts: string[][] = [];
-  let muComponentsScriptsParts: string[][] = [];
   let classicComponentsScriptsParts: string[][] = [];
 
   if (podModulePrefix) {
     podComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app' + path.sep + podModulePrefix, maybeComponentName);
   }
 
-  if (isModuleUnificationApp(root)) {
-    muComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'src/ui', maybeComponentName);
-  } else {
-    classicComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app', maybeComponentName);
-  }
+  classicComponentsScriptsParts = getAbstractComponentTemplatesParts(root, 'app', maybeComponentName);
 
-  const paths = [...podComponentsScriptsParts, ...muComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
+  const paths = [...podComponentsScriptsParts, ...classicComponentsScriptsParts].map((pathParts: any) => {
     return path.join(...pathParts.filter((part: any) => !!part));
   });
 
   return paths;
 }
 
-export function getAddonImport(root: string, importPath: string) {
+export async function getAddonImport(root: string, importPath: string) {
   const importParts = importPath.split('/');
   let addonName = importParts.shift();
 
@@ -154,17 +146,19 @@ export function getAddonImport(root: string, importPath: string) {
   }
 
   const items: string[] = [];
-  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const [addonRoots, inRepoRoots] = await Promise.all([mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root)]);
+
+  const roots = items.concat(addonRoots, inRepoRoots);
   let existingPaths: string[] = [];
   let hasValidPath = false;
 
-  roots.forEach((rootPath: string) => {
+  for (const rootPath of roots) {
     if (!rootPath.endsWith(addonName as string)) {
-      return;
+      continue;
     }
 
     if (hasValidPath) {
-      return;
+      continue;
     }
 
     const addonPaths: string[][] = [];
@@ -179,17 +173,18 @@ export function getAddonImport(root: string, importPath: string) {
         addonPaths.push(parts);
       });
     });
-    const validPaths = addonPaths
-      .map((pathArr: string[]): string => {
-        return path.join(...pathArr.filter((part: any) => !!part));
-      })
-      .filter(fs.existsSync);
+
+    const rawPaths = addonPaths.map((pathArr: string[]): string => {
+      return path.join(...pathArr.filter((part: any) => !!part));
+    });
+
+    const validPaths = await asyncFilter(rawPaths, fsProvider().exists);
 
     if (validPaths.length) {
       hasValidPath = true;
       existingPaths = validPaths;
     }
-  });
+  }
 
   const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
 
@@ -200,15 +195,16 @@ export function getAddonImport(root: string, importPath: string) {
   return existingPaths;
 }
 
-export function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
+export async function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
   const items: string[] = [];
-  const roots = items.concat(mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root));
+  const [addonRoots, inRepoRoots] = await Promise.all([mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root)]);
+  const roots = items.concat(addonRoots, inRepoRoots);
   let existingPaths: string[] = [];
   let hasValidPath = false;
 
-  roots.forEach((rootPath: string) => {
+  for (const rootPath of roots) {
     if (hasValidPath) {
-      return;
+      break;
     }
 
     const addonPaths: string[][] = [];
@@ -219,17 +215,17 @@ export function getAddonPathsForType(root: string, collection: 'services' | 'mod
     getAbstractParts(rootPath, 'addon', collection, name).forEach((parts: any) => {
       addonPaths.push(parts);
     });
-    const validPaths = addonPaths
-      .map((pathArr: string[]): string => {
-        return path.join(...pathArr.filter((part: any) => !!part));
-      })
-      .filter(fs.existsSync);
+    const rawPaths = addonPaths.map((pathArr: string[]): string => {
+      return path.join(...pathArr.filter((part: any) => !!part));
+    });
+
+    const validPaths = await asyncFilter(rawPaths, fsProvider().exists);
 
     if (validPaths.length) {
       hasValidPath = true;
       existingPaths = validPaths;
     }
-  });
+  }
 
   const addonFolderFiles = existingPaths.filter(hasAddonFolderInPath);
 

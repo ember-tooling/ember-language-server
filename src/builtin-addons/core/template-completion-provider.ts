@@ -3,7 +3,6 @@ import { AddonMeta, CompletionFunctionParams } from './../../utils/addon-api';
 import { uniqBy } from 'lodash';
 
 import * as memoize from 'memoizee';
-import * as fs from 'fs';
 import { emberBlockItems, emberMustacheItems, emberSubExpressionItems, emberModifierItems } from './ember-helpers';
 import { getPathsFromRegistry, provideComponentTemplatePaths } from './template-definition-provider';
 
@@ -38,11 +37,12 @@ import {
   isRootStartingWithFilePath,
   isScriptPath,
   isTestFile,
+  asyncFilter,
 } from '../../utils/layout-helpers';
 
 import { normalizeToAngleBracketComponent } from '../../utils/normalizers';
 import { getTemplateBlocks } from '../../utils/template-tokens-collector';
-import { ASTNode } from 'ast-types';
+import type { ASTNode } from 'ast-types';
 import { ASTv1 } from '@glimmer/syntax';
 import { URI } from 'vscode-uri';
 import { componentsContextData } from './template-context-provider';
@@ -157,25 +157,25 @@ export default class TemplateCompletionProvider {
   async initRegistry(_: Server, project: Project) {
     this.project = project;
     this.server = _;
-    this.hasNamespaceSupport = hasNamespaceSupport(project.root);
+    this.hasNamespaceSupport = await hasNamespaceSupport(project.root);
 
     if (project.flags.enableEagerRegistryInitialization) {
       try {
         const initStartTime = Date.now();
 
-        mListHelpers(project);
+        await mListHelpers(project);
         this.enableRegistryCache('helpersRegistryInitialized');
 
-        mListModifiers(project);
+        await mListModifiers(project);
         this.enableRegistryCache('modifiersRegistryInitialized');
 
-        mListRoutes(project);
+        await mListRoutes(project);
         this.enableRegistryCache('routesRegistryInitialized');
 
-        mListComponents(project);
+        await mListComponents(project);
         this.enableRegistryCache('componentsRegistryInitialized');
 
-        mGetProjectAddonsInfo(project.root);
+        await mGetProjectAddonsInfo(project.root);
         this.enableRegistryCache('projectAddonsInfoInitialized');
 
         this.project.invalidateRegistry();
@@ -188,22 +188,22 @@ export default class TemplateCompletionProvider {
       logInfo('EagerRegistryInitialization is disabled for "' + project.name + '" (template-completion-provider)');
     }
   }
-  getAllAngleBracketComponents(root: string, uri: string) {
+  async getAllAngleBracketComponents(root: string, uri: string) {
     const items: CompletionItem[] = [];
 
     if (!this.meta.projectAddonsInfoInitialized) {
-      mGetProjectAddonsInfo(root);
+      await mGetProjectAddonsInfo(root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }
 
     if (!this.meta.componentsRegistryInitialized) {
-      mListComponents(this.project);
+      await mListComponents(this.project);
       this.enableRegistryCache('componentsRegistryInitialized');
     }
 
     if (!this.meta.podComponentsRegistryInitialized) {
-      mListPodsComponents(this.project);
+      await mListPodsComponents(this.project);
       this.enableRegistryCache('podComponentsRegistryInitialized');
     }
 
@@ -229,7 +229,7 @@ export default class TemplateCompletionProvider {
       'label'
     );
   }
-  templateContextLookup(rawCurrentFilePath: string, templateContent: string): CompletionItem[] {
+  async templateContextLookup(rawCurrentFilePath: string, templateContent: string): Promise<CompletionItem[]> {
     const fsPath = URI.parse(rawCurrentFilePath).fsPath;
     const componentName = this.project.matchPathToType(fsPath)?.name;
 
@@ -240,27 +240,29 @@ export default class TemplateCompletionProvider {
 
     const maybeScripts = getPathsFromRegistry('component', componentName, this.registry).filter((el) => !isTestFile(el) && isScriptPath(el));
 
-    return componentsContextData(maybeScripts, templateContent);
+    const items: CompletionItem[] = await componentsContextData(this.server.fs, maybeScripts, templateContent);
+
+    return items;
   }
-  getLocalPathExpressionCandidates(uri: string, originalText: string) {
-    const candidates: CompletionItem[] = [...this.templateContextLookup(uri, originalText)];
+  async getLocalPathExpressionCandidates(uri: string, originalText: string) {
+    const candidates: CompletionItem[] = await this.templateContextLookup(uri, originalText);
 
     return candidates;
   }
-  getMustachePathCandidates(root: string) {
+  async getMustachePathCandidates(root: string) {
     if (!this.meta.projectAddonsInfoInitialized) {
-      mGetProjectAddonsInfo(root);
+      await mGetProjectAddonsInfo(root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }
 
     if (!this.meta.componentsRegistryInitialized) {
-      mListComponents(this.project);
+      await mListComponents(this.project);
       this.enableRegistryCache('componentsRegistryInitialized');
     }
 
     if (!this.meta.podComponentsRegistryInitialized) {
-      mListPodsComponents(this.project);
+      await mListPodsComponents(this.project);
       this.enableRegistryCache('podComponentsRegistryInitialized');
     }
 
@@ -290,20 +292,20 @@ export default class TemplateCompletionProvider {
 
     return candidates;
   }
-  getBlockPathCandidates(root: string): CompletionItem[] {
+  async getBlockPathCandidates(root: string): Promise<CompletionItem[]> {
     if (!this.meta.projectAddonsInfoInitialized) {
-      mGetProjectAddonsInfo(root);
+      await mGetProjectAddonsInfo(root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }
 
     if (!this.meta.componentsRegistryInitialized) {
-      mListComponents(this.project);
+      await mListComponents(this.project);
       this.enableRegistryCache('componentsRegistryInitialized');
     }
 
     if (!this.meta.podComponentsRegistryInitialized) {
-      mListPodsComponents(this.project);
+      await mListPodsComponents(this.project);
       this.enableRegistryCache('podComponentsRegistryInitialized');
     }
 
@@ -317,14 +319,14 @@ export default class TemplateCompletionProvider {
       };
     });
   }
-  getSubExpressionPathCandidates() {
+  async getSubExpressionPathCandidates() {
     if (!this.meta.helpersRegistryInitialized) {
       mListHelpers(this.project);
       this.enableRegistryCache('helpersRegistryInitialized');
     }
 
     if (!this.meta.projectAddonsInfoInitialized) {
-      mGetProjectAddonsInfo(this.project.root);
+      await mGetProjectAddonsInfo(this.project.root);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }
@@ -355,14 +357,15 @@ export default class TemplateCompletionProvider {
 
     return scopedValues;
   }
-  getParentComponentYields(focusPath: ASTNode & { tag: string }) {
+  async getParentComponentYields(focusPath: ASTNode & { tag: string }) {
     if (focusPath.type !== 'ElementNode') {
       return [];
     }
 
     const paths: string[] = [];
 
-    const scopedPaths = provideComponentTemplatePaths(this.registry, focusPath.tag).filter((p) => fs.existsSync(p));
+    const rawScopedPaths = provideComponentTemplatePaths(this.registry, focusPath.tag);
+    const scopedPaths = await asyncFilter(rawScopedPaths, this.server.fs.exists);
 
     scopedPaths.forEach((p) => {
       if (!paths.includes(p)) {
@@ -376,7 +379,7 @@ export default class TemplateCompletionProvider {
 
     const tpl = paths[0];
 
-    const content = fs.readFileSync(tpl, 'utf8');
+    const content = await this.server.fs.readFile(tpl);
 
     return getTemplateBlocks(content).map((blockName: string) => {
       return {
@@ -402,13 +405,13 @@ export default class TemplateCompletionProvider {
       if (isNamedBlockName(focusPath)) {
         log('isNamedBlockName');
         // <:main>
-        const yields = this.getParentComponentYields(focusPath.parent);
+        const yields = await this.getParentComponentYields(focusPath.parent);
 
         completions.push(...yields);
       } else if (isAngleComponentPath(focusPath) && !isNamedBlockName(focusPath)) {
         log('isAngleComponentPath');
         // <Foo>
-        const candidates = this.getAllAngleBracketComponents(root, uri);
+        const candidates = await this.getAllAngleBracketComponents(root, uri);
         const scopedValues = this.getScopedValues(focusPath);
 
         log(candidates, scopedValues);
@@ -434,12 +437,12 @@ export default class TemplateCompletionProvider {
             }
           });
 
-          const existingTpls = tpls.filter(fs.existsSync);
+          const existingTpls = await asyncFilter(tpls, this.server.fs.exists);
 
           if (existingTpls.length) {
             const existingAttributes = focusPath.parent.attributes.map((attr: ASTv1.AttrNode) => attr.name).filter((name: string) => isArgumentName(name));
-            const content = fs.readFileSync(existingTpls[0], 'utf8');
-            const candidates = this.getLocalPathExpressionCandidates(tpls[0], content);
+            const content = await this.server.fs.readFile(existingTpls[0]);
+            const candidates = await this.getLocalPathExpressionCandidates(tpls[0], content);
             const preResults: CompletionItem[] = [];
 
             candidates.forEach((obj: CompletionItem) => {
@@ -462,14 +465,16 @@ export default class TemplateCompletionProvider {
       } else if (isLocalPathExpression(focusPath)) {
         // {{foo-bar this.na?}}
         log('isLocalPathExpression');
-        const candidates = this.getLocalPathExpressionCandidates(uri, originalText).filter((el) => {
+        const rawCandidates = await this.getLocalPathExpressionCandidates(uri, originalText);
+        const candidates = rawCandidates.filter((el) => {
           return el.label.startsWith('this.');
         });
 
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isArgumentPathExpression(focusPath)) {
         // {{@ite..}}
-        const candidates = this.getLocalPathExpressionCandidates(uri, originalText).filter((el) => {
+        const rawCandidates = await this.getLocalPathExpressionCandidates(uri, originalText);
+        const candidates = rawCandidates.filter((el) => {
           return isArgumentName(el.label);
         });
 
@@ -477,8 +482,8 @@ export default class TemplateCompletionProvider {
       } else if (isMustachePath(focusPath)) {
         // {{foo-bar?}}
         log('isMustachePath');
-        const candidates = this.getMustachePathCandidates(root);
-        const localCandidates = this.getLocalPathExpressionCandidates(uri, originalText);
+        const candidates = await this.getMustachePathCandidates(root);
+        const localCandidates = await this.getLocalPathExpressionCandidates(uri, originalText);
 
         if (isScopedPathExpression(focusPath)) {
           const scopedValues = this.getScopedValues(focusPath);
@@ -492,7 +497,7 @@ export default class TemplateCompletionProvider {
       } else if (isBlockPath(focusPath)) {
         // {{#foo-bar?}} {{/foo-bar}}
         log('isBlockPath');
-        const candidates = this.getBlockPathCandidates(root);
+        const candidates = await this.getBlockPathCandidates(root);
 
         if (isScopedPathExpression(focusPath)) {
           const scopedValues = this.getScopedValues(focusPath);
@@ -505,7 +510,7 @@ export default class TemplateCompletionProvider {
       } else if (isSubExpressionPath(focusPath)) {
         // {{foo-bar name=(subexpr? )}}
         log('isSubExpressionPath');
-        const candidates = this.getSubExpressionPathCandidates();
+        const candidates = await this.getSubExpressionPathCandidates();
 
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
@@ -516,7 +521,7 @@ export default class TemplateCompletionProvider {
           completions.push(...uniqBy(scopedValues, 'label'));
         }
 
-        const candidates = this.getLocalPathExpressionCandidates(uri, originalText);
+        const candidates = await this.getLocalPathExpressionCandidates(uri, originalText);
 
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isLinkToTarget(focusPath)) {
@@ -568,7 +573,7 @@ export default class TemplateCompletionProvider {
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          mGetProjectAddonsInfo(root);
+          await mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }

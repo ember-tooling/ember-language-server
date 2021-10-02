@@ -6,7 +6,7 @@ import { isLinkToTarget, isLinkComponentRouteTarget, isOutlet } from './../../ut
 import ASTPath from './../../glimmer-utils';
 import { IRegistry } from './../../utils/registry-api';
 import { normalizeToClassicComponent } from '../../utils/normalizers';
-import { isTemplatePath, isTestFile, isScriptPath } from './../../utils/layout-helpers';
+import { isTemplatePath, isTestFile, isScriptPath, asyncFilter } from './../../utils/layout-helpers';
 
 import { pathsToLocationsWithPosition, pathsToLocations } from './../../utils/definition-helpers';
 
@@ -15,6 +15,7 @@ import { ASTv1 } from '@glimmer/syntax';
 import { Project } from '../../project';
 import Server from '../../server';
 import { isStyleFile } from '../../utils/layout-helpers';
+import FSProvider from '../../fs-provider';
 
 function getComponentAndAddonName(rawComponentName: string) {
   const componentParts = rawComponentName.split('$');
@@ -49,10 +50,11 @@ export function provideComponentTemplatePaths(registry: IRegistry, rawComponentN
   }
 }
 
-export function provideRouteDefinition(registry: IRegistry, routeName: string): Location[] {
+export async function provideRouteDefinition(registry: IRegistry, routeName: string, fs: FSProvider): Promise<Location[]> {
   const items = getPathsFromRegistry('routePath', routeName, registry).filter((el) => !isTestFile(el));
+  const existingItems = await asyncFilter(items, fs.exists);
 
-  return pathsToLocations(...items);
+  return pathsToLocations(...existingItems);
 }
 
 export default class TemplateDefinitionProvider {
@@ -76,35 +78,35 @@ export default class TemplateDefinitionProvider {
     }
 
     if (isOutlet(focusPath)) {
-      definitions = this.provideChildRouteDefinitions(uri);
+      definitions = await this.provideChildRouteDefinitions(uri);
     } else if (this.maybeClassicComponentName(focusPath)) {
       const { addonName, componentName } = getComponentAndAddonName(this.extractValueForMaybeClassicComponentName(focusPath));
 
       // <FooBar @some-component-name="my-component" /> || {{some-component some-name="my-component/name"}}
-      definitions = this.provideComponentDefinition(componentName, addonName);
+      definitions = await this.provideComponentDefinition(componentName, addonName);
     } else if (this.isAngleComponent(focusPath)) {
       // <FooBar />
-      definitions = this.provideAngleBrackedComponentDefinition(focusPath);
+      definitions = await this.provideAngleBrackedComponentDefinition(focusPath);
       // {{#foo-bar}} {{/foo-bar}}
     } else if (this.isComponentWithBlock(focusPath)) {
-      definitions = this.provideBlockComponentDefinition(focusPath);
+      definitions = await this.provideBlockComponentDefinition(focusPath);
       // {{action "fooBar"}}, (action "fooBar"), (action this.fooBar), this.someProperty
     } else if (this.isActionName(focusPath) || this.isLocalProperty(focusPath)) {
-      definitions = this.providePropertyDefinition(focusPath, uri);
+      definitions = await this.providePropertyDefinition(focusPath, uri);
       // {{foo-bar}}
     } else if (this.isComponentOrHelperName(focusPath)) {
-      definitions = this.provideMustacheDefinition(focusPath);
+      definitions = await this.provideMustacheDefinition(focusPath);
       // <FooBar @somePropertyToFindUsage="" />
     } else if (isLinkComponentRouteTarget(focusPath)) {
       // <LinkTo @route="name" />
-      definitions = this.provideRouteDefinition((focusPath.node as ASTv1.TextNode).chars);
+      definitions = await this.provideRouteDefinition((focusPath.node as ASTv1.TextNode).chars);
     } else if (this.isAnglePropertyAttribute(focusPath)) {
-      definitions = this.provideAngleBracketComponentAttributeUsage(focusPath);
+      definitions = await this.provideAngleBracketComponentAttributeUsage(focusPath);
       // {{hello propertyUsageToFind=someValue}}
     } else if (this.isHashPairKey(focusPath)) {
-      definitions = this.provideHashPropertyUsage(focusPath);
+      definitions = await this.provideHashPropertyUsage(focusPath);
     } else if (isLinkToTarget(focusPath)) {
-      definitions = this.provideRouteDefinition((focusPath.node as ASTv1.PathExpression).original);
+      definitions = await this.provideRouteDefinition((focusPath.node as ASTv1.PathExpression).original);
     }
 
     return definitions;
@@ -138,8 +140,8 @@ export default class TemplateDefinitionProvider {
       return false;
     }
   }
-  provideRouteDefinition(routeName: string): Location[] {
-    return provideRouteDefinition(this.registry, routeName);
+  async provideRouteDefinition(routeName: string): Promise<Location[]> {
+    return await provideRouteDefinition(this.registry, routeName, this.server.fs);
   }
   _provideLikelyRawComponentTemplatePaths(rawComponentName: string, addonName: string) {
     const maybeComponentName = normalizeToClassicComponent(rawComponentName);
@@ -157,7 +159,7 @@ export default class TemplateDefinitionProvider {
 
     return paths;
   }
-  provideLikelyComponentTemplatePath(rawComponentName: string): Location[] {
+  async provideLikelyComponentTemplatePath(rawComponentName: string): Promise<Location[]> {
     // Check for batman syntax <Foo$Bar>
     const { addonName, componentName } = getComponentAndAddonName(rawComponentName);
 
@@ -169,21 +171,27 @@ export default class TemplateDefinitionProvider {
       paths.add(p);
     });
 
-    return pathsToLocations(...(paths.size > 1 ? Array.from(paths).filter((postfix: string) => isTemplatePath(postfix)) : Array.from(paths)));
+    const selectedPaths = paths.size > 1 ? Array.from(paths).filter((postfix: string) => isTemplatePath(postfix)) : Array.from(paths);
+
+    const existingPaths = await asyncFilter(selectedPaths, this.server.fs.exists);
+
+    return pathsToLocations(...existingPaths);
   }
   provideAngleBrackedComponentDefinition(focusPath: ASTPath) {
     return this.provideLikelyComponentTemplatePath((focusPath.node as ASTv1.ElementNode).tag);
   }
-  provideBlockComponentDefinition(focusPath: ASTPath): Location[] {
+  async provideBlockComponentDefinition(focusPath: ASTPath): Promise<Location[]> {
     const maybeComponentName = normalizeToClassicComponent(((focusPath.node as ASTv1.BlockStatement).path as ASTv1.PathExpression).original);
 
     const paths = getPathsFromRegistry('component', maybeComponentName, this.registry).filter((el) => isTemplatePath(el));
 
+    const existingPaths = await asyncFilter(paths, this.server.fs.exists);
+
     // mAddonPathsForComponentTemplates
-    return pathsToLocationsWithPosition(paths, '{{yield');
+    return pathsToLocationsWithPosition(existingPaths, '{{yield');
   }
 
-  provideChildRouteDefinitions(uri: string): Location[] {
+  async provideChildRouteDefinitions(uri: string): Promise<Location[]> {
     const rawPath = URI.parse(uri).fsPath.toLowerCase();
     const registry = this.registry;
     const allPaths = registry.routePath;
@@ -232,14 +240,16 @@ export default class TemplateDefinitionProvider {
       }
     });
 
-    return pathsToLocations(...files);
+    const existingFiles = await asyncFilter(files, this.server.fs.exists);
+
+    return pathsToLocations(...existingFiles);
   }
 
-  providePropertyDefinition(focusPath: ASTPath, uri: string): Location[] {
+  async providePropertyDefinition(focusPath: ASTPath, uri: string): Promise<Location[]> {
     const rawPath = URI.parse(uri).fsPath;
 
     if (!rawPath) {
-      return [];
+      return Promise.resolve([]);
     }
 
     const filePath = path.resolve(rawPath);
@@ -247,18 +257,19 @@ export default class TemplateDefinitionProvider {
     const data = this.project.matchPathToType(filePath);
 
     if (data === null || data.type !== 'component') {
-      return [];
+      return Promise.resolve([]);
     }
 
     const maybeComponentName = normalizeToClassicComponent(data.name);
     const paths = getPathsFromRegistry('component', maybeComponentName, this.registry).filter((el) => isScriptPath(el));
 
+    const existingPaths = await asyncFilter(paths, this.server.fs.exists);
     const text = (focusPath.node as ASTv1.PathExpression).original;
 
-    return pathsToLocationsWithPosition(paths, text.replace('this.', '').split('.')[0]);
+    return pathsToLocationsWithPosition(existingPaths, text.replace('this.', '').split('.')[0]);
   }
 
-  provideComponentDefinition(rawComponentName: string, addonName: string): Location[] {
+  async provideComponentDefinition(rawComponentName: string, addonName: string): Promise<Location[]> {
     const maybeComponentName = normalizeToClassicComponent(rawComponentName);
 
     let paths = [...getPathsFromRegistry('component', maybeComponentName, this.registry), ...getPathsFromRegistry('helper', maybeComponentName, this.registry)];
@@ -273,7 +284,11 @@ export default class TemplateDefinitionProvider {
       }
     }
 
-    return pathsToLocations(...(paths.length > 1 ? paths.filter(isTemplatePath) : paths));
+    const selectedPaths = paths.length > 1 ? paths.filter(isTemplatePath) : paths;
+
+    const existingPaths = await asyncFilter(selectedPaths, this.server.fs.exists);
+
+    return pathsToLocations(...existingPaths);
   }
   provideMustacheDefinition(focusPath: ASTPath) {
     const maybeComponentName =
@@ -285,7 +300,7 @@ export default class TemplateDefinitionProvider {
 
     return this.provideComponentDefinition(componentName, addonName);
   }
-  provideHashPropertyUsage(focusPath: ASTPath): Location[] {
+  async provideHashPropertyUsage(focusPath: ASTPath): Promise<Location[]> {
     const parentPath = focusPath.parentPath;
 
     if (parentPath && parentPath.parent && parentPath.parent.path) {
@@ -293,19 +308,22 @@ export default class TemplateDefinitionProvider {
 
       if (!maybeComponentName.includes('.') && maybeComponentName.includes('-')) {
         const paths = getPathsFromRegistry('component', maybeComponentName, this.registry).filter((postfix: string) => isTemplatePath(postfix));
+        const existingPaths = await asyncFilter(paths, this.server.fs.exists);
 
-        return pathsToLocationsWithPosition(paths, '@' + (focusPath.node as ASTv1.HashPair).key);
+        return pathsToLocationsWithPosition(existingPaths, '@' + (focusPath.node as ASTv1.HashPair).key);
       }
     }
 
-    return [];
+    return Promise.resolve([]);
   }
-  provideAngleBracketComponentAttributeUsage(focusPath: ASTPath): Location[] {
+  async provideAngleBracketComponentAttributeUsage(focusPath: ASTPath): Promise<Location[]> {
     const maybeComponentName = normalizeToClassicComponent(focusPath.parent.tag);
 
     const paths = getPathsFromRegistry('component', maybeComponentName, this.registry).filter((postfix: string) => isTemplatePath(postfix));
 
-    return pathsToLocationsWithPosition(paths, (focusPath.node as ASTv1.AttrNode).name);
+    const existingPaths = await asyncFilter(paths, this.server.fs.exists);
+
+    return pathsToLocationsWithPosition(existingPaths, (focusPath.node as ASTv1.AttrNode).name);
   }
 
   isLocalProperty(path: ASTPath) {

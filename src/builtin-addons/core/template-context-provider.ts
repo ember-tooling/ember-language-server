@@ -1,11 +1,13 @@
-import * as fs from 'fs';
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
+import { CompletionItemKind } from 'vscode-languageserver';
+import type { CompletionItem } from 'vscode-languageserver';
 
 import { log } from '../../utils/logger';
 
 import { extractComponentInformationFromMeta, IComponentMetaInformation, IJsMeta, processJSFile, processTemplate } from 'ember-meta-explorer';
 
 import { uniqBy } from 'lodash';
+import FSProvider from '../../fs-provider';
+import { asyncFilter } from '../../utils/layout-helpers';
 
 function localizeName(name: string) {
   if (name.startsWith('this.')) {
@@ -17,15 +19,15 @@ function localizeName(name: string) {
   }
 }
 
-export function componentsContextData(maybeScripts: string[], templateContent: string): CompletionItem[] {
-  const existingScripts = maybeScripts.filter(fs.existsSync);
+export async function componentsContextData(fs: FSProvider, maybeScripts: string[], templateContent: string): Promise<CompletionItem[]> {
+  const existingScripts = await asyncFilter(maybeScripts, fs.exists);
   const hasAddonScript = existingScripts.find((el) => el.includes('addon'));
   const infoItems: IJsMeta[] = [];
 
   if (existingScripts.length) {
     try {
       const filePath = hasAddonScript ? hasAddonScript : (existingScripts.pop() as string);
-      const fileContent = fs.readFileSync(filePath, { encoding: 'utf8' });
+      const fileContent = await fs.readFile(filePath);
       const jsMeta = processJSFile(fileContent, filePath);
 
       log('jsMeta', jsMeta);

@@ -1,12 +1,12 @@
 import { Location, TextDocumentIdentifier, Command, CodeActionParams, CodeAction, Position, CompletionItem } from 'vscode-languageserver/node';
 import {
   getProjectAddonsRoots,
-  getPackageJSON,
   getProjectInRepoAddonsRoots,
   PackageInfo,
   ADDON_CONFIG_KEY,
   hasEmberLanguageServerExtension,
   addonVersion,
+  asyncGetPackageJSON,
 } from './layout-helpers';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import * as path from 'path';
@@ -149,17 +149,18 @@ function requireUncached(module: string) {
   return result;
 }
 
-export function collectProjectProviders(root: string, addons: string[]): ProjectProviders {
+export async function collectProjectProviders(root: string, addons: string[]): Promise<ProjectProviders> {
+  const [projectAddonsRoots, projectInRepoAddonsRoots] = await Promise.all([getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root)]);
   const roots = addons
     .concat([root])
-    .concat(getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root))
+    .concat(projectAddonsRoots, projectInRepoAddonsRoots)
     .filter((pathItem) => typeof pathItem === 'string');
   const dagMap: DAGMap<HandlerObject> = new DAGMap();
 
   const addonsMeta: AddonMeta[] = [];
 
-  roots.forEach((packagePath: string) => {
-    const info = getPackageJSON(packagePath);
+  for (const packagePath of roots) {
+    const info = await asyncGetPackageJSON(packagePath);
 
     if (info.name) {
       addonsMeta.push({
@@ -185,7 +186,7 @@ export function collectProjectProviders(root: string, addons: string[]): Project
 
       dagMap.add(info.name || packagePath, addon, addonInfo.before, addonInfo.after);
     }
-  });
+  }
 
   const result: {
     definitionProviders: DefinitionResolveFunction[];

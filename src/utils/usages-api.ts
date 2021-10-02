@@ -1,6 +1,6 @@
 import { extractTokensFromTemplate } from './template-tokens-collector';
-import * as fs from 'fs';
 import { MatchResultType } from './path-matcher';
+import { fsProvider } from '../fs-provider';
 
 export interface TemplateTokenMeta {
   source: string;
@@ -122,7 +122,7 @@ export function getAllTemplateTokens(): ITemplateTokens {
   return TEMPLATE_TOKENS;
 }
 
-function extractTokens() {
+async function extractTokens() {
   if (!tokenQueue.length) {
     return;
   }
@@ -136,7 +136,7 @@ function extractTokens() {
   const [kind, normalizedName, file]: [UsageType, string, string] = item;
 
   try {
-    const content = fs.readFileSync(file, 'utf8');
+    const content = await fsProvider().readFile(file);
     const tokens = extractTokensFromTemplate(content);
 
     TEMPLATE_TOKENS[kind][normalizedName] = {

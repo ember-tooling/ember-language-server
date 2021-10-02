@@ -84,7 +84,7 @@ export default class ScriptCompletionProvider {
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          mGetProjectAddonsInfo(root);
+          await mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }
@@ -102,12 +102,12 @@ export default class ScriptCompletionProvider {
         log('isRouteLookup');
 
         if (!this.meta.routesRegistryInitialized) {
-          mListRoutes(this.project);
+          await mListRoutes(this.project);
           this.enableRegistryCache('routesRegistryInitialized');
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          mGetProjectAddonsInfo(root);
+          await mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }
@@ -130,7 +130,7 @@ export default class ScriptCompletionProvider {
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          mGetProjectAddonsInfo(root);
+          await mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }
@@ -185,7 +185,7 @@ export default class ScriptCompletionProvider {
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          mGetProjectAddonsInfo(root);
+          await mGetProjectAddonsInfo(root);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }
