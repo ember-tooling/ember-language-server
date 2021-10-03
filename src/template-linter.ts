@@ -11,6 +11,7 @@ import * as path from 'path';
 
 import Server from './server';
 import { Project } from './project';
+import { getRequireSupport } from './utils/layout-helpers';
 
 export interface TemplateLinterError {
   fatal?: boolean;
@@ -39,7 +40,11 @@ export default class TemplateLinter {
   private _linterCache = new Map<Project, any>();
   private _isEnabled = true;
 
-  constructor(private server: Server) {}
+  constructor(private server: Server) {
+    if (this.server.options.type === 'worker') {
+      this.disable();
+    }
+  }
 
   disable() {
     this._isEnabled = false;
@@ -113,13 +118,13 @@ export default class TemplateLinter {
       return;
     }
 
-    const TemplateLinter = await this.getLinter(project);
+    const TemplateLinterKlass = await this.getLinter(project);
 
-    let linter: typeof TemplateLinter | null = null;
+    let linter: typeof TemplateLinterKlass | null = null;
 
     try {
       setCwd(project.root);
-      linter = new TemplateLinter();
+      linter = new TemplateLinterKlass();
     } catch (e) {
       setCwd(cwd);
 
@@ -190,6 +195,10 @@ export default class TemplateLinter {
       }) as Promise<string>);
 
       if (!linterPath) {
+        return;
+      }
+
+      if (!getRequireSupport()) {
         return;
       }
 

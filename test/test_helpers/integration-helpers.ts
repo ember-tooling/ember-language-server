@@ -1,7 +1,7 @@
 /* eslint-disable semi */
 import * as path from 'path';
 import * as fs from 'fs';
-import { createTempDir } from 'broccoli-test-helper';
+import { createTempDir, Tree } from 'broccoli-test-helper';
 import { URI } from 'vscode-uri';
 import { MessageConnection } from 'vscode-jsonrpc/node';
 import * as spawn from 'cross-spawn';
@@ -18,11 +18,26 @@ import {
   DidOpenTextDocumentParams,
   CompletionRequest,
 } from 'vscode-languageserver-protocol/node';
+import { FileStat, FileType, fileTypeFromFsStat } from '../../src/utils/fs-utils';
 
-export function startServer() {
-  return spawn('node_modules/.bin/nyc', ['--reporter', 'none', 'node', './inst/start-server.js', '--stdio', '--no-clean'], {
-    cwd: path.join(__dirname, '../..'),
-  });
+export function startServer(asyncFs = false) {
+  const options: Array<string | undefined> = [
+    '--reporter',
+    'none',
+    'node',
+    './inst/start-server.js',
+    '--stdio',
+    asyncFs ? '--async-fs' : undefined,
+    '--no-clean',
+  ];
+
+  return spawn(
+    'node_modules/.bin/nyc',
+    options.filter((el) => el !== undefined),
+    {
+      cwd: path.join(__dirname, '../..'),
+    }
+  );
 }
 
 export type UnknownResult = Record<string, unknown>;
@@ -31,6 +46,97 @@ export type Registry = {
     [key: string]: string[];
   };
 };
+
+export function asyncFSProvider() {
+  // likely we should emit special error objects instead of nulls
+  // if (error !== null && typeof error === 'object' && (error.code === 'ENOENT' || error.code === 'ENOTDIR' || error.code === 'EPERM')) {
+  //   return;
+  // }
+
+  const commands: Record<string, unknown> = {};
+
+  commands['els.fs.readFile'] = async (uri: URI) => {
+    const fsPath = URI.from(uri).fsPath;
+    let data: unknown;
+
+    try {
+      data = fs.readFileSync(fsPath, 'utf8');
+    } catch (e) {
+      data = null;
+    }
+
+    return data;
+  };
+
+  commands['els.fs.stat'] = async (uri: URI): Promise<FileStat | null> => {
+    const fsPath = URI.from(uri).fsPath;
+    let data: fs.Stats = null;
+
+    try {
+      data = fs.statSync(fsPath);
+
+      const fType = fileTypeFromFsStat(data);
+
+      return {
+        mtime: data.mtimeMs,
+        ctime: data.ctimeMs,
+        size: data.size,
+        type: fType,
+      };
+    } catch (e) {
+      data = null;
+    }
+
+    return data as null;
+  };
+
+  commands['els.fs.readDirectory'] = async (uri: URI) => {
+    const fsPath = URI.from(uri).fsPath;
+
+    let data: unknown;
+
+    try {
+      data = fs.readdirSync(fsPath);
+    } catch (e) {
+      data = null;
+    }
+
+    if (data === null) {
+      return null;
+    }
+
+    return (data as string[])
+      .map((el) => {
+        let stat = FileType.Unknown;
+
+        try {
+          const statData = fs.statSync(path.join(fsPath, path.sep, el));
+
+          stat = fileTypeFromFsStat(statData);
+        } catch (e) {
+          return null;
+          // EOL;
+        }
+
+        return [el, stat];
+      })
+      .filter((el) => el !== null);
+  };
+
+  return commands;
+}
+
+export async function registerCommandExecutor(connection: MessageConnection, handlers: Record<string, (...args: unknown[]) => unknown>) {
+  const disposable = connection.onRequest(ExecuteCommandRequest.type, async ({ command, arguments: args }) => {
+    if (command in handlers) {
+      return handlers[command](...args);
+    } else {
+      throw new Error(`Unhandled command: "${command}"`);
+    }
+  });
+
+  return disposable;
+}
 
 export async function reloadProjects(connection: MessageConnection, project = undefined) {
   const result = await connection.sendRequest(ExecuteCommandRequest.type, {
@@ -41,7 +147,7 @@ export async function reloadProjects(connection: MessageConnection, project = un
   return result;
 }
 
-export async function initFileStructure(files) {
+export async function initFileStructure(files: Tree) {
   const dir = await createTempDir();
 
   dir.write(files);
@@ -180,6 +286,7 @@ export async function setServerConfig(connection: MessageConnection, config = { 
   await connection.sendRequest(ExecuteCommandRequest.type, configParams);
 }
 
+// @ts-expect-error overload signature
 export async function createProject(
   files: unknown,
   connection: MessageConnection,
@@ -196,7 +303,7 @@ export async function createProject(
 ): Promise<{ normalizedPath: string; originalPath: string; result: UnknownResult; destroy(): Promise<void> }>;
 
 export async function createProject(
-  files,
+  files: RecursiveRecord<string | RecursiveRecord<string>>,
   connection: MessageConnection,
   projectName?: string | string[]
 ): Promise<{ normalizedPath: unknown; originalPath: string; result: UnknownResult | UnknownResult[]; destroy(): Promise<void> }> {
@@ -251,7 +358,7 @@ export async function createProject(
   }
 }
 
-export function textDocument(modelPath, position = { line: 0, character: 0 }) {
+export function textDocument(modelPath: string, position = { line: 0, character: 0 }) {
   const params = {
     textDocument: {
       uri: URI.file(modelPath).toString(),
@@ -288,74 +395,75 @@ export async function getResult(
   reqType: typeof CompletionRequest.method,
   connection: MessageConnection,
   files,
-  fileToInspect,
-  position,
+  fileToInspect: string,
+  position: { line: number; character: number },
   projectName: string[]
 ): Promise<IResponse<CompletionItem[]>[]>;
 export async function getResult(
   reqType: typeof CompletionRequest.method,
   connection: MessageConnection,
   files,
-  fileToInspect,
-  position,
+  fileToInspect: string,
+  position: { line: number; character: number },
   projectName: string
 ): Promise<IResponse<CompletionItem[]>>;
 export async function getResult(
   reqType: typeof CompletionRequest.method,
   connection: MessageConnection,
   files,
-  fileToInspect,
-  position
+  fileToInspect: string,
+  position: { line: number; character: number }
 ): Promise<IResponse<CompletionItem[]>>;
 
 export async function getResult(
   reqType: typeof DefinitionRequest.method,
   connection: MessageConnection,
   files,
-  fileToInspect,
-  position,
+  fileToInspect: string,
+  position: { line: number; character: number },
   projectName?: string[]
 ): Promise<IResponse<Definition[]>[]>;
 export async function getResult(
   reqType: typeof DefinitionRequest.method,
   connection: MessageConnection,
   files,
-  fileToInspect,
-  position,
+  fileToInspect: string,
+  position: { line: number; character: number },
   projectName?: string
 ): Promise<IResponse<Definition>>;
 export async function getResult(
   reqType: typeof DefinitionRequest.method,
   connection: MessageConnection,
   files,
-  fileToInspect,
-  position
+  fileToInspect: string,
+  position: { line: number; character: number }
 ): Promise<IResponse<Definition[]>>;
 
 export async function getResult(
   reqType: typeof DocumentSymbolRequest.type,
   connection: MessageConnection,
   files,
-  fileToInspect,
-  position
+  fileToInspect: string,
+  position: { line: number; character: number }
 ): Promise<IResponse<DocumentSymbol[]>>;
 
 export async function getResult(
   reqType: typeof ReferencesRequest.type,
   connection: MessageConnection,
   files,
-  fileToInspect,
-  position
+  fileToInspect: string,
+  position: { line: number; character: number }
 ): Promise<IResponse<Location[]>>;
 
 export async function getResult(
   reqType: unknown,
   connection: MessageConnection,
-  files,
-  fileToInspect,
-  position,
+  files: unknown,
+  fileToInspect: string,
+  position: { line: number; character: number },
   projectName?: string[] | string
 ): Promise<IResponse<unknown> | IResponse<unknown>[]> {
+  // @ts-expect-error overload
   const { normalizedPath, originalPath, destroy, result } = await createProject(files, connection, projectName);
 
   const modelPath = path.join(originalPath, fileToInspect);
@@ -473,7 +581,7 @@ export function makeProject(appFiles = {}, addons = {}) {
   return fileStructure;
 }
 
-export function makeAddonPackage(name, config, addonConfig = undefined) {
+export function makeAddonPackage(name: string, config: { entry: string }, addonConfig = undefined) {
   const pack = {
     name,
     'ember-language-server': config,

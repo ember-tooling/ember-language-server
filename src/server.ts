@@ -29,6 +29,7 @@ import {
   Location,
   ExecuteCommandParams,
   TextDocumentChangeEvent,
+  ExecuteCommandRequest,
 } from 'vscode-languageserver';
 
 import ProjectRoots from './project-roots';
@@ -59,15 +60,26 @@ import { MatchResultType } from './utils/path-matcher';
 import { FileChangeType } from 'vscode-languageserver/node';
 import { debounce } from 'lodash';
 import { Config, Initializer } from './types';
-import { asyncGetJSON, isFileBelongsToRoots, mGetProjectAddonsInfo } from './utils/layout-helpers';
-import FSProvider, { setFSImplementation } from './fs-provider';
+import { asyncGetJSON, isFileBelongsToRoots, mGetProjectAddonsInfo, setRequireSupport, setSyncFSSupport } from './utils/layout-helpers';
+import FSProvider, { AsyncFsProvider, setFSImplementation } from './fs-provider';
 
 export interface IServerConfig {
   local: Config;
 }
 
+export interface ServerOptions {
+  type: 'node' | 'worker';
+  fs: 'sync' | 'async';
+}
+
+const defaultServerOptions: ServerOptions = { type: 'node', fs: 'sync' };
+
 export default class Server {
-  fs = new FSProvider();
+  flags = {
+    hasExternalFileWatcher: false,
+  };
+  options!: ServerOptions;
+  fs!: FSProvider;
   initializers: Initializer[] = [];
   lazyInit = false;
   // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
@@ -75,8 +87,8 @@ export default class Server {
   connection!: Connection;
   // Create a simple text document manager. The text document manager
   // supports full document sync only
-  documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
-  projectRoots: ProjectRoots = new ProjectRoots(this);
+  documents!: TextDocuments<TextDocument>;
+  projectRoots!: ProjectRoots;
   addToRegistry(normalizedName: string, kind: REGISTRY_KIND, fullPath: string | string[]) {
     const rawPaths = Array.isArray(fullPath) ? fullPath : [fullPath];
     const purePaths = rawPaths.filter((p) => path.isAbsolute(p));
@@ -109,10 +121,14 @@ export default class Server {
       this.projectRoots.setIgnoredProjects(config.ignoredProjects);
     }
 
-    if (config.useBuiltinLinting === false) {
+    if (this.options.type === 'node') {
+      if (config.useBuiltinLinting === false) {
+        this.templateLinter.disable();
+      } else if (config.useBuiltinLinting === true) {
+        this.templateLinter.enable();
+      }
+    } else {
       this.templateLinter.disable();
-    } else if (config.useBuiltinLinting === true) {
-      this.templateLinter.enable();
     }
 
     if (config.collectTemplateTokens === false) {
@@ -122,17 +138,17 @@ export default class Server {
     }
   }
 
-  documentSymbolProviders: DocumentSymbolProvider[] = [new JSDocumentSymbolProvider(), new HBSDocumentSymbolProvider()];
+  documentSymbolProviders!: DocumentSymbolProvider[];
 
-  templateCompletionProvider: TemplateCompletionProvider = new TemplateCompletionProvider(this);
-  scriptCompletionProvider: ScriptCompletionProvider = new ScriptCompletionProvider(this);
+  templateCompletionProvider!: TemplateCompletionProvider;
+  scriptCompletionProvider!: ScriptCompletionProvider;
 
-  definitionProvider: DefinitionProvider = new DefinitionProvider(this);
+  definitionProvider!: DefinitionProvider;
 
-  templateLinter: TemplateLinter = new TemplateLinter(this);
+  templateLinter!: TemplateLinter;
 
-  referenceProvider: ReferenceProvider = new ReferenceProvider(this);
-  codeActionProvider: CodeActionProvider = new CodeActionProvider(this);
+  referenceProvider!: ReferenceProvider;
+  codeActionProvider!: CodeActionProvider;
   async executeInitializers() {
     for (const initializer of this.initializers) {
       await initializer();
@@ -314,17 +330,35 @@ export default class Server {
     }
   }
   clientCapabilities!: ClientCapabilities;
-  constructor(connection: Connection) {
+  constructor(connection: Connection, options: ServerOptions = defaultServerOptions) {
     if (!connection) {
       throw new Error('uELS constructor accept connection instance as first argument');
     }
 
+    this.options = { ...defaultServerOptions, ...options };
     this.connection = connection;
+    this.fs = this.options.fs === 'sync' ? new FSProvider() : new AsyncFsProvider(this);
+
+    setSyncFSSupport(this.options.fs === 'sync');
+    setRequireSupport(this.options.type === 'node');
+
     // Make the text document manager listen on the connection
     // for open, change and close text document events
 
     setConsole(this.connection.console);
     setFSImplementation(this.fs);
+
+    this.templateLinter = new TemplateLinter(this);
+    this.projectRoots = new ProjectRoots(this);
+    this.documents = new TextDocuments(TextDocument);
+
+    this.documentSymbolProviders = [new JSDocumentSymbolProvider(), new HBSDocumentSymbolProvider()];
+
+    this.templateCompletionProvider = new TemplateCompletionProvider(this);
+    this.scriptCompletionProvider = new ScriptCompletionProvider(this);
+    this.definitionProvider = new DefinitionProvider(this);
+    this.referenceProvider = new ReferenceProvider(this);
+    this.codeActionProvider = new CodeActionProvider(this);
 
     this.documents.listen(this.connection);
 
@@ -404,9 +438,7 @@ export default class Server {
       });
     }
   }
-  flags = {
-    hasExternalFileWatcher: false,
-  };
+
   // After the server has started the client sends an initilize request. The server receives
   // in the passed params the rootPath of the workspace plus the client capabilites.
   private async onInitialize({ rootUri, rootPath, workspaceFolders, initializationOptions, capabilities }: InitializeParams): Promise<InitializeResult> {
@@ -490,6 +522,13 @@ export default class Server {
   }
 
   executors: Executors = {};
+
+  sendCommand(command: string, ...options: unknown[]) {
+    return this.connection.sendRequest(ExecuteCommandRequest.type.method, {
+      command,
+      arguments: options,
+    });
+  }
 
   private async runAddonLinters(document: TextDocument) {
     const results: Diagnostic[] = [];

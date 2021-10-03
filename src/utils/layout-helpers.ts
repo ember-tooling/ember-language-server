@@ -1,11 +1,11 @@
 import * as memoize from 'memoizee';
-import * as walkSync from 'walk-sync';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { addToRegistry, normalizeMatchNaming } from './registry-api';
 import { clean, coerce, valid } from 'semver';
 import { BaseProject } from '../base-project';
 import { fsProvider } from '../fs-provider';
+import walkAsync from './walk-async';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 
@@ -52,7 +52,26 @@ export interface PackageInfo {
   };
 }
 
-export async function safeWalkSync(filePath: string | false, opts: any) {
+let _supportSyncFS = true;
+let _requireSupport = true;
+
+export function setSyncFSSupport(value: boolean) {
+  _supportSyncFS = value;
+}
+
+export function getSyncFSSupport() {
+  return _supportSyncFS;
+}
+
+export function setRequireSupport(value: boolean) {
+  _requireSupport = value;
+}
+
+export function getRequireSupport() {
+  return _requireSupport;
+}
+
+export async function safeWalkAsync(filePath: string | false, opts: any) {
   if (!filePath) {
     return [];
   }
@@ -61,7 +80,7 @@ export async function safeWalkSync(filePath: string | false, opts: any) {
     return [];
   }
 
-  return walkSync(filePath, { ...opts, fs: fsProvider() });
+  return await walkAsync(filePath, { ...opts, fs: fsProvider() });
 }
 
 export function getPodModulePrefix(root: string): string | null {
@@ -69,6 +88,10 @@ export function getPodModulePrefix(root: string): string | null {
 
   // log('listPodsComponents');
   try {
+    if (!getRequireSupport()) {
+      return null;
+    }
+
     // @ts-expect-error @todo - fix webpack imports
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
 
@@ -405,9 +428,9 @@ export async function listPodsComponents(project: BaseProject): Promise<void> {
 
   const entryPath = path.resolve(path.join(project.root, 'app', podModulePrefix, 'components'));
 
-  const jsPaths = await safeWalkSync(entryPath, {
+  const jsPaths = await safeWalkAsync(entryPath, {
     directories: false,
-    globs: ['**/*.{js,ts,hbs,css,less,scss}'],
+    globs: ['**/*.js', '**/*.ts', '**/*.hbs', '**/*.css', '**/*.less', '**/*.scss'],
   });
 
   jsPaths.forEach((filePath: string) => {
@@ -442,16 +465,27 @@ export async function listComponents(project: BaseProject): Promise<void> {
   const templateEntry = path.join(root, 'app', 'templates', 'components');
   const addonComponents = path.join(root, 'addon', 'components');
   const addonTemplates = path.join(root, 'addon', 'templates', 'components');
-  const addonComponentsPaths = await safeWalkSync(addonComponents, {
-    directories: false,
-    globs: ['**/*.{js,ts,hbs}'],
-  });
-  const addonTemplatesPaths = await safeWalkSync(addonTemplates, {
-    directories: false,
-    globs: ['**/*.{js,ts,hbs}'],
-  });
 
-  addonComponentsPaths.forEach((p) => {
+  const [addonComponentsPaths, addonTemplatesPaths, jsPaths, hbsPaths] = await Promise.all([
+    safeWalkAsync(addonComponents, {
+      directories: false,
+      globs: ['**/*.js', '**/*.ts', '**/*.hbs'],
+    }),
+    safeWalkAsync(addonTemplates, {
+      directories: false,
+      globs: ['**/*.js', '**/*.ts', '**/*.hbs'],
+    }),
+    safeWalkAsync(scriptEntry, {
+      directories: false,
+      globs: ['**/*.js', '**/*.ts', '**/*.hbs', '**/*.css', '**/*.less', '**/*.scss'],
+    }),
+    safeWalkAsync(templateEntry, {
+      directories: false,
+      globs: ['**/*.hbs'],
+    }),
+  ]);
+
+  addonComponentsPaths.forEach((p: string) => {
     const fsPath = path.join(addonComponents, p);
     const name = project.matchPathToType(fsPath)?.name;
 
@@ -459,7 +493,7 @@ export async function listComponents(project: BaseProject): Promise<void> {
       addToRegistry(name, 'component', [fsPath]);
     }
   });
-  addonTemplatesPaths.forEach((p) => {
+  addonTemplatesPaths.forEach((p: string) => {
     const fsPath = path.join(addonTemplates, p);
     const name = project.matchPathToType(fsPath)?.name;
 
@@ -468,12 +502,7 @@ export async function listComponents(project: BaseProject): Promise<void> {
     }
   });
 
-  const jsPaths = await safeWalkSync(scriptEntry, {
-    directories: false,
-    globs: ['**/*.{js,ts,hbs,css,less,scss}'],
-  });
-
-  jsPaths.forEach((p) => {
+  jsPaths.forEach((p: string) => {
     const fsPath = path.join(scriptEntry, p);
     const name = project.matchPathToType(fsPath)?.name;
 
@@ -482,12 +511,7 @@ export async function listComponents(project: BaseProject): Promise<void> {
     }
   });
 
-  const hbsPaths = await safeWalkSync(templateEntry, {
-    directories: false,
-    globs: ['**/*.hbs'],
-  });
-
-  hbsPaths.forEach((p) => {
+  hbsPaths.forEach((p: string) => {
     const fsPath = path.join(templateEntry, p);
     const name = project.matchPathToType(fsPath)?.name;
 
@@ -499,7 +523,7 @@ export async function listComponents(project: BaseProject): Promise<void> {
 
 async function findRegistryItemsForProject(project: BaseProject, prefix: string, globs: string[]): Promise<void> {
   const entry = path.resolve(path.join(project.root, prefix));
-  const paths = await safeWalkSync(entry, {
+  const paths = await safeWalkAsync(entry, {
     directories: false,
     globs,
   });
@@ -517,15 +541,15 @@ async function findRegistryItemsForProject(project: BaseProject, prefix: string,
 }
 
 export async function findTestsForProject(project: BaseProject) {
-  await findRegistryItemsForProject(project, 'tests', ['**/*.{js,ts}']);
+  await findRegistryItemsForProject(project, 'tests', ['**/*.js', '**/*.ts']);
 }
 
 export async function findAppItemsForProject(project: BaseProject) {
-  await findRegistryItemsForProject(project, 'app', ['**/*.{js,ts,css,less,sass,hbs}']);
+  await findRegistryItemsForProject(project, 'app', ['**/*.js', '**/*.ts', '**/*.css', '**/*.less', '**/*.sass', '**/*.hbs']);
 }
 
 export async function findAddonItemsForProject(project: BaseProject) {
-  await findRegistryItemsForProject(project, 'addon', ['**/*.{js,ts,css,less,sass,hbs}']);
+  await findRegistryItemsForProject(project, 'addon', ['**/*.js', '**/*.ts', '**/*.css', '**/*.less', '**/*.sass', '**/*.hbs']);
 }
 
 async function listCollection(
@@ -535,9 +559,9 @@ async function listCollection(
   detail: 'transform' | 'service' | 'model' | 'helper' | 'modifier'
 ) {
   const entry = path.resolve(path.join(project.root, prefix, collectionName));
-  const paths = await safeWalkSync(entry, {
+  const paths = await safeWalkAsync(entry, {
     directories: false,
-    globs: ['**/*.{js,ts}'],
+    globs: ['**/*.js', '**/*.ts'],
   });
 
   paths.forEach((filePath: string) => {
@@ -575,13 +599,13 @@ export async function listRoutes(project: BaseProject): Promise<void> {
   const scriptEntry = path.join(root, 'app', 'routes');
   const templateEntry = path.join(root, 'app', 'templates');
   const controllersEntry = path.join(root, 'app', 'controllers');
-  const paths = await safeWalkSync(scriptEntry, {
+  const paths = await safeWalkAsync(scriptEntry, {
     directories: false,
-    globs: ['**/*.{js,ts}'],
+    globs: ['**/*.js', '**/*.ts'],
   });
 
   const templatePaths = (
-    await safeWalkSync(templateEntry, {
+    await safeWalkAsync(templateEntry, {
       directories: false,
       globs: ['**/*.hbs'],
     })
@@ -591,9 +615,9 @@ export async function listRoutes(project: BaseProject): Promise<void> {
     return !name.startsWith('components/') && skipEndings.filter((ending: string) => name.endsWith(ending + '.hbs')).length === 0;
   });
 
-  const controllers = await safeWalkSync(controllersEntry, {
+  const controllers = await safeWalkAsync(controllersEntry, {
     directories: false,
-    globs: ['**/*.{js,ts}'],
+    globs: ['**/*.js', '**/*.ts'],
   });
 
   templatePaths.forEach((filePath) => {

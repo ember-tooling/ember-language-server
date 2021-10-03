@@ -7,7 +7,7 @@ import {
   getRegistryForRoots,
   existsInRegistry,
 } from './utils/registry-api';
-import { ProjectProviders, collectProjectProviders, AddonMeta, DependencyMeta } from './utils/addon-api';
+import { ProjectProviders, collectProjectProviders, AddonMeta, DependencyMeta, emptyProjectProviders } from './utils/addon-api';
 import {
   findTestsForProject,
   findAddonItemsForProject,
@@ -141,8 +141,16 @@ export class Project extends BaseProject {
   get name() {
     return this.packageJSON.name;
   }
-  async initialize() {
-    this.providers = await collectProjectProviders(this.root, this.addons);
+  async initialize(server: Server) {
+    if (server.options.type === 'worker') {
+      this.providers = emptyProjectProviders();
+      this.flags.enableEagerRegistryInitialization = false;
+    } else if (server.options.type === 'node') {
+      this.providers = await collectProjectProviders(this.root, this.addons);
+    } else {
+      throw new Error(`Unknown server type: "${server.options.type}"`);
+    }
+
     this.addonsMeta = this.providers.addonsMeta.filter((el) => el.root !== this.root);
     this.builtinProviders = initBuiltinProviders();
   }
@@ -192,6 +200,7 @@ export class Project extends BaseProject {
       } catch (e) {
         logError(e);
         this.initIssues.push(e.toString());
+        this.initIssues.push(e.stack);
       }
     });
 
@@ -205,6 +214,7 @@ export class Project extends BaseProject {
       } catch (e) {
         logError(e);
         this.initIssues.push(e.toString());
+        this.initIssues.push(e.stack);
       }
     });
 

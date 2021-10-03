@@ -1,6 +1,6 @@
 import {
   getPodModulePrefix,
-  safeWalkSync,
+  safeWalkAsync,
   resolvePackageRoot,
   asyncGetPackageJSON,
   listPodsComponents,
@@ -27,9 +27,9 @@ describe('definition-helpers', function () {
     });
   });
 
-  describe('safeWalkSync()', function () {
+  describe('safeWalkAsync()', function () {
     it('return empty array if entry path does not exists', async function () {
-      expect(await safeWalkSync(path.join(__dirname, './../fixtures/-non-existing-path'), {})).toEqual([]);
+      expect(await safeWalkAsync(path.join(__dirname, './../fixtures/-non-existing-path'), {})).toEqual([]);
     });
   });
 

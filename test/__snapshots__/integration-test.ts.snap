@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`integration API:Chain support addon ordering 1`] = `
+exports[`integration async fs enabled: false API:Chain support addon ordering 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -54,7 +54,7 @@ Object {
 }
 `;
 
-exports[`integration Able to load API from project itself project custom completion:template 1`] = `
+exports[`integration async fs enabled: false Able to load API from project itself project custom completion:template 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -85,7 +85,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide API:Completion support dummy addon completion:script 1`] = `
+exports[`integration async fs enabled: false Able to provide API:Completion support dummy addon completion:script 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -109,7 +109,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide API:Completion support dummy addon completion:template 1`] = `
+exports[`integration async fs enabled: false Able to provide API:Completion support dummy addon completion:template 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -146,7 +146,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide API:Definition support dummy addon definition:script 1`] = `
+exports[`integration async fs enabled: false Able to provide API:Definition support dummy addon definition:script 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -180,7 +180,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide API:Definition support dummy addon definition:template 1`] = `
+exports[`integration async fs enabled: false Able to provide API:Definition support dummy addon definition:template 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -214,7 +214,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide API:Reference support dummy addon reference:template 1`] = `
+exports[`integration async fs enabled: false Able to provide API:Reference support dummy addon reference:template 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -248,7 +248,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -320,7 +320,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide autocomplete information for local context access support child project addon calling parent project addon 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for local context access support child project addon calling parent project addon 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -371,7 +371,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide autocomplete information for local context access support collocated components 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for local context access support collocated components 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -423,7 +423,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide autocomplete information for local context access support collocated components in mustache arguments 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for local context access support collocated components in mustache arguments 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -475,7 +475,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide autocomplete information for local context access support collocated components in node attributes 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for local context access support collocated components in node attributes 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -527,7 +527,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide autocomplete information for local scoped params support component name autocomplete from block params 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for local scoped params support component name autocomplete from block params 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -596,7 +596,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide autocomplete information for local scoped params support mustache blocks 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for local scoped params support mustache blocks 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -672,7 +672,7 @@ Object {
 }
 `;
 
-exports[`integration Able to provide autocomplete information for local scoped params support tag blocks 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for local scoped params support tag blocks 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -748,7 +748,7 @@ Object {
 }
 `;
 
-exports[`integration Able to use classes for API support dummy class-based addon definition:template 1`] = `
+exports[`integration async fs enabled: false Able to use classes for API support dummy class-based addon definition:template 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -782,7 +782,7 @@ Object {
 }
 `;
 
-exports[`integration Able to use classes for API support dummy class-based addon definition:template with correctly binded context 1`] = `
+exports[`integration async fs enabled: false Able to use classes for API support dummy class-based addon definition:template with correctly binded context 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -816,7 +816,7 @@ Object {
 }
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
 Array [
   Object {
     "detail": "component",
@@ -920,7 +920,7 @@ Array [
 ]
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for component #1 {{ 2`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for component #1 {{ 2`] = `
 Object {
   "component": Object {
     "darling": Array [
@@ -933,7 +933,7 @@ Object {
 }
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for component #2 < 1`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for component #2 < 1`] = `
 Array [
   Object {
     "detail": "component",
@@ -974,7 +974,7 @@ Array [
 ]
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for component #2 < 2`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for component #2 < 2`] = `
 Object {
   "component": Object {
     "darling": Array [
@@ -987,7 +987,7 @@ Object {
 }
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for component #3 {{# 1`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for component #3 {{# 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -1237,7 +1237,7 @@ Object {
 }
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 1`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 1`] = `
 Array [
   Object {
     "detail": "helper",
@@ -1617,7 +1617,7 @@ Array [
 ]
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 2`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 2`] = `
 Object {
   "component": Object {
     "hello": Array [
@@ -1632,7 +1632,7 @@ Object {
 }
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 1`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 1`] = `
 Array [
   Object {
     "detail": "helper",
@@ -2012,7 +2012,7 @@ Array [
 ]
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 2`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 2`] = `
 Object {
   "component": Object {
     "hello": Array [
@@ -2027,7 +2027,7 @@ Object {
 }
 `;
 
-exports[`integration Autocomplete works for broken templates autocomplete information for modifier #4 <Foo {{ 1`] = `
+exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for modifier #4 <Foo {{ 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2128,7 +2128,7 @@ Object {
 }
 `;
 
-exports[`integration Autocomplete works in LinkTo components for @route argument able to autocomplete basic routes 1`] = `
+exports[`integration async fs enabled: false Autocomplete works in LinkTo components for @route argument able to autocomplete basic routes 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2166,7 +2166,7 @@ Object {
 }
 `;
 
-exports[`integration Diffent commands handle "els.getLegacyTemplateTokens" command 1`] = `
+exports[`integration async fs enabled: false Diffent commands handle "els.getLegacyTemplateTokens" command 1`] = `
 Object {
   "component": Object {
     "hello": Object {
@@ -2182,7 +2182,7 @@ Object {
 }
 `;
 
-exports[`integration Diffent commands handle "els.getProjectRegistry" command 1`] = `
+exports[`integration async fs enabled: false Diffent commands handle "els.getProjectRegistry" command 1`] = `
 Object {
   "component": Object {
     "hello": Array [
@@ -2194,7 +2194,7 @@ Object {
 }
 `;
 
-exports[`integration Diffent commands handle "els.getRelatedFiles" command 1`] = `
+exports[`integration async fs enabled: false Diffent commands handle "els.getRelatedFiles" command 1`] = `
 Object {
   "component": Object {
     "hello": Array [
@@ -2206,7 +2206,7 @@ Object {
 }
 `;
 
-exports[`integration Diffent commands handle "els.getRelatedFiles" command 2`] = `
+exports[`integration async fs enabled: false Diffent commands handle "els.getRelatedFiles" command 2`] = `
 Array [
   "app/components/hello/component.js",
   "app/components/hello/template.hbs",
@@ -2214,7 +2214,7 @@ Array [
 ]
 `;
 
-exports[`integration Diffent commands handle "els.getRelatedFiles" command with meta flag 1`] = `
+exports[`integration async fs enabled: false Diffent commands handle "els.getRelatedFiles" command with meta flag 1`] = `
 Object {
   "component": Object {
     "hello": Array [
@@ -2226,7 +2226,7 @@ Object {
 }
 `;
 
-exports[`integration Diffent commands handle "els.getRelatedFiles" command with meta flag 2`] = `
+exports[`integration async fs enabled: false Diffent commands handle "els.getRelatedFiles" command with meta flag 2`] = `
 Array [
   Object {
     "meta": Object {
@@ -2258,7 +2258,7 @@ Array [
 ]
 `;
 
-exports[`integration DocumentSymbolProvider able to provide symbols for script document 1`] = `
+exports[`integration async fs enabled: false DocumentSymbolProvider able to provide symbols for script document 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2272,7 +2272,7 @@ Object {
 }
 `;
 
-exports[`integration DocumentSymbolProvider able to provide symbols for template document 1`] = `
+exports[`integration async fs enabled: false DocumentSymbolProvider able to provide symbols for template document 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2286,7 +2286,7 @@ Object {
 }
 `;
 
-exports[`integration DocumentSymbolProvider stable if ast broken in script document 1`] = `
+exports[`integration async fs enabled: false DocumentSymbolProvider stable if ast broken in script document 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2300,7 +2300,7 @@ Object {
 }
 `;
 
-exports[`integration DocumentSymbolProvider stable if ast broken in template document 1`] = `
+exports[`integration async fs enabled: false DocumentSymbolProvider stable if ast broken in template document 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2314,7 +2314,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to component from typescripted inline template 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to component from typescripted inline template 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2345,7 +2345,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to definition from app to in repo addon 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to definition from app to in repo addon 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -2385,7 +2385,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to definition from app to nested utils location of in repo addon 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to definition from app to nested utils location of in repo addon 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -2422,7 +2422,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to definition from handlebars template working if we have test for component 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to definition from handlebars template working if we have test for component 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2454,7 +2454,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to definition from script template working if we have test for component 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to definition from script template working if we have test for component 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2486,7 +2486,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to local template-only component 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to local template-only component 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2517,7 +2517,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to local template-only component in module 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to local template-only component in module 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2548,7 +2548,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to local template-only component in pod-like 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to local template-only component in pod-like 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2579,7 +2579,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases go to local template-only component in templates dir 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to local template-only component in templates dir 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2610,7 +2610,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases to children route from application outlet 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases to children route from application outlet 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2641,7 +2641,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases to children route from meaningful outlet 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases to children route from meaningful outlet 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2691,7 +2691,7 @@ Object {
 }
 `;
 
-exports[`integration Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
+exports[`integration async fs enabled: false Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -2724,7 +2724,7 @@ Object {
 }
 `;
 
-exports[`integration Initialize request returns an initialize request 1`] = `
+exports[`integration async fs enabled: false Initialize request returns an initialize request 1`] = `
 Object {
   "capabilities": Object {
     "codeActionProvider": true,
@@ -2773,7 +2773,7 @@ Object {
 }
 `;
 
-exports[`integration Project class resolution, based on fs path and file structure support parent project addon calling child project 1`] = `
+exports[`integration async fs enabled: false Project class resolution, based on fs path and file structure support parent project addon calling child project 1`] = `
 Object {
   "addonsMeta": Array [
     Object {
@@ -2823,7 +2823,7 @@ Object {
 }
 `;
 
-exports[`integration Project class resolution, based on fs path and file structure without ignoring main project returns one only top level result 1`] = `
+exports[`integration async fs enabled: false Project class resolution, based on fs path and file structure without ignoring main project returns one only top level result 1`] = `
 Array [
   Object {
     "addonsMeta": Array [],
@@ -2900,7 +2900,7 @@ Array [
 ]
 `;
 
-exports[`integration autocomplete works for angle component slots 1`] = `
+exports[`integration async fs enabled: false autocomplete works for angle component slots 1`] = `
 Array [
   Object {
     "detail": "Named block (Slot) for <Darling>",
@@ -2923,7 +2923,7 @@ Array [
 ]
 `;
 
-exports[`integration autocomplete works for multiple angle component slots 1`] = `
+exports[`integration async fs enabled: false autocomplete works for multiple angle component slots 1`] = `
 Array [
   Object {
     "detail": "Named block (Slot) for <Darling>",
@@ -2981,3 +2981,2521 @@ Array [
   },
 ]
 `;
+
+exports[`integration async fs enabled: true API:Chain support addon ordering 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "addon1",
+      "root": "node_modules/addon1",
+      "version": null,
+    },
+    Object {
+      "name": "addon2",
+      "root": "node_modules/addon2",
+      "version": null,
+    },
+    Object {
+      "name": "addon3",
+      "root": "node_modules/addon3",
+      "version": null,
+    },
+    Object {
+      "name": "addon4",
+      "root": "node_modules/addon4",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "dory": Array [
+        "app/components/dory/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "a = undefined",
+      "kind": 10,
+      "label": "this.a_addon2__addon1__addon4__addon3_",
+      "textEdit": Object {
+        "newText": "this.a_addon2__addon1__addon4__addon3_",
+        "range": Object {
+          "end": Object {
+            "character": 8,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to load API from project itself project custom completion:template 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "label": "this.name",
+      "textEdit": Object {
+        "newText": "this.name",
+        "range": Object {
+          "end": Object {
+            "character": 8,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide API:Completion support dummy addon completion:script 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.js",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "label": "name",
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide API:Completion support dummy addon completion:template 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "label": "this.name",
+      "textEdit": Object {
+        "newText": "this.name",
+        "range": Object {
+          "end": Object {
+            "character": 8,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide API:Definition support dummy addon definition:script 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.js",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.js",
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide API:Definition support dummy addon definition:template 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.hbs",
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide API:Reference support dummy addon reference:template 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.hbs",
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for angle component arguments names support template-only collocated components arguments extraction 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+      "my-bar": Array [
+        "app/components/my-bar.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for local context access support child project addon calling parent project addon 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "biz",
+      "root": "lib/biz",
+      "version": 1,
+    },
+    Object {
+      "name": "foo",
+      "root": "../lib/foo",
+      "version": 1,
+    },
+  ],
+  "registry": Object {
+    "routePath": Object {
+      "hello": Array [
+        "app/templates/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Foo$Bar",
+      "textEdit": Object {
+        "newText": "Foo$Bar",
+        "range": Object {
+          "end": Object {
+            "character": 2,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for local context access support collocated components 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+        "app/components/hello/index.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for local context access support collocated components in mustache arguments 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+        "app/components/hello/index.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for local context access support collocated components in node attributes 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+        "app/components/hello/index.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for local scoped params support component name autocomplete from block params 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "Foo",
+      "textEdit": Object {
+        "newText": "Foo",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Param from <MyComponent as |...|>",
+      "kind": 6,
+      "label": "boo",
+      "textEdit": Object {
+        "newText": "boo",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Param from {{#my-component as |...|}}",
+      "kind": 6,
+      "label": "bar",
+      "textEdit": Object {
+        "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for local scoped params support mustache blocks 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Param from {{#my-component as |...|}}",
+      "kind": 6,
+      "label": "bar",
+      "textEdit": Object {
+        "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "unbound",
+      "textEdit": Object {
+        "newText": "unbound",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+        "SubExpressionPath",
+      ],
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "debugger",
+      "textEdit": Object {
+        "newText": "debugger",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for local scoped params support tag blocks 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Param from <MyComponent as |...|>",
+      "kind": 6,
+      "label": "bar",
+      "textEdit": Object {
+        "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "unbound",
+      "textEdit": Object {
+        "newText": "unbound",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+        "SubExpressionPath",
+      ],
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "debugger",
+      "textEdit": Object {
+        "newText": "debugger",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to use classes for API support dummy class-based addon definition:template 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.hbs",
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to use classes for API support dummy class-based addon definition:template with correctly binded context 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/hello/index.hbs",
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "hello",
+    "textEdit": Object {
+      "newText": "hello",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "darling",
+    "textEdit": Object {
+      "newText": "darling",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "input",
+    "textEdit": Object {
+      "newText": "input",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "link-to",
+    "textEdit": Object {
+      "newText": "link-to",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 7,
+    "label": "textarea",
+    "textEdit": Object {
+      "newText": "textarea",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 2,
+          "line": 1,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+    ],
+  },
+]
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for component #1 {{ 2`] = `
+Object {
+  "component": Object {
+    "darling": Array [
+      "app/components/darling.hbs",
+    ],
+    "hello": Array [
+      "app/components/hello.hbs",
+    ],
+  },
+}
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for component #2 < 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Hello",
+    "textEdit": Object {
+      "newText": "Hello",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 1,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Darling",
+    "textEdit": Object {
+      "newText": "Darling",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 1,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for component #2 < 2`] = `
+Object {
+  "component": Object {
+    "darling": Array [
+      "app/components/darling.hbs",
+    ],
+    "hello": Array [
+      "app/components/hello.hbs",
+    ],
+  },
+}
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for component #3 {{# 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Ember 1.11.0",
+      "kind": 3,
+      "label": "component",
+      "textEdit": Object {
+        "newText": "component}}
+  
+{{/component}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "BlockPath",
+        "MustachePath",
+        "SubExpressionPath",
+      ],
+      "version": "1.11.0",
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "each",
+      "textEdit": Object {
+        "newText": "each}}
+  
+{{/each}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "BlockPath",
+      ],
+    },
+    Object {
+      "detail": "Ember 2.1.0",
+      "kind": 3,
+      "label": "each-in",
+      "textEdit": Object {
+        "newText": "each-in}}
+  
+{{/each-in}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "BlockPath",
+      ],
+      "version": "2.1.0",
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "in-element",
+      "textEdit": Object {
+        "newText": "in-element}}
+  
+{{/in-element}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "BlockPath",
+      ],
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "let",
+      "textEdit": Object {
+        "newText": "let}}
+  
+{{/let}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "BlockPath",
+      ],
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "if",
+      "textEdit": Object {
+        "newText": "if}}
+  
+{{/if}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "BlockPath",
+        "MustachePath",
+        "SubExpressionPath",
+      ],
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "unless",
+      "textEdit": Object {
+        "newText": "unless}}
+  
+{{/unless}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "BlockPath",
+        "MustachePath",
+        "SubExpressionPath",
+      ],
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "with",
+      "textEdit": Object {
+        "newText": "with}}
+  
+{{/with}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "BlockPath",
+      ],
+    },
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "hello",
+      "textEdit": Object {
+        "newText": "hello}}
+  
+{{/hello}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "component",
+      "kind": 7,
+      "label": "darling",
+      "textEdit": Object {
+        "newText": "darling}}
+  
+{{/darling}}",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 3,
+            "line": 1,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 1`] = `
+Array [
+  Object {
+    "detail": "helper",
+    "kind": 3,
+    "label": "boo",
+    "textEdit": Object {
+      "newText": "boo",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "action",
+    "textEdit": Object {
+      "newText": "action",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "textEdit": Object {
+      "newText": "component",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember 1.13.0",
+    "kind": 3,
+    "label": "concat",
+    "textEdit": Object {
+      "newText": "concat",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.13.0",
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "get",
+    "textEdit": Object {
+      "newText": "get",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember 3.12.0",
+    "kind": 3,
+    "label": "fn",
+    "textEdit": Object {
+      "newText": "fn",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "3.12.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "hash",
+    "textEdit": Object {
+      "newText": "hash",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "has-block",
+    "textEdit": Object {
+      "newText": "has-block",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "has-block-params",
+    "textEdit": Object {
+      "newText": "has-block-params",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "textEdit": Object {
+      "newText": "if",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "loc",
+    "textEdit": Object {
+      "newText": "loc",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "mut",
+    "textEdit": Object {
+      "newText": "mut",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "query-params",
+    "textEdit": Object {
+      "newText": "query-params",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unbound",
+    "textEdit": Object {
+      "newText": "unbound",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "textEdit": Object {
+      "newText": "unless",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "helper",
+    "textEdit": Object {
+      "newText": "helper",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+    ],
+    "version": "3.27.0",
+  },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "modifier",
+    "textEdit": Object {
+      "newText": "modifier",
+      "range": Object {
+        "end": Object {
+          "character": 8,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 8,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+      "ModifierPath",
+    ],
+    "version": "3.27.0",
+  },
+]
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 2`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "app/components/hello.hbs",
+    ],
+  },
+  "helper": Object {
+    "boo": Array [
+      "app/helpers/boo.js",
+    ],
+  },
+}
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 1`] = `
+Array [
+  Object {
+    "detail": "helper",
+    "kind": 3,
+    "label": "boo",
+    "textEdit": Object {
+      "newText": "boo",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "action",
+    "textEdit": Object {
+      "newText": "action",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 1.11.0",
+    "kind": 3,
+    "label": "component",
+    "textEdit": Object {
+      "newText": "component",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.11.0",
+  },
+  Object {
+    "detail": "Ember 1.13.0",
+    "kind": 3,
+    "label": "concat",
+    "textEdit": Object {
+      "newText": "concat",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "1.13.0",
+  },
+  Object {
+    "detail": "Ember 2.1.0",
+    "kind": 3,
+    "label": "get",
+    "textEdit": Object {
+      "newText": "get",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "2.1.0",
+  },
+  Object {
+    "detail": "Ember 3.12.0",
+    "kind": 3,
+    "label": "fn",
+    "textEdit": Object {
+      "newText": "fn",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+    "version": "3.12.0",
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "hash",
+    "textEdit": Object {
+      "newText": "hash",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "has-block",
+    "textEdit": Object {
+      "newText": "has-block",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "has-block-params",
+    "textEdit": Object {
+      "newText": "has-block-params",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "if",
+    "textEdit": Object {
+      "newText": "if",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "loc",
+    "textEdit": Object {
+      "newText": "loc",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "mut",
+    "textEdit": Object {
+      "newText": "mut",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "query-params",
+    "textEdit": Object {
+      "newText": "query-params",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unbound",
+    "textEdit": Object {
+      "newText": "unbound",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "unless",
+    "textEdit": Object {
+      "newText": "unless",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "BlockPath",
+      "MustachePath",
+      "SubExpressionPath",
+    ],
+  },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "helper",
+    "textEdit": Object {
+      "newText": "helper",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+    ],
+    "version": "3.27.0",
+  },
+  Object {
+    "detail": "Ember 3.27.0",
+    "kind": 3,
+    "label": "modifier",
+    "textEdit": Object {
+      "newText": "modifier",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "SubExpressionPath",
+      "MustachePath",
+      "ModifierPath",
+    ],
+    "version": "3.27.0",
+  },
+]
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 2`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "app/components/hello.hbs",
+    ],
+  },
+  "helper": Object {
+    "boo": Array [
+      "app/helpers/boo.js",
+    ],
+  },
+}
+`;
+
+exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for modifier #4 <Foo {{ 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "modifier": Object {
+      "boo": Array [
+        "app/modifiers/boo.js",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "on",
+      "textEdit": Object {
+        "newText": "on",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
+        },
+      },
+      "usableIn": Array [
+        "ModifierPath",
+      ],
+    },
+    Object {
+      "detail": "Ember 3.27.0",
+      "kind": 3,
+      "label": "modifier",
+      "textEdit": Object {
+        "newText": "modifier",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
+        },
+      },
+      "usableIn": Array [
+        "SubExpressionPath",
+        "MustachePath",
+        "ModifierPath",
+      ],
+      "version": "3.27.0",
+    },
+    Object {
+      "detail": "modifier",
+      "kind": 3,
+      "label": "boo",
+      "textEdit": Object {
+        "newText": "boo",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "modifier",
+      "kind": 2,
+      "label": "action",
+      "textEdit": Object {
+        "newText": "action",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Autocomplete works in LinkTo components for @route argument able to autocomplete basic routes 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "routePath": Object {
+      "foo.bar.baz": Array [
+        "app/templates/foo/bar/baz.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "route",
+      "kind": 17,
+      "label": "foo.bar.baz",
+      "textEdit": Object {
+        "newText": "foo.bar.baz",
+        "range": Object {
+          "end": Object {
+            "character": 16,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 16,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Diffent commands handle "els.getLegacyTemplateTokens" command 1`] = `
+Object {
+  "component": Object {},
+  "routePath": Object {},
+}
+`;
+
+exports[`integration async fs enabled: true Diffent commands handle "els.getProjectRegistry" command 1`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "tests/integration/components/hello-test.js",
+      "app/components/hello/index.hbs",
+      "app/components/hello/index.js",
+    ],
+  },
+}
+`;
+
+exports[`integration async fs enabled: true Diffent commands handle "els.getRelatedFiles" command 1`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "tests/integration/components/hello-test.js",
+      "app/components/hello/component.js",
+      "app/components/hello/template.hbs",
+    ],
+  },
+}
+`;
+
+exports[`integration async fs enabled: true Diffent commands handle "els.getRelatedFiles" command 2`] = `
+Array [
+  "app/components/hello/component.js",
+  "app/components/hello/template.hbs",
+  "tests/integration/components/hello-test.js",
+]
+`;
+
+exports[`integration async fs enabled: true Diffent commands handle "els.getRelatedFiles" command with meta flag 1`] = `
+Object {
+  "component": Object {
+    "hello": Array [
+      "tests/integration/components/hello-test.js",
+      "app/components/hello/index.hbs",
+      "app/components/hello/index.js",
+    ],
+  },
+}
+`;
+
+exports[`integration async fs enabled: true Diffent commands handle "els.getRelatedFiles" command with meta flag 2`] = `
+Array [
+  Object {
+    "meta": Object {
+      "kind": "template",
+      "name": "hello",
+      "scope": "application",
+      "type": "component",
+    },
+    "path": "app/components/hello/index.hbs",
+  },
+  Object {
+    "meta": Object {
+      "kind": "script",
+      "name": "hello",
+      "scope": "application",
+      "type": "component",
+    },
+    "path": "app/components/hello/index.js",
+  },
+  Object {
+    "meta": Object {
+      "kind": "test",
+      "name": "hello",
+      "scope": "application",
+      "type": "component",
+    },
+    "path": "tests/integration/components/hello-test.js",
+  },
+]
+`;
+
+exports[`integration async fs enabled: true DocumentSymbolProvider able to provide symbols for script document 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true DocumentSymbolProvider able to provide symbols for template document 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true DocumentSymbolProvider stable if ast broken in script document 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true DocumentSymbolProvider stable if ast broken in template document 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to component from typescripted inline template 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/templates/components/darling.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.ts",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to definition from app to in repo addon 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "biz",
+      "root": "lib/biz",
+      "version": 1,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling/index.js",
+      ],
+      "hello": Array [
+        "app/components/hello.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to definition from app to nested utils location of in repo addon 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "biz",
+      "root": "lib/biz",
+      "version": 1,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling/index.js",
+      ],
+      "hello": Array [
+        "app/components/hello.js",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to definition from handlebars template working if we have test for component 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "tests/integration/components/darling/component-test.js",
+        "app/components/darling.ts",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to definition from script template working if we have test for component 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "tests/integration/components/darling/component-test.js",
+        "app/components/darling.ts",
+      ],
+      "hello": Array [
+        "app/components/hello.ts",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to local template-only component 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to local template-only component in module 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling/index.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to local template-only component in pod-like 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/components/darling/template.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to local template-only component in templates dir 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "darling": Array [
+        "app/templates/components/darling.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases to children route from application outlet 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "routePath": Object {
+      "application": Array [
+        "app/templates/application.hbs",
+      ],
+      "foo": Array [
+        "app/templates/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases to children route from meaningful outlet 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "routePath": Object {
+      "foo": Array [
+        "app/templates/foo.hbs",
+      ],
+      "foo.bar": Array [
+        "app/templates/foo/bar.hbs",
+      ],
+      "foo.baz": Array [
+        "app/templates/foo/baz.hbs",
+      ],
+      "foo.boo.bax": Array [
+        "app/templates/foo/boo/bax.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "routePath": Object {
+      "foo.bar.baz": Array [
+        "app/templates/foo/bar/baz.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Initialize request returns an initialize request 1`] = `
+Object {
+  "capabilities": Object {
+    "codeActionProvider": true,
+    "completionProvider": Object {
+      "resolveProvider": true,
+      "triggerCharacters": Array [
+        ".",
+        "::",
+        "$",
+        "=",
+        "/",
+        "{{",
+        "(",
+        "<",
+        "@",
+        "this.",
+        "<:",
+      ],
+    },
+    "definitionProvider": true,
+    "documentSymbolProvider": true,
+    "executeCommandProvider": Object {
+      "commands": Array [
+        "els.registerProjectPath",
+        "els.provideDiagnostics",
+        "els.extractSourceCodeToComponent",
+        "els.executeInEmberCLI",
+        "els.getRelatedFiles",
+        "els.getKindUsages",
+        "els.setConfig",
+        "els.reloadProject",
+      ],
+    },
+    "referencesProvider": true,
+    "textDocumentSync": 1,
+    "workspace": Object {
+      "workspaceFolders": Object {
+        "changeNotifications": true,
+        "supported": true,
+      },
+    },
+  },
+  "serverInfo": Object {
+    "name": "@lifeart/ember-language-server",
+  },
+}
+`;
+
+exports[`integration async fs enabled: true Project class resolution, based on fs path and file structure support parent project addon calling child project 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "biz",
+      "root": "lib/biz",
+      "version": 1,
+    },
+    Object {
+      "name": "foo",
+      "root": "../lib/foo",
+      "version": 1,
+    },
+  ],
+  "registry": Object {
+    "helper": Object {
+      "blah": Array [
+        "tests/helpers/blah.js",
+      ],
+    },
+    "routePath": Object {
+      "hello": Array [
+        "app/templates/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [],
+}
+`;
+
+exports[`integration async fs enabled: true Project class resolution, based on fs path and file structure without ignoring main project returns one only top level result 1`] = `
+Array [
+  Object {
+    "addonsMeta": Array [],
+    "registry": Object {
+      "component": Object {
+        "item": Array [
+          "addon/components/item.hbs",
+        ],
+      },
+    },
+    "response": Array [
+      Object {
+        "detail": "component",
+        "kind": 7,
+        "label": "Item",
+        "textEdit": Object {
+          "newText": "Item",
+          "range": Object {
+            "end": Object {
+              "character": 1,
+              "line": 0,
+            },
+            "start": Object {
+              "character": 1,
+              "line": 0,
+            },
+          },
+        },
+      },
+    ],
+  },
+  Object {
+    "addonsMeta": Array [
+      Object {
+        "name": "my-addon",
+        "root": "../lib",
+        "version": 1,
+      },
+    ],
+    "registry": Object {
+      "component": Object {
+        "bar": Array [
+          "app/components/bar.hbs",
+        ],
+        "foo": Array [
+          "app/components/foo.hbs",
+        ],
+        "item": Array [
+          "../lib/addon/components/item.hbs",
+        ],
+      },
+    },
+    "response": Array [
+      Object {
+        "detail": "component",
+        "kind": 7,
+        "label": "Item",
+        "textEdit": Object {
+          "newText": "Item",
+          "range": Object {
+            "end": Object {
+              "character": 1,
+              "line": 0,
+            },
+            "start": Object {
+              "character": 1,
+              "line": 0,
+            },
+          },
+        },
+      },
+    ],
+  },
+]
+`;
+
+exports[`integration async fs enabled: true autocomplete works for angle component slots 1`] = `Array []`;
+
+exports[`integration async fs enabled: true autocomplete works for multiple angle component slots 1`] = `Array []`;

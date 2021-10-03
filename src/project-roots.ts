@@ -3,7 +3,7 @@
 import * as path from 'path';
 import { logError, logInfo } from './utils/logger';
 import { URI } from 'vscode-uri';
-import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath, safeWalkSync, asyncGetPackageJSON } from './utils/layout-helpers';
+import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath, safeWalkAsync, asyncGetPackageJSON } from './utils/layout-helpers';
 
 import Server from './server';
 
@@ -80,7 +80,7 @@ export default class ProjectRoots {
   }
 
   async findProjectsInsideRoot(workspaceRoot: string) {
-    const roots = await safeWalkSync(workspaceRoot, {
+    const roots = await safeWalkAsync(workspaceRoot, {
       directories: false,
       globs: ['**/ember-cli-build.js', '**/package.json'],
       ignore: ['**/.git/**', '**/bower_components/**', '**/dist/**', '**/node_modules/**', '**/tmp/**'],
@@ -158,7 +158,7 @@ export default class ProjectRoots {
 
       const project = new Project(projectPath, this.localAddons, info);
 
-      await project.initialize();
+      await project.initialize(this.server);
 
       this.projects.set(projectPath, project);
       logInfo(`Ember CLI project added at ${projectPath}`);
@@ -175,7 +175,7 @@ export default class ProjectRoots {
       logError(e);
 
       return {
-        initIssues: [e.toString()],
+        initIssues: [e.toString(), e.stack],
         providers: {
           definitionProviders: [],
           referencesProviders: [],

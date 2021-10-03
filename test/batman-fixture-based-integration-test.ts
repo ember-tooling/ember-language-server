@@ -26,14 +26,18 @@ describe('With `batman project` initialized on server', () => {
         console.log('warn', msg);
       },
     });
+
+    serverProcess.on('error', (err) => {
+      console.log(err);
+    });
     // connection.trace(2, {log: console.log}, false);
     connection.listen();
     await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
-  afterAll(() => {
-    connection.dispose();
-    serverProcess.kill();
+  afterAll(async () => {
+    await connection.dispose();
+    await serverProcess.kill();
   });
 
   beforeEach(async () => {

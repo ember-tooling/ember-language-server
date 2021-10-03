@@ -5,6 +5,9 @@ import { Connection, createConnection, BrowserMessageReader, BrowserMessageWrite
 // also supports stdio via command line flag
 const connection: Connection = createConnection(new BrowserMessageReader(self), new BrowserMessageWriter(self));
 
-const server = new Server(connection);
+const server = new Server(connection, {
+  type: 'worker',
+  fs: 'async',
+});
 
 server.listen();
