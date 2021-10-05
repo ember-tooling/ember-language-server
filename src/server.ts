@@ -113,8 +113,11 @@ export default class Server {
   }
 
   async setConfiguration(config: Config) {
-    if (config.addons) {
-      await this.projectRoots.setLocalAddons(config.addons);
+    // in worker mode we don't have fs access, so, we don't trying to include it
+    if (this.options.type !== 'worker') {
+      if (config.addons) {
+        await this.projectRoots.setLocalAddons(config.addons);
+      }
     }
 
     if (config.ignoredProjects) {

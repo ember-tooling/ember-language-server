@@ -127,7 +127,7 @@ async function extractTokens() {
     return;
   }
 
-  const item = tokenQueue.shift();
+  const item = tokenQueue[0];
 
   if (item === undefined) {
     return;
@@ -146,6 +146,7 @@ async function extractTokens() {
   } catch (e) {
     //
   } finally {
+    tokenQueue.shift();
     setTimeout(extractTokens, 16);
   }
 }

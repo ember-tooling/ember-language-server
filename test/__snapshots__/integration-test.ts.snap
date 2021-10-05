@@ -4977,7 +4977,16 @@ Object {
 
 exports[`integration async fs enabled: true Diffent commands handle "els.getLegacyTemplateTokens" command 1`] = `
 Object {
-  "component": Object {},
+  "component": Object {
+    "hello": Object {
+      "source": "app/components/hello/index.hbs",
+      "tokens": Array [
+        "foo",
+        "my-component",
+        "another/my/component",
+      ],
+    },
+  },
   "routePath": Object {},
 }
 `;
