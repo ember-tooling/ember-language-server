@@ -2186,9 +2186,9 @@ exports[`integration async fs enabled: false Diffent commands handle "els.getPro
 Object {
   "component": Object {
     "hello": Array [
-      "tests/integration/components/hello-test.js",
       "app/components/hello/index.hbs",
       "app/components/hello/index.js",
+      "tests/integration/components/hello-test.js",
     ],
   },
 }
@@ -2198,9 +2198,9 @@ exports[`integration async fs enabled: false Diffent commands handle "els.getRel
 Object {
   "component": Object {
     "hello": Array [
-      "tests/integration/components/hello-test.js",
       "app/components/hello/component.js",
       "app/components/hello/template.hbs",
+      "tests/integration/components/hello-test.js",
     ],
   },
 }
@@ -2218,9 +2218,9 @@ exports[`integration async fs enabled: false Diffent commands handle "els.getRel
 Object {
   "component": Object {
     "hello": Array [
-      "tests/integration/components/hello-test.js",
       "app/components/hello/index.hbs",
       "app/components/hello/index.js",
+      "tests/integration/components/hello-test.js",
     ],
   },
 }
@@ -2428,8 +2428,8 @@ Object {
   "registry": Object {
     "component": Object {
       "darling": Array [
-        "tests/integration/components/darling/component-test.js",
         "app/components/darling.ts",
+        "tests/integration/components/darling/component-test.js",
       ],
       "hello": Array [
         "app/components/hello.hbs",
@@ -2460,8 +2460,8 @@ Object {
   "registry": Object {
     "component": Object {
       "darling": Array [
-        "tests/integration/components/darling/component-test.js",
         "app/components/darling.ts",
+        "tests/integration/components/darling/component-test.js",
       ],
       "hello": Array [
         "app/components/hello.ts",
@@ -3262,6 +3262,13 @@ Object {
     },
   ],
   "registry": Object {
+    "component": Object {
+      "bar": Array [
+        "lib/biz/addon/templates/components/bar.hbs",
+        "../lib/foo/addon/templates/components/bar.hbs",
+        "../lib/foo/app/components/bar.js",
+      ],
+    },
     "routePath": Object {
       "hello": Array [
         "app/templates/hello.hbs",
@@ -4995,9 +5002,9 @@ exports[`integration async fs enabled: true Diffent commands handle "els.getProj
 Object {
   "component": Object {
     "hello": Array [
-      "tests/integration/components/hello-test.js",
       "app/components/hello/index.hbs",
       "app/components/hello/index.js",
+      "tests/integration/components/hello-test.js",
     ],
   },
 }
@@ -5007,9 +5014,9 @@ exports[`integration async fs enabled: true Diffent commands handle "els.getRela
 Object {
   "component": Object {
     "hello": Array [
-      "tests/integration/components/hello-test.js",
       "app/components/hello/component.js",
       "app/components/hello/template.hbs",
+      "tests/integration/components/hello-test.js",
     ],
   },
 }
@@ -5027,9 +5034,9 @@ exports[`integration async fs enabled: true Diffent commands handle "els.getRela
 Object {
   "component": Object {
     "hello": Array [
-      "tests/integration/components/hello-test.js",
       "app/components/hello/index.hbs",
       "app/components/hello/index.js",
+      "tests/integration/components/hello-test.js",
     ],
   },
 }
@@ -5151,6 +5158,9 @@ Object {
   ],
   "registry": Object {
     "component": Object {
+      "bar": Array [
+        "lib/biz/addon/components/bar.js",
+      ],
       "darling": Array [
         "app/components/darling/index.js",
       ],
@@ -5192,8 +5202,8 @@ Object {
   "registry": Object {
     "component": Object {
       "darling": Array [
-        "tests/integration/components/darling/component-test.js",
         "app/components/darling.ts",
+        "tests/integration/components/darling/component-test.js",
       ],
       "hello": Array [
         "app/components/hello.hbs",
@@ -5210,8 +5220,8 @@ Object {
   "registry": Object {
     "component": Object {
       "darling": Array [
-        "tests/integration/components/darling/component-test.js",
         "app/components/darling.ts",
+        "tests/integration/components/darling/component-test.js",
       ],
       "hello": Array [
         "app/components/hello.ts",
@@ -5413,6 +5423,12 @@ Object {
     },
   ],
   "registry": Object {
+    "component": Object {
+      "bar": Array [
+        "lib/biz/addon/components/bar.js",
+        "../lib/foo/addon/components/bar.js",
+      ],
+    },
     "helper": Object {
       "blah": Array [
         "tests/helpers/blah.js",

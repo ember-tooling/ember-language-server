@@ -177,7 +177,7 @@ export default class Server {
     };
 
     this.executors['els.provideDiagnostics'] = async (_, __, [document]: [TextDocument]) => {
-      return this.runAddonLinters(document);
+      return await this.runAddonLinters(document);
     };
 
     this.executors['els.getProjectRegistry'] = async (_, __, [filePath]: [string]) => {

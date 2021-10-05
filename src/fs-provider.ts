@@ -45,6 +45,9 @@ export default class FSProvider {
     const entry = URI.isUri(uri) ? URI.parse(uri as DocumentUri).fsPath : uri;
     const item = fs.readFileSync(entry, null);
 
+    // need this lines to debug slowness issues
+    // await new Promise((resolve) => setTimeout(resolve, 200));
+
     return item.toString('utf8');
   }
   // logger api

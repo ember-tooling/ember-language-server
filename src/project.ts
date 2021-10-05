@@ -190,9 +190,9 @@ export class Project extends BaseProject {
     enableEagerRegistryInitialization: true,
   };
   async init(server: Server) {
-    this.providers.initFunctions.forEach((initFn) => {
+    for (const initFn of this.providers.initFunctions) {
       try {
-        const initResult = initFn(server, this);
+        const initResult = await initFn(server, this);
 
         if (typeof initResult === 'function') {
           this.destructors.push(initResult);
@@ -202,11 +202,11 @@ export class Project extends BaseProject {
         this.initIssues.push(e.toString());
         this.initIssues.push(e.stack);
       }
-    });
+    }
 
-    this.builtinProviders.initFunctions.forEach((initFn) => {
+    for (const initFn of this.builtinProviders.initFunctions) {
       try {
-        const initResult = initFn(server, this);
+        const initResult = await initFn(server, this);
 
         if (typeof initResult === 'function') {
           this.destructors.push(initResult);
@@ -216,13 +216,11 @@ export class Project extends BaseProject {
         this.initIssues.push(e.toString());
         this.initIssues.push(e.stack);
       }
-    });
+    }
 
     if (this.flags.enableEagerRegistryInitialization) {
       // prefer explicit registry tree building
-      await findTestsForProject(this);
-      await findAppItemsForProject(this);
-      await findAddonItemsForProject(this);
+      await Promise.all([findTestsForProject(this), findAppItemsForProject(this), findAddonItemsForProject(this)]);
     }
 
     if (this.providers.info.length) {

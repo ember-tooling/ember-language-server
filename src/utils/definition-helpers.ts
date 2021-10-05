@@ -56,7 +56,7 @@ export async function pathsToLocationsWithPosition(paths: string[], findMe: stri
     return Location.create(URI.file(fileName).toString(), Range.create(startLine, startCharacter, startLine, startCharacter + findMe.length));
   });
 
-  return Promise.all(results);
+  return await Promise.all(results);
 }
 
 export function getAbstractParts(root: string, prefix: string, collection: string, name: string) {

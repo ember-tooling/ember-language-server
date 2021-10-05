@@ -86,22 +86,22 @@ export default class ProjectRoots {
       ignore: ['**/.git/**', '**/bower_components/**', '**/dist/**', '**/node_modules/**', '**/tmp/**'],
     });
 
-    roots.forEach(async (rootPath: string) => {
+    for (const rootPath of roots) {
       const filePath = path.join(workspaceRoot, rootPath);
       const fullPath = path.dirname(filePath);
 
       if (filePath.endsWith('package.json')) {
         try {
           if (await isGlimmerXProject(fullPath)) {
-            this.onProjectAdd(fullPath);
+            await this.onProjectAdd(fullPath);
           }
         } catch (e) {
           logError(e);
         }
       } else {
-        this.onProjectAdd(fullPath);
+        await this.onProjectAdd(fullPath);
       }
-    });
+    }
   }
 
   async initialize(workspaceRoot: string) {

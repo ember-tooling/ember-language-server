@@ -272,9 +272,11 @@ async function registerProject(connection: MessageConnection, normalizedPath: st
     arguments: [normalizedPath],
   };
 
-  return (await connection.sendRequest(ExecuteCommandRequest.type, params)) as {
+  const data = (await connection.sendRequest(ExecuteCommandRequest.type, params)) as {
     registry: Registry;
   };
+
+  return data;
 }
 
 export async function setServerConfig(connection: MessageConnection, config = { local: { addons: [], ignoredProjects: [] } }) {

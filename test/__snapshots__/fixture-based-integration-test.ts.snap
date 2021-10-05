@@ -644,42 +644,6 @@ Array [
   Object {
     "detail": "route",
     "kind": 17,
-    "label": "test-route",
-    "textEdit": Object {
-      "newText": "test-route",
-      "range": Object {
-        "end": Object {
-          "character": 12,
-          "line": 3,
-        },
-        "start": Object {
-          "character": 12,
-          "line": 3,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "route",
-    "kind": 17,
-    "label": "nested.nested-route",
-    "textEdit": Object {
-      "newText": "nested.nested-route",
-      "range": Object {
-        "end": Object {
-          "character": 12,
-          "line": 3,
-        },
-        "start": Object {
-          "character": 12,
-          "line": 3,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "route",
-    "kind": 17,
     "label": "angle-completion",
     "textEdit": Object {
       "newText": "angle-completion",
@@ -737,6 +701,42 @@ Array [
     "label": "inrepo-addon-completion",
     "textEdit": Object {
       "newText": "inrepo-addon-completion",
+      "range": Object {
+        "end": Object {
+          "character": 12,
+          "line": 3,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 3,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "test-route",
+    "textEdit": Object {
+      "newText": "test-route",
+      "range": Object {
+        "end": Object {
+          "character": 12,
+          "line": 3,
+        },
+        "start": Object {
+          "character": 12,
+          "line": 3,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "nested.nested-route",
+    "textEdit": Object {
+      "newText": "nested.nested-route",
       "range": Object {
         "end": Object {
           "character": 12,
@@ -757,42 +757,6 @@ Array [
   Object {
     "detail": "route",
     "kind": 17,
-    "label": "test-route",
-    "textEdit": Object {
-      "newText": "test-route",
-      "range": Object {
-        "end": Object {
-          "character": 23,
-          "line": 2,
-        },
-        "start": Object {
-          "character": 23,
-          "line": 2,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "route",
-    "kind": 17,
-    "label": "nested.nested-route",
-    "textEdit": Object {
-      "newText": "nested.nested-route",
-      "range": Object {
-        "end": Object {
-          "character": 23,
-          "line": 2,
-        },
-        "start": Object {
-          "character": 23,
-          "line": 2,
-        },
-      },
-    },
-  },
-  Object {
-    "detail": "route",
-    "kind": 17,
     "label": "angle-completion",
     "textEdit": Object {
       "newText": "angle-completion",
@@ -850,6 +814,42 @@ Array [
     "label": "inrepo-addon-completion",
     "textEdit": Object {
       "newText": "inrepo-addon-completion",
+      "range": Object {
+        "end": Object {
+          "character": 23,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 23,
+          "line": 2,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "test-route",
+    "textEdit": Object {
+      "newText": "test-route",
+      "range": Object {
+        "end": Object {
+          "character": 23,
+          "line": 2,
+        },
+        "start": Object {
+          "character": 23,
+          "line": 2,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "route",
+    "kind": 17,
+    "label": "nested.nested-route",
+    "textEdit": Object {
+      "newText": "nested.nested-route",
       "range": Object {
         "end": Object {
           "character": 23,
