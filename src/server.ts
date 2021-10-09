@@ -153,6 +153,8 @@ export default class Server {
   referenceProvider!: ReferenceProvider;
   codeActionProvider!: CodeActionProvider;
   async executeInitializers() {
+    logInfo('UELS: executeInitializers');
+
     for (const initializer of this.initializers) {
       await initializer();
     }
@@ -165,10 +167,18 @@ export default class Server {
     }
 
     this.executors['els.setConfig'] = async (_, __, [config]: [IServerConfig]) => {
-      await this.setConfiguration(config.local);
+      try {
+        await this.setConfiguration(config.local);
+      } catch (e) {
+        logError(e);
+      }
 
       if (this.lazyInit) {
-        await this.executeInitializers();
+        try {
+          await this.executeInitializers();
+        } catch (e) {
+          logError(e);
+        }
       }
     };
 
@@ -243,7 +253,7 @@ export default class Server {
       };
     };
 
-    this.executors['els.reloadProject'] = async (_, __, [projectPath]: [string]) => {
+    this.executors['els.reloadProject'] = async (_, __, [projectPath, force]: [string, boolean?]) => {
       if (projectPath) {
         const project = this.projectRoots.projectForPath(projectPath);
 
@@ -255,10 +265,21 @@ export default class Server {
             path: project.root,
           };
         } else {
-          return {
-            msg: 'No project found',
-            path: projectPath,
-          };
+          if (force) {
+            const results = await this.projectRoots.onProjectAdd(projectPath);
+            const project = this.projectRoots.projectForPath(projectPath);
+
+            return {
+              msg: `Project added`,
+              path: project ? project.root : 'unable to resolve project path',
+              results,
+            };
+          } else {
+            return {
+              msg: 'No project found',
+              path: projectPath,
+            };
+          }
         }
       } else {
         await this.projectRoots.reloadProjects();

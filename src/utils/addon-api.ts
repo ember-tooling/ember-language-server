@@ -99,8 +99,26 @@ function create<T>(model: new () => T): T {
   return new model();
 }
 
-// @ts-expect-error @todo - fix webpack imports
-const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
+let requireFunc: any = {
+  resolve(a: string): any {
+    return a;
+  },
+};
+
+try {
+  // @ts-expect-error @todo - fix webpack imports
+  requireFunc =
+    typeof __webpack_require__ === 'function'
+      ? // @ts-expect-error @todo - fix webpack imports
+        __non_webpack_require__
+      : typeof require !== 'undefined'
+      ? require
+      : function () {
+          // EOL
+        };
+} catch (e) {
+  // expected error in worker
+}
 
 function requireUncached(module: string) {
   if (!getRequireSupport()) {

@@ -23,3 +23,4 @@
 /appveyor.yml
 /tsconfig.json
 /.releaserc.json
+/fix-worker-bundle.js

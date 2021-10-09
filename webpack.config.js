@@ -22,43 +22,43 @@ const nodeBundleConfig = {
   },
   // devtool: 'source-map',
   module: {
-		rules: [
-			{
-				test: /\.ts$/,
-				exclude: /node_modules/,
-				use: [
-					{
-						loader: 'ts-loader',
-					},
-				],
-			},
-		],
-	},
+    rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader',
+          },
+        ],
+      },
+    ],
+  },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
     mainFields: ['module', 'main'],
-		extensions: ['.ts', '.js'], // support ts-files and js-files
+    extensions: ['.ts', '.js'], // support ts-files and js-files
   }
 };
 
 const workerBundleConfig = /** @type WebpackConfig */ {
-	mode: 'none',
-	target: 'webworker', // web extensions run in a webworker context
-	entry: {
-		'start-worker-server': './src/start-worker-server.ts',
-	},
-	output: {
-		filename: 'start-worker-server.js',
-		path: path.join(__dirname, 'dist', 'bundled'),
-		libraryTarget: 'var',
-		library: 'serverExportVar',
-	},
-	resolve: {
-		mainFields: ['module', 'main'],
-		extensions: ['.ts', '.js'], // support ts-files and js-files
-		alias: {},
-		fallback: {
-			path: require.resolve("path-browserify"),
+  mode: 'none',
+  target: 'webworker', // web extensions run in a webworker context
+  entry: {
+    'start-worker-server': './src/start-worker-server.ts',
+  },
+  output: {
+    filename: 'start-worker-server.js',
+    path: path.join(__dirname, 'dist', 'bundled'),
+    libraryTarget: 'var',
+    library: 'serverExportVar',
+  },
+  resolve: {
+    mainFields: ['module', 'main'],
+    extensions: ['.ts', '.js'], // support ts-files and js-files
+    alias: {},
+    fallback: {
+      path: require.resolve("path-browserify"),
       util: false,
       os: false,
       fs: false,
@@ -67,28 +67,28 @@ const workerBundleConfig = /** @type WebpackConfig */ {
       debug: false,
       net: false,
       stream: false,
-		},
-	},
-	module: {
-		rules: [
-			{
-				test: /\.ts$/,
-				exclude: /node_modules/,
-				use: [
-					{
-						loader: 'ts-loader',
-					},
-				],
-			},
-		],
-	},
-	externals: {
-		vscode: 'commonjs vscode', // ignored because it doesn't exist
-	},
-	performance: {
-		hints: false,
-	},
-	// devtool: 'source-map',
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader',
+          },
+        ],
+      },
+    ],
+  },
+  externals: {
+    vscode: 'commonjs vscode', // ignored because it doesn't exist
+  },
+  performance: {
+    hints: false,
+  },
+  // devtool: 'source-map',
 };
 
 const configs = [
@@ -102,4 +102,4 @@ const configs = [
   }
 ];
 
-module.exports = configs.filter(({name}) => name.startsWith(buildName)).map(e => e.config);
+module.exports = configs.filter(({ name }) => name.startsWith(buildName)).map(e => e.config);
