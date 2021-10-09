@@ -6,15 +6,15 @@ This guide has been constructed based on an Emacs debugging session. We used std
 
 ## Approach
 
-We will install EULS locally.  ELS is running in nodejs, which we will instrument to enable debugging.  We will visit the logs in a Chromium based browser.
+We will install uELS locally.  ELS is running in nodejs, which we will instrument to enable debugging.  We will visit the logs in a Chromium based browser.
 
-## Fetching EULS
+## Fetching uELS
 
 In order to debug the sources, we need to get hold of them and their dependencies.
 
 ### Getting the sources
 
-Sources for EULS can be fetched from https://github.com/lifeart/ember-language-server
+Sources for uELS can be fetched from https://github.com/lifeart/ember-language-server
 
     git clone https://github.com/lifeart/ember-language-server.git
 
@@ -88,7 +88,7 @@ Most editors that have a language server integration will require some configura
                                           :add-on? t
                                           :server-id 'els))
 
-We first followed the steps in "Fetching EULS", installing in `/home/madnificent/code/javascript/ember-language-server/`.
+We first followed the steps in "Fetching uELS", installing in `/home/madnificent/code/javascript/ember-language-server/`.
 
 We then adapted the integration code to the following:
 
