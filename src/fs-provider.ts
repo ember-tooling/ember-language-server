@@ -49,14 +49,19 @@ export default class FSProvider {
     return fs.statSync(entry);
   }
   // expected VSCode api, replacement of readFileSync
-  async readFile(uri: DocumentUri | fs.PathLike): Promise<string> {
+  async readFile(uri: DocumentUri | fs.PathLike): Promise<string | null> {
     const entry = URI.isUri(uri) ? URI.parse(uri as DocumentUri).fsPath : uri;
-    const item = fs.readFileSync(entry, null);
+
+    try {
+      const item = fs.readFileSync(entry, null);
+
+      return item.toString('utf8');
+    } catch (e) {
+      return null;
+    }
 
     // need this lines to debug slowness issues
     // await new Promise((resolve) => setTimeout(resolve, 200));
-
-    return item.toString('utf8');
   }
   // logger api
   createWriteStream(filePath: fs.PathLike, flags: { flags: string }) {
@@ -120,13 +125,13 @@ export class AsyncFsProvider extends FSProvider {
 
     return convertToFsStat(data);
   }
-  async readFile(uri: DocumentUri | fs.PathLike): Promise<string> {
+  async readFile(uri: DocumentUri | fs.PathLike): Promise<string | null> {
     const entry = this.getGetUri(uri);
 
     const result = await this.sendCommand('els.fs.readFile', entry);
 
     if (typeof result !== 'string') {
-      return '';
+      return null;
     }
 
     return result as string;

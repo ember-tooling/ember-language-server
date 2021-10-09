@@ -3,9 +3,22 @@ import { Command, CodeAction, WorkspaceEdit, CodeActionKind, TextEdit, Diagnosti
 import { URI } from 'vscode-uri';
 import { toLSRange } from '../../../estree-utils';
 import BaseCodeActionProvider, { INodeSelectionInfo } from './base';
+import { logError } from '../../../utils/logger';
+
+function setCwd(cwd: string) {
+  try {
+    process.chdir(cwd);
+  } catch (err) {
+    logError(err);
+  }
+}
 
 export default class TemplateLintFixesCodeAction extends BaseCodeActionProvider {
   async fixTemplateLintIssues(issues: Diagnostic[], params: CodeActionFunctionParams, meta: INodeSelectionInfo): Promise<Array<CodeAction | null>> {
+    if (!this.server.templateLinter.isEnabled) {
+      return [];
+    }
+
     const linterKlass = await this.server.templateLinter.linterForProject(this.project);
 
     if (!linterKlass) {
@@ -15,7 +28,7 @@ export default class TemplateLintFixesCodeAction extends BaseCodeActionProvider 
     const cwd = process.cwd();
 
     try {
-      process.chdir(this.project.root);
+      setCwd(this.project.root);
       const linter = new linterKlass();
 
       const fixes = issues.map(
@@ -47,7 +60,7 @@ export default class TemplateLintFixesCodeAction extends BaseCodeActionProvider 
     } catch (e) {
       return [];
     } finally {
-      process.chdir(cwd);
+      setCwd(cwd);
     }
   }
   public async onCodeAction(_: string, params: CodeActionFunctionParams): Promise<(Command | CodeAction)[] | undefined | null> {

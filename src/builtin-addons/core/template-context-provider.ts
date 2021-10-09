@@ -28,10 +28,13 @@ export async function componentsContextData(fs: FSProvider, maybeScripts: string
     try {
       const filePath = hasAddonScript ? hasAddonScript : (existingScripts.pop() as string);
       const fileContent = await fs.readFile(filePath);
-      const jsMeta = processJSFile(fileContent, filePath);
 
-      logDebugInfo('jsMeta', jsMeta);
-      infoItems.push(jsMeta);
+      if (fileContent !== null) {
+        const jsMeta = processJSFile(fileContent, filePath);
+
+        logDebugInfo('jsMeta', jsMeta);
+        infoItems.push(jsMeta);
+      }
     } catch (e) {
       logError(e);
     }

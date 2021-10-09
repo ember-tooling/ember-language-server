@@ -9,3 +9,4 @@ inst/
 
 # Debug Logging
 debug.log
+debug.*.log

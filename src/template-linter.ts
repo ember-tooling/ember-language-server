@@ -32,7 +32,7 @@ function setCwd(cwd: string) {
   try {
     process.chdir(cwd);
   } catch (err) {
-    logError(`chdir: ${err.toString()}`);
+    logError(err);
   }
 }
 
@@ -52,6 +52,10 @@ export default class TemplateLinter {
 
   enable() {
     this._isEnabled = true;
+  }
+
+  get isEnabled() {
+    return this._isEnabled;
   }
 
   private getProjectForDocument(textDocument: TextDocument) {

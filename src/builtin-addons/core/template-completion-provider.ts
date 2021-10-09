@@ -369,6 +369,10 @@ export default class TemplateCompletionProvider {
 
     const content = await this.server.fs.readFile(tpl);
 
+    if (content === null) {
+      return [];
+    }
+
     return getTemplateBlocks(content).map((blockName: string) => {
       return {
         label: `:${blockName}`,
@@ -430,23 +434,26 @@ export default class TemplateCompletionProvider {
           if (existingTpls.length) {
             const existingAttributes = focusPath.parent.attributes.map((attr: ASTv1.AttrNode) => attr.name).filter((name: string) => isArgumentName(name));
             const content = await this.server.fs.readFile(existingTpls[0]);
-            const candidates = await this.getLocalPathExpressionCandidates(tpls[0], content);
-            const preResults: CompletionItem[] = [];
 
-            candidates.forEach((obj: CompletionItem) => {
-              const name = obj.label.split('.')[0];
+            if (content !== null) {
+              const candidates = await this.getLocalPathExpressionCandidates(tpls[0], content);
+              const preResults: CompletionItem[] = [];
 
-              if (isArgumentName(name) && !existingAttributes.includes(name)) {
-                preResults.push({
-                  label: name,
-                  detail: obj.detail,
-                  kind: obj.kind,
-                });
+              candidates.forEach((obj: CompletionItem) => {
+                const name = obj.label.split('.')[0];
+
+                if (isArgumentName(name) && !existingAttributes.includes(name)) {
+                  preResults.push({
+                    label: name,
+                    detail: obj.detail,
+                    kind: obj.kind,
+                  });
+                }
+              });
+
+              if (preResults.length) {
+                completions.push(...uniqBy(preResults, 'label'));
               }
-            });
-
-            if (preResults.length) {
-              completions.push(...uniqBy(preResults, 'label'));
             }
           }
         }

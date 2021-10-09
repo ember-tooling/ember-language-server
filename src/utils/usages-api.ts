@@ -1,6 +1,7 @@
 import { extractTokensFromTemplate } from './template-tokens-collector';
 import { MatchResultType } from './path-matcher';
 import { fsProvider } from '../fs-provider';
+import { logError, logDebugInfo } from './logger';
 
 export interface TemplateTokenMeta {
   source: string;
@@ -130,6 +131,8 @@ async function extractTokens() {
   const item = tokenQueue[0];
 
   if (item === undefined) {
+    logDebugInfo('extractTokens:item:undefined', tokenQueue);
+
     return;
   }
 
@@ -137,13 +140,17 @@ async function extractTokens() {
 
   try {
     const content = await fsProvider().readFile(file);
-    const tokens = extractTokensFromTemplate(content);
 
-    TEMPLATE_TOKENS[kind][normalizedName] = {
-      source: file,
-      tokens,
-    };
+    if (content !== null) {
+      const tokens = extractTokensFromTemplate(content);
+
+      TEMPLATE_TOKENS[kind][normalizedName] = {
+        source: file,
+        tokens,
+      };
+    }
   } catch (e) {
+    logError(e);
     //
   } finally {
     tokenQueue.shift();

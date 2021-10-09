@@ -68,6 +68,8 @@ describe('integration', function () {
       });
 
       afterAll(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         for (const item of disposables) {
           await item.dispose();
         }

@@ -2,6 +2,7 @@ import { updateTemplateTokens, UsageType } from './usages-api';
 import { isRootStartingWithFilePath, isTemplatePath, normalizeRoutePath } from './layout-helpers';
 import { MatchResult } from './path-matcher';
 import * as path from 'path';
+import { logDebugInfo } from './logger';
 
 type GLOBAL_REGISTRY_ITEM = Map<string, Set<string>>;
 export type REGISTRY_KIND = 'transform' | 'helper' | 'component' | 'routePath' | 'model' | 'service' | 'modifier';
@@ -13,10 +14,12 @@ export function getGlobalRegistry() {
 let _templateTokensCollectionEnabled = true;
 
 export function disableTemplateTokensCollection() {
+  logDebugInfo('disable:TemplateTokensCollection');
   _templateTokensCollectionEnabled = false;
 }
 
 export function enableTemplateTokensCollection() {
+  logDebugInfo('enable:TemplateTokensCollection');
   _templateTokensCollectionEnabled = true;
 }
 

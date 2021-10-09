@@ -159,8 +159,8 @@ export async function initFileStructure(files: Tree) {
 
   return {
     path: path.normalize(dir.path()),
-    destroy() {
-      return dir.dispose();
+    async destroy() {
+      await dir.dispose();
     },
   };
 }

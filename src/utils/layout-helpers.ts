@@ -332,6 +332,11 @@ export async function asyncGetPackageJSON(file: string): Promise<PackageInfo> {
 export async function asyncGetJSON(filePath: string): Promise<PackageInfo> {
   try {
     const content = await fsProvider().readFile(filePath);
+
+    if (content === null) {
+      return {};
+    }
+
     const result = JSON.parse(content);
 
     return result;

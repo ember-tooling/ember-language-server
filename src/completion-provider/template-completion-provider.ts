@@ -18,7 +18,7 @@ const PLACEHOLDER = 'ELSCompletionDummy';
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
-    logDebugInfo('getTextForGuessing', originalText, offset, PLACEHOLDER);
+    // logDebugInfo('getTextForGuessing', originalText, offset, PLACEHOLDER);
 
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
@@ -104,12 +104,10 @@ export default class TemplateCompletionProvider {
         logDebugInfo('validText', validText);
         break;
       } catch (e) {
-        logDebugInfo('parsing-error', this.getTextForGuessing(originalText, offset, normalPlaceholder));
+        // logDebugInfo('parsing-error', this.getTextForGuessing(originalText, offset, normalPlaceholder));
         ast = null;
       }
     }
-
-    logDebugInfo('ast must exists');
 
     if (ast === null) {
       return null;

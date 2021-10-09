@@ -24,6 +24,11 @@ jobs:
       - run: yarn compile
       - run: yarn lint
       - run: yarn test:coverage
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          path: ./debug.*.log
+
 
   coverage:
     name: Coverage

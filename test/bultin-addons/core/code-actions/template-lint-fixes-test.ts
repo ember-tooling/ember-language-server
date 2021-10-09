@@ -7,6 +7,7 @@ describe('ProjectTemplateLinter', () => {
   beforeEach(() => {
     server = {
       templateLinter: {
+        isEnabled: true,
         linterForProject: (): unknown =>
           class LinterMock {
             verifyAndFix(): { isFixed: boolean; output: string } {

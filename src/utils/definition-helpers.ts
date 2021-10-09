@@ -51,12 +51,19 @@ export function getFirstTextPostion(text: string, content: string) {
 export async function pathsToLocationsWithPosition(paths: string[], findMe: string): Promise<Location[]> {
   const results = paths.map(async (fileName: string) => {
     const text = await fsProvider().readFile(fileName);
+
+    if (text === null) {
+      return null;
+    }
+
     const [startLine, startCharacter] = getFirstTextPostion(text, findMe);
 
     return Location.create(URI.file(fileName).toString(), Range.create(startLine, startCharacter, startLine, startCharacter + findMe.length));
   });
 
-  return await Promise.all(results);
+  const data = await Promise.all(results);
+
+  return data.filter((el) => el !== null) as Location[];
 }
 
 export function getAbstractParts(root: string, prefix: string, collection: string, name: string) {

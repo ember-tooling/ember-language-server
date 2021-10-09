@@ -206,13 +206,15 @@ export default class Server {
       const project = this.projectRoots.projectForPath(projectPath);
 
       if (!project) {
+        logDebugInfo('els.getLegacyTemplateTokens: no project');
+
         return {
           msg: 'Unable to find project for path',
           path: projectPath,
         };
       }
 
-      logDebugInfo('els.getLegacyTemplateTokens');
+      logDebugInfo('els.getLegacyTemplateTokens [before collect]');
 
       await waitForTokensToBeCollected();
 
@@ -681,6 +683,10 @@ export default class Server {
     if (providers.length === 0) return [];
 
     const content = await this.fs.readFile(filePath);
+
+    if (content === null) {
+      return [];
+    }
 
     return providers.map((providers) => providers.process(content)).reduce((a, b) => a.concat(b), []);
   }
