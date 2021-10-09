@@ -47,14 +47,37 @@ All features currently only work in Ember CLI application that use the default c
 * [els-component-extraction-addon](https://github.com/lifeart/els-component-extraction-addon) - Component extraction addon.
 * [els-intl-addon](https://github.com/lifeart/els-intl-addon) - Ember-Intl, Ember-i18n autocomplete.
 
-Addon notes:
+## Addon notes:
 
 - all addons could be added as dev-dependency for a project
 - dev-dependency installation allow us to have independent versions of addons for different projects
 - for global addon installation check LS settings in your editor (you have to specify path to addon root in LS config)
 - you could [build](https://github.com/lifeart/ember-language-server/wiki/Addon-API) your project-sepecific addon
 
+---
 
-# Licence
+# Integration details
+
+## Server entrypoints
+
+`lib/start-server.js` - nodejs
+
+`lib/start-worker-server.js` - worker
+## Server options
+
+```js
+new Server({fs, type})
+```
+
+
+`fs` - available options: 
+  * `sync` - LS should use nodejs.fs logic
+  * `async` - LS should use client's fs provider
+
+`type` - available options: 
+  * `node` - supported addons & require logic
+  * `worker` - addons and require logic not supported
+
+## Licence
 
 [MIT](LICENSE.md)
