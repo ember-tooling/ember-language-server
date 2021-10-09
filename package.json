@@ -1,16 +1,15 @@
 {
   "name": "@lifeart/ember-language-server",
   "description": "A language server implementation for Ember.js projects.",
-  "version": "1.22.1",
+  "version": "2.0.0",
   "contributors": [
-    "Aleksandr Kanunnikov <lifeart92@gmail.com>",
-    "Tobias Bieniek <tobias.bieniek@gmail.com>",
-    "Thomas Sauer <t-sauer@outlook.de>"
+    "Aleksandr Kanunnikov <lifeart92@gmail.com>"
   ],
   "license": "MIT",
   "keywords": [
     "ember",
-    "language-server"
+    "language-server",
+    "ember-language-server"
   ],
   "repository": {
     "type": "git",
