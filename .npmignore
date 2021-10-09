@@ -1,10 +1,11 @@
 /.vscode
 /.github
+/.husky
 /.nyc_output
 /src
 /inst
-/dist
 /lib/*.js.map
+/lib/*.ts
 /test
 /coverage
 /.editorconfig

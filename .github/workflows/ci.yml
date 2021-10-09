@@ -144,6 +144,12 @@ jobs:
       - name: compile
         run: yarn compile
 
+      - name: bundle for node
+        run: yarn build:bundle:node
+
+      - name: bundle for worker
+        run: yarn build:bundle:worker
+
       - name: Release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
