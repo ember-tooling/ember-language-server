@@ -53,3 +53,8 @@ Addon notes:
 - dev-dependency installation allow us to have independent versions of addons for different projects
 - for global addon installation check LS settings in your editor (you have to specify path to addon root in LS config)
 - you could [build](https://github.com/lifeart/ember-language-server/wiki/Addon-API) your project-sepecific addon
+
+
+# Licence
+
+[MIT](LICENSE.md)
