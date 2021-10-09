@@ -134,7 +134,7 @@ jobs:
         run: git fetch --prune --unshallow
 
       - name: setup node
-      - uses: volta-cli/action@v1
+        uses: volta-cli/action@v1
         with:
           node-version: 14.x
 
