@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/lifeart/ember-language-server/compare/v2.0.0...v2.1.0) (2021-10-09)
+
+
+### Features
+
+* async fs documentation details ([c409cf9](https://github.com/lifeart/ember-language-server/commit/c409cf95c7e7f01d0346d90fee190e678af7f8e9))
+
 ## [1.22.1](https://github.com/lifeart/ember-language-server/compare/v1.22.0...v1.22.1) (2021-07-25)
 
 
