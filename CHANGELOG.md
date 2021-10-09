@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/lifeart/ember-language-server/compare/v2.1.0...v2.2.0) (2021-10-09)
+
+
+### Features
+
+* custom bundle ([#313](https://github.com/lifeart/ember-language-server/issues/313)) ([9bbb9dd](https://github.com/lifeart/ember-language-server/commit/9bbb9ddf2041ff22dcb5bdb9d868929a33adafa0))
+
 # [2.1.0](https://github.com/lifeart/ember-language-server/compare/v2.0.0...v2.1.0) (2021-10-09)
 
 
