@@ -46,6 +46,18 @@ export function safeStringify(obj: unknown, indent = 2) {
   return retVal;
 }
 
+export function logDebugInfo(...args: unknown[]) {
+  if (!log_file) {
+    return;
+  }
+
+  const output = args.map((a) => safeStringify(a)).join(' ');
+
+  log_file.write('----------------------------------------' + '\r\n');
+  log_file.write(util.format(output) + '\r\n');
+  log_file.write('----------------------------------------' + '\r\n');
+}
+
 export function log(...args: unknown[]) {
   const output = args.map((a) => safeStringify(a)).join(' ');
 

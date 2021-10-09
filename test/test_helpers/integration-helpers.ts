@@ -19,6 +19,7 @@ import {
   CompletionRequest,
 } from 'vscode-languageserver-protocol/node';
 import { FileStat, FileType, fileTypeFromFsStat } from '../../src/utils/fs-utils';
+import { IRegistry } from '../../src/utils/registry-api';
 
 export function startServer(asyncFs = false) {
   const options: Array<string | undefined> = [
@@ -40,7 +41,11 @@ export function startServer(asyncFs = false) {
   );
 }
 
-export type UnknownResult = Record<string, unknown>;
+export type UnknownResult = Record<string, unknown> & {
+  registry: IRegistry;
+  initIssues: string[];
+};
+
 export type Registry = {
   [key: string]: {
     [key: string]: string[];

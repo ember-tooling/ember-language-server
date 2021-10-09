@@ -47,15 +47,15 @@ export default class ProjectRoots {
   }
 
   async reloadProject(projectRoot: string) {
-    this.removeProject(projectRoot);
+    await this.removeProject(projectRoot);
     await this.onProjectAdd(projectRoot);
   }
 
-  removeProject(projectRoot: string) {
+  async removeProject(projectRoot: string) {
     const project = this.projectForPath(projectRoot);
 
     if (project) {
-      project.unload();
+      await project.unload();
     }
 
     this.projects.delete(projectRoot);

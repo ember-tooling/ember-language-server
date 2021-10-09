@@ -3243,7 +3243,62 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "detail": "@foo = undefined // (used in template)",
+      "kind": 10,
+      "label": "@foo",
+      "textEdit": Object {
+        "newText": "@foo",
+        "range": Object {
+          "end": Object {
+            "character": 18,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 17,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "@name = undefined // (used in template)",
+      "kind": 10,
+      "label": "@name",
+      "textEdit": Object {
+        "newText": "@name",
+        "range": Object {
+          "end": Object {
+            "character": 18,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 17,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "@picture = undefined // (used in template)",
+      "kind": 10,
+      "label": "@picture",
+      "textEdit": Object {
+        "newText": "@picture",
+        "range": Object {
+          "end": Object {
+            "character": 18,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 17,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
 }
 `;
 
@@ -3309,7 +3364,44 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "detail": "lastName = \\"b\\"",
+      "kind": 10,
+      "label": "this.lastName",
+      "textEdit": Object {
+        "newText": "this.lastName",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "firstName = \\"a\\"",
+      "kind": 10,
+      "label": "this.firstName",
+      "textEdit": Object {
+        "newText": "this.firstName",
+        "range": Object {
+          "end": Object {
+            "character": 7,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
 }
 `;
 
@@ -3324,7 +3416,44 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "detail": "lastName = \\"b\\"",
+      "kind": 10,
+      "label": "this.lastName",
+      "textEdit": Object {
+        "newText": "this.lastName",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 6,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "firstName = \\"a\\"",
+      "kind": 10,
+      "label": "this.firstName",
+      "textEdit": Object {
+        "newText": "this.firstName",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 6,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
 }
 `;
 
@@ -3339,7 +3468,44 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "detail": "lastName = \\"b\\"",
+      "kind": 10,
+      "label": "this.lastName",
+      "textEdit": Object {
+        "newText": "this.lastName",
+        "range": Object {
+          "end": Object {
+            "character": 17,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 12,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "firstName = \\"a\\"",
+      "kind": 10,
+      "label": "this.firstName",
+      "textEdit": Object {
+        "newText": "this.firstName",
+        "range": Object {
+          "end": Object {
+            "character": 17,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 12,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
 }
 `;
 
@@ -4984,16 +5150,7 @@ Object {
 
 exports[`integration async fs enabled: true Diffent commands handle "els.getLegacyTemplateTokens" command 1`] = `
 Object {
-  "component": Object {
-    "hello": Object {
-      "source": "app/components/hello/index.hbs",
-      "tokens": Array [
-        "foo",
-        "my-component",
-        "another/my/component",
-      ],
-    },
-  },
+  "component": Object {},
   "routePath": Object {},
 }
 `;
@@ -5143,7 +5300,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/components/darling.hbs",
+    },
+  ],
 }
 `;
 
@@ -5169,7 +5340,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/lib/biz/addon/components/bar.js",
+    },
+  ],
 }
 `;
 
@@ -5192,7 +5377,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/lib/biz/addon/utils/boo/blah/zoo/bar.js",
+    },
+  ],
 }
 `;
 
@@ -5210,7 +5409,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling.ts",
+    },
+  ],
 }
 `;
 
@@ -5228,7 +5441,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling.ts",
+    },
+  ],
 }
 `;
 
@@ -5245,7 +5472,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling.hbs",
+    },
+  ],
 }
 `;
 
@@ -5262,7 +5503,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling/index.hbs",
+    },
+  ],
 }
 `;
 
@@ -5279,7 +5534,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/darling/template.hbs",
+    },
+  ],
 }
 `;
 
@@ -5296,7 +5565,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/components/darling.hbs",
+    },
+  ],
 }
 `;
 
@@ -5313,7 +5596,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo.hbs",
+    },
+  ],
 }
 `;
 
@@ -5336,7 +5633,34 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo/bar.hbs",
+    },
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo/baz.hbs",
+    },
+  ],
 }
 `;
 
@@ -5355,7 +5679,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo/bar/baz.hbs",
+    },
+  ],
 }
 `;
 
@@ -5440,7 +5778,21 @@ Object {
       ],
     },
   },
-  "response": Array [],
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/tests/helpers/blah.js",
+    },
+  ],
 }
 `;
 
@@ -5521,6 +5873,84 @@ Array [
 ]
 `;
 
-exports[`integration async fs enabled: true autocomplete works for angle component slots 1`] = `Array []`;
+exports[`integration async fs enabled: true autocomplete works for angle component slots 1`] = `
+Array [
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":main",
+    "textEdit": Object {
+      "newText": ":main",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
 
-exports[`integration async fs enabled: true autocomplete works for multiple angle component slots 1`] = `Array []`;
+exports[`integration async fs enabled: true autocomplete works for multiple angle component slots 1`] = `
+Array [
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":main",
+    "textEdit": Object {
+      "newText": ":main",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":body",
+    "textEdit": Object {
+      "newText": ":body",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":footer",
+    "textEdit": Object {
+      "newText": ":footer",
+      "range": Object {
+        "end": Object {
+          "character": 11,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;

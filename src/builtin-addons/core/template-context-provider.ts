@@ -1,7 +1,7 @@
 import { CompletionItemKind } from 'vscode-languageserver';
 import type { CompletionItem } from 'vscode-languageserver';
 
-import { log } from '../../utils/logger';
+import { logDebugInfo, logError } from '../../utils/logger';
 
 import { extractComponentInformationFromMeta, IComponentMetaInformation, IJsMeta, processJSFile, processTemplate } from 'ember-meta-explorer';
 
@@ -30,10 +30,10 @@ export async function componentsContextData(fs: FSProvider, maybeScripts: string
       const fileContent = await fs.readFile(filePath);
       const jsMeta = processJSFile(fileContent, filePath);
 
-      log('jsMeta', jsMeta);
+      logDebugInfo('jsMeta', jsMeta);
       infoItems.push(jsMeta);
     } catch (e) {
-      log('template-context-lookup-error', e.toString());
+      logError(e);
     }
   }
 
@@ -43,15 +43,14 @@ export async function componentsContextData(fs: FSProvider, maybeScripts: string
     templateInfo = processTemplate(templateContent);
     infoItems.push(templateInfo as IJsMeta);
   } catch (e) {
-    log('templateError', e);
+    logError(e);
   }
 
-  log('infoItems', infoItems);
+  logDebugInfo('infoItems', infoItems);
 
   const meta: Record<string, string[]> = infoItems
     .filter((item: IJsMeta) => item !== null)
     .reduce((result: Record<string, string[]>, it: IJsMeta) => {
-      log('it', it);
       Object.keys(it).forEach((name: keyof IJsMeta) => {
         if (name in result) {
           result[name] = result[name].concat(it[name]);
@@ -64,16 +63,16 @@ export async function componentsContextData(fs: FSProvider, maybeScripts: string
     }, {});
   const items: CompletionItem[] = [];
 
-  log('meta', meta);
+  logDebugInfo('meta', meta);
   let contextInfo: IComponentMetaInformation = {} as IComponentMetaInformation;
 
   try {
     contextInfo = extractComponentInformationFromMeta(meta);
   } catch (e) {
-    log('contextInforError', e);
+    logError(e);
   }
 
-  log('contextInfo', contextInfo);
+  logDebugInfo('contextInfo', contextInfo);
   contextInfo.jsProps.forEach((propName: string) => {
     const [name]: string[] = propName.split(' ');
 

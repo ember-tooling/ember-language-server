@@ -41,7 +41,7 @@ import JSDocumentSymbolProvider from './symbols/js-document-symbol-provider';
 import HBSDocumentSymbolProvider from './symbols/hbs-document-symbol-provider';
 import { ReferenceProvider } from './reference-provider/entry';
 import { CodeActionProvider } from './code-action-provider/entry';
-import { log, setConsole, logError, logInfo } from './utils/logger';
+import { log, setConsole, logError, logInfo, logDebugInfo } from './utils/logger';
 import TemplateCompletionProvider from './completion-provider/template-completion-provider';
 import ScriptCompletionProvider from './completion-provider/script-completion-provider';
 import {
@@ -212,9 +212,12 @@ export default class Server {
         };
       }
 
+      logDebugInfo('els.getLegacyTemplateTokens');
+
       await waitForTokensToBeCollected();
 
       const allTokens = getAllTemplateTokens();
+
       const projectTokens: ITemplateTokens = {
         component: {},
         routePath: {},
@@ -652,7 +655,7 @@ export default class Server {
       completionItems.push(...templateCompletions, ...scriptCompletions);
     } catch (e) {
       logError(e);
-      log('onCompletionError', textDocumentPosition, e, e.stack, e.toString());
+      logDebugInfo('onCompletionError', textDocumentPosition, e, e.stack, e.toString());
     }
 
     // this.setStatusText('Running');

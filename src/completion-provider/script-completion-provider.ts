@@ -7,12 +7,12 @@ import { filter } from 'fuzzaldrin';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { uniqBy } from 'lodash';
 import { getExtension } from '../utils/file-extension';
-import { log } from '../utils/logger';
+import { logDebugInfo } from '../utils/logger';
 
 export default class ScriptCompletionProvider {
   constructor(private server: Server) {}
   async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
-    log('provideCompletions');
+    logDebugInfo('provideCompletions');
 
     if (!['.js', '.ts'].includes(getExtension(params.textDocument) as string)) {
       return [];

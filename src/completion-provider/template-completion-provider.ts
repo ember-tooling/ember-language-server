@@ -6,7 +6,7 @@ import { filter } from 'fuzzaldrin';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import { preprocess, ASTv1 } from '@glimmer/syntax';
 import { getExtension } from '../utils/file-extension';
-import { log, logInfo } from '../utils/logger';
+import { logDebugInfo, logInfo } from '../utils/logger';
 import { searchAndExtractHbs } from '@lifeart/ember-extract-inline-templates';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { Position as EsTreePosition } from 'estree';
@@ -18,7 +18,7 @@ const PLACEHOLDER = 'ELSCompletionDummy';
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
-    log('getTextForGuessing', originalText, offset, PLACEHOLDER);
+    logDebugInfo('getTextForGuessing', originalText, offset, PLACEHOLDER);
 
     return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
   }
@@ -63,10 +63,10 @@ export default class TemplateCompletionProvider {
             },
           });
 
-    log('originalText', originalText);
+    logDebugInfo('originalText', originalText);
 
     if (originalText.trim().length === 0) {
-      log('originalText - empty');
+      logDebugInfo('originalText - empty');
 
       return null;
     }
@@ -101,15 +101,15 @@ export default class TemplateCompletionProvider {
       try {
         validText = this.getTextForGuessing(originalText, offset, normalPlaceholder);
         ast = this.getAST(validText);
-        log('validText', validText);
+        logDebugInfo('validText', validText);
         break;
       } catch (e) {
-        log('parsing-error', this.getTextForGuessing(originalText, offset, normalPlaceholder));
+        logDebugInfo('parsing-error', this.getTextForGuessing(originalText, offset, normalPlaceholder));
         ast = null;
       }
     }
 
-    log('ast must exists');
+    logDebugInfo('ast must exists');
 
     if (ast === null) {
       return null;
@@ -129,11 +129,11 @@ export default class TemplateCompletionProvider {
     };
   }
   async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
-    log('template:provideCompletions');
+    logDebugInfo('template:provideCompletions');
     const ext = getExtension(params.textDocument);
 
     if (ext !== null && !extensionsToProvideTemplateCompletions.includes(ext)) {
-      log('template:provideCompletions:unsupportedExtension', ext);
+      logDebugInfo('template:provideCompletions:unsupportedExtension', ext);
 
       return [];
     }

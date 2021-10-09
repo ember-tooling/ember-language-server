@@ -20,6 +20,14 @@ export function fsProvider(): FSProvider {
 }
 
 export default class FSProvider {
+  constructor() {
+    this.createWriteStream = this.createWriteStream.bind(this);
+    this.exists = this.exists.bind(this);
+    this.readDirectory = this.readDirectory.bind(this);
+    this.readFile = this.readFile.bind(this);
+    this.realpathSync = this.realpathSync.bind(this);
+    this.stat = this.stat.bind(this);
+  }
   // expected VSCode api, replacement of existsSync
   get hasRealFsAccess() {
     return true;

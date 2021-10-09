@@ -1,7 +1,7 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { CompletionFunctionParams } from '../../utils/addon-api';
 import * as memoize from 'memoizee';
-import { log, logError, logInfo } from '../../utils/logger';
+import { logError, logInfo, logDebugInfo } from '../../utils/logger';
 import Server from '../../server';
 import { Project } from '../../project';
 import * as t from '@babel/types';
@@ -52,9 +52,9 @@ export default class ScriptCompletionProvider {
       try {
         const initStartTime = Date.now();
 
-        mListModels(project);
+        await mListModels(project);
         this.enableRegistryCache('modelsRegistryInitialized');
-        mListServices(project);
+        await mListServices(project);
         this.enableRegistryCache('servicesRegistryInitialized');
         logInfo(project.root + ': script registry initialized in ' + (Date.now() - initStartTime) + 'ms');
       } catch (e) {
@@ -71,15 +71,15 @@ export default class ScriptCompletionProvider {
       return params.results;
     }
 
-    log('script:onComplete');
+    logDebugInfo('script:onComplete');
     const completions: CompletionItem[] = params.results;
 
     try {
       if (isStoreModelLookup(focusPath) || isModelReference(focusPath)) {
-        log('isStoreModelLookup || isModelReference');
+        logDebugInfo('isStoreModelLookup || isModelReference');
 
         if (!this.meta.modelsRegistryInitialized) {
-          mListModels(this.project);
+          await mListModels(this.project);
           this.enableRegistryCache('modelsRegistryInitialized');
         }
 
@@ -99,7 +99,7 @@ export default class ScriptCompletionProvider {
           });
         });
       } else if (isRouteLookup(focusPath)) {
-        log('isRouteLookup');
+        logDebugInfo('isRouteLookup');
 
         if (!this.meta.routesRegistryInitialized) {
           await mListRoutes(this.project);
@@ -122,10 +122,10 @@ export default class ScriptCompletionProvider {
           });
         });
       } else if (isNamedServiceInjection(focusPath)) {
-        log('isNamedServiceInjection');
+        logDebugInfo('isNamedServiceInjection');
 
         if (!this.meta.servicesRegistryInitialized) {
-          mListServices(this.project);
+          await mListServices(this.project);
           this.enableRegistryCache('servicesRegistryInitialized');
         }
 
@@ -145,7 +145,7 @@ export default class ScriptCompletionProvider {
           });
         });
       } else if (isComputedPropertyArgument(focusPath)) {
-        log('isComputedPropertyArgument');
+        logDebugInfo('isComputedPropertyArgument');
 
         if (!focusPath.parentPath || !focusPath.parentPath.parentPath) {
           return [];
@@ -154,7 +154,7 @@ export default class ScriptCompletionProvider {
         const node = closestScriptNodeParent(focusPath, 'ObjectExpression', ['ObjectProperty']) || closestScriptNodeParent(focusPath, 'ClassBody');
 
         if (node === null) {
-          log('isComputedPropertyArgument - unable to find keys');
+          logDebugInfo('isComputedPropertyArgument - unable to find keys');
 
           return [];
         }
@@ -177,10 +177,10 @@ export default class ScriptCompletionProvider {
           }
         });
       } else if (isTransformReference(focusPath)) {
-        log('isTransformReference');
+        logDebugInfo('isTransformReference');
 
         if (!this.meta.transformsRegistryInitialized) {
-          mListTransforms(this.project);
+          await mListTransforms(this.project);
           this.enableRegistryCache('transformsRegistryInitialized');
         }
 
@@ -201,10 +201,10 @@ export default class ScriptCompletionProvider {
         });
       }
     } catch (e) {
-      log('error', e);
+      logDebugInfo('error', e);
     }
 
-    log('completions', completions);
+    logDebugInfo('completions', completions);
 
     return completions;
   }

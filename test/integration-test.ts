@@ -37,6 +37,7 @@ describe('integration', function () {
     describe(`async fs enabled: ${asyncFsEnabled.toString()}`, function () {
       let connection: MessageConnection;
       let serverProcess: cp.ChildProcess;
+      let asyncFSProviderInstance!: any;
       const disposables: Disposable[] = [];
 
       beforeAll(async () => {
@@ -59,7 +60,8 @@ describe('integration', function () {
         connection.listen();
 
         if (asyncFsEnabled) {
-          disposables.push(await registerCommandExecutor(connection, asyncFSProvider()));
+          asyncFSProviderInstance = asyncFSProvider();
+          disposables.push(await registerCommandExecutor(connection, asyncFSProviderInstance));
         }
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -68,6 +70,10 @@ describe('integration', function () {
       afterAll(async () => {
         for (const item of disposables) {
           await item.dispose();
+        }
+
+        if (asyncFsEnabled) {
+          asyncFSProviderInstance = null;
         }
 
         await connection.dispose();
@@ -555,6 +561,14 @@ describe('integration', function () {
             },
             connection
           );
+
+          expect(project.result.initIssues.length).toEqual(0);
+          expect(project.result.name).toEqual('my-project');
+          expect(project.result.registry.component.hello.length).toEqual(3);
+
+          if (asyncFsEnabled) {
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // @to-do - figure out fails
+          }
 
           const data: { tokens: ITemplateTokens } = await connection.sendRequest((ExecuteCommandRequest.type as unknown) as string, {
             command: 'els.getLegacyTemplateTokens',

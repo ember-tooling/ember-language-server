@@ -86,7 +86,7 @@ export async function safeWalkAsync(filePath: string | false, opts: any) {
 export function getPodModulePrefix(root: string): string | null {
   let podModulePrefix = '';
 
-  // log('listPodsComponents');
+  // logDebugInfo('listPodsComponents');
   try {
     if (!getRequireSupport()) {
       return null;
@@ -98,14 +98,14 @@ export function getPodModulePrefix(root: string): string | null {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const appConfig = requireFunc(path.join(root, 'config', 'environment.js'));
 
-    // log('appConfig', appConfig);
+    // logDebugInfo('appConfig', appConfig);
     podModulePrefix = appConfig('development').podModulePrefix || '';
 
     if (podModulePrefix.includes('/')) {
       podModulePrefix = podModulePrefix.split('/').pop() as string;
     }
   } catch (e) {
-    // log('catch', e);
+    // logDebugInfo('catch', e);
     return null;
   }
 
@@ -284,7 +284,7 @@ export async function getProjectAddonsRoots(root: string, resolvedItems: string[
   const items = resolvedItems.length
     ? [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.peerDependencies || {})]
     : [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.peerDependencies || {}), ...Object.keys(pack.devDependencies || {})];
-  // log('items', items);
+  // logDebugInfo('items', items);
 
   const rawRoots = await Promise.all(
     items.map(async (item: string) => {
@@ -396,7 +396,7 @@ export async function getProjectAddonsInfo(root: string): Promise<void> {
 
   for (const packagePath of roots) {
     const info = await asyncGetPackageJSON(packagePath);
-    // log('info', info);
+    // logDebugInfo('info', info);
     const version = addonVersion(info);
 
     if (version === null) {
@@ -459,7 +459,7 @@ export async function hasNamespaceSupport(root: string) {
 }
 
 export async function listComponents(project: BaseProject): Promise<void> {
-  // log('listComponents');
+  // logDebugInfo('listComponents');
   const root = path.resolve(project.root);
   const scriptEntry = path.join(root, 'app', 'components');
   const templateEntry = path.join(root, 'app', 'templates', 'components');
