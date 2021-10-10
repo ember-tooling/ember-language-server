@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/lifeart/ember-language-server/compare/v2.2.0...v2.2.1) (2021-10-10)
+
+
+### Bug Fixes
+
+* worker bundling errors ([634316e](https://github.com/lifeart/ember-language-server/commit/634316e6d47ce2ebd1619349d719e893583f5227))
+
 # [2.2.0](https://github.com/lifeart/ember-language-server/compare/v2.1.0...v2.2.0) (2021-10-09)
 
 
