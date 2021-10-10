@@ -1,8 +1,8 @@
 import { SymbolInformation, SymbolKind } from 'vscode-languageserver/node';
 import { preprocess, traverse, ASTv1 } from '@glimmer/syntax';
-import { log } from './../utils/logger';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';
+import { logDebugInfo } from '../utils/logger';
 
 export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.hbs'];
@@ -50,7 +50,7 @@ export default class HBSDocumentSymbolProvider implements DocumentSymbolProvider
         },
       });
     } catch (e) {
-      log('symbolprovider:template:error', e, e.toString(), e.stack);
+      logDebugInfo('symbolprovider:template:error', e, e.toString(), e.stack);
     }
 
     return symbols;

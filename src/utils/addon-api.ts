@@ -106,8 +106,8 @@ let requireFunc: any = {
 };
 
 try {
-  // @ts-expect-error @todo - fix webpack imports
   requireFunc =
+    // @ts-expect-error @todo - fix webpack imports
     typeof __webpack_require__ === 'function'
       ? // @ts-expect-error @todo - fix webpack imports
         __non_webpack_require__

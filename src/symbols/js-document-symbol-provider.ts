@@ -2,7 +2,7 @@ import { SymbolInformation, SymbolKind } from 'vscode-languageserver/node';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';
-import { log } from './../utils/logger';
+import { logDebugInfo } from '../utils/logger';
 import { visit } from 'ast-types';
 
 export default class JSDocumentSymbolProvider implements DocumentSymbolProvider {
@@ -26,7 +26,7 @@ export default class JSDocumentSymbolProvider implements DocumentSymbolProvider 
         },
       });
     } catch (e) {
-      log('symbolprovider:script:error', e, e.toString(), e.stack);
+      logDebugInfo('symbolprovider:script:error', e, e.toString(), e.stack);
     }
 
     return symbols;

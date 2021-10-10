@@ -110,8 +110,13 @@ export default class ProjectRoots {
     await this.findProjectsInsideRoot(this.workspaceRoot);
   }
 
+  // @todo figure out better solution
+  _fixRemoveFSArtifacts(fPath: string) {
+    return fPath.replace('/\\', '/');
+  }
+
   async onProjectAdd(rawPath: string) {
-    const projectPath = path.resolve(URI.parse(rawPath).fsPath);
+    const projectPath = this._fixRemoveFSArtifacts(path.resolve(URI.parse(rawPath).fsPath));
 
     if (this.projects.has(projectPath)) {
       const project = this.projects.get(projectPath) as Project;

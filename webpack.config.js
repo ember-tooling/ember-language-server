@@ -2,6 +2,9 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+
 
 const buildName = process.env.npm_lifecycle_event;
 // build:bundle:node
@@ -53,20 +56,26 @@ const workerBundleConfig = /** @type WebpackConfig */ {
     libraryTarget: 'var',
     library: 'serverExportVar',
   },
+  plugins: [
+		new NodePolyfillPlugin({
+			// excludeAliases: ["console"]
+      excludeAliases: []
+		})
+	],
   resolve: {
     mainFields: ['module', 'main'],
     extensions: ['.ts', '.js'], // support ts-files and js-files
     alias: {},
     fallback: {
-      path: require.resolve("path-browserify"),
-      util: false,
-      os: false,
+    //   path: require.resolve("path-browserify"),
+    //   util: false,
+    //   os: false,
       fs: false,
-      tty: false,
-      assert: false,
+    //   tty: false,
+    //   assert: false,
       debug: false,
       net: false,
-      stream: false,
+    //   stream: false,
     },
   },
   module: {
