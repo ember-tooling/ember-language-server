@@ -26,7 +26,7 @@
   "typings": "lib/index.d.ts",
   "dependencies": {
     "@glimmer/syntax": "^0.73.1",
-    "@lifeart/ember-extract-inline-templates": "^2.0.0",
+    "@lifeart/ember-extract-inline-templates": "2.1.0",
     "ast-types": "^0.14.2",
     "dag-map": "^2.0.2",
     "ember-meta-explorer": "1.1.0",
