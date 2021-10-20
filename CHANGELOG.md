@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/lifeart/ember-language-server/compare/v2.2.2...v2.3.0) (2021-10-20)
+
+
+### Features
+
+* builtin intl completion provider ([#318](https://github.com/lifeart/ember-language-server/issues/318)) ([12132e9](https://github.com/lifeart/ember-language-server/commit/12132e94364991e58a94d649da3e17a56427f405))
+
 ## [2.2.2](https://github.com/lifeart/ember-language-server/compare/v2.2.1...v2.2.2) (2021-10-16)
 
 
