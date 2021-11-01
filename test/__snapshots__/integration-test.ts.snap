@@ -230,21 +230,19 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "contents": "foo",
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
+  "response": Object {
+    "contents": "foo",
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
       },
     },
-  ],
+  },
 }
 `;
 
@@ -3247,21 +3245,19 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "contents": "foo",
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
+  "response": Object {
+    "contents": "foo",
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
       },
     },
-  ],
+  },
 }
 `;
 

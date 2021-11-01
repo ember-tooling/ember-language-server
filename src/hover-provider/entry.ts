@@ -4,11 +4,11 @@ import { queryELSAddonsAPIChain } from './../utils/addon-api';
 
 export class HoverProvider {
   constructor(private server: Server) {}
-  async provideHovers({ textDocument, position }: HoverParams): Promise<Hover[]> {
+  async provideHover({ textDocument, position }: HoverParams): Promise<Hover | null> {
     const project = this.server.projectRoots.projectForUri(textDocument.uri);
 
     if (!project) {
-      return [];
+      return null;
     }
 
     const addonResults = await queryELSAddonsAPIChain(project.providers.hoverProviders, project.root, {
@@ -18,6 +18,10 @@ export class HoverProvider {
       server: this.server,
     });
 
-    return addonResults;
+    if (addonResults.length) {
+      return addonResults[0];
+    }
+
+    return null;
   }
 }

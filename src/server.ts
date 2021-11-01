@@ -670,8 +670,8 @@ export default class Server {
     return await this.referenceProvider.provideReferences(params);
   }
 
-  private async onHover(params: HoverParams): Promise<Hover[]> {
-    return await this.hoverProvider.provideHovers(params);
+  private async onHover(params: HoverParams): Promise<Hover | null> {
+    return await this.hoverProvider.provideHover(params);
   }
 
   private async onCompletionResolve(item: CompletionItem) {
