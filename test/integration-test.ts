@@ -27,6 +27,7 @@ import {
   ExecuteCommandRequest,
   ReferencesRequest,
   Disposable,
+  HoverRequest,
 } from 'vscode-languageserver-protocol/node';
 import { ITemplateTokens } from '../src/utils/usages-api';
 
@@ -1294,6 +1295,53 @@ describe('integration', function () {
                       entry: './lib/langserver',
                       capabilities: {
                         referencesProvider: true,
+                      },
+                    },
+                  }),
+                },
+              },
+              'package.json': JSON.stringify({
+                dependencies: {
+                  provider: '*',
+                },
+              }),
+              app: {
+                components: {
+                  hello: {
+                    'index.hbs': '{{this}}',
+                  },
+                },
+              },
+            },
+            'app/components/hello/index.hbs',
+            { line: 0, character: 3 }
+          );
+
+          expect(result).toMatchSnapshot();
+        });
+      });
+
+      describe('Able to provide API:Hover', () => {
+        it('support dummy addon hover:template', async () => {
+          const result = await getResult(
+            HoverRequest.type,
+            connection,
+            {
+              node_modules: {
+                provider: {
+                  lib: {
+                    'langserver.js': `
+                      module.exports.onHover = function(root) {
+                        return [ { contents: "foo", range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } } } ];
+                      }
+                    `,
+                  },
+                  'package.json': JSON.stringify({
+                    name: 'provider',
+                    'ember-language-server': {
+                      entry: './lib/langserver',
+                      capabilities: {
+                        hoverProvider: true,
                       },
                     },
                   }),

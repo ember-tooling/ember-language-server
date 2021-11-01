@@ -5,13 +5,31 @@ import { toDiagnostic, toHbsSource } from './utils/diagnostic';
 import { getTemplateNodes } from '@lifeart/ember-extract-inline-templates';
 import { parseScriptFile } from 'ember-meta-explorer';
 import { URI } from 'vscode-uri';
-import { log, logError } from './utils/logger';
+import { log, logError, logDebugInfo } from './utils/logger';
 import * as findUp from 'find-up';
 import * as path from 'path';
 
 import Server from './server';
 import { Project } from './project';
 import { getRequireSupport } from './utils/layout-helpers';
+
+type LinterVerifyArgs = { source: string; moduleId: string; filePath: string };
+class Linter {
+  constructor() {
+    return this;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  verify(_params: LinterVerifyArgs): TemplateLinterError[] {
+    return [];
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  verifyAndFix(_params: LinterVerifyArgs): { isFixed: boolean; output: string } {
+    return {
+      output: '',
+      isFixed: true,
+    };
+  }
+}
 
 export interface TemplateLinterError {
   fatal?: boolean;
@@ -37,7 +55,7 @@ function setCwd(cwd: string) {
 }
 
 export default class TemplateLinter {
-  private _linterCache = new Map<Project, any>();
+  private _linterCache = new Map<Project, typeof Linter>();
   private _isEnabled = true;
 
   constructor(private server: Server) {
@@ -124,13 +142,21 @@ export default class TemplateLinter {
 
     const TemplateLinterKlass = await this.getLinter(project);
 
-    let linter: typeof TemplateLinterKlass | null = null;
+    if (!TemplateLinterKlass) {
+      return;
+    }
+
+    let linter: Linter;
 
     try {
       setCwd(project.root);
       linter = new TemplateLinterKlass();
     } catch (e) {
-      setCwd(cwd);
+      try {
+        setCwd(cwd);
+      } catch (e) {
+        logDebugInfo(e.stack);
+      }
 
       return;
     }
@@ -159,7 +185,11 @@ export default class TemplateLinter {
       logError(e);
     }
 
-    setCwd(cwd);
+    try {
+      setCwd(cwd);
+    } catch (e) {
+      logDebugInfo(e.stack);
+    }
 
     return diagnostics;
   }
@@ -171,7 +201,7 @@ export default class TemplateLinter {
     return await this.getLinter(project);
   }
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  private async getLinter(project: Project) {
+  private async getLinter(project: Project): Promise<typeof Linter | undefined> {
     if (this._linterCache.has(project)) {
       return this._linterCache.get(project);
     }
@@ -210,7 +240,7 @@ export default class TemplateLinter {
       const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const linter = requireFunc(linterPath);
+      const linter: typeof Linter = requireFunc(linterPath);
 
       this._linterCache.set(project, linter);
 

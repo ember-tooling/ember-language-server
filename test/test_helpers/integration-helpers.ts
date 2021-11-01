@@ -8,7 +8,7 @@ import * as spawn from 'cross-spawn';
 import { set, merge, get } from 'lodash';
 import { AddonMeta } from '../../src/utils/addon-api';
 import { CompletionItem } from 'vscode-languageserver/node';
-import { DefinitionRequest, DocumentSymbol, DocumentSymbolRequest, ReferencesRequest } from 'vscode-languageserver-protocol/node';
+import { DefinitionRequest, DocumentSymbol, DocumentSymbolRequest, Hover, HoverRequest, ReferencesRequest } from 'vscode-languageserver-protocol/node';
 
 import {
   DidOpenTextDocumentNotification,
@@ -399,6 +399,14 @@ function _buildResponse<T>(response: T, normalizedPath: string, result: UnknownR
   return content;
 }
 
+export async function getResult(
+  reqType: typeof HoverRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect: string,
+  position: { line: number; character: number },
+  projectName: string[]
+): Promise<IResponse<Hover[]>[]>;
 export async function getResult(
   reqType: typeof CompletionRequest.method,
   connection: MessageConnection,

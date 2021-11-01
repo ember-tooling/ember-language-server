@@ -8,6 +8,7 @@ import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath, safeWalk
 import Server from './server';
 
 import { Project } from './project';
+import { emptyProjectProviders } from './utils/addon-api';
 
 export default class ProjectRoots {
   constructor(private server: Server) {}
@@ -146,15 +147,7 @@ export default class ProjectRoots {
 
         return {
           initIssues: [`Unable to create project "${info.name}", because it ignored according to config: [${this.ignoredProjects.join(',')}]`],
-          providers: {
-            definitionProviders: [],
-            referencesProviders: [],
-            completionProviders: [],
-            codeActionProviders: [],
-            initFunctions: [],
-            info: [],
-            addonsMeta: [],
-          },
+          providers: emptyProjectProviders(),
           addonsMeta: [],
           name: info.name,
           registry: {},
@@ -181,15 +174,7 @@ export default class ProjectRoots {
 
       return {
         initIssues: [e.toString(), e.stack],
-        providers: {
-          definitionProviders: [],
-          referencesProviders: [],
-          completionProviders: [],
-          codeActionProviders: [],
-          initFunctions: [],
-          info: [],
-          addonsMeta: [],
-        },
+        providers: emptyProjectProviders(),
         addonsMeta: [],
         name: `[${projectPath}]`,
         registry: {},

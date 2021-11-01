@@ -1,4 +1,4 @@
-import { Location, TextDocumentIdentifier, Command, CodeActionParams, CodeAction, Position, CompletionItem } from 'vscode-languageserver/node';
+import { Location, TextDocumentIdentifier, Command, CodeActionParams, CodeAction, Position, CompletionItem, Hover } from 'vscode-languageserver/node';
 import {
   getProjectAddonsRoots,
   getProjectInRepoAddonsRoots,
@@ -30,6 +30,10 @@ interface ExtendedAPIParams extends BaseAPIParams {
 export interface ReferenceFunctionParams extends BaseAPIParams {
   results: Location[];
 }
+
+export interface HoverFunctionParams extends BaseAPIParams {
+  results: Hover[];
+}
 export interface CompletionFunctionParams extends ExtendedAPIParams {
   results: CompletionItem[];
 }
@@ -42,6 +46,8 @@ export interface CodeActionFunctionParams extends CodeActionParams {
 }
 
 type ReferenceResolveFunction = (root: string, params: ReferenceFunctionParams) => Promise<Location[]>;
+
+type HoverResolveFunction = (root: string, params: HoverFunctionParams) => Promise<Hover[]>;
 type CompletionResolveFunction = (root: string, params: CompletionFunctionParams) => Promise<CompletionItem[]>;
 type DefinitionResolveFunction = (root: string, params: DefinitionFunctionParams) => Promise<Location[]>;
 type CodeActionResolveFunction = (root: string, params: CodeActionFunctionParams) => Promise<(Command | CodeAction)[] | undefined | null>;
@@ -55,6 +61,7 @@ export interface AddonAPI {
 }
 
 interface PublicAddonAPI {
+  onHover?: HoverResolveFunction;
   onReference?: ReferenceResolveFunction;
   onComplete?: CompletionResolveFunction;
   onDefinition?: DefinitionResolveFunction;
@@ -159,6 +166,10 @@ function requireUncached(module: string) {
         instanceResult.onReference = instance.onReference.bind(instance);
       }
 
+      if (typeof instance.onHover === 'function') {
+        instanceResult.onHover = instance.onHover.bind(instance);
+      }
+
       return instanceResult;
     }
   } catch (e) {
@@ -220,19 +231,13 @@ export async function collectProjectProviders(root: string, addons: string[]): P
     referencesProviders: ReferenceResolveFunction[];
     completionProviders: CompletionResolveFunction[];
     codeActionProviders: CodeActionResolveFunction[];
+    hoverProviders: HoverResolveFunction[];
     initFunctions: InitFunction[];
     info: string[];
     addonsMeta: AddonMeta[];
-  } = {
-    definitionProviders: [],
-    referencesProviders: [],
-    completionProviders: [],
-    codeActionProviders: [],
-    initFunctions: [],
-    info: [],
+  } = emptyProjectProviders({
     addonsMeta,
-  };
-
+  });
   // onReference, onComplete, onDefinition
 
   dagMap.each((_, handlerObject) => {
@@ -262,6 +267,15 @@ export async function collectProjectProviders(root: string, addons: string[]): P
           return params.results;
         }
       } as ReferenceResolveFunction);
+      result.hoverProviders.push(function (root: string, params: HoverFunctionParams) {
+        handlerObject.updateHandler();
+
+        if (typeof handlerObject.handler.onHover === 'function') {
+          return handlerObject.handler.onHover(root, params);
+        } else {
+          return params.results;
+        }
+      } as HoverResolveFunction);
       result.definitionProviders.push(function (root: string, params: DefinitionFunctionParams) {
         handlerObject.updateHandler();
 
@@ -300,6 +314,10 @@ export async function collectProjectProviders(root: string, addons: string[]): P
         result.referencesProviders.push(handlerObject.handler.onReference);
       }
 
+      if (handlerObject.capabilities.hoverProvider && typeof handlerObject.handler.onHover === 'function') {
+        result.hoverProviders.push(handlerObject.handler.onHover);
+      }
+
       if (handlerObject.capabilities.definitionProvider && typeof handlerObject.handler.onDefinition === 'function') {
         result.definitionProviders.push(handlerObject.handler.onDefinition);
       }
@@ -320,19 +338,21 @@ export async function collectProjectProviders(root: string, addons: string[]): P
 export type AddonMeta = { root: string; name: string; version: null | 1 | 2 };
 export type DependencyMeta = { name: string; version: string };
 
-export function emptyProjectProviders(): ProjectProviders {
+export function emptyProjectProviders(providers?: Partial<ProjectProviders>): ProjectProviders {
   return {
-    definitionProviders: [],
-    referencesProviders: [],
-    completionProviders: [],
-    codeActionProviders: [],
-    initFunctions: [],
-    info: [],
-    addonsMeta: [],
+    definitionProviders: providers?.definitionProviders ?? [],
+    hoverProviders: providers?.hoverProviders ?? [],
+    referencesProviders: providers?.referencesProviders ?? [],
+    completionProviders: providers?.completionProviders ?? [],
+    codeActionProviders: providers?.codeActionProviders ?? [],
+    initFunctions: providers?.initFunctions ?? [],
+    info: providers?.info ?? [],
+    addonsMeta: providers?.addonsMeta ?? [],
   };
 }
 
 export interface ProjectProviders {
+  hoverProviders: HoverResolveFunction[];
   definitionProviders: DefinitionResolveFunction[];
   referencesProviders: ReferenceResolveFunction[];
   completionProviders: CompletionResolveFunction[];
@@ -343,6 +363,7 @@ export interface ProjectProviders {
 }
 
 export interface ExtensionCapabilities {
+  hoverProvider: undefined | true | false;
   definitionProvider: undefined | true | false;
   codeActionProvider: undefined | true | false;
   referencesProvider:
@@ -355,6 +376,7 @@ export interface ExtensionCapabilities {
 }
 
 interface NormalizedCapabilities {
+  hoverProvider: true | false;
   definitionProvider: true | false;
   referencesProvider: true | false;
   completionProvider: true | false;
@@ -363,6 +385,7 @@ interface NormalizedCapabilities {
 
 function normalizeCapabilities(raw: ExtensionCapabilities): NormalizedCapabilities {
   return {
+    hoverProvider: raw.hoverProvider === true,
     definitionProvider: raw.definitionProvider === true,
     codeActionProvider: raw.codeActionProvider === true,
     referencesProvider: raw.referencesProvider === true || (typeof raw.referencesProvider === 'object' && raw.referencesProvider.components === true),

@@ -214,6 +214,40 @@ Object {
 }
 `;
 
+exports[`integration async fs enabled: false Able to provide API:Hover support dummy addon hover:template 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "contents": "foo",
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+    },
+  ],
+}
+`;
+
 exports[`integration async fs enabled: false Able to provide API:Reference support dummy addon reference:template 1`] = `
 Object {
   "addonsMeta": Array [
@@ -2758,6 +2792,7 @@ Object {
         "els.reloadProject",
       ],
     },
+    "hoverProvider": true,
     "referencesProvider": true,
     "textDocumentSync": 1,
     "workspace": Object {
@@ -3191,6 +3226,40 @@ Object {
         },
       },
       "uri": "/app/components/hello/index.hbs",
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide API:Hover support dummy addon hover:template 1`] = `
+Object {
+  "addonsMeta": Array [
+    Object {
+      "name": "provider",
+      "root": "node_modules/provider",
+      "version": null,
+    },
+  ],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "contents": "foo",
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
     },
   ],
 }
@@ -5740,6 +5809,7 @@ Object {
         "els.reloadProject",
       ],
     },
+    "hoverProvider": true,
     "referencesProvider": true,
     "textDocumentSync": 1,
     "workspace": Object {

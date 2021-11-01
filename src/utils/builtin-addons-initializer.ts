@@ -50,6 +50,7 @@ export function initBuiltinProviders(addonsMeta: AddonMeta[]): ProjectProviders 
     definitionProviders,
     referencesProviders,
     codeActionProviders,
+    hoverProviders: [],
     initFunctions,
     info: [],
     addonsMeta: [],

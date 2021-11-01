@@ -4,6 +4,7 @@ module.exports = {
   },
   testRegex: '-test\\.ts$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  testTimeout: 15000,
   globals: {
     'ts-jest': {
       diagnostics: false,

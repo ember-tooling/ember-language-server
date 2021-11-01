@@ -30,6 +30,8 @@ import {
   ExecuteCommandParams,
   TextDocumentChangeEvent,
   ExecuteCommandRequest,
+  HoverParams,
+  Hover,
 } from 'vscode-languageserver';
 
 import ProjectRoots from './project-roots';
@@ -62,6 +64,7 @@ import { debounce } from 'lodash';
 import { Config, Initializer } from './types';
 import { asyncGetJSON, isFileBelongsToRoots, mGetProjectAddonsInfo, setRequireSupport, setSyncFSSupport } from './utils/layout-helpers';
 import FSProvider, { AsyncFsProvider, setFSImplementation } from './fs-provider';
+import { HoverProvider } from './hover-provider/entry';
 
 export interface IServerConfig {
   local: Config;
@@ -151,6 +154,7 @@ export default class Server {
   templateLinter!: TemplateLinter;
 
   referenceProvider!: ReferenceProvider;
+  hoverProvider!: HoverProvider;
   codeActionProvider!: CodeActionProvider;
   async executeInitializers() {
     logInfo('UELS: executeInitializers');
@@ -387,6 +391,7 @@ export default class Server {
     this.scriptCompletionProvider = new ScriptCompletionProvider(this);
     this.definitionProvider = new DefinitionProvider(this);
     this.referenceProvider = new ReferenceProvider(this);
+    this.hoverProvider = new HoverProvider(this);
     this.codeActionProvider = new CodeActionProvider(this);
 
     this.documents.listen(this.connection);
@@ -407,6 +412,7 @@ export default class Server {
     this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
     this.connection.onExecuteCommand(this.onExecute.bind(this));
     this.connection.onReferences(this.onReference.bind(this));
+    this.connection.onHover(this.onHover.bind(this));
     this.connection.onCodeAction(this.onCodeAction.bind(this));
     this.connection.telemetry.logEvent({ connected: true });
   }
@@ -536,6 +542,7 @@ export default class Server {
         documentSymbolProvider: true,
         codeActionProvider: true,
         referencesProvider: true,
+        hoverProvider: true,
         workspace: {
           workspaceFolders: {
             supported: true,
@@ -661,6 +668,10 @@ export default class Server {
 
   private async onReference(params: ReferenceParams): Promise<Location[]> {
     return await this.referenceProvider.provideReferences(params);
+  }
+
+  private async onHover(params: HoverParams): Promise<Hover[]> {
+    return await this.hoverProvider.provideHovers(params);
   }
 
   private async onCompletionResolve(item: CompletionItem) {

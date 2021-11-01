@@ -35,7 +35,7 @@ export default class TemplateLintFixesCodeAction extends BaseCodeActionProvider 
         async (issue): Promise<null | CodeAction> => {
           const { output, isFixed } = await Promise.resolve(
             linter.verifyAndFix({
-              source: meta.selection,
+              source: meta.selection || '',
               moduleId: URI.parse(params.textDocument.uri).fsPath,
               filePath: URI.parse(params.textDocument.uri).fsPath,
             })
