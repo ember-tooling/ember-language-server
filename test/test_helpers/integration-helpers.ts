@@ -44,6 +44,7 @@ export function startServer(asyncFs = false) {
 export type UnknownResult = Record<string, unknown> & {
   registry: IRegistry;
   initIssues: string[];
+  addonsMeta: { name: string; root: string }[];
 };
 
 export type Registry = {

@@ -49,6 +49,7 @@ export interface PackageInfo {
     paths?: string[];
     before?: string | string[];
     after?: string | string[];
+    'app-js'?: string | Record<string, string>;
   };
 }
 
@@ -420,6 +421,51 @@ export async function getProjectAddonsInfo(root: string): Promise<void> {
         listServices(localProject),
         listModifiers(localProject),
       ]);
+    } else if (version === 2) {
+      const appExports = info?.['ember-addon']?.['app-js'] ?? {};
+
+      // https://github.com/embroider-build/embroider/blob/fe30c4c5a942e608c81082433940b530bfd6a7b2/SPEC.md#app-javascript
+      if (typeof appExports !== 'string') {
+        const localProject = new BaseProject(packagePath);
+
+        localProject['classicMatcher'].setIgnores([]);
+        localProject['podMatcher'].setIgnores([]);
+
+        const appExportedPaths = Object.keys(appExports);
+
+        appExportedPaths.forEach((el) => {
+          const entry = path.join(localProject.root, 'app', el);
+          const meta = localProject.matchPathToType(entry);
+
+          if (meta) {
+            const normalizedItem = normalizeMatchNaming(meta);
+
+            addToRegistry(normalizedItem.name, normalizedItem.type, [path.join(localProject.root, appExports[el])]);
+          }
+        });
+      } else {
+        const entry = path.join(packagePath, appExports);
+        const files = await safeWalkAsync(entry, {
+          directories: false,
+          globs: ['**/*.js', '**/*.ts', '**/*.hbs'],
+        });
+
+        const localProject = new BaseProject(entry);
+
+        localProject['classicMatcher'].setIgnores([]);
+        localProject['podMatcher'].setIgnores([]);
+
+        files.forEach((el) => {
+          const entry = path.join(localProject.root, el);
+          const meta = localProject.matchPathToType(entry);
+
+          if (meta) {
+            const normalizedItem = normalizeMatchNaming(meta);
+
+            addToRegistry(normalizedItem.name, normalizedItem.type, [entry]);
+          }
+        });
+      }
     }
   }
 }

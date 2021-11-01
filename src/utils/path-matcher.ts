@@ -42,6 +42,9 @@ export class ClassicPathMatcher {
     util: ['/utils/'],
   };
   ignores = ['/tmp/', '/dist/', '/.git/'];
+  setIgnores(ignores: string[]) {
+    this.ignores = ignores;
+  }
   matchKey(key: string, str: string) {
     const isIgnored = this.ignores.find((el) => str.includes(el));
 

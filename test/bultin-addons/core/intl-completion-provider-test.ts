@@ -1,9 +1,6 @@
-import * as cp from 'child_process';
-import { Readable, Writable } from 'stream';
-import { createMessageConnection, Disposable, Logger, MessageConnection } from 'vscode-jsonrpc';
-import { StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
+import { MessageConnection } from 'vscode-jsonrpc';
 import { CompletionRequest } from 'vscode-languageserver-protocol';
-import { asyncFSProvider, getResult, initServer, makeProject, registerCommandExecutor, startServer } from '../../test_helpers/integration-helpers';
+import { createServer, ServerBucket, getResult, makeProject } from '../../test_helpers/public-integration-helpers';
 
 const testCaseAsyncFsOptions = [false, true];
 const translations = {
@@ -22,56 +19,16 @@ const translations = {
 
 for (const asyncFsEnabled of testCaseAsyncFsOptions) {
   describe(`Intl - async fs enabled: ${asyncFsEnabled.toString()}`, function () {
-    let connection: MessageConnection;
-    let serverProcess: cp.ChildProcess;
-    let asyncFSProviderInstance!: any;
-    const disposables: Disposable[] = [];
+    let instance!: ServerBucket;
+    let connection!: MessageConnection;
 
     beforeAll(async () => {
-      serverProcess = startServer(asyncFsEnabled);
-      connection = createMessageConnection(
-        new StreamMessageReader(serverProcess.stdout as Readable),
-        new StreamMessageWriter(serverProcess.stdin as Writable),
-        <Logger>{
-          error(msg) {
-            console.log('error', msg);
-          },
-          log(msg) {
-            console.log('log', msg);
-          },
-          info(msg) {
-            console.log('info', msg);
-          },
-          warn(msg) {
-            console.log('warn', msg);
-          },
-        }
-      );
-      connection.listen();
-
-      if (asyncFsEnabled) {
-        asyncFSProviderInstance = asyncFSProvider();
-        disposables.push(await registerCommandExecutor(connection, asyncFSProviderInstance));
-      }
-
-      await initServer(connection, 'full-project');
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      instance = await createServer({ asyncFsEnabled: asyncFsEnabled });
+      connection = instance.connection;
     });
 
     afterAll(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      for (const item of disposables) {
-        await item.dispose();
-      }
-
-      if (asyncFsEnabled) {
-        asyncFSProviderInstance = null;
-      }
-
-      await connection.dispose();
-      await serverProcess.kill();
+      await instance.destroy();
     });
 
     describe('empty autocomplete', () => {
@@ -378,7 +335,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
                 translations: {
                   'en-us.yaml': `rootFileTranslation: text 1`,
                   'sub-folder': {
-                    'en-us.yaml': `subFolderTranslation: 
+                    'en-us.yaml': `subFolderTranslation:
                         subTranslation: text 2
                         anotherTranslation: another text
                       `,
@@ -426,7 +383,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
                 translations: {
                   'en-us.yaml': `rootFileTranslation: text 1`,
                   'sub-folder': {
-                    'en-us.yaml': `subFolderTranslation: 
+                    'en-us.yaml': `subFolderTranslation:
                         subTranslation: text 2
                         anotherTranslation: another text
                       `,
