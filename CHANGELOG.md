@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/lifeart/ember-language-server/compare/v2.3.0...v2.4.0) (2021-11-01)
+
+
+### Features
+
+* addon-api hover provider ([#327](https://github.com/lifeart/ember-language-server/issues/327)) ([3b739f5](https://github.com/lifeart/ember-language-server/commit/3b739f5509e320334ecef302e6137bfe64800556))
+
 # [2.3.0](https://github.com/lifeart/ember-language-server/compare/v2.2.2...v2.3.0) (2021-10-20)
 
 
