@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/lifeart/ember-language-server/compare/v2.4.0...v2.4.1) (2021-11-01)
+
+
+### Bug Fixes
+
+* hover provider ([#332](https://github.com/lifeart/ember-language-server/issues/332)) ([99b360b](https://github.com/lifeart/ember-language-server/commit/99b360b94fed7cda891971c4acd77a1b62c592cf))
+
 # [2.4.0](https://github.com/lifeart/ember-language-server/compare/v2.3.0...v2.4.0) (2021-11-01)
 
 
