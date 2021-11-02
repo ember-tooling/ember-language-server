@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/lifeart/ember-language-server/compare/v2.4.1...v2.4.2) (2021-11-02)
+
+
+### Bug Fixes
+
+* template provider position mutation ([#333](https://github.com/lifeart/ember-language-server/issues/333)) ([ceaf863](https://github.com/lifeart/ember-language-server/commit/ceaf863a788e713acfd76ac4bd904f26b4547d52))
+
 ## [2.4.1](https://github.com/lifeart/ember-language-server/compare/v2.4.0...v2.4.1) (2021-11-01)
 
 
