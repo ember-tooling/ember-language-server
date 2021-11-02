@@ -50,6 +50,11 @@ export default class ScriptCompletionProvider {
 
     let textPrefix = focusPath.node.value || '';
 
+    // it's likely hbs template literal, no specific prefix to autocomplete
+    if (focusPath.node.type === 'TemplateElement') {
+      textPrefix = '';
+    }
+
     if (typeof textPrefix !== 'string') {
       if (textPrefix.raw) {
         textPrefix = textPrefix.raw || '';
@@ -58,10 +63,12 @@ export default class ScriptCompletionProvider {
       }
     }
 
+    const position = Object.freeze({ ...params.position });
+
     const completions: CompletionItem[] = await queryELSAddonsAPIChain(project.builtinProviders.completionProviders, root, {
       focusPath,
       textDocument: params.textDocument,
-      position: params.position,
+      position,
       server: this.server,
       results: [],
       type: 'script',
@@ -70,7 +77,7 @@ export default class ScriptCompletionProvider {
     const addonResults: CompletionItem[] = await queryELSAddonsAPIChain(project.providers.completionProviders, root, {
       focusPath,
       textDocument: params.textDocument,
-      position: params.position,
+      position,
       server: this.server,
       results: completions,
       type: 'script',
