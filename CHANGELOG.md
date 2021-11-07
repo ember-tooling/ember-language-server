@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/lifeart/ember-language-server/compare/v2.4.2...v2.5.0) (2021-11-07)
+
+
+### Features
+
+* Intl definition provider for yaml & json ([#334](https://github.com/lifeart/ember-language-server/issues/334)) ([96e53e6](https://github.com/lifeart/ember-language-server/commit/96e53e60a7fc7fd225b66a430a1645681433802d))
+
 ## [2.4.2](https://github.com/lifeart/ember-language-server/compare/v2.4.1...v2.4.2) (2021-11-02)
 
 
