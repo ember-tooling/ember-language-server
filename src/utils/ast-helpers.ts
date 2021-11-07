@@ -405,6 +405,25 @@ export function isModelReference(astPath: ASTPath): boolean {
   return expressionHasIdentifierName(parent, ['belongsTo', 'hasMany']);
 }
 
+export function isLocalizationHelperTranslataionName(focusPath: ASTPath, type: 'script' | 'template'): boolean {
+  const parent = focusPath.parent;
+
+  if (!parent) {
+    return false;
+  }
+
+  if (type === 'script' && isString(focusPath.node)) {
+    const isMemberExp = isCallExpression(parent) && parent.callee && parent.callee.type === 'MemberExpression';
+    const hasValidCallee = isMemberExp && expressionHasIdentifierName(parent, 't');
+
+    return hasValidCallee && expressionHasArgument(parent, focusPath.node, 0);
+  }
+
+  return (
+    type === 'template' && isString(focusPath.node) && (parent.type === 'MustacheStatement' || parent.type === 'SubExpression') && parent.path.original === 't'
+  );
+}
+
 function hasNodeType(node: any, type: string) {
   if (!node) {
     return false;

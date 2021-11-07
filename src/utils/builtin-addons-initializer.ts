@@ -8,6 +8,7 @@ import TemplateCompletionProvider from './../builtin-addons/core/template-comple
 import IntlCompletionProvider from '../builtin-addons/core/intl-completion-provider';
 import { AddonMeta, ProjectProviders } from './addon-api';
 import { logInfo } from './logger';
+import IntlDefinitionProvider from '../builtin-addons/core/intl-definition-provider';
 
 export function initBuiltinProviders(addonsMeta: AddonMeta[]): ProjectProviders {
   const scriptDefinition = new CoreScriptDefinitionProvider();
@@ -18,8 +19,13 @@ export function initBuiltinProviders(addonsMeta: AddonMeta[]): ProjectProviders 
   const templateLintFixesCodeAction = new TemplateLintFixesCodeAction();
   const templateLintCommentsCodeAction = new TemplateLintCommentsCodeAction();
   const typedTemplatesCodeAction = new TypedTemplatesCodeAction();
+  const intlDefinition = new IntlDefinitionProvider();
 
-  const definitionProviders = [scriptDefinition.onDefinition.bind(scriptDefinition), templateDefinition.onDefinition.bind(templateDefinition)];
+  const definitionProviders = [
+    scriptDefinition.onDefinition.bind(scriptDefinition),
+    templateDefinition.onDefinition.bind(templateDefinition),
+    intlDefinition.onDefinition.bind(intlDefinition),
+  ];
   const referencesProviders: any[] = [];
   const codeActionProviders = [
     templateLintFixesCodeAction.onCodeAction.bind(templateLintFixesCodeAction),
@@ -34,6 +40,7 @@ export function initBuiltinProviders(addonsMeta: AddonMeta[]): ProjectProviders 
     scriptCompletion.initRegistry.bind(scriptCompletion),
     templateDefinition.onInit.bind(templateDefinition),
     scriptDefinition.onInit.bind(scriptDefinition),
+    intlDefinition.onInit.bind(intlDefinition),
   ];
   const completionProviders = [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)];
 
