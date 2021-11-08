@@ -216,6 +216,7 @@ describe('ClassicPathMatcher', () => {
     });
 
     expect(m('frontend/app/components/audio-player/styles.css')).toEqual({ type: 'component', name: 'audio-player', scope: 'application', kind: 'style' });
+    expect(m('app/components/ui/bottom-container/style.css')).toEqual({ type: 'component', name: 'ui/bottom-container', scope: 'application', kind: 'style' });
     expect(m('frontend/app/components/audio-player/styles.css')).toEqual({ type: 'component', name: 'audio-player', scope: 'application', kind: 'style' });
     expect(m('frontend/app/components/audio-player/styles.scss')).toEqual({ type: 'component', name: 'audio-player', scope: 'application', kind: 'style' });
     expect(m('frontend/app/components/audio-player/module.less')).toEqual({ type: 'component', name: 'audio-player', scope: 'application', kind: 'style' });
