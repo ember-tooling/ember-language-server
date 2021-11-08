@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/lifeart/ember-language-server/compare/v2.5.0...v2.5.1) (2021-11-08)
+
+
+### Bug Fixes
+
+* false component recognition for style file ([#338](https://github.com/lifeart/ember-language-server/issues/338)) ([c80e15e](https://github.com/lifeart/ember-language-server/commit/c80e15e68cbc485844fee34ea7860ebfee9ff8a6))
+
 # [2.5.0](https://github.com/lifeart/ember-language-server/compare/v2.4.2...v2.5.0) (2021-11-07)
 
 
