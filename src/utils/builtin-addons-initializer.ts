@@ -9,6 +9,7 @@ import IntlCompletionProvider from '../builtin-addons/core/intl-completion-provi
 import { AddonMeta, ProjectProviders } from './addon-api';
 import { logInfo } from './logger';
 import IntlDefinitionProvider from '../builtin-addons/core/intl-definition-provider';
+import IntlHoverProvider from '../builtin-addons/core/intl-hover-provider';
 
 export function initBuiltinProviders(addonsMeta: AddonMeta[]): ProjectProviders {
   const scriptDefinition = new CoreScriptDefinitionProvider();
@@ -20,6 +21,7 @@ export function initBuiltinProviders(addonsMeta: AddonMeta[]): ProjectProviders 
   const templateLintCommentsCodeAction = new TemplateLintCommentsCodeAction();
   const typedTemplatesCodeAction = new TypedTemplatesCodeAction();
   const intlDefinition = new IntlDefinitionProvider();
+  const intlHover = new IntlHoverProvider();
 
   const definitionProviders = [
     scriptDefinition.onDefinition.bind(scriptDefinition),
@@ -41,8 +43,10 @@ export function initBuiltinProviders(addonsMeta: AddonMeta[]): ProjectProviders 
     templateDefinition.onInit.bind(templateDefinition),
     scriptDefinition.onInit.bind(scriptDefinition),
     intlDefinition.onInit.bind(intlDefinition),
+    intlHover.onInit.bind(intlHover),
   ];
   const completionProviders = [scriptCompletion.onComplete.bind(scriptCompletion), templateCompletion.onComplete.bind(templateCompletion)];
+  const hoverProviders = [intlHover.onHover.bind(intlHover)];
 
   if (!addonsMeta.find((addon) => addon.name == 'els-intl-addon')) {
     const intlCompletion = new IntlCompletionProvider();
@@ -57,7 +61,7 @@ export function initBuiltinProviders(addonsMeta: AddonMeta[]): ProjectProviders 
     definitionProviders,
     referencesProviders,
     codeActionProviders,
-    hoverProviders: [],
+    hoverProviders,
     initFunctions,
     info: [],
     addonsMeta: [],

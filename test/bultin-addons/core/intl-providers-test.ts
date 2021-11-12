@@ -1,5 +1,5 @@
 import { MessageConnection } from 'vscode-jsonrpc';
-import { CompletionRequest, DefinitionRequest } from 'vscode-languageserver-protocol';
+import { CompletionRequest, DefinitionRequest, HoverRequest } from 'vscode-languageserver-protocol';
 import { createServer, ServerBucket, getResult, makeProject } from '../../test_helpers/public-integration-helpers';
 
 const testCaseAsyncFsOptions = [false, true];
@@ -166,7 +166,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
           ).response
         ).toEqual([
           {
-            detail: 'en-us : text 1\npl-pl : text 1 in polish',
+            documentation: 'en-us : text 1\npl-pl : text 1 in polish',
             kind: 12,
             label: 'rootFileTranslation',
             textEdit: {
@@ -206,7 +206,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
           ).response
         ).toEqual([
           {
-            detail: 'en-us : text 1\npl-pl : text 1 in polish',
+            documentation: 'en-us : text 1\npl-pl : text 1 in polish',
             kind: 12,
             label: 'rootFileTranslation',
             textEdit: {
@@ -246,7 +246,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
           ).response
         ).toEqual([
           {
-            detail: 'en-us : text 2',
+            documentation: 'en-us : text 2',
             kind: 12,
             label: 'subFolderTranslation.subTranslation',
             textEdit: {
@@ -264,7 +264,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
             },
           },
           {
-            detail: 'en-us : another text',
+            documentation: 'en-us : another text',
             kind: 12,
             label: 'subFolderTranslation.anotherTranslation',
             textEdit: {
@@ -304,7 +304,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
           ).response
         ).toEqual([
           {
-            detail: 'en-us : another text',
+            documentation: 'en-us : another text',
             kind: 12,
             label: 'subFolderTranslation.anotherTranslation',
             textEdit: {
@@ -344,7 +344,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
           ).response
         ).toEqual([
           {
-            detail: 'en-us : text 2',
+            documentation: 'en-us : text 2',
             kind: 12,
             label: 'subFolderTranslation.subTranslation',
             textEdit: {
@@ -362,7 +362,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
             },
           },
           {
-            detail: 'en-us : another text',
+            documentation: 'en-us : another text',
             kind: 12,
             label: 'subFolderTranslation.anotherTranslation',
             textEdit: {
@@ -374,6 +374,47 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
                 },
                 start: {
                   character: 59,
+                  line: 0,
+                },
+              },
+            },
+          },
+        ]);
+      });
+      it('should autocomplete translation base on translation text', async () => {
+        expect(
+          (
+            await getResult(
+              CompletionRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.hbs': `{{t "polish" }}`,
+                  },
+                },
+                translations,
+              },
+              'app/components/test.hbs',
+              { line: 0, character: 8 }
+            )
+          ).response
+        ).toEqual([
+          {
+            documentation: 'en-us : text 1\npl-pl : text 1 in polish',
+            filterText: 'text 1 in polish pl-pl',
+            kind: 12,
+            label: 'text 1 in polish',
+            textEdit: {
+              newText: 'rootFileTranslation',
+
+              range: {
+                end: {
+                  character: 5,
+                  line: 0,
+                },
+                start: {
+                  character: 5,
                   line: 0,
                 },
               },
@@ -404,7 +445,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
           ).response
         ).toEqual([
           {
-            detail: 'en-us : text 1',
+            documentation: 'en-us : text 1',
             kind: 12,
             label: 'rootFileTranslation',
             textEdit: {
@@ -444,7 +485,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
           ).response
         ).toEqual([
           {
-            detail: 'en-us : text 2',
+            documentation: 'en-us : text 2',
             kind: 12,
             label: 'subFolderTranslation.subTranslation',
             textEdit: {
@@ -462,7 +503,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
             },
           },
           {
-            detail: 'en-us : another text',
+            documentation: 'en-us : another text',
             kind: 12,
             label: 'subFolderTranslation.anotherTranslation',
             textEdit: {
@@ -626,6 +667,66 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
             },
           },
         ]);
+      });
+    });
+
+    describe('provide hover', () => {
+      it('should provide translation hover in handlebars', async () => {
+        expect(
+          ((await getResult(
+            HoverRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'test.hbs': '{{t "rootFileTranslation" }}',
+                },
+              },
+              translations,
+            },
+            'app/components/test.hbs',
+            { line: 0, character: 20 }
+          )) as any).response
+        ).toEqual({
+          contents: {
+            kind: 'plaintext',
+            value: 'en-us : text 1\npl-pl : text 1 in polish',
+          },
+
+          range: {
+            start: { line: 0, character: 4 },
+            end: { line: 0, character: 25 },
+          },
+        });
+      });
+
+      it('should provide translation hover in js', async () => {
+        expect(
+          ((await getResult(
+            HoverRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'test.js': 'export default class Foo extends Bar { text = this.intl.t("rootFileTranslation"); }',
+                },
+              },
+              translations,
+            },
+            'app/components/test.js',
+            { line: 0, character: 70 }
+          )) as any).response
+        ).toEqual({
+          contents: {
+            kind: 'plaintext',
+            value: 'en-us : text 1\npl-pl : text 1 in polish',
+          },
+
+          range: {
+            start: { line: 0, character: 58 },
+            end: { line: 0, character: 79 },
+          },
+        });
       });
     });
   });

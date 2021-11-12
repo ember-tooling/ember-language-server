@@ -405,7 +405,7 @@ export async function getResult(
   files,
   fileToInspect: string,
   position: { line: number; character: number },
-  projectName: string[]
+  projectName?: string[]
 ): Promise<IResponse<Hover[]>[]>;
 export async function getResult(
   reqType: typeof CompletionRequest.method,

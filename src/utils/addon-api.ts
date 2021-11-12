@@ -31,7 +31,7 @@ export interface ReferenceFunctionParams extends BaseAPIParams {
   results: Location[];
 }
 
-export interface HoverFunctionParams extends BaseAPIParams {
+export interface HoverFunctionParams extends ExtendedAPIParams {
   results: Hover[];
 }
 export interface CompletionFunctionParams extends ExtendedAPIParams {

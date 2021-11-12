@@ -54,7 +54,7 @@ export default class IntlCompletionProvider {
                 end: endPosition,
               },
             },
-            detail: detail,
+            documentation: detail,
           });
         }
 
@@ -74,7 +74,7 @@ export default class IntlCompletionProvider {
               },
             },
             filterText: t.text + ' ' + t.locale,
-            detail: detail,
+            documentation: detail,
           });
         });
       });
