@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/lifeart/ember-language-server/compare/v2.5.1...v2.6.0) (2021-11-12)
+
+
+### Features
+
+* hover provider for intl addon (translations) ([#340](https://github.com/lifeart/ember-language-server/issues/340)) ([3a7e6d0](https://github.com/lifeart/ember-language-server/commit/3a7e6d04a5bfa9462fbe00a314d11cd5bcba2fe6))
+
 ## [2.5.1](https://github.com/lifeart/ember-language-server/compare/v2.5.0...v2.5.1) (2021-11-08)
 
 
