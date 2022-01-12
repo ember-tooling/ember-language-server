@@ -8,6 +8,7 @@ import { URI } from 'vscode-uri';
 import { log, logError, logDebugInfo } from './utils/logger';
 import * as findUp from 'find-up';
 import * as path from 'path';
+import { pathToFileURL } from 'url';
 
 import Server from './server';
 import { Project } from './project';
@@ -212,16 +213,14 @@ export default class TemplateLinter {
         return;
       }
 
-      let nodePath = Files.resolveGlobalNodePath();
+      if (!getRequireSupport()) {
+        return;
+      }
 
-      // vs-code-online fix (we don't have global path, but it returned)
-      if (!nodePath || !(await this.server.fs.exists(nodePath))) {
-        // easy fix case
-        nodePath = 'node_modules';
+      const nodePath = 'node_modules';
 
-        if (!(await this.server.fs.exists(path.join(project.root, nodePath)))) {
-          return;
-        }
+      if (!(await this.server.fs.exists(path.join(project.root, nodePath)))) {
+        return;
       }
 
       const linterPath = await (Files.resolveModulePath(project.root, 'ember-template-lint', nodePath, () => {
@@ -232,21 +231,29 @@ export default class TemplateLinter {
         return;
       }
 
-      if (!getRequireSupport()) {
-        return;
+      try {
+        // commonjs behavior
+
+        // @ts-expect-error @todo - fix webpack imports
+        const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
+
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const linter: typeof Linter = requireFunc(linterPath);
+
+        this._linterCache.set(project, linter);
+
+        return linter;
+      } catch {
+        // ember-template-lint v4 support (as esm module)
+        // using eval here to stop webpack from bundling it
+        const linter: typeof Linter = (await eval(`import("${pathToFileURL(linterPath)}")`)).default;
+
+        this._linterCache.set(project, linter);
+
+        return linter;
       }
-
-      // @ts-expect-error @todo - fix webpack imports
-      const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
-
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const linter: typeof Linter = requireFunc(linterPath);
-
-      this._linterCache.set(project, linter);
-
-      return linter;
     } catch (error) {
-      log('Module ember-template-lint not found.');
+      log('Module ember-template-lint not found. ' + error.toString());
     }
   }
 }

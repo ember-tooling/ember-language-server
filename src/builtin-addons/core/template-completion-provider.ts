@@ -373,13 +373,17 @@ export default class TemplateCompletionProvider {
       return [];
     }
 
-    return getTemplateBlocks(content).map((blockName: string) => {
-      return {
-        label: `:${blockName}`,
-        kind: CompletionItemKind.Variable,
-        detail: `Named block (Slot) for <${focusPath.tag}>`,
-      };
-    });
+    try {
+      return getTemplateBlocks(content).map((blockName: string) => {
+        return {
+          label: `:${blockName}`,
+          kind: CompletionItemKind.Variable,
+          detail: `Named block (Slot) for <${focusPath.tag}>`,
+        };
+      });
+    } catch (e) {
+      return [];
+    }
   }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     logDebugInfo('provideCompletions');

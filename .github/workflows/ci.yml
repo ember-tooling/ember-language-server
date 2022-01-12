@@ -29,6 +29,11 @@ jobs:
         with:
           path: ./debug.*.log
 
+      - name: bundle (node)
+        run: yarn build:bundle:node
+
+      - name: bundle (worker)
+        run: yarn build:bundle:worker
 
   coverage:
     name: Coverage

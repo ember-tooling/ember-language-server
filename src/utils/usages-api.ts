@@ -1,7 +1,7 @@
 import { extractTokensFromTemplate } from './template-tokens-collector';
 import { MatchResultType } from './path-matcher';
 import { fsProvider } from '../fs-provider';
-import { logError, logDebugInfo } from './logger';
+import { logDebugInfo } from './logger';
 
 export interface TemplateTokenMeta {
   source: string;
@@ -150,7 +150,6 @@ async function extractTokens() {
       };
     }
   } catch (e) {
-    logError(e);
     //
   } finally {
     tokenQueue.shift();
