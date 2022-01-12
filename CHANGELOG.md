@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/lifeart/ember-language-server/compare/v2.6.0...v2.7.0) (2022-01-12)
+
+
+### Features
+
+* add support for ember-template-lint v4 ([#347](https://github.com/lifeart/ember-language-server/issues/347)) ([ef13b60](https://github.com/lifeart/ember-language-server/commit/ef13b602fc367e5f525f08236fa645c317c2e002))
+
 # [2.6.0](https://github.com/lifeart/ember-language-server/compare/v2.5.1...v2.6.0) (2021-11-12)
 
 

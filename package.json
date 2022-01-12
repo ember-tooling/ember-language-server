@@ -1,7 +1,7 @@
 {
   "name": "@lifeart/ember-language-server",
   "description": "A language server implementation for Ember.js projects.",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "contributors": [
     "Aleksandr Kanunnikov <lifeart92@gmail.com>"
   ],
@@ -111,7 +111,7 @@
     "prepare": "husky install"
   },
   "volta": {
-    "node": "14.18.1",
+    "node": "14.18.3",
     "yarn": "1.22.4"
   }
 }
