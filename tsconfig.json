@@ -6,7 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    "lib" : [ "es2019", "WebWorker" ],
+    "lib" : [ "es2020", "WebWorker" ],
     "outDir": "./lib",
     "strictNullChecks": true,
     "noImplicitAny": true,

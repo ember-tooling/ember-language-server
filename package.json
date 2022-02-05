@@ -25,7 +25,7 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "dependencies": {
-    "@glimmer/syntax": "^0.73.1",
+    "@glimmer/syntax": "^0.83.1",
     "@lifeart/ember-extract-inline-templates": "2.1.0",
     "ast-types": "^0.14.2",
     "dag-map": "^2.0.2",

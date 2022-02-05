@@ -371,7 +371,7 @@ export function isScriptPath(filePath: string) {
     return false;
   }
 
-  return filePath.endsWith('.js') || filePath.endsWith('.ts');
+  return filePath.endsWith('.js') || filePath.endsWith('.ts') || filePath.endsWith('.gjs') || filePath.endsWith('.gts');
 }
 
 export function normalizedPath(filePath: string) {
@@ -528,7 +528,7 @@ export async function listComponents(project: BaseProject): Promise<void> {
     }),
     safeWalkAsync(scriptEntry, {
       directories: false,
-      globs: ['**/*.js', '**/*.ts', '**/*.hbs', '**/*.css', '**/*.less', '**/*.scss'],
+      globs: ['**/*.gjs', '**/*.gts', '**/*.js', '**/*.ts', '**/*.hbs', '**/*.css', '**/*.less', '**/*.scss'],
     }),
     safeWalkAsync(templateEntry, {
       directories: false,
@@ -592,11 +592,11 @@ async function findRegistryItemsForProject(project: BaseProject, prefix: string,
 }
 
 export async function findTestsForProject(project: BaseProject) {
-  await findRegistryItemsForProject(project, 'tests', ['**/*.js', '**/*.ts']);
+  await findRegistryItemsForProject(project, 'tests', ['**/*.gjs', '**/*.gts', '**/*.js', '**/*.ts']);
 }
 
 export async function findAppItemsForProject(project: BaseProject) {
-  await findRegistryItemsForProject(project, 'app', ['**/*.js', '**/*.ts', '**/*.css', '**/*.less', '**/*.sass', '**/*.hbs']);
+  await findRegistryItemsForProject(project, 'app', ['**/*.gjs', '**/*.gts', '**/*.js', '**/*.ts', '**/*.css', '**/*.less', '**/*.sass', '**/*.hbs']);
 }
 
 export async function findAddonItemsForProject(project: BaseProject) {

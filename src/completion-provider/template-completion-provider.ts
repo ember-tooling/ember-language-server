@@ -1,26 +1,21 @@
 import { CompletionItem, TextDocumentPositionParams, Position, TextDocumentIdentifier } from 'vscode-languageserver/node';
 import Server from '../server';
 import ASTPath from '../glimmer-utils';
-import { toPosition } from '../estree-utils';
 import { filter } from 'fuzzaldrin';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import { preprocess, ASTv1 } from '@glimmer/syntax';
 import { getExtension } from '../utils/file-extension';
 import { logDebugInfo, logInfo } from '../utils/logger';
-import { searchAndExtractHbs } from '@lifeart/ember-extract-inline-templates';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { Position as EsTreePosition } from 'estree';
-import { parseScriptFile } from 'ember-meta-explorer';
-
-const extensionsToProvideTemplateCompletions = ['.hbs', '.js', '.ts'];
-const PLACEHOLDER = 'ELSCompletionDummy';
+import { createFocusPath, extensionsToProvideTemplateCompletions, getFocusPath, getTextForGuessing, PLACEHOLDER } from '../utils/glimmer-template';
+import { Project } from '../project';
 
 export default class TemplateCompletionProvider {
   constructor(private server: Server) {}
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
     // logDebugInfo('getTextForGuessing', originalText, offset, PLACEHOLDER);
-
-    return originalText.slice(0, offset) + PLACEHOLDER + originalText.slice(offset);
+    return getTextForGuessing(originalText, offset, PLACEHOLDER);
   }
   getRoots(doc: TextDocumentIdentifier) {
     const project = this.server.projectRoots.projectForUri(doc.uri);
@@ -35,130 +30,25 @@ export default class TemplateCompletionProvider {
     return preprocess(textContent);
   }
   createFocusPath(ast: any, position: EsTreePosition, validText: string) {
-    return ASTPath.toPosition(ast, position, validText);
+    return createFocusPath(ast, position, validText);
   }
-  getFocusPath(
-    document: TextDocument,
+  getFocusPath(document: TextDocument, position: Position, placeholder = PLACEHOLDER) {
+    return getFocusPath(document, position, placeholder);
+  }
+  async provideCompletionsForFocusPath(
+    results: { focusPath: any; originalText: string; normalPlaceholder: string },
+    textDocument: TextDocumentIdentifier,
     position: Position,
-    placeholder = PLACEHOLDER
-  ): null | {
-    focusPath: ASTPath;
-    originalText: string;
-    normalPlaceholder: string;
-    ast: any;
-  } {
-    const documentContent = document.getText();
-    const ext = getExtension(document);
-
-    if (!extensionsToProvideTemplateCompletions.includes(ext as string)) {
-      return null;
-    }
-
-    const originalText =
-      ext === '.hbs'
-        ? documentContent
-        : searchAndExtractHbs(documentContent, {
-            parse(source: string) {
-              return parseScriptFile(source);
-            },
-          });
-
-    logDebugInfo('originalText', originalText);
-
-    if (originalText.trim().length === 0) {
-      logDebugInfo('originalText - empty');
-
-      return null;
-    }
-
-    const offset = document.offsetAt(position);
-    let normalPlaceholder: any = placeholder;
-    let ast: any = {};
-
-    const cases = [
-      PLACEHOLDER + ' />',
-      PLACEHOLDER,
-      PLACEHOLDER + '"',
-      PLACEHOLDER + "'",
-      // block params autocomplete
-      PLACEHOLDER + '| />',
-      PLACEHOLDER + '}} />',
-      PLACEHOLDER + '"}}',
-      PLACEHOLDER + '}}',
-      PLACEHOLDER + '}}{{/' + PLACEHOLDER + '}}',
-      // {{#}} -> {{# + P}}{{/P + }}
-      PLACEHOLDER + '}}{{/' + PLACEHOLDER,
-      PLACEHOLDER + ')}}',
-      PLACEHOLDER + '))}}',
-      PLACEHOLDER + ')))}}',
-    ];
-
-    let validText = '';
-
-    while (cases.length) {
-      normalPlaceholder = cases.shift();
-
-      try {
-        validText = this.getTextForGuessing(originalText, offset, normalPlaceholder);
-        ast = this.getAST(validText);
-        logDebugInfo('validText', validText);
-        break;
-      } catch (e) {
-        // logDebugInfo('parsing-error', this.getTextForGuessing(originalText, offset, normalPlaceholder));
-        ast = null;
-      }
-    }
-
-    if (ast === null) {
-      return null;
-    }
-
-    const focusPath = this.createFocusPath(ast, toPosition(position), validText);
-
-    if (!focusPath) {
-      return null;
-    }
-
-    return {
-      ast,
-      focusPath,
-      originalText,
-      normalPlaceholder,
-    };
-  }
-  async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
-    logDebugInfo('template:provideCompletions');
-    const ext = getExtension(params.textDocument);
-
-    if (ext !== null && !extensionsToProvideTemplateCompletions.includes(ext)) {
-      logDebugInfo('template:provideCompletions:unsupportedExtension', ext);
-
-      return [];
-    }
-
-    const position = Object.freeze({ ...params.position });
-    const { project, document } = this.getRoots(params.textDocument);
-
-    if (!project || !document) {
-      logInfo(`No project for file: ${params.textDocument.uri}`);
-
-      return [];
-    }
-
-    const { root } = project;
-    const results = this.getFocusPath(document, position, PLACEHOLDER);
-
-    if (!results) {
-      return [];
-    }
-
+    project: Project
+  ) {
     const focusPath = results.focusPath;
     const originalText = results.originalText;
     const normalPlaceholder = results.normalPlaceholder;
+    const root = project.root;
 
     const completions: CompletionItem[] = await queryELSAddonsAPIChain(project.builtinProviders.completionProviders, root, {
       focusPath,
-      textDocument: params.textDocument,
+      textDocument,
       position,
       results: [],
       server: this.server,
@@ -168,7 +58,7 @@ export default class TemplateCompletionProvider {
 
     const addonResults = await queryELSAddonsAPIChain(project.providers.completionProviders, root, {
       focusPath,
-      textDocument: params.textDocument,
+      textDocument,
       position,
       results: completions,
       server: this.server,
@@ -209,6 +99,36 @@ export default class TemplateCompletionProvider {
 
       return el;
     });
+  }
+  async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
+    logDebugInfo('template:provideCompletions');
+    const ext = getExtension(params.textDocument);
+
+    // @to-do cleanup this creepy stuff (streamline autocomplete stuff);
+    const extToHandle = extensionsToProvideTemplateCompletions.filter((e) => e !== '.gts' && e !== '.gjs');
+
+    if (ext !== null && !extToHandle.includes(ext)) {
+      logDebugInfo('template:provideCompletions:unsupportedExtension', ext);
+
+      return [];
+    }
+
+    const position = Object.freeze({ ...params.position });
+    const { project, document } = this.getRoots(params.textDocument);
+
+    if (!project || !document) {
+      logInfo(`No project for file: ${params.textDocument.uri}`);
+
+      return [];
+    }
+
+    const results = this.getFocusPath(document, position, PLACEHOLDER);
+
+    if (!results) {
+      return [];
+    }
+
+    return this.provideCompletionsForFocusPath(results, params.textDocument, position, project);
   }
 }
 

@@ -8,6 +8,8 @@ import { searchAndExtractHbs } from '@lifeart/ember-extract-inline-templates';
 import { parseScriptFile } from 'ember-meta-explorer';
 import { toPosition } from '../../../estree-utils';
 import ASTPath from '../../../glimmer-utils';
+import { getFileRanges, RangeWalker } from '../../../utils/glimmer-script';
+import { toHbsSource } from '../../../utils/diagnostic';
 export interface INodeSelectionInfo {
   selection: string | undefined;
   location: SourceLocation;
@@ -42,7 +44,7 @@ function findValidNodeSelection(focusPath: ASTPath): null | INodeSelectionInfo {
   return null;
 }
 
-const extensionsToLint: string[] = ['.hbs', '.js', '.ts'];
+const extensionsToLint: string[] = ['.hbs', '.js', '.ts', '.gts', 'gjs'];
 
 export default class BaseCodeActionProvider implements AddonAPI {
   public server!: Server;
@@ -62,6 +64,27 @@ export default class BaseCodeActionProvider implements AddonAPI {
 
     if (extension === '.hbs') {
       ast = this.server.templateCompletionProvider.getAST(documentContent);
+    } else if (extension === '.gjs' || extension === '.gts') {
+      const ranges = getFileRanges(documentContent);
+
+      const rangeWalker = new RangeWalker(ranges);
+      const templates = rangeWalker.templates();
+
+      if (!templates.length) {
+        return null;
+      }
+
+      const t = templates[0];
+
+      const source = toHbsSource({
+        startLine: t.loc.start.line,
+        startColumn: t.loc.start.character,
+        endColumn: t.loc.end.character,
+        endLine: t.loc.end.line,
+        template: t.content,
+      });
+
+      ast = this.server.templateCompletionProvider.getAST(source);
     } else {
       const templateData = searchAndExtractHbs(documentContent, {
         parse(source: string) {

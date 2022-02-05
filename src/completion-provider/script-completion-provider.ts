@@ -8,14 +8,22 @@ import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { uniqBy } from 'lodash';
 import { getExtension } from '../utils/file-extension';
 import { logDebugInfo } from '../utils/logger';
+import GlimmerScriptCompletionProvider from './glimmer-script-completion-provider';
 
 export default class ScriptCompletionProvider {
   constructor(private server: Server) {}
   async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
     logDebugInfo('provideCompletions');
 
-    if (!['.js', '.ts'].includes(getExtension(params.textDocument) as string)) {
+    const ext = getExtension(params.textDocument) as string;
+
+    if (!['.js', '.ts', '.gjs', '.gts'].includes(ext)) {
       return [];
+    }
+
+    if (ext === '.gts' || ext === '.gjs') {
+      // temporary workaround
+      return new GlimmerScriptCompletionProvider(this.server).provideCompletions(params);
     }
 
     const uri = params.textDocument.uri;

@@ -22,15 +22,24 @@ import { FileStat, FileType, fileTypeFromFsStat } from '../../src/utils/fs-utils
 import { IRegistry } from '../../src/utils/registry-api';
 
 export function startServer(asyncFs = false) {
-  const options: Array<string | undefined> = [
-    '--reporter',
-    'none',
-    'node',
-    './inst/start-server.js',
-    '--stdio',
-    asyncFs ? '--async-fs' : undefined,
-    '--no-clean',
-  ];
+  const params = JSON.parse(process.env.npm_config_argv);
+
+  // {
+  //   remain: [],
+  //   cooked: [ 'run', 'test' ],
+  //   original: [ 'test', 'template-imports-integration' ]
+  // }
+  const command = params.original[0];
+
+  let serverPath = '';
+
+  if (command === 'test') {
+    serverPath = './lib/start-server.js';
+  } else {
+    serverPath = './inst/start-server.js';
+  }
+
+  const options: Array<string | undefined> = ['--reporter', 'none', 'node', serverPath, '--stdio', asyncFs ? '--async-fs' : undefined, '--no-clean'];
 
   return spawn(
     'node_modules/.bin/nyc',

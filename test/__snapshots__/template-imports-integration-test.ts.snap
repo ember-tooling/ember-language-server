@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`has basic template imports support CompletionRequest inside <template> template imports completion requests working fine support component autocomplete from scope and layout for .gts files 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.gts",
+      ],
+      "world": Array [
+        "app/components/world/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "label": "FooBar",
+    },
+    Object {
+      "label": "Foo",
+    },
+  ],
+}
+`;
+
+exports[`has basic template imports support CompletionRequest inside <template> template imports completion requests working fine support component autocomplete from scope for .gjs files 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.gjs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "label": "FooBar",
+    },
+    Object {
+      "label": "Foo",
+    },
+  ],
+}
+`;
+
+exports[`has basic template imports support CompletionRequest inside <template> template imports completion requests working fine support component autocomplete from scope for .gts files 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.gts",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "label": "FooBar",
+    },
+    Object {
+      "label": "Foo",
+    },
+  ],
+}
+`;

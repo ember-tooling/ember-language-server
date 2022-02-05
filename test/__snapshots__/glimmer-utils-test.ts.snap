@@ -2,6 +2,7 @@
 
 exports[`glimmer-utils ASTPath works as expected 1`] = `
 PathExpressionImplV1 {
+  "_head": undefined,
   "data": false,
   "loc": Object {
     "end": Object {
@@ -83,6 +84,7 @@ BlockParamDefinition {
                 },
                 "params": Array [],
                 "path": PathExpressionImplV1 {
+                  "_head": undefined,
                   "data": false,
                   "loc": Object {
                     "end": Object {
@@ -204,6 +206,7 @@ BlockParamDefinition {
             },
             "params": Array [],
             "path": PathExpressionImplV1 {
+              "_head": undefined,
               "data": false,
               "loc": Object {
                 "end": Object {
@@ -330,6 +333,7 @@ BlockParamDefinition {
                 },
                 "params": Array [],
                 "path": PathExpressionImplV1 {
+                  "_head": undefined,
                   "data": false,
                   "loc": Object {
                     "end": Object {
@@ -449,6 +453,7 @@ BlockParamDefinition {
             },
             "params": Array [],
             "path": PathExpressionImplV1 {
+              "_head": undefined,
               "data": false,
               "loc": Object {
                 "end": Object {
