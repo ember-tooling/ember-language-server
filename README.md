@@ -10,9 +10,14 @@ All features currently only work in Ember CLI application that use the default c
 
 - Autocompletion
   - `*.{js/ts}`: services, models, routes, transforms
-  - `*.hbs`: components, route names, helpers, modifiers, local paths
-  - GlimmerNative components autocompletion support
+  - `*.hbs`: components, route names, helpers, modifiers, local paths, arguments
   - Namespaces support (batman syntax)
+
+- Template linting
+  - works only if `ember-template-lint` dependency added into project.
+  - [ember-template-lint](https://github.com/ember-template-lint/ember-template-lint) (`v2`, `v3`, `v4`) integration, including documentation links and auto fixes
+  - template linting inside `.js` and `.ts` files (with `hbs` literal)
+  - experimental linting inside `.gjs` and `.gts` files (with `<template>` tag)
 
 - Definition providers for (enable features like "Go To Definition" or "Peek Definition"):
   - Components (in Templates)
@@ -25,8 +30,6 @@ All features currently only work in Ember CLI application that use the default c
 
 - Route autocompletion in `link-to` and `<LinkTo>` components.
 - Outlet jumping
-- Diagnostics for `ember-template-lint` (if it is included in a project)
-- `ember-template-lint` template fixes support (if exists).
 - Workspaces support
 - Supports Ignoring of LS initialization on unneeded projects by using `ignoredProjects` config option, if you need "exclude except" functionality, specify project name as `!my-project`.
 
