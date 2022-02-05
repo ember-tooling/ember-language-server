@@ -1,0 +1,21 @@
+<html>
+<body>
+  <div id="container" style="font-family: monospace;">
+
+  </div>
+  <script>
+
+    fetch('http://localhost:8080/dist/bundled/start-worker-server.js').then(async (result) => {
+      const w = new Worker('data:application/javascript,' + encodeURIComponent(await result.text()));
+      w.onerror = (e) => {
+        console.error(e);
+      };
+      w.onmessage = (e) => {
+        document.getElementById('container').appendChild(document.createTextNode(JSON.stringify(e.data, null, 2)));
+        console.info(e);
+      };
+    });
+  </script>
+</body>
+
+</html>

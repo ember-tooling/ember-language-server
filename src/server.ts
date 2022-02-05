@@ -60,7 +60,8 @@ import { Usage, findRelatedFiles, waitForTokensToBeCollected, getAllTemplateToke
 import { URI } from 'vscode-uri';
 import { MatchResultType } from './utils/path-matcher';
 import { FileChangeType } from 'vscode-languageserver/node';
-import { debounce } from 'lodash';
+// @ts-expect-error esmodule
+import * as debounce from 'lodash/debounce';
 import { Config, Initializer } from './types';
 import { asyncGetJSON, isFileBelongsToRoots, mGetProjectAddonsInfo, setRequireSupport, setSyncFSSupport } from './utils/layout-helpers';
 import FSProvider, { AsyncFsProvider, setFSImplementation } from './fs-provider';
@@ -366,6 +367,10 @@ export default class Server {
   constructor(connection: Connection, options: ServerOptions = defaultServerOptions) {
     if (!connection) {
       throw new Error('uELS constructor accept connection instance as first argument');
+    }
+
+    if (globalThis.process) {
+      globalThis.process.title = 'unstable_ember_language_server';
     }
 
     this.options = { ...defaultServerOptions, ...options };

@@ -1,6 +1,7 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { AddonMeta, CompletionFunctionParams } from './../../utils/addon-api';
-import { uniqBy } from 'lodash';
+// @ts-expect-error esmodule
+import * as uniqBy from 'lodash/uniqBy';
 
 import * as memoize from 'memoizee';
 import { emberBlockItems, emberMustacheItems, emberSubExpressionItems, emberModifierItems } from './ember-helpers';
@@ -42,7 +43,6 @@ import {
 
 import { normalizeToAngleBracketComponent } from '../../utils/normalizers';
 import { getTemplateBlocks } from '../../utils/template-tokens-collector';
-import type { ASTNode } from 'ast-types';
 import { ASTv1 } from '@glimmer/syntax';
 import { URI } from 'vscode-uri';
 import { componentsContextData } from './template-context-provider';
@@ -345,7 +345,7 @@ export default class TemplateCompletionProvider {
 
     return scopedValues;
   }
-  async getParentComponentYields(focusPath: ASTNode & { tag: string }) {
+  async getParentComponentYields(focusPath: any) {
     if (focusPath.type !== 'ElementNode') {
       return [];
     }

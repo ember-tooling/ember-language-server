@@ -3,8 +3,10 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const isCI = process.env.CI;
 
 const buildName = process.env.npm_lifecycle_event;
 // build:bundle:node
@@ -41,11 +43,11 @@ const nodeBundleConfig = {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
     mainFields: ['module', 'main'],
     extensions: ['.ts', '.js'], // support ts-files and js-files
-  }
+  },
 };
 
 const workerBundleConfig = /** @type WebpackConfig */ {
-  mode: 'none',
+  mode: 'development',
   target: 'webworker', // web extensions run in a webworker context
   entry: {
     'start-worker-server': './src/start-worker-server.ts',
@@ -56,26 +58,47 @@ const workerBundleConfig = /** @type WebpackConfig */ {
     libraryTarget: 'var',
     library: 'serverExportVar',
   },
-  plugins: [
-		new NodePolyfillPlugin({
-			// excludeAliases: ["console"]
-      excludeAliases: []
-		})
-	],
+  plugins: isCI
+    ? [
+        new NodePolyfillPlugin({
+          // excludeAliases: ["console"]
+          excludeAliases: [],
+        }),
+      ]
+    : [
+        new BundleAnalyzerPlugin(),
+        new NodePolyfillPlugin({
+          // excludeAliases: ["console"]
+          excludeAliases: [],
+        }),
+      ],
   resolve: {
     mainFields: ['module', 'main'],
     extensions: ['.ts', '.js'], // support ts-files and js-files
-    alias: {},
+    alias: {
+      'find-up': false,
+      'dag-map': false,
+      'ember-template-recast': false,
+      // 'caniuse-lite': false,
+      // assert: false,
+      // buffer: false,
+      browserlist: false,
+      '@babel/generator': false,
+      '@babel/highlight': false,
+      // '@babel/types': false,
+      // 'babel-types': false,
+    },
     fallback: {
-    //   path: require.resolve("path-browserify"),
-    //   util: false,
-    //   os: false,
+      //   path: require.resolve("path-browserify"),
+      //   util: false,
+      //   os: false,
       fs: false,
-    //   tty: false,
-    //   assert: false,
+      // browserlist: false,
+      //   tty: false,
+      //   assert: false,
       debug: false,
       net: false,
-    //   stream: false,
+      //   stream: false,
     },
   },
   module: {
@@ -103,12 +126,12 @@ const workerBundleConfig = /** @type WebpackConfig */ {
 const configs = [
   {
     name: 'build:bundle:node',
-    config: nodeBundleConfig
+    config: nodeBundleConfig,
   },
   {
     name: 'build:bundle:worker',
-    config: workerBundleConfig
-  }
+    config: workerBundleConfig,
+  },
 ];
 
-module.exports = configs.filter(({ name }) => name.startsWith(buildName)).map(e => e.config);
+module.exports = configs.filter(({ name }) => name.startsWith(buildName)).map((e) => e.config);

@@ -3,7 +3,7 @@ import { parseScriptFile as parse } from 'ember-meta-explorer';
 import DocumentSymbolProvider from './document-symbol-provider';
 import { toLSRange } from '../estree-utils';
 import { logDebugInfo } from '../utils/logger';
-import { visit } from 'ast-types';
+import traverse from '@babel/traverse';
 
 export default class JSDocumentSymbolProvider implements DocumentSymbolProvider {
   extensions: string[] = ['.js'];
@@ -14,15 +14,13 @@ export default class JSDocumentSymbolProvider implements DocumentSymbolProvider 
     try {
       const ast = parse(content);
 
-      visit(ast, {
-        visitProperty(path: any) {
+      traverse(ast, {
+        Property(path: any) {
           const node = path.node;
 
           const symbol = SymbolInformation.create(node.key.name, SymbolKind.Property, toLSRange(node.key.loc));
 
           symbols.push(symbol);
-
-          this.traverse(path);
         },
       });
     } catch (e) {

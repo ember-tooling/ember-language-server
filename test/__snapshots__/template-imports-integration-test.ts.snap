@@ -15,10 +15,10 @@ Object {
   },
   "response": Array [
     Object {
-      "label": "FooBar",
+      "label": "Foo",
     },
     Object {
-      "label": "Foo",
+      "label": "FooBar",
     },
   ],
 }
@@ -36,10 +36,10 @@ Object {
   },
   "response": Array [
     Object {
-      "label": "FooBar",
+      "label": "Foo",
     },
     Object {
-      "label": "Foo",
+      "label": "FooBar",
     },
   ],
 }
@@ -57,10 +57,10 @@ Object {
   },
   "response": Array [
     Object {
-      "label": "FooBar",
+      "label": "Foo",
     },
     Object {
-      "label": "Foo",
+      "label": "FooBar",
     },
   ],
 }

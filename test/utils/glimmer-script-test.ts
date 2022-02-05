@@ -23,7 +23,7 @@ describe('glimmer-scripts', function () {
 
       const scope = getScope(p.scope);
 
-      expect(scope).toStrictEqual(['foo', 'case', 'hello', 'Boo']);
+      expect(scope).toStrictEqual(['Foo', 'Boo', 'foo', 'case', 'hello']);
     });
     it('able to extract scope from js variable notation by given path', function () {
       const tpl = `

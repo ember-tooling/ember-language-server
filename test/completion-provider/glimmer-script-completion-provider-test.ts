@@ -41,7 +41,7 @@ describe('GlimmerScriptCompletionProvider', function () {
       position: Position.create(1, 12),
     });
 
-    expect(results).toStrictEqual([{ label: 'n' }, { label: 'Component' }]);
+    expect(results).toStrictEqual([{ label: 'Component' }, { label: 'n' }]);
   });
   it('works with legacy logic', async function () {
     const tpl = `var n = 42; class Component { \n<template></template> }`;
@@ -54,6 +54,6 @@ describe('GlimmerScriptCompletionProvider', function () {
       position: Position.create(1, 12),
     });
 
-    expect(results).toStrictEqual([{ label: 'n' }, { label: 'Component' }]);
+    expect(results).toStrictEqual([{ label: 'Component' }, { label: 'n' }]);
   });
 });

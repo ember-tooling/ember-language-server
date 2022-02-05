@@ -4,7 +4,7 @@ import * as memoize from 'memoizee';
 import { logError, logInfo, logDebugInfo } from '../../utils/logger';
 import Server from '../../server';
 import { Project } from '../../project';
-import * as t from '@babel/types';
+import type * as t from '@babel/types';
 import {
   isStoreModelLookup,
   isRouteLookup,
