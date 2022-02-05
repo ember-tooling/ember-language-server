@@ -81,6 +81,15 @@ new Server({fs, type})
   * `node` - supported addons & require logic
   * `worker` - addons and require logic not supported
 
+---
+
+### [Debugging](DEBUGGING.md)
+
+---
+### [Changelog](CHANGELOG.md)
+
+---
+
 ## Licence
 
 [MIT](LICENSE.md)

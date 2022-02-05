@@ -1,5 +1,13 @@
 # Debugging ember-language-server
 
+
+## VSCode
+
+  Check out this gist: [https://gist.github.com/lifeart/dc966071ec6c5a3f9d5adc70c2aa8102](https://gist.github.com/lifeart/dc966071ec6c5a3f9d5adc70c2aa8102)
+
+## Emac
+
+
 The debug console should be initiated through node.js and can be shown in a chromium-based browser.
 
 This guide has been constructed based on an Emacs debugging session. We used stdio as a communication channel but it should translate to other means of communication.

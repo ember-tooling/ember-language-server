@@ -1,4 +1,4 @@
-Copyright (c) 2021 Aleksandr Kanunnikov, Tobias Bieniek, Thomas Sauer, and other contributors.
+Copyright (c) 2022 Aleksandr Kanunnikov and other contributors.
 
 All rights reserved.
 
