@@ -15,6 +15,8 @@ const buildName = process.env.npm_lifecycle_event;
 
 /**@type {import('webpack').Configuration}*/
 const nodeBundleConfig = {
+  mode: 'production',
+  devtool: 'source-map',
   target: 'node', // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
 
   entry: './src/server.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
@@ -47,7 +49,7 @@ const nodeBundleConfig = {
 };
 
 const workerBundleConfig = /** @type WebpackConfig */ {
-  mode: 'development',
+  mode: 'production',
   target: 'webworker', // web extensions run in a webworker context
   entry: {
     'start-worker-server': './src/start-worker-server.ts',
