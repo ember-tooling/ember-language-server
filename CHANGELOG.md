@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/lifeart/ember-language-server/compare/v2.7.0...v2.8.0) (2022-02-05)
+
+
+### Features
+
+* basic template imports support (<template> tag and gts, gjs files) ([#350](https://github.com/lifeart/ember-language-server/issues/350)) ([778c9cb](https://github.com/lifeart/ember-language-server/commit/778c9cb0de28e12eb02aa6bb648bdb516ba64436))
+
 # [2.7.0](https://github.com/lifeart/ember-language-server/compare/v2.6.0...v2.7.0) (2022-01-12)
 
 
