@@ -536,13 +536,6 @@
   dependencies:
     "@simple-dom/interface" "^1.4.0"
 
-"@glimmer/interfaces@0.82.0":
-  version "0.82.0"
-  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.82.0.tgz#e3f21e51a421b4c1ee34dcb682c719832f4a36f5"
-  integrity sha512-Cdr2uWSNHBBf2fnm4QjkjHWgxGoT4SdrD+RDQBMwYWSaysqqsXYU3+toOLKFmaMJuyDa28Zeq17lCab7zOg43g==
-  dependencies:
-    "@simple-dom/interface" "^1.4.0"
-
 "@glimmer/interfaces@0.83.1":
   version "0.83.1"
   resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.83.1.tgz#fb16f5f683ddc55f130887b6141f58c0751350fe"
@@ -561,13 +554,13 @@
     "@glimmer/util" "0.65.1"
     "@glimmer/validator" "0.65.1"
 
-"@glimmer/syntax@0.82.0":
-  version "0.82.0"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.82.0.tgz#b45d932a3c3de83710324a676af49d02a0940cf3"
-  integrity sha512-KjtLyJ0EZLLDMsPOgDtPXClMK1zgi1vNUI3VIk02L6plFV/ACus0YTgkZ/DJZptnHTEAj2Ip9dSUS8otC6pzsg==
+"@glimmer/syntax@0.83.1", "@glimmer/syntax@^0.83.1":
+  version "0.83.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.83.1.tgz#7e18dd445871c157ba0281f12a4fbf316fa49b41"
+  integrity sha512-n3vEd0GtjtgkOsd2gqkSimp8ecqq5KrHyana/s1XJZvVAPD5rMWT9WvAVWG8XAktns8BxjwLIUoj/vkOfA+eHg==
   dependencies:
-    "@glimmer/interfaces" "0.82.0"
-    "@glimmer/util" "0.82.0"
+    "@glimmer/interfaces" "0.83.1"
+    "@glimmer/util" "0.83.1"
     "@handlebars/parser" "~2.0.0"
     simple-html-tokenizer "^0.5.11"
 
@@ -581,16 +574,6 @@
     "@handlebars/parser" "^1.1.0"
     simple-html-tokenizer "^0.5.10"
 
-"@glimmer/syntax@^0.83.1":
-  version "0.83.1"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.83.1.tgz#7e18dd445871c157ba0281f12a4fbf316fa49b41"
-  integrity sha512-n3vEd0GtjtgkOsd2gqkSimp8ecqq5KrHyana/s1XJZvVAPD5rMWT9WvAVWG8XAktns8BxjwLIUoj/vkOfA+eHg==
-  dependencies:
-    "@glimmer/interfaces" "0.83.1"
-    "@glimmer/util" "0.83.1"
-    "@handlebars/parser" "~2.0.0"
-    simple-html-tokenizer "^0.5.11"
-
 "@glimmer/util@0.65.1":
   version "0.65.1"
   resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.65.1.tgz#c85ebc13344739c123e0ec6551ae740cf5fd62bf"
@@ -598,15 +581,6 @@
   dependencies:
     "@glimmer/env" "0.1.7"
     "@glimmer/interfaces" "0.65.1"
-    "@simple-dom/interface" "^1.4.0"
-
-"@glimmer/util@0.82.0":
-  version "0.82.0"
-  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.82.0.tgz#d6ae4985f70343898d4b2297a4b3b1f5feda1934"
-  integrity sha512-/13rKFiFG8P4eXuiwnu0Y5OX0B8DkPI+4M9eH/vWp32WbhEngKwtYpVdKpjK0SEZ6DTmqFYdUQr17bwQHSDh2Q==
-  dependencies:
-    "@glimmer/env" "0.1.7"
-    "@glimmer/interfaces" "0.82.0"
     "@simple-dom/interface" "^1.4.0"
 
 "@glimmer/util@0.83.1":
@@ -2658,10 +2632,10 @@ elliptic@^6.5.3:
     minimalistic-assert "^1.0.1"
     minimalistic-crypto-utils "^1.0.1"
 
-ember-meta-explorer@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/ember-meta-explorer/-/ember-meta-explorer-1.1.0.tgz#f0b0631aa2b40d9c3e14f754a98373df085c5a82"
-  integrity sha512-pNCk0y1oOWYMwYAT666zFerUbWzY0ZLSPB/OBxXwLMovPscjBdnuZSAZdvWaYCN7RZVEIbfXvxISgaGXloFgkw==
+ember-meta-explorer@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/ember-meta-explorer/-/ember-meta-explorer-1.2.0.tgz#a7702f528c3569b1af8473494d3d74bc22b7f56f"
+  integrity sha512-gSNS3PusX+axtlzWJzPg4xMNAm0IGi5/K08mDSQNuAyAhiMMRquKCBDeXmeQdaxuxwyrYvTo0pVYOjS89s4Txg==
   dependencies:
     "@babel/core" "^7.15.8"
     "@babel/plugin-proposal-async-generator-functions" "^7.15.8"
@@ -2676,7 +2650,7 @@ ember-meta-explorer@1.1.0:
     "@babel/plugin-proposal-optional-chaining" "^7.14.5"
     "@babel/plugin-proposal-private-methods" "^7.14.5"
     "@babel/preset-typescript" "^7.15.0"
-    "@glimmer/syntax" "0.82.0"
+    "@glimmer/syntax" "0.83.1"
 
 ember-template-recast@^5.0.3:
   version "5.0.3"

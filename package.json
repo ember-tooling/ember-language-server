@@ -29,7 +29,7 @@
     "@lifeart/ember-extract-inline-templates": "2.1.0",
     "ast-types": "^0.14.2",
     "dag-map": "^2.0.2",
-    "ember-meta-explorer": "1.1.0",
+    "ember-meta-explorer": "1.2.0",
     "ember-template-recast": "^5.0.3",
     "find-up": "^5.0.0",
     "flat": "^5.0.2",
