@@ -1,3 +1,10 @@
+# [2.10.0](https://github.com/lifeart/ember-language-server/compare/v2.9.0...v2.10.0) (2022-02-05)
+
+
+### Features
+
+* debugging section ([ead1183](https://github.com/lifeart/ember-language-server/commit/ead1183fb2aa4540acb84c464485b6b04e850044))
+
 # [2.9.0](https://github.com/lifeart/ember-language-server/compare/v2.8.0...v2.9.0) (2022-02-05)
 
 
