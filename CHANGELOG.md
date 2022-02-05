@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/lifeart/ember-language-server/compare/v2.8.0...v2.9.0) (2022-02-05)
+
+
+### Features
+
+* readme update ([74ad82c](https://github.com/lifeart/ember-language-server/commit/74ad82ce107ff90822d2b5c5d2dac08443daee43))
+
 # [2.8.0](https://github.com/lifeart/ember-language-server/compare/v2.7.0...v2.8.0) (2022-02-05)
 
 
