@@ -3,6 +3,12 @@
 exports[`With \`batman project\` initialized on server Completion request returns all angle-bracket components with same name from different namespaces 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/another-awesome-component.js",
+        "app/templates/components/another-awesome-component.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "AnotherAwesomeComponent",
@@ -21,6 +27,11 @@ Array [
     },
   },
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/my-awesome-component.js",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "MyAwesomeComponent",
@@ -39,6 +50,11 @@ Array [
     },
   },
   Object {
+    "data": Object {
+      "files": Array [
+        "app/templates/components/nested/nested-component.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "Nested::NestedComponent",
@@ -57,6 +73,13 @@ Array [
     },
   },
   Object {
+    "data": Object {
+      "files": Array [
+        "lib/boo/addon/templates/components/bar.hbs",
+        "lib/foo/addon/components/bar.js",
+        "lib/foo/addon/templates/components/bar.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "Boo$Bar",

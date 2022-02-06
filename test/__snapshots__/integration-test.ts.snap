@@ -571,6 +571,11 @@ Object {
   },
   "response": Array [
     Object {
+      "data": Object {
+        "files": Array [
+          "app/components/foo.hbs",
+        ],
+      },
       "detail": "component",
       "kind": 7,
       "label": "Foo",
@@ -851,6 +856,11 @@ Object {
 exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/hello.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "hello",
@@ -869,6 +879,11 @@ Array [
     },
   },
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/darling.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "darling",
@@ -968,6 +983,11 @@ Object {
 exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for component #2 < 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/hello.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "Hello",
@@ -986,6 +1006,11 @@ Array [
     },
   },
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/darling.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "Darling",
@@ -1226,6 +1251,11 @@ Object {
       ],
     },
     Object {
+      "data": Object {
+        "files": Array [
+          "app/components/hello.hbs",
+        ],
+      },
       "detail": "component",
       "kind": 7,
       "label": "hello",
@@ -1246,6 +1276,11 @@ Object {
       },
     },
     Object {
+      "data": Object {
+        "files": Array [
+          "app/components/darling.hbs",
+        ],
+      },
       "detail": "component",
       "kind": 7,
       "label": "darling",
@@ -1272,6 +1307,11 @@ Object {
 exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/helpers/boo.js",
+      ],
+    },
     "detail": "helper",
     "kind": 3,
     "label": "boo",
@@ -1667,6 +1707,11 @@ Object {
 exports[`integration async fs enabled: false Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/helpers/boo.js",
+      ],
+    },
     "detail": "helper",
     "kind": 3,
     "label": "boo",
@@ -2121,6 +2166,11 @@ Object {
       "version": "3.27.0",
     },
     Object {
+      "data": Object {
+        "files": Array [
+          "app/modifiers/boo.js",
+        ],
+      },
       "detail": "modifier",
       "kind": 3,
       "label": "boo",
@@ -2869,6 +2919,11 @@ Array [
     },
     "response": Array [
       Object {
+        "data": Object {
+          "files": Array [
+            "../addon/components/item.hbs",
+          ],
+        },
         "detail": "component",
         "kind": 7,
         "label": "Item",
@@ -2911,6 +2966,11 @@ Array [
     },
     "response": Array [
       Object {
+        "data": Object {
+          "files": Array [
+            "../addon/components/item.hbs",
+          ],
+        },
         "detail": "component",
         "kind": 7,
         "label": "Item",
@@ -3586,6 +3646,11 @@ Object {
   },
   "response": Array [
     Object {
+      "data": Object {
+        "files": Array [
+          "app/components/foo.hbs",
+        ],
+      },
       "detail": "component",
       "kind": 7,
       "label": "Foo",
@@ -3866,6 +3931,11 @@ Object {
 exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for component #1 {{ 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/hello.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "hello",
@@ -3884,6 +3954,11 @@ Array [
     },
   },
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/darling.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "darling",
@@ -3983,6 +4058,11 @@ Object {
 exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for component #2 < 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/hello.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "Hello",
@@ -4001,6 +4081,11 @@ Array [
     },
   },
   Object {
+    "data": Object {
+      "files": Array [
+        "app/components/darling.hbs",
+      ],
+    },
     "detail": "component",
     "kind": 7,
     "label": "Darling",
@@ -4241,6 +4326,11 @@ Object {
       ],
     },
     Object {
+      "data": Object {
+        "files": Array [
+          "app/components/hello.hbs",
+        ],
+      },
       "detail": "component",
       "kind": 7,
       "label": "hello",
@@ -4261,6 +4351,11 @@ Object {
       },
     },
     Object {
+      "data": Object {
+        "files": Array [
+          "app/components/darling.hbs",
+        ],
+      },
       "detail": "component",
       "kind": 7,
       "label": "darling",
@@ -4287,6 +4382,11 @@ Object {
 exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for helper #5 {{name ( 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/helpers/boo.js",
+      ],
+    },
     "detail": "helper",
     "kind": 3,
     "label": "boo",
@@ -4682,6 +4782,11 @@ Object {
 exports[`integration async fs enabled: true Autocomplete works for broken templates autocomplete information for helper #6 {{name (foo ( 1`] = `
 Array [
   Object {
+    "data": Object {
+      "files": Array [
+        "app/helpers/boo.js",
+      ],
+    },
     "detail": "helper",
     "kind": 3,
     "label": "boo",
@@ -5136,6 +5241,11 @@ Object {
       "version": "3.27.0",
     },
     Object {
+      "data": Object {
+        "files": Array [
+          "app/modifiers/boo.js",
+        ],
+      },
       "detail": "modifier",
       "kind": 3,
       "label": "boo",
@@ -5884,6 +5994,11 @@ Array [
     },
     "response": Array [
       Object {
+        "data": Object {
+          "files": Array [
+            "../addon/components/item.hbs",
+          ],
+        },
         "detail": "component",
         "kind": 7,
         "label": "Item",
@@ -5926,6 +6041,11 @@ Array [
     },
     "response": Array [
       Object {
+        "data": Object {
+          "files": Array [
+            "../addon/components/item.hbs",
+          ],
+        },
         "detail": "component",
         "kind": 7,
         "label": "Item",

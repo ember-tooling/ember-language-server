@@ -1,7 +1,7 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import { URI } from 'vscode-uri';
-import { startServer, initServer, reloadProjects, openFile, normalizeUri } from './test_helpers/integration-helpers';
+import { startServer, initServer, reloadProjects, openFile, normalizeUri, normalizeCompletionRequest } from './test_helpers/integration-helpers';
 import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 
 import { CompletionRequest, Definition, DefinitionRequest } from 'vscode-languageserver-protocol/node';
@@ -47,7 +47,8 @@ describe('With `full-project` initialized on server', () => {
   describe('Completion request', () => {
     jest.setTimeout(15000);
     it('returns all components and helpers when requesting completion items in a handlebars expression', async () => {
-      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'application.hbs');
+      const root = path.join(__dirname, 'fixtures', 'full-project');
+      const applicationTemplatePath = path.join(root, 'app', 'templates', 'application.hbs');
       const params = {
         textDocument: {
           uri: URI.file(applicationTemplatePath).toString(),
@@ -62,11 +63,12 @@ describe('With `full-project` initialized on server', () => {
 
       const response = await connection.sendRequest(CompletionRequest.method, params);
 
-      expect(response).toMatchSnapshot();
+      expect(normalizeCompletionRequest(response, root)).toMatchSnapshot();
     });
 
     it('returns all angle-bracket in a element expression', async () => {
-      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'angle-completion.hbs');
+      const root = path.join(__dirname, 'fixtures', 'full-project');
+      const applicationTemplatePath = path.join(root, 'app', 'templates', 'angle-completion.hbs');
       const params = {
         textDocument: {
           uri: URI.file(applicationTemplatePath).toString(),
@@ -81,11 +83,12 @@ describe('With `full-project` initialized on server', () => {
 
       const response = await connection.sendRequest(CompletionRequest.method, params);
 
-      expect(response).toMatchSnapshot();
+      expect(normalizeCompletionRequest(response, root)).toMatchSnapshot();
     });
 
     it('returns all routes when requesting completion items in an inline link-to', async () => {
-      const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      const root = path.join(__dirname, 'fixtures', 'full-project');
+      const templatePath = path.join(root, 'app', 'templates', 'definition.hbs');
       const params = {
         textDocument: {
           uri: URI.file(templatePath).toString(),
@@ -100,11 +103,12 @@ describe('With `full-project` initialized on server', () => {
 
       const response = await connection.sendRequest(CompletionRequest.method, params);
 
-      expect(response).toMatchSnapshot();
+      expect(normalizeCompletionRequest(response, root)).toMatchSnapshot();
     });
 
     it('returns all routes when requesting completion items in a block link-to', async () => {
-      const templatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'definition.hbs');
+      const root = path.join(__dirname, 'fixtures', 'full-project');
+      const templatePath = path.join(root, 'app', 'templates', 'definition.hbs');
       const params = {
         textDocument: {
           uri: URI.file(templatePath).toString(),
@@ -119,11 +123,12 @@ describe('With `full-project` initialized on server', () => {
 
       const response = await connection.sendRequest(CompletionRequest.method, params);
 
-      expect(response).toMatchSnapshot();
+      expect(normalizeCompletionRequest(response, root)).toMatchSnapshot();
     });
 
     it('returns all angle-bracket in a element expression for in repo addons without batman syntax', async () => {
-      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'full-project', 'app', 'templates', 'inrepo-addon-completion.hbs');
+      const root = path.join(__dirname, 'fixtures', 'full-project');
+      const applicationTemplatePath = path.join(root, 'app', 'templates', 'inrepo-addon-completion.hbs');
       const params = {
         textDocument: {
           uri: URI.file(applicationTemplatePath).toString(),
@@ -138,7 +143,7 @@ describe('With `full-project` initialized on server', () => {
 
       const response = await connection.sendRequest(CompletionRequest.method, params);
 
-      expect(response).toMatchSnapshot();
+      expect(normalizeCompletionRequest(response, root)).toMatchSnapshot();
     });
   });
 

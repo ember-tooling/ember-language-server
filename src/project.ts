@@ -156,6 +156,9 @@ export class Project extends BaseProject {
     this.addonsMeta = this.providers.addonsMeta.filter((el) => el.root !== this.root);
     this.builtinProviders = initBuiltinProviders(this.addonsMeta);
   }
+  addonForFile(filePath: string) {
+    return this.addonsMeta.find((el) => filePath.startsWith(el.root));
+  }
   constructor(public readonly root: string, addons: string[] = [], pkg: PackageInfo = {}) {
     super(root);
     this.addons = addons;

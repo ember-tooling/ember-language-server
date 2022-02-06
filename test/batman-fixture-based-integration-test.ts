@@ -1,7 +1,15 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import { URI } from 'vscode-uri';
-import { startServer, initServer, reloadProjects, openFile, normalizeUri, fsProjectToJSON } from './test_helpers/integration-helpers';
+import {
+  startServer,
+  initServer,
+  reloadProjects,
+  openFile,
+  normalizeUri,
+  fsProjectToJSON,
+  normalizeCompletionRequest,
+} from './test_helpers/integration-helpers';
 import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 
 import { CompletionRequest, Definition, DefinitionRequest } from 'vscode-languageserver-protocol/node';
@@ -51,7 +59,8 @@ describe('With `batman project` initialized on server', () => {
   describe('Completion request', () => {
     jest.setTimeout(15000);
     it('returns all angle-bracket in a element expression for in repo addons with batman syntax', async () => {
-      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'batman', 'app', 'templates', 'batman-completion.hbs');
+      const root = path.join(__dirname, 'fixtures', 'batman');
+      const applicationTemplatePath = path.join(root, 'app', 'templates', 'batman-completion.hbs');
       const params = {
         textDocument: {
           uri: URI.file(applicationTemplatePath).toString(),
@@ -66,11 +75,12 @@ describe('With `batman project` initialized on server', () => {
 
       const response = await connection.sendRequest(CompletionRequest.method, params);
 
-      expect(response).toMatchSnapshot();
+      expect(normalizeCompletionRequest(response, root)).toMatchSnapshot();
     });
 
     it('returns all angle-bracket components with same name from different namespaces', async () => {
-      const applicationTemplatePath = path.join(__dirname, 'fixtures', 'batman', 'app', 'templates', 'same-component-name.hbs');
+      const root = path.join(__dirname, 'fixtures', 'batman');
+      const applicationTemplatePath = path.join(root, 'app', 'templates', 'same-component-name.hbs');
       const params = {
         textDocument: {
           uri: URI.file(applicationTemplatePath).toString(),
@@ -85,7 +95,7 @@ describe('With `batman project` initialized on server', () => {
 
       const response = await connection.sendRequest(CompletionRequest.method, params);
 
-      expect(response).toMatchSnapshot();
+      expect(normalizeCompletionRequest(response, root)).toMatchSnapshot();
     });
   });
 

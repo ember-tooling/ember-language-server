@@ -62,6 +62,39 @@ export type Registry = {
   };
 };
 
+export function normalizeCompletionRequest(results: CompletionItem[] | unknown, root: string | string[]) {
+  const roots_ = Array.isArray(root) ? root : [root];
+  const roots = Array.from(new Set(roots_))
+    .map((r) => normalizePath(r))
+    .sort();
+  const bestRootForPath = (fPath) => {
+    const looksLikeRoots = roots.filter((r) => fPath.startsWith(r + '/')).sort((a, b) => b.length - a.length);
+
+    if (looksLikeRoots.length) {
+      return looksLikeRoots[0];
+    } else {
+      return roots[0];
+    }
+  };
+
+  return (results as CompletionItem[]).map((r) => {
+    if (r.data) {
+      if (r.data.files) {
+        r.data.files = r.data.files
+          .map((f) => normalizePath(f))
+          .map((f) => path.relative(bestRootForPath(f), f))
+          .sort();
+      }
+
+      if (r.data.resolvedFile) {
+        r.data.resolvedFile = path.relative(bestRootForPath(r.data.resolvedFile), r.data.resolvedFile);
+      }
+    }
+
+    return r;
+  });
+}
+
 export function asyncFSProvider() {
   // likely we should emit special error objects instead of nulls
   // if (error !== null && typeof error === 'object' && (error.code === 'ENOENT' || error.code === 'ENOTDIR' || error.code === 'EPERM')) {
@@ -308,7 +341,7 @@ export async function createProject(
   files: unknown,
   connection: MessageConnection,
   projectName: string[]
-): Promise<{ normalizedPath: string[]; originalPath: string; result: UnknownResult[]; destroy(): Promise<void> }>;
+): Promise<{ normalizedPath: string[]; originalPath: string[]; result: UnknownResult[]; destroy(): Promise<void> }>;
 export async function createProject(
   files: unknown,
   connection: MessageConnection,
@@ -500,15 +533,33 @@ export async function getResult(
   const params = textDocument(modelPath, position);
 
   openFile(connection, modelPath);
-  const response = await connection.sendRequest(reqType as never, params);
+  let response = await connection.sendRequest(reqType as never, params);
+
+  if (reqType === CompletionRequest.method) {
+    if (!Array.isArray(projectName) && Array.isArray(response)) {
+      response = normalizeCompletionRequest(response, originalPath);
+    }
+  }
 
   await destroy();
 
   if (Array.isArray(projectName)) {
     const resultsArr: IResponse<unknown>[] = [];
+    const roots = result.reduce(
+      (acc, el) => {
+        acc.push(...el.addonsMeta.map((e) => e.root));
+
+        return acc;
+      },
+      [...originalPath]
+    );
 
     for (let i = 0; i < projectName.length; i++) {
-      resultsArr.push(_buildResponse(response, normalizedPath[i], result[i]));
+      if (reqType === CompletionRequest.method) {
+        resultsArr.push(_buildResponse(normalizeCompletionRequest(response, roots), normalizedPath[i], result[i]));
+      } else {
+        resultsArr.push(_buildResponse(response, normalizedPath[i], result[i]));
+      }
     }
 
     return resultsArr;

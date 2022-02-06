@@ -1,6 +1,6 @@
 {
   "app/app.js": "import Application from '@ember/application';\r\nimport Resolver from './resolver';\r\nimport loadInitializers from 'ember-load-initializers';\r\nimport config from './config/environment';\r\n\r\nconst App = Application.extend({\r\n  modulePrefix: config.modulePrefix,\r\n  podModulePrefix: config.podModulePrefix,\r\n  Resolver\r\n});\r\n\r\nloadInitializers(App, config.modulePrefix);\r\n\r\nexport default App;\r\n",
-  "app/components/another-awesome-component.js": "import Bar from 'foo/components/bar';\nexport default class Awesome extends Bar {\n\n}\n",
+  "app/components/another-awesome-component.js": "import Bar from 'foo/components/bar';\r\nexport default class Awesome extends Bar {\r\n\r\n}\r\n",
   "app/components/my-awesome-component.js": "",
   "app/helpers/some-helper.js": "",
   "app/models/model-a.js": "import DS from 'ember-data';\r\n\r\nexport default DS.Model.extend({\r\n\r\n  modelB: DS.hasMany('model-b'),\r\n\r\n  someAttr: DS.attr('custom-transform')\r\n\r\n});\r\n",
