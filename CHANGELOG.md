@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/lifeart/ember-language-server/compare/v2.10.1...v2.11.0) (2022-02-06)
+
+
+### Features
+
+* legacy completion and definition modes for template imports ([#354](https://github.com/lifeart/ember-language-server/issues/354)) ([21e11bd](https://github.com/lifeart/ember-language-server/commit/21e11bd65abab56d28dc8b366f034ac8414c6212))
+
 ## [2.10.1](https://github.com/lifeart/ember-language-server/compare/v2.10.0...v2.10.1) (2022-02-06)
 
 
