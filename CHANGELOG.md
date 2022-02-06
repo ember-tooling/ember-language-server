@@ -1,3 +1,10 @@
+## [2.10.1](https://github.com/lifeart/ember-language-server/compare/v2.10.0...v2.10.1) (2022-02-06)
+
+
+### Bug Fixes
+
+* improve range walker keys stability ([#353](https://github.com/lifeart/ember-language-server/issues/353)) ([ca88dbc](https://github.com/lifeart/ember-language-server/commit/ca88dbc3c119bbe700dc2340a0a1b49e7a330d4c))
+
 # [2.10.0](https://github.com/lifeart/ember-language-server/compare/v2.9.0...v2.10.0) (2022-02-05)
 
 
