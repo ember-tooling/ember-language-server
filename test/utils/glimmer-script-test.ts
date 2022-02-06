@@ -1,4 +1,5 @@
 import { getFileRanges, RangeWalker, TemplateData, getScope, getPlaceholderPath } from './../../src/utils/glimmer-script';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
 function rw(tpl: string) {
   return new RangeWalker(getFileRanges(tpl));
@@ -315,7 +316,34 @@ describe('glimmer-scripts', function () {
       const r = rw(tpl);
       const [template] = r.templates(true);
 
-      expect(template.absoluteContent.split('\n')).toStrictEqual(['', '', '', '', ' <template>123', ' </template>']);
+      expect(template.absoluteContent.split('\n')).toStrictEqual(['', '', '', ' <template>123', ' </template>']);
+    });
+    it('match document offsets with absolute content', function () {
+      const tpl = `
+      class MyComponent {
+         <template>
+            <$123
+        </template>
+    }
+      `;
+      const originalDoc = TextDocument.create('', 'javascript', 0, tpl);
+      const tParts = tpl.split('\n');
+      const line = tParts.findIndex((e) => e.includes('$'));
+      const p1 = {
+        character: tParts[line].indexOf('$'),
+        line,
+      };
+      const p2 = {
+        character: tParts[line].indexOf('$') + 4,
+        line,
+      };
+
+      expect(originalDoc.getText({ start: p1, end: p2 })).toBe('$123');
+      const r = rw(originalDoc.getText());
+      const [template] = r.templates(true);
+      const templateDoc = TextDocument.create('', 'handlebars', 0, template.absoluteContent);
+
+      expect(templateDoc.getText({ start: p1, end: p2 })).toBe('$123');
     });
     it('return expected list of locals', function () {
       const tpl = `<div>{{this.foo}}</div>`;

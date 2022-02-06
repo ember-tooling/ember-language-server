@@ -1,6 +1,6 @@
 import { createServer, getResult, ServerBucket } from './test_helpers/public-integration-helpers';
 import { MessageConnection } from 'vscode-jsonrpc/node';
-import { CompletionRequest } from 'vscode-languageserver-protocol/node';
+import { CompletionRequest, DefinitionRequest } from 'vscode-languageserver-protocol/node';
 
 function createPointer(tpl = '') {
   const findMe = '⚡';
@@ -114,6 +114,50 @@ describe('has basic template imports support', function () {
             },
           },
           'app/components/hello/index.gts',
+          position
+        );
+
+        expect(result).toMatchSnapshot();
+      });
+    });
+  });
+
+  describe('DefinitionRequest inside <template>', () => {
+    beforeAll(async () => {
+      instance = await createServer({ asyncFsEnabled: false });
+      connection = instance.connection;
+    });
+
+    afterAll(async () => {
+      await instance.destroy();
+    });
+
+    describe('template imports definition requests working fine [legacy mode]', () => {
+      it('support component definition in .gjs files', async () => {
+        const tpl = `
+          export default class Foo extends Bar {
+            <template>
+              <W⚡orld/>
+            </template>
+          }
+        `;
+        const { content, position } = createPointer(tpl);
+        const result = await getResult(
+          DefinitionRequest.method,
+          connection,
+          {
+            app: {
+              components: {
+                hello: {
+                  'index.gjs': content,
+                },
+                world: {
+                  'index.gts': '',
+                },
+              },
+            },
+          },
+          'app/components/hello/index.gjs',
           position
         );
 

@@ -412,7 +412,7 @@ export default class Server {
     this.connection.onDidChangeWatchedFiles(this.onDidChangeWatchedFiles.bind(this));
     this.connection.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this));
     this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
-    this.connection.onDefinition(this.definitionProvider.handler);
+    this.connection.onDefinition(this.onDefinition.bind(this));
     this.connection.onCompletion(this.onCompletion.bind(this));
     this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
     this.connection.onExecuteCommand(this.onExecute.bind(this));
@@ -677,6 +677,10 @@ export default class Server {
 
   private async onHover(params: HoverParams): Promise<Hover | null> {
     return await this.hoverProvider.provideHover(params);
+  }
+
+  private async onDefinition(params: TextDocumentPositionParams) {
+    return this.definitionProvider.handle(params);
   }
 
   private async onCompletionResolve(item: CompletionItem) {

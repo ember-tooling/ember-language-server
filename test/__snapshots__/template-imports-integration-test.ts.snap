@@ -65,3 +65,34 @@ Object {
   ],
 }
 `;
+
+exports[`has basic template imports support DefinitionRequest inside <template> template imports definition requests working fine [legacy mode] support component definition in .gjs files 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.gjs",
+      ],
+      "world": Array [
+        "app/components/world/index.gts",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/world/index.gts",
+    },
+  ],
+}
+`;
