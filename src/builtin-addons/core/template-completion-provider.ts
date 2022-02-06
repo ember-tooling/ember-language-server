@@ -204,6 +204,9 @@ export default class TemplateCompletionProvider {
           Object.keys(registry.component).map((rawName) => {
             return {
               label: rawName,
+              data: {
+                files: registry.component[rawName],
+              },
               kind: CompletionItemKind.Class,
               detail: 'component',
             };
@@ -265,6 +268,9 @@ export default class TemplateCompletionProvider {
       ...Object.keys(registry.component).map((rawName) => {
         return {
           label: rawName,
+          data: {
+            files: registry.component[rawName],
+          },
           kind: CompletionItemKind.Class,
           detail: 'component',
         };
@@ -273,6 +279,9 @@ export default class TemplateCompletionProvider {
         return {
           label: rawName,
           kind: CompletionItemKind.Function,
+          data: {
+            files: registry.helper[rawName],
+          },
           detail: 'helper',
         };
       }),
@@ -302,6 +311,9 @@ export default class TemplateCompletionProvider {
     return Object.keys(registry.component).map((rawName) => {
       return {
         label: rawName,
+        data: {
+          files: registry.component[rawName],
+        },
         kind: CompletionItemKind.Class,
         detail: 'component',
       };
@@ -324,6 +336,9 @@ export default class TemplateCompletionProvider {
     return Object.keys(registry.helper).map((helperName) => {
       return {
         label: helperName,
+        data: {
+          files: registry.helper[helperName],
+        },
         kind: CompletionItemKind.Function,
         detail: 'helper',
       };
@@ -582,6 +597,9 @@ export default class TemplateCompletionProvider {
         const resolvedModifiers = Object.keys(registry.modifier).map((name) => {
           return {
             label: name,
+            data: {
+              files: registry.modifier[name],
+            },
             kind: CompletionItemKind.Function,
             detail: 'modifier',
           };

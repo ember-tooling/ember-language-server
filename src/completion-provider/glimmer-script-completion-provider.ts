@@ -1,10 +1,14 @@
-import { CompletionItem, TextDocumentPositionParams } from 'vscode-languageserver/node';
+import { CompletionItem, TextDocumentPositionParams, TextEdit, Position, InsertTextFormat } from 'vscode-languageserver/node';
 import Server from '../server';
+import ASTPath from '../glimmer-utils';
+import { Project } from '../project';
 import { getFileRanges, RangeWalker, getPlaceholderPathFromAst, getScope, documentPartForPosition } from '../utils/glimmer-script';
 import { parseScriptFile as parse } from 'ember-meta-explorer';
 import { getFocusPath } from '../utils/glimmer-template';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-
+// @ts-expect-error es module import
+import * as camelCase from 'lodash/camelCase';
+import * as path from 'path';
 export default class GlimmerScriptCompletionProvider {
   constructor(private server: Server) {}
   async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
@@ -32,17 +36,23 @@ export default class GlimmerScriptCompletionProvider {
     const templateForPosition = documentPartForPosition(templates, params.position);
 
     if (templateForPosition) {
-      const ast = parse(cleanScriptWalker.content, {
-        sourceType: 'module',
-      });
-      const placeholder = getPlaceholderPathFromAst(ast, templateForPosition.key);
-
-      if (!placeholder) {
-        return [];
-      }
-
       const results: CompletionItem[] = [];
-      const scopes = getScope(placeholder.scope);
+      let scopes: string[] = [];
+
+      try {
+        const ast = parse(cleanScriptWalker.content, {
+          sourceType: 'module',
+        });
+        const placeholder = getPlaceholderPathFromAst(ast, templateForPosition.key);
+
+        if (!placeholder) {
+          return [];
+        }
+
+        scopes = getScope(placeholder.scope);
+      } catch (e) {
+        // oops
+      }
 
       scopes.forEach((name) => {
         results.push({
@@ -66,7 +76,7 @@ export default class GlimmerScriptCompletionProvider {
       const legacyResults = await this.server.templateCompletionProvider.provideCompletionsForFocusPath(info, params.textDocument, params.position, project);
 
       legacyResults.forEach((result) => {
-        results.push(result);
+        results.push(this.transformLegacyResult(result, scopes, params.position, info.focusPath, project));
       });
 
       return results;
@@ -75,5 +85,48 @@ export default class GlimmerScriptCompletionProvider {
     } else {
       return [];
     }
+  }
+  transformLegacyResult(result: CompletionItem, scopes: string[], position: Position, focusPath: ASTPath, project: Project): CompletionItem {
+    if (!result.data?.files?.length) {
+      return result;
+    }
+
+    const scripts: string[] = result.data.files.filter((f: string) => {
+      const e = project.matchPathToType(f);
+
+      return e && e.kind === 'script';
+    });
+    const script = scripts.find((e) => project.matchPathToType(e)?.scope === 'application');
+
+    if (!script) {
+      return result;
+    }
+
+    let p = path.relative(project.root, script).replace('app', project.name).replace('.js', '').replace('.ts', '').split('\\').join('/');
+
+    if (p.endsWith('/index')) {
+      p = p.replace('/index', '');
+    }
+
+    const name = result.label.includes('::') ? result.label.split('::').pop() : camelCase(result.label);
+
+    if (!name) {
+      return result;
+    }
+
+    if (scopes.includes(name)) {
+      return result;
+    }
+
+    result.insertTextFormat = InsertTextFormat.Snippet;
+    result.detail = `(${result.label}) ${result.detail || ''}`.trim();
+    result.label = name;
+    result.additionalTextEdits = [TextEdit.insert(Position.create(0, 0), `import ${name} from '${p}';`)];
+
+    const loc = focusPath.node.loc.toJSON();
+
+    result.textEdit = TextEdit.insert(Position.create(position.line, loc.start.column), name);
+
+    return result;
   }
 }
