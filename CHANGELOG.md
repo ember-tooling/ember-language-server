@@ -1,3 +1,10 @@
+# [2.12.0](https://github.com/lifeart/ember-language-server/compare/v2.11.0...v2.12.0) (2022-02-06)
+
+
+### Features
+
+* template suggestion import ([#356](https://github.com/lifeart/ember-language-server/issues/356)) ([73177fc](https://github.com/lifeart/ember-language-server/commit/73177fcde8d4a84f711dc3d4f40230a6d68fe62e))
+
 # [2.11.0](https://github.com/lifeart/ember-language-server/compare/v2.10.1...v2.11.0) (2022-02-06)
 
 
