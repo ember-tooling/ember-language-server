@@ -121,7 +121,7 @@ export default class GlimmerScriptCompletionProvider {
     result.insertTextFormat = InsertTextFormat.Snippet;
     result.detail = `(${result.label}) ${result.detail || ''}`.trim();
     result.label = name;
-    result.additionalTextEdits = [TextEdit.insert(Position.create(0, 0), `import ${name} from '${p}';`)];
+    result.additionalTextEdits = [TextEdit.insert(Position.create(0, 0), `import ${name} from '${p}';\n`)];
 
     const loc = focusPath.node.loc.toJSON();
 
