@@ -82,6 +82,71 @@ describe('glimmer-scripts', function () {
   });
 
   describe('RangeWalker', function () {
+    describe('stable keys', function () {
+      const tpl = `'const Boo = {};\n\nclass MyComponent {\n    <template>\n\n    <button>asa</button>\n    <\n        <:foo>\n\n\n        </:foo>\n\n        <Ui::Avatars @foo="name" />\n\n\n    <img src="">\n</template>\n\n}\n'`;
+      const r = rw(tpl);
+
+      const [template] = r.templates(true);
+      const rangeWithoutTemplates = r.subtract([template], true);
+
+      expect(rangeWithoutTemplates.content).toContain(template.key);
+    });
+    describe('stable with multiple mutations', function () {
+      const tpl = `'const Boo = {};\n\nclass MyComponent {\n    <template>\n\n    <button>asa</button>\n    <\n        <:foo>\n\n\n        </:foo>\n\n        <Ui::Avatars @foo="name" />\n\n\n    <img src="">\n</template>\n\n}\n'`;
+      let r = rw(tpl);
+
+      r = r.subtract(r.hbsInlineComments(true));
+      r = r.subtract(r.hbsComments(true));
+      r = r.subtract(r.htmlComments(true));
+
+      const [template] = r.templates(true);
+      const rangeWithoutTemplates = r.subtract([template], true);
+
+      expect(rangeWithoutTemplates.content).toContain(template.key);
+    });
+    describe('stable with multiple template mutations', function () {
+      const tpl = `
+        const Boo {
+          <template>1</template>
+        }
+        const Moo {
+          <template>2</template>
+        }
+      `;
+      const r = rw(tpl);
+
+      const templates = r.templates(true);
+
+      expect(templates.length).toBe(2);
+
+      const [template1, template2] = templates;
+
+      expect(template1.key).toContain('_');
+      expect(template2.key).toContain('_');
+      const rangeWithoutTemplates = r.subtract([template1, template2], true);
+
+      expect(rangeWithoutTemplates.content).toContain(template1.key);
+      expect(rangeWithoutTemplates.content).toContain(template2.key);
+    });
+    describe('stable with multiple step-by-step mutations', function () {
+      const tpl = `
+        const Boo {
+          <template>1</template>
+        }
+        const Moo {
+          <template>2</template>
+        }
+      `;
+      const r = rw(tpl);
+
+      const [template1, template2] = r.templates(true);
+      let rangeWithoutTemplates = r.subtract([template1], true);
+
+      rangeWithoutTemplates = rangeWithoutTemplates.subtract([template2], true);
+
+      expect(rangeWithoutTemplates.content).toContain(template1.key);
+      expect(rangeWithoutTemplates.content).toContain(template2.key);
+    });
     describe('content getter', function () {
       it('works just fine', function () {
         const tpl = `<template>\n<template>\n</template>`;

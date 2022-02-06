@@ -245,6 +245,10 @@ export class RangeWalker {
         const charPlaceholder = ' ';
         let key = part.key;
 
+        const hasKeysToAdd = () => {
+          return key.length && addPlaceholders;
+        };
+
         const charForPosition = () => {
           if (!addPlaceholders) {
             return charPlaceholder;
@@ -272,6 +276,12 @@ export class RangeWalker {
               return char;
             }
           });
+
+          if (hasKeysToAdd()) {
+            for (let i = 0; i < key.length; i++) {
+              rangeLine.addColumn(key.charAt(i));
+            }
+          }
         } else if (part.loc.start.line === lineNumber) {
           rangeLine.characters = rangeLine.characters.map((char, index) => {
             if (index >= part.loc.start.character) {
@@ -280,6 +290,12 @@ export class RangeWalker {
               return char;
             }
           });
+
+          if (hasKeysToAdd()) {
+            for (let i = 0; i < key.length; i++) {
+              rangeLine.addColumn(key.charAt(i));
+            }
+          }
         } else if (part.loc.end.line === lineNumber) {
           rangeLine.characters = rangeLine.characters.map((char, index) => {
             if (index < part.loc.end.character) {
