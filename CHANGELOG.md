@@ -1,3 +1,10 @@
+# [2.14.0](https://github.com/lifeart/ember-language-server/compare/v2.13.0...v2.14.0) (2022-02-11)
+
+
+### Features
+
+* folding range provider for {ts,js,gts,gjs} files ([#360](https://github.com/lifeart/ember-language-server/issues/360)) ([645c300](https://github.com/lifeart/ember-language-server/commit/645c300b9bef95192e340e65e607d41ce98ed97c))
+
 # [2.13.0](https://github.com/lifeart/ember-language-server/compare/v2.12.0...v2.13.0) (2022-02-11)
 
 
