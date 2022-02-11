@@ -8,7 +8,16 @@ import * as spawn from 'cross-spawn';
 import { set, merge, get } from 'lodash';
 import { AddonMeta } from '../../src/utils/addon-api';
 import { CompletionItem } from 'vscode-languageserver/node';
-import { DefinitionRequest, DocumentSymbol, DocumentSymbolRequest, Hover, HoverRequest, ReferencesRequest } from 'vscode-languageserver-protocol/node';
+import {
+  DefinitionRequest,
+  DocumentSymbol,
+  DocumentSymbolRequest,
+  FoldingRange,
+  FoldingRangeRequest,
+  Hover,
+  HoverRequest,
+  ReferencesRequest,
+} from 'vscode-languageserver-protocol/node';
 
 import {
   DidOpenTextDocumentNotification,
@@ -504,7 +513,13 @@ export async function getResult(
   fileToInspect: string,
   position: { line: number; character: number }
 ): Promise<IResponse<DocumentSymbol[]>>;
-
+export async function getResult(
+  reqType: typeof FoldingRangeRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect: string,
+  position: { line: number; character: number }
+): Promise<IResponse<FoldingRange[]>>;
 export async function getResult(
   reqType: typeof ReferencesRequest.type,
   connection: MessageConnection,

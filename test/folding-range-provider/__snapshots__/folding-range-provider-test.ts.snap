@@ -1,0 +1,211 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`has folding range support for handlebars language folding range for [.gts] files able to provide folding ranges  1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.gts",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "endCharacter": 31,
+      "endLine": 9,
+      "kind": "region",
+      "startCharacter": 20,
+      "startLine": 1,
+    },
+    Object {
+      "endCharacter": 30,
+      "endLine": 8,
+      "kind": "region",
+      "startCharacter": 24,
+      "startLine": 2,
+    },
+    Object {
+      "endCharacter": 35,
+      "endLine": 7,
+      "kind": "region",
+      "startCharacter": 28,
+      "startLine": 3,
+    },
+    Object {
+      "endCharacter": 28,
+      "endLine": 7,
+      "kind": "region",
+      "startCharacter": 36,
+      "startLine": 5,
+    },
+  ],
+}
+`;
+
+exports[`has folding range support for handlebars language folding range for [.hbs] files able to provide folding ranges  1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "endCharacter": 16,
+      "endLine": 6,
+      "kind": "region",
+      "startCharacter": 0,
+      "startLine": 0,
+    },
+    Object {
+      "endCharacter": 19,
+      "endLine": 5,
+      "kind": "region",
+      "startCharacter": 12,
+      "startLine": 1,
+    },
+    Object {
+      "endCharacter": 12,
+      "endLine": 5,
+      "kind": "region",
+      "startCharacter": 20,
+      "startLine": 3,
+    },
+  ],
+}
+`;
+
+exports[`has folding range support for handlebars language folding range for [.hbs] files able to provide folding ranges for blocks 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "endCharacter": 19,
+      "endLine": 2,
+      "kind": "region",
+      "startCharacter": 0,
+      "startLine": 0,
+    },
+  ],
+}
+`;
+
+exports[`has folding range support for handlebars language folding range for [.hbs] files able to provide folding ranges for comments 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "endCharacter": 16,
+      "endLine": 6,
+      "kind": "comment",
+      "startCharacter": 0,
+      "startLine": 0,
+    },
+  ],
+}
+`;
+
+exports[`has folding range support for handlebars language folding range for [.hbs] files able to provide folding ranges for inverse blocks 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "endCharacter": 19,
+      "endLine": 4,
+      "kind": "region",
+      "startCharacter": 0,
+      "startLine": 0,
+    },
+    Object {
+      "endCharacter": 12,
+      "endLine": 4,
+      "kind": "region",
+      "startCharacter": 20,
+      "startLine": 2,
+    },
+  ],
+}
+`;
+
+exports[`has folding range support for handlebars language folding range for [.hbs] files able to provide folding ranges for tags 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "endCharacter": 26,
+      "endLine": 2,
+      "kind": "region",
+      "startCharacter": 0,
+      "startLine": 0,
+    },
+  ],
+}
+`;
+
+exports[`has folding range support for handlebars language folding range for [.ts] files able to provide folding ranges  1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello/index.ts",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "endCharacter": 18,
+      "endLine": 7,
+      "kind": "region",
+      "startCharacter": 28,
+      "startLine": 1,
+    },
+    Object {
+      "endCharacter": 21,
+      "endLine": 6,
+      "kind": "region",
+      "startCharacter": 14,
+      "startLine": 2,
+    },
+    Object {
+      "endCharacter": 14,
+      "endLine": 6,
+      "kind": "region",
+      "startCharacter": 22,
+      "startLine": 4,
+    },
+  ],
+}
+`;
