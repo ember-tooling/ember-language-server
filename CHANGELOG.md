@@ -1,3 +1,10 @@
+# [2.13.0](https://github.com/lifeart/ember-language-server/compare/v2.12.0...v2.13.0) (2022-02-11)
+
+
+### Features
+
+* folding range provider for hbs files ([#359](https://github.com/lifeart/ember-language-server/issues/359)) ([b58a850](https://github.com/lifeart/ember-language-server/commit/b58a850bea935f123a86ae2764d00c9e7183c7e2))
+
 # [2.12.0](https://github.com/lifeart/ember-language-server/compare/v2.11.0...v2.12.0) (2022-02-06)
 
 
