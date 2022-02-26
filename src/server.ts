@@ -146,6 +146,12 @@ export default class Server {
     } else if (config.collectTemplateTokens === true) {
       enableTemplateTokensCollection();
     }
+
+    if (config.useBuiltinFoldingRangeProvider === false) {
+      this.foldingProvider.disable();
+    } else if (config.useBuiltinFoldingRangeProvider === true) {
+      this.foldingProvider.enable();
+    }
   }
 
   documentSymbolProviders!: DocumentSymbolProvider[];

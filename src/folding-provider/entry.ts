@@ -7,9 +7,20 @@ import { searchAndExtractHbs } from '@lifeart/ember-extract-inline-templates';
 import { parseScriptFile } from 'ember-meta-explorer';
 
 export default class FoldingProvider {
+  isEnabled = true;
   constructor(private server: Server) {}
   private templateFoldingProvider = new TemplateFoldingProvider();
+  enable() {
+    this.isEnabled = true;
+  }
+  disable() {
+    this.isEnabled = false;
+  }
   onFoldingRanges(params: FoldingRangeParams): FoldingRange[] | null {
+    if (!this.isEnabled) {
+      return null;
+    }
+
     const document = this.server.documents.get(params.textDocument.uri);
 
     if (!document) {
