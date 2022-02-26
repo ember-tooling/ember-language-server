@@ -1,3 +1,10 @@
+# [2.15.0](https://github.com/lifeart/ember-language-server/compare/v2.14.0...v2.15.0) (2022-02-26)
+
+
+### Features
+
+* ability to enable or disable builtin folding range provider ([#364](https://github.com/lifeart/ember-language-server/issues/364)) ([824db11](https://github.com/lifeart/ember-language-server/commit/824db1100b34f2e414a75911305273343f6fcaf3))
+
 # [2.14.0](https://github.com/lifeart/ember-language-server/compare/v2.13.0...v2.14.0) (2022-02-11)
 
 
