@@ -25,6 +25,7 @@ import {
   isAngleComponentPath,
   isModifierPath,
   isNamedBlockName,
+  isElementAttribute,
 } from '../../utils/ast-helpers';
 import {
   listComponents,
@@ -47,6 +48,7 @@ import { ASTv1 } from '@glimmer/syntax';
 import { URI } from 'vscode-uri';
 import { componentsContextData } from './template-context-provider';
 import { IRegistry } from '../../utils/registry-api';
+import { docForAttribute } from '../doc/autocomplete';
 
 const mListModifiers = memoize(listModifiers, { length: 1, maxAge: 60000 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
@@ -427,6 +429,16 @@ export default class TemplateCompletionProvider {
 
         logDebugInfo(candidates, scopedValues);
         completions.push(...uniqBy([...candidates, ...scopedValues], 'label'));
+      } else if (isElementAttribute(focusPath) && (focusPath.node as ASTv1.AttrNode).name.startsWith('.')) {
+        const attrName = '...attributes';
+
+        if (!(focusPath.parent as ASTv1.ElementNode).attributes.find((attr) => attr.name === attrName)) {
+          completions.push({
+            label: attrName,
+            documentation: docForAttribute(attrName),
+            kind: CompletionItemKind.Property,
+          });
+        }
       } else if (isComponentArgumentName(focusPath)) {
         // <Foo @name.. />
 

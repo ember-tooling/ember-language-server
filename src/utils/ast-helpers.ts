@@ -457,7 +457,11 @@ export function isScopedPathExpression(path: any): boolean {
 }
 
 export function isComponentArgumentName(path: any): boolean {
-  return hasNodeType(path.node, 'AttrNode') && path.node.name.startsWith('@');
+  return isElementAttribute(path) && path.node.name.startsWith('@');
+}
+
+export function isElementAttribute(path: any): boolean {
+  return hasNodeType(path.node, 'AttrNode');
 }
 
 export function isLinkComponentRouteTarget(path: any): boolean {

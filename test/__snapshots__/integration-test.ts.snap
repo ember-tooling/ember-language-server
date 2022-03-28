@@ -352,6 +352,47 @@ Object {
 }
 `;
 
+exports[`integration async fs enabled: false Able to provide autocomplete information for element attributes support ...attributes autocomplete 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "documentation": "
+In general, you should place ...attributes after any attributes you specify to give people using your component an opportunity to override your attribute.
+If ...attributes appears after an attribute, it overrides that attribute.
+If it appears before an attribute, it does not.
+Place ...attributes before your attributes only if you want to disallow tags from overriding your attributes.
+This is likely to be unusual.
+In addition, the class attribute is special, and will be merged with any existing classes on the element rather than overwriting them.
+This allows you to progressively add CSS classes to your components, and makes them more flexible overall.
+",
+      "kind": 10,
+      "label": "...attributes",
+      "textEdit": Object {
+        "newText": "...attributes",
+        "range": Object {
+          "end": Object {
+            "character": 8,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
 exports[`integration async fs enabled: false Able to provide autocomplete information for local context access support child project addon calling parent project addon 1`] = `
 Object {
   "addonsMeta": Array [
@@ -3419,6 +3460,47 @@ Object {
           },
           "start": Object {
             "character": 17,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for element attributes support ...attributes autocomplete 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "documentation": "
+In general, you should place ...attributes after any attributes you specify to give people using your component an opportunity to override your attribute.
+If ...attributes appears after an attribute, it overrides that attribute.
+If it appears before an attribute, it does not.
+Place ...attributes before your attributes only if you want to disallow tags from overriding your attributes.
+This is likely to be unusual.
+In addition, the class attribute is special, and will be merged with any existing classes on the element rather than overwriting them.
+This allows you to progressively add CSS classes to your components, and makes them more flexible overall.
+",
+      "kind": 10,
+      "label": "...attributes",
+      "textEdit": Object {
+        "newText": "...attributes",
+        "range": Object {
+          "end": Object {
+            "character": 8,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 7,
             "line": 0,
           },
         },

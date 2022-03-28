@@ -684,6 +684,43 @@ describe('integration', function () {
         });
       });
 
+      describe('Able to provide autocomplete information for element attributes', () => {
+        it('support ...attributes autocomplete', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'foo.hbs': '<input ./>',
+                },
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 0, character: 8 }
+          );
+
+          expect(result).toMatchSnapshot();
+        });
+        it('does not complete attributes twice', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'foo.hbs': '<input ...attributes .>',
+                },
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 0, character: 22 }
+          );
+
+          expect(result.response.length).toBe(0);
+        });
+      });
+
       describe('Able to provide autocomplete information for local scoped params', () => {
         it('support tag blocks', async () => {
           const result = await getResult(
