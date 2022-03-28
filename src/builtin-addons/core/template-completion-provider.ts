@@ -26,6 +26,8 @@ import {
   isModifierPath,
   isNamedBlockName,
   isElementAttribute,
+  isHashPair,
+  isHashPairValue,
 } from '../../utils/ast-helpers';
 import {
   listComponents,
@@ -48,7 +50,7 @@ import { ASTv1 } from '@glimmer/syntax';
 import { URI } from 'vscode-uri';
 import { componentsContextData } from './template-context-provider';
 import { IRegistry } from '../../utils/registry-api';
-import { docForAttribute } from '../doc/autocomplete';
+import { argumentsForBuiltinComponent, docForAttribute, valuesForBuiltinComponentArgument } from '../doc/autocomplete';
 
 const mListModifiers = memoize(listModifiers, { length: 1, maxAge: 60000 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
@@ -430,6 +432,8 @@ export default class TemplateCompletionProvider {
         logDebugInfo(candidates, scopedValues);
         completions.push(...uniqBy([...candidates, ...scopedValues], 'label'));
       } else if (isElementAttribute(focusPath) && (focusPath.node as ASTv1.AttrNode).name.startsWith('.')) {
+        logDebugInfo('isElementAttribute');
+
         const attrName = '...attributes';
 
         if (!(focusPath.parent as ASTv1.ElementNode).attributes.find((attr) => attr.name === attrName)) {
@@ -440,6 +444,8 @@ export default class TemplateCompletionProvider {
           });
         }
       } else if (isComponentArgumentName(focusPath)) {
+        logDebugInfo('isComponentArgumentName');
+
         // <Foo @name.. />
 
         const maybeComponentName = focusPath.parent.tag;
@@ -498,6 +504,7 @@ export default class TemplateCompletionProvider {
 
         completions.push(...uniqBy(candidates, 'label'));
       } else if (isArgumentPathExpression(focusPath)) {
+        logDebugInfo('isArgumentPathExpression');
         // {{@ite..}}
         const rawCandidates = await this.getLocalPathExpressionCandidates(uri, originalText);
         const candidates = rawCandidates.filter((el) => {
@@ -541,6 +548,8 @@ export default class TemplateCompletionProvider {
         completions.push(...uniqBy(candidates, 'label'));
         completions.push(...emberSubExpressionItems);
       } else if (isPathExpression(focusPath)) {
+        logDebugInfo('isPathExpression');
+
         if (isScopedPathExpression(focusPath)) {
           const scopedValues = this.getScopedValues(focusPath);
 
@@ -618,6 +627,47 @@ export default class TemplateCompletionProvider {
         });
 
         completions.push(...uniqBy([...emberModifierItems, ...resolvedModifiers, ...builtinModifiers()], 'label'));
+      } else if (isHashPair(focusPath)) {
+        // {{#each key=}}
+        logDebugInfo('isHashPair');
+
+        const grandPaparentNode = focusPath.parentPath?.parentPath?.node as ASTv1.BlockStatement;
+
+        if (grandPaparentNode && grandPaparentNode.type === 'BlockStatement') {
+          if (isPathExpression(grandPaparentNode.path)) {
+            const name = (grandPaparentNode.path as ASTv1.PathExpression).original;
+
+            completions.push(
+              ...argumentsForBuiltinComponent(name).map((el) => {
+                return {
+                  label: el.label,
+                  kind: CompletionItemKind.Property,
+                  documentation: el.documentation,
+                };
+              })
+            );
+          }
+        }
+      } else if (isHashPairValue(focusPath)) {
+        // {{#each key=value}} {{/each}}
+        logDebugInfo('isHashPairValue');
+        const grandPaparentNode = focusPath.parentPath?.parentPath?.parentPath?.node as ASTv1.BlockStatement;
+
+        if (grandPaparentNode && grandPaparentNode.type === 'BlockStatement' && isPathExpression(grandPaparentNode.path)) {
+          const name = (grandPaparentNode.path as ASTv1.PathExpression).original;
+
+          completions.push(
+            ...valuesForBuiltinComponentArgument(name, focusPath.parent.key).map((el) => {
+              return {
+                label: el.label,
+                kind: CompletionItemKind.Value,
+                documentation: el.documentation,
+              };
+            })
+          );
+        }
+      } else {
+        logDebugInfo('no match');
       }
     } catch (e) {
       logError(e);

@@ -352,6 +352,74 @@ Object {
 }
 `;
 
+exports[`integration async fs enabled: false Able to provide autocomplete information for each attributes autocomplete key argument 1`] = `
+Array [
+  Object {
+    "documentation": "
+The \`key\` option is used to tell Ember how to determine if the items in the
+array being iterated over with \`{{#each}}\` has changed between renders. By
+default the item's object identity is used.
+",
+    "kind": 10,
+    "label": "key",
+    "textEdit": Object {
+      "newText": "key",
+      "range": Object {
+        "end": Object {
+          "character": 9,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 9,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: false Able to provide autocomplete information for each attributes autocomplete key argument values 1`] = `
+Array [
+  Object {
+    "documentation": "The index of the item in the array.",
+    "kind": 12,
+    "label": "@identity",
+    "textEdit": Object {
+      "newText": "@identity",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "documentation": "The item in the array itself.",
+    "kind": 12,
+    "label": "@index",
+    "textEdit": Object {
+      "newText": "@index",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
 exports[`integration async fs enabled: false Able to provide autocomplete information for element attributes support ...attributes autocomplete 1`] = `
 Object {
   "addonsMeta": Array [],
@@ -3467,6 +3535,74 @@ Object {
     },
   ],
 }
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for each attributes autocomplete key argument 1`] = `
+Array [
+  Object {
+    "documentation": "
+The \`key\` option is used to tell Ember how to determine if the items in the
+array being iterated over with \`{{#each}}\` has changed between renders. By
+default the item's object identity is used.
+",
+    "kind": 10,
+    "label": "key",
+    "textEdit": Object {
+      "newText": "key",
+      "range": Object {
+        "end": Object {
+          "character": 9,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 9,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for each attributes autocomplete key argument values 1`] = `
+Array [
+  Object {
+    "documentation": "The index of the item in the array.",
+    "kind": 12,
+    "label": "@identity",
+    "textEdit": Object {
+      "newText": "@identity",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "documentation": "The item in the array itself.",
+    "kind": 12,
+    "label": "@index",
+    "textEdit": Object {
+      "newText": "@index",
+      "range": Object {
+        "end": Object {
+          "character": 13,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 13,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
 `;
 
 exports[`integration async fs enabled: true Able to provide autocomplete information for element attributes support ...attributes autocomplete 1`] = `

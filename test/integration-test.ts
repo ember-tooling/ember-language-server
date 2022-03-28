@@ -721,6 +721,44 @@ describe('integration', function () {
         });
       });
 
+      describe('Able to provide autocomplete information for each attributes', () => {
+        it('autocomplete key argument', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'foo.hbs': ['{{#each k="" }}', '{{/each}}'].join('\n'),
+                },
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 0, character: 9 }
+          );
+
+          expect(result.response).toMatchSnapshot();
+        });
+
+        it('autocomplete key argument values', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'foo.hbs': ['{{#each key="" }}', '{{/each}}'].join('\n'),
+                },
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 0, character: 13 }
+          );
+
+          expect(result.response).toMatchSnapshot();
+        });
+      });
+
       describe('Able to provide autocomplete information for local scoped params', () => {
         it('support tag blocks', async () => {
           const result = await getResult(

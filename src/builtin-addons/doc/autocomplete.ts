@@ -16,6 +16,73 @@ const attributes: {
   },
 };
 
+const builtins: {
+  [key: string]: {
+    arguments: {
+      [key: string]: {
+        documentation: string;
+        values: { value: string; documentation: string }[];
+      };
+    };
+  };
+} = {
+  each: {
+    arguments: {
+      key: {
+        documentation: `
+            The \`key\` option is used to tell Ember how to determine if the items in the
+            array being iterated over with \`{{#each}}\` has changed between renders. By
+            default the item's object identity is used.
+        `,
+        values: [
+          {
+            value: '@identity',
+            documentation: 'The index of the item in the array.',
+          },
+          {
+            value: '@index',
+            documentation: 'The item in the array itself.',
+          },
+        ],
+      },
+    },
+  },
+};
+
+export function valuesForBuiltinComponentArgument(componentName: string, argumentName: string) {
+  const component = builtins[componentName];
+
+  if (!component) {
+    return [];
+  }
+
+  const argument = component.arguments[argumentName];
+
+  if (!argument) {
+    return [];
+  }
+
+  return argument.values.map((e) => {
+    return {
+      label: e.value,
+      documentation: normalizeNewlines(e.documentation),
+    };
+  });
+}
+
+export function argumentsForBuiltinComponent(componentName: string) {
+  if (builtins[componentName] && builtins[componentName].arguments) {
+    return Object.keys(builtins[componentName].arguments).map((key) => {
+      return {
+        label: key,
+        documentation: normalizeNewlines(builtins[componentName].arguments[key].documentation ?? ''),
+      };
+    });
+  }
+
+  return [];
+}
+
 function normalizeNewlines(text: string) {
   return text
     .split('\n')

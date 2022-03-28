@@ -263,6 +263,20 @@ export function isBlockPath(path: ASTPath): boolean {
   return parent.path === node;
 }
 
+export function isHashPair(path: ASTPath) {
+  const node = path.node;
+
+  if (!hasNodeType(node, 'HashPair')) {
+    return false;
+  }
+
+  return true;
+}
+
+export function isHashPairValue(path: ASTPath) {
+  return path.parent && isHashPair(path.parentPath as ASTPath) && path.parent.value === path.node;
+}
+
 export function isSubExpressionPath(path: ASTPath): boolean {
   const node = path.node;
 
