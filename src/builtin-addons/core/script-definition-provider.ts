@@ -2,7 +2,7 @@ import * as path from 'path';
 import type * as t from '@babel/types';
 import { Definition, Location } from 'vscode-languageserver/node';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
-import { pathsToLocations, getAddonPathsForType, getAddonImport } from '../../utils/definition-helpers';
+import { getAddonPathsForType, getAddonImport, importPathsToLocations, pathsToLocations } from '../../utils/definition-helpers';
 import {
   isRouteLookup,
   isTransformReference,
@@ -12,6 +12,7 @@ import {
   isNamedServiceInjection,
   isTemplateElement,
   isImportSpecifier,
+  isImportDefaultSpecifier,
 } from './../../utils/ast-helpers';
 import { normalizeServiceName } from '../../utils/normalizers';
 import { asyncFilter, podModulePrefixForRoot } from './../../utils/layout-helpers';
@@ -20,6 +21,7 @@ import { logInfo } from '../../utils/logger';
 import { Project } from '../../project';
 import Server from '../../server';
 import { IRegistry } from '../../utils/registry-api';
+import { Position } from 'vscode-languageserver-textdocument';
 
 type ItemType = 'Model' | 'Transform' | 'Service';
 
@@ -109,7 +111,7 @@ export default class CoreScriptDefinitionProvider {
     this.server = server;
     this.project = project;
   }
-  async guessPathForImport(root: string, uri: string, importPath: string) {
+  async guessPathForImport(root: string, uri: string, importPath: string, importName = '') {
     if (!uri) {
       return null;
     }
@@ -129,7 +131,7 @@ export default class CoreScriptDefinitionProvider {
 
     const existingPaths = await asyncFilter(guessedPaths, this.server.fs.exists);
 
-    return pathsToLocations(...existingPaths);
+    return importPathsToLocations(existingPaths, importName);
   }
   async guessPathsForType(root: string, fnName: ItemType, typeName: string) {
     const guessedPaths: string[] = [];
@@ -156,6 +158,19 @@ export default class CoreScriptDefinitionProvider {
     const existingPaths = await asyncFilter(guessedPaths, this.server.fs.exists);
 
     return pathsToLocations(...existingPaths);
+  }
+  getImportSpecifierName(importDeclaration: t.ImportDeclaration, position: Position) {
+    const importNameData = importDeclaration.specifiers.find((item) => {
+      const importLine = item.loc?.start.line;
+      const importStartCol = item.loc?.start.column;
+      const importStartEnd = item.loc?.end.column;
+
+      return (
+        importStartCol && importStartEnd && position.line + 1 === importLine && importStartCol <= position.character && importStartEnd >= position.character
+      );
+    }) as t.ImportSpecifier;
+
+    return importNameData && importNameData.type === 'ImportSpecifier' ? (importNameData.imported as t.Identifier).name : '';
   }
   async onDefinition(root: string, params: DefinitionFunctionParams): Promise<Definition | null> {
     const { textDocument, focusPath, type, results, server, position } = params;
@@ -196,10 +211,21 @@ export default class CoreScriptDefinitionProvider {
       definitions = await this.guessPathsForType(root, 'Transform', transformName);
     } else if (isImportPathDeclaration(astPath)) {
       definitions = (await this.guessPathForImport(root, uri, ((astPath.node as unknown) as t.StringLiteral).value)) || [];
-    } else if (isImportSpecifier(astPath)) {
+    } else if (isImportSpecifier(astPath) || isImportDefaultSpecifier(astPath)) {
       logInfo(`Handle script import for Project "${project.name}"`);
-      const pathName: string = ((astPath.parentFromLevel(2) as unknown) as t.ImportDeclaration).source.value;
+
+      const importDeclaration: t.ImportDeclaration = astPath.parentFromLevel(2) as t.ImportDeclaration;
+
+      const pathName: string = importDeclaration.source.value;
+
+      let importSpecifierName = 'default';
+
+      if (isImportSpecifier(astPath)) {
+        importSpecifierName = this.getImportSpecifierName(importDeclaration, position);
+      }
+
       const pathParts = pathName.split('/');
+
       let maybeAppName = pathParts.shift();
 
       if (maybeAppName && maybeAppName.startsWith('@')) {
@@ -214,14 +240,14 @@ export default class CoreScriptDefinitionProvider {
         const importPaths = this.resolvers.resolveTestScopeImport(project.root, pathParts.join(path.sep));
         const existingPaths = await asyncFilter(importPaths, this.server.fs.exists);
 
-        potentialPaths = pathsToLocations(...existingPaths);
+        potentialPaths = await importPathsToLocations(existingPaths, importSpecifierName);
       } else if (addonInfo) {
         const importPaths = this.resolvers.resolveTestScopeImport(addonInfo.root, pathName);
         const existingPaths = await asyncFilter(importPaths, this.server.fs.exists);
 
-        potentialPaths = pathsToLocations(...existingPaths);
+        potentialPaths = await importPathsToLocations(existingPaths, importSpecifierName);
       } else {
-        potentialPaths = (await this.guessPathForImport(project.root, uri, pathName)) || [];
+        potentialPaths = (await this.guessPathForImport(project.root, uri, pathName, importSpecifierName)) || [];
       }
 
       definitions = definitions.concat(potentialPaths);

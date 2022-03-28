@@ -48,6 +48,32 @@ export function getFirstTextPostion(text: string, content: string) {
   return [startLine, startCharacter];
 }
 
+export async function importPathsToLocations(paths: string[], importName?: string): Promise<Location[]> {
+  if (importName) {
+    const locations = paths.map(async (modulePath) => {
+      const file = await fsProvider().readFile(modulePath);
+
+      if (file === null) {
+        return null;
+      }
+
+      const arr = file.split(/\r?\n/).map((l) => l.trim());
+
+      const idxFound = arr.findIndex((line) => line.includes(importName) && line.startsWith('export '));
+      const useIndex = idxFound > -1 ? idxFound : 0;
+      const start = idxFound > -1 ? arr[idxFound].indexOf(importName) : 0;
+      const end = idxFound > -1 ? start + importName.length : 0;
+
+      return Location.create(URI.file(modulePath).toString(), Range.create(useIndex, start, useIndex, end));
+    });
+    const results = await Promise.all(locations);
+
+    return results.filter((r) => r !== null) as Location[];
+  }
+
+  return Promise.resolve(pathsToLocations(...paths));
+}
+
 export async function pathsToLocationsWithPosition(paths: string[], findMe: string): Promise<Location[]> {
   const results = paths.map(async (fileName: string) => {
     const text = await fsProvider().readFile(fileName);

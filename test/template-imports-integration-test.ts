@@ -1,21 +1,6 @@
-import { createServer, getResult, ServerBucket } from './test_helpers/public-integration-helpers';
+import { createServer, getResult, ServerBucket, createPointer } from './test_helpers/public-integration-helpers';
 import { MessageConnection } from 'vscode-jsonrpc/node';
 import { CompletionRequest, DefinitionRequest } from 'vscode-languageserver-protocol/node';
-
-function createPointer(tpl = '') {
-  const findMe = '⚡';
-  const parts = tpl.split('\n');
-  const line = parts.findIndex((e) => e.includes(findMe));
-  const character = parts[line].indexOf(findMe) - 1;
-
-  return {
-    content: tpl.replace(findMe, ''),
-    position: {
-      line,
-      character,
-    },
-  };
-}
 
 describe('has basic template imports support', function () {
   let instance!: ServerBucket;

@@ -356,7 +356,15 @@ export function isImportPathDeclaration(path: ASTPath): boolean {
 }
 
 export function isImportSpecifier(path: ASTPath): boolean {
-  if (!hasNodeType(path.parent, 'ImportDefaultSpecifier') && !hasNodeType(path.parent, 'ImportSpecifier')) {
+  if (!hasNodeType(path.parent, 'ImportSpecifier')) {
+    return false;
+  }
+
+  return true;
+}
+
+export function isImportDefaultSpecifier(path: ASTPath): boolean {
+  if (!hasNodeType(path.parent, 'ImportDefaultSpecifier')) {
     return false;
   }
 

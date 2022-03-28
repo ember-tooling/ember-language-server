@@ -5,6 +5,21 @@ import { asyncFSProvider, initServer, registerCommandExecutor, startServer } fro
 
 export { getResult, makeProject, createProject } from './integration-helpers';
 
+export function createPointer(tpl = '') {
+  const findMe = '⚡';
+  const parts = tpl.split('\n');
+  const line = parts.findIndex((e) => e.includes(findMe));
+  const character = parts[line].indexOf(findMe) - 1;
+
+  return {
+    content: tpl.replace(findMe, ''),
+    position: {
+      line,
+      character,
+    },
+  };
+}
+
 export interface ServerBucket {
   connection: MessageConnection;
   destroy(): Promise<void>;
