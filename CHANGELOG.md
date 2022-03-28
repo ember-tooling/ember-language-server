@@ -1,3 +1,11 @@
+# [2.16.0](https://github.com/lifeart/ember-language-server/compare/v2.15.0...v2.16.0) (2022-03-28)
+
+
+### Features
+
+*  ...attributes autocomplete ([#365](https://github.com/lifeart/ember-language-server/issues/365)) ([7960626](https://github.com/lifeart/ember-language-server/commit/79606267e913ef59dd7a130c485373ea122ac313))
+* fix test cases ([fed97aa](https://github.com/lifeart/ember-language-server/commit/fed97aa372f073d7bc16d0a26da3990d495037a5))
+
 # [2.15.0](https://github.com/lifeart/ember-language-server/compare/v2.14.0...v2.15.0) (2022-02-26)
 
 
