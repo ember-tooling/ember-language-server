@@ -1,3 +1,10 @@
+# [2.17.0](https://github.com/lifeart/ember-language-server/compare/v2.16.0...v2.17.0) (2022-03-28)
+
+
+### Features
+
+* each key autocomplete ([#367](https://github.com/lifeart/ember-language-server/issues/367)) ([db0b31e](https://github.com/lifeart/ember-language-server/commit/db0b31e25c6c31ea24cabc9a8ef612983719495f))
+
 # [2.16.0](https://github.com/lifeart/ember-language-server/compare/v2.15.0...v2.16.0) (2022-03-28)
 
 
