@@ -10,7 +10,7 @@ describe('glimmer-scripts', function () {
     it('able to extract scope symbols from js class file by given path', function () {
       const tpl = `
         import foo from 'bar';
-        import { case } from 'ace';
+        import { cases } from 'ace';
         var hello = 42;
         class Boo {
           n = class Foo {
@@ -24,7 +24,7 @@ describe('glimmer-scripts', function () {
 
       const scope = getScope(p.scope);
 
-      expect(scope).toStrictEqual(['Foo', 'Boo', 'foo', 'case', 'hello']);
+      expect(scope).toStrictEqual(['Foo', 'Boo', 'foo', 'cases', 'hello']);
     });
     it('able to extract scope from js variable notation by given path', function () {
       const tpl = `
