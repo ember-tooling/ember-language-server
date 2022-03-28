@@ -1,3 +1,10 @@
+# [2.18.0](https://github.com/lifeart/ember-language-server/compare/v2.17.0...v2.18.0) (2022-03-28)
+
+
+### Features
+
+* Improve import specifier support in go-to definition ([#368](https://github.com/lifeart/ember-language-server/issues/368)) ([afbe8f1](https://github.com/lifeart/ember-language-server/commit/afbe8f1cb39a4aaa1de78f1354476b4a92e4e6cd))
+
 # [2.17.0](https://github.com/lifeart/ember-language-server/compare/v2.16.0...v2.17.0) (2022-03-28)
 
 
