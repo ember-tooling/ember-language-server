@@ -31,29 +31,27 @@ export default class TemplateLintFixesCodeAction extends BaseCodeActionProvider 
       setCwd(this.project.root);
       const linter = new linterKlass();
 
-      const fixes = issues.map(
-        async (issue): Promise<null | CodeAction> => {
-          const { output, isFixed } = await Promise.resolve(
-            linter.verifyAndFix({
-              source: meta.selection || '',
-              moduleId: URI.parse(params.textDocument.uri).fsPath,
-              filePath: URI.parse(params.textDocument.uri).fsPath,
-            })
-          );
+      const fixes = issues.map(async (issue): Promise<null | CodeAction> => {
+        const { output, isFixed } = await Promise.resolve(
+          linter.verifyAndFix({
+            source: meta.selection || '',
+            moduleId: URI.parse(params.textDocument.uri).fsPath,
+            filePath: URI.parse(params.textDocument.uri).fsPath,
+          })
+        );
 
-          if (!isFixed) {
-            return null;
-          }
-
-          const edit: WorkspaceEdit = {
-            changes: {
-              [params.textDocument.uri]: [TextEdit.replace(toLSRange(meta.location), output)],
-            },
-          };
-
-          return CodeAction.create(`fix: ${issue.code}`, edit, CodeActionKind.QuickFix);
+        if (!isFixed) {
+          return null;
         }
-      );
+
+        const edit: WorkspaceEdit = {
+          changes: {
+            [params.textDocument.uri]: [TextEdit.replace(toLSRange(meta.location), output)],
+          },
+        };
+
+        return CodeAction.create(`fix: ${issue.code}`, edit, CodeActionKind.QuickFix);
+      });
       const resolvedFixes = await Promise.all(fixes);
 
       return resolvedFixes;

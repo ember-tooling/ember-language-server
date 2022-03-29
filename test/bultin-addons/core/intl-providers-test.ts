@@ -527,20 +527,22 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
     describe('provide definition', () => {
       it('should provide translation definition in handlebars', async () => {
         expect(
-          ((await getResult(
-            DefinitionRequest.method,
-            connection,
-            {
-              app: {
-                components: {
-                  'test.hbs': '{{t "subFolderTranslation.subTranslation" }}',
+          (
+            (await getResult(
+              DefinitionRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.hbs': '{{t "subFolderTranslation.subTranslation" }}',
+                  },
                 },
+                translations,
               },
-              translations,
-            },
-            'app/components/test.hbs',
-            { line: 0, character: 32 }
-          )) as any).response
+              'app/components/test.hbs',
+              { line: 0, character: 32 }
+            )) as any
+          ).response
         ).toEqual([
           {
             uri: '/translations/sub-folder/en-us.json',
@@ -554,20 +556,22 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
 
       it('should provide translation definition in js', async () => {
         expect(
-          ((await getResult(
-            DefinitionRequest.method,
-            connection,
-            {
-              app: {
-                components: {
-                  'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.anotherTranslation"); }',
+          (
+            (await getResult(
+              DefinitionRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.anotherTranslation"); }',
+                  },
                 },
+                translations,
               },
-              translations,
-            },
-            'app/components/test.js',
-            { line: 0, character: 86 }
-          )) as any).response
+              'app/components/test.js',
+              { line: 0, character: 86 }
+            )) as any
+          ).response
         ).toEqual([
           {
             uri: '/translations/sub-folder/en-us.json',
@@ -581,20 +585,22 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
 
       it('should provide translation definitions from multiple files', async () => {
         expect(
-          ((await getResult(
-            DefinitionRequest.method,
-            connection,
-            {
-              app: {
-                components: {
-                  'test.js': 'export default class Foo extends Bar { text = this.intl.t("rootFileTranslation"); }',
+          (
+            (await getResult(
+              DefinitionRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.js': 'export default class Foo extends Bar { text = this.intl.t("rootFileTranslation"); }',
+                  },
                 },
+                translations,
               },
-              translations,
-            },
-            'app/components/test.js',
-            { line: 0, character: 70 }
-          )) as any).response
+              'app/components/test.js',
+              { line: 0, character: 70 }
+            )) as any
+          ).response
         ).toEqual([
           {
             uri: '/translations/en-us.json',
@@ -617,20 +623,22 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
     describe('provide definition -YAML', () => {
       it('should provide translation definition in handlebars', async () => {
         expect(
-          ((await getResult(
-            DefinitionRequest.method,
-            connection,
-            {
-              app: {
-                components: {
-                  'test.hbs': '{{t "subFolderTranslation.subTranslation" }}',
+          (
+            (await getResult(
+              DefinitionRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.hbs': '{{t "subFolderTranslation.subTranslation" }}',
+                  },
                 },
+                translations: translationsYaml,
               },
-              translations: translationsYaml,
-            },
-            'app/components/test.hbs',
-            { line: 0, character: 32 }
-          )) as any).response
+              'app/components/test.hbs',
+              { line: 0, character: 32 }
+            )) as any
+          ).response
         ).toEqual([
           {
             uri: '/translations/sub-folder/en-us.yaml',
@@ -644,20 +652,22 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
 
       it('should provide translation definition in js', async () => {
         expect(
-          ((await getResult(
-            DefinitionRequest.method,
-            connection,
-            {
-              app: {
-                components: {
-                  'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.anotherTranslation"); }',
+          (
+            (await getResult(
+              DefinitionRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.anotherTranslation"); }',
+                  },
                 },
+                translations: translationsYaml,
               },
-              translations: translationsYaml,
-            },
-            'app/components/test.js',
-            { line: 0, character: 86 }
-          )) as any).response
+              'app/components/test.js',
+              { line: 0, character: 86 }
+            )) as any
+          ).response
         ).toEqual([
           {
             uri: '/translations/sub-folder/en-us.yaml',
@@ -673,20 +683,22 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
     describe('provide hover', () => {
       it('should provide translation hover in handlebars', async () => {
         expect(
-          ((await getResult(
-            HoverRequest.method,
-            connection,
-            {
-              app: {
-                components: {
-                  'test.hbs': '{{t "rootFileTranslation" }}',
+          (
+            (await getResult(
+              HoverRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.hbs': '{{t "rootFileTranslation" }}',
+                  },
                 },
+                translations,
               },
-              translations,
-            },
-            'app/components/test.hbs',
-            { line: 0, character: 20 }
-          )) as any).response
+              'app/components/test.hbs',
+              { line: 0, character: 20 }
+            )) as any
+          ).response
         ).toEqual({
           contents: {
             kind: 'plaintext',
@@ -702,20 +714,22 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
 
       it('should provide translation hover in js', async () => {
         expect(
-          ((await getResult(
-            HoverRequest.method,
-            connection,
-            {
-              app: {
-                components: {
-                  'test.js': 'export default class Foo extends Bar { text = this.intl.t("rootFileTranslation"); }',
+          (
+            (await getResult(
+              HoverRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.js': 'export default class Foo extends Bar { text = this.intl.t("rootFileTranslation"); }',
+                  },
                 },
+                translations,
               },
-              translations,
-            },
-            'app/components/test.js',
-            { line: 0, character: 70 }
-          )) as any).response
+              'app/components/test.js',
+              { line: 0, character: 70 }
+            )) as any
+          ).response
         ).toEqual({
           contents: {
             kind: 'plaintext',

@@ -27,7 +27,7 @@ class ServerMock {
 }
 
 function createServer(content: string, project: ProjectMock | null) {
-  return (new ServerMock(content, project) as unknown) as Server;
+  return new ServerMock(content, project) as unknown as Server;
 }
 
 describe('GlimmerScriptCompletionProvider', function () {

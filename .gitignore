@@ -10,3 +10,5 @@ inst/
 # Debug Logging
 debug.log
 debug.*.log
+error.log
+error.*.log

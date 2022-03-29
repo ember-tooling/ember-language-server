@@ -17,8 +17,9 @@ import {
   setServerConfig,
   asyncFSProvider,
   registerCommandExecutor,
+  createConnection,
 } from './test_helpers/integration-helpers';
-import { createMessageConnection, MessageConnection, Logger, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
+import { MessageConnection } from 'vscode-jsonrpc/node';
 
 import {
   CompletionRequest,
@@ -43,20 +44,7 @@ describe('integration', function () {
 
       beforeAll(async () => {
         serverProcess = startServer(asyncFsEnabled);
-        connection = createMessageConnection(new StreamMessageReader(serverProcess.stdout), new StreamMessageWriter(serverProcess.stdin), <Logger>{
-          error(msg) {
-            console.log('error', msg);
-          },
-          log(msg) {
-            console.log('log', msg);
-          },
-          info(msg) {
-            console.log('info', msg);
-          },
-          warn(msg) {
-            console.log('warn', msg);
-          },
-        });
+        connection = createConnection(serverProcess);
         // connection.trace(2, {log: console.log}, false);
         connection.listen();
 
@@ -451,7 +439,7 @@ describe('integration', function () {
           );
 
           // wait for async registry initialization;
-          const result: string[] = await connection.sendRequest((ExecuteCommandRequest.type as unknown) as string, {
+          const result: string[] = await connection.sendRequest(ExecuteCommandRequest.type as unknown as string, {
             command: 'els.getRelatedFiles',
             arguments: [path.join(project.normalizedPath, 'app', 'components', 'hello', 'template.hbs')],
           });
@@ -484,7 +472,7 @@ describe('integration', function () {
             connection
           );
 
-          const result: { path: string; meta: UnknownResult }[] = await connection.sendRequest((ExecuteCommandRequest.type as unknown) as string, {
+          const result: { path: string; meta: UnknownResult }[] = await connection.sendRequest(ExecuteCommandRequest.type as unknown as string, {
             command: 'els.getRelatedFiles',
             arguments: [path.join(project.normalizedPath, 'app', 'components', 'hello', 'index.hbs'), { includeMeta: true }],
           });
@@ -528,7 +516,7 @@ describe('integration', function () {
             connection
           );
 
-          const result: { registry: Registry; projectName: string } = await connection.sendRequest((ExecuteCommandRequest.type as unknown) as string, {
+          const result: { registry: Registry; projectName: string } = await connection.sendRequest(ExecuteCommandRequest.type as unknown as string, {
             command: 'els.getProjectRegistry',
             arguments: [project.normalizedPath],
           });
@@ -573,7 +561,7 @@ describe('integration', function () {
             await new Promise((resolve) => setTimeout(resolve, 1000)); // @to-do - figure out fails
           }
 
-          const data: { tokens: ITemplateTokens } = await connection.sendRequest((ExecuteCommandRequest.type as unknown) as string, {
+          const data: { tokens: ITemplateTokens } = await connection.sendRequest(ExecuteCommandRequest.type as unknown as string, {
             command: 'els.getLegacyTemplateTokens',
             arguments: [project.normalizedPath],
           });

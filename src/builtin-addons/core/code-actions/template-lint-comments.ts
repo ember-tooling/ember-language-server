@@ -69,8 +69,8 @@ export default class TemplateLintCommentsCodeAction extends BaseCodeActionProvid
             const text = ` ${comment} `;
             const textComment = '\n' + new Array(startColumn).fill(' ').join('');
 
-            children.splice(children.indexOf(node), 0, (b.mustacheComment(text) as unknown) as ASTv1.CommentStatement);
-            children.splice(children.indexOf(node), 0, (b.text(textComment) as unknown) as ASTv1.TextNode);
+            children.splice(children.indexOf(node), 0, b.mustacheComment(text) as unknown as ASTv1.CommentStatement);
+            children.splice(children.indexOf(node), 0, b.text(textComment) as unknown as ASTv1.TextNode);
           }
         }
 

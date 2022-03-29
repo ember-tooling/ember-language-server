@@ -194,7 +194,7 @@ export function isNamedBlockName(path: ASTPath): boolean {
 }
 
 export function isAngleComponentPath(path: ASTPath): boolean {
-  const node = (path.node as unknown) as ASTv1.ElementNode;
+  const node = path.node as unknown as ASTv1.ElementNode;
 
   if (!hasNodeType(node, 'ElementNode')) {
     return false;

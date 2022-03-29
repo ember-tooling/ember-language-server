@@ -3,11 +3,12 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { createTempDir, Tree } from 'broccoli-test-helper';
 import { URI } from 'vscode-uri';
-import { MessageConnection } from 'vscode-jsonrpc/node';
+import { createMessageConnection, Logger, MessageConnection, StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
 import * as spawn from 'cross-spawn';
 import { set, merge, get } from 'lodash';
 import { AddonMeta } from '../../src/utils/addon-api';
 import { CompletionItem } from 'vscode-languageserver/node';
+import * as cp from 'child_process';
 import {
   DefinitionRequest,
   DocumentSymbol,
@@ -29,6 +30,33 @@ import {
 } from 'vscode-languageserver-protocol/node';
 import { FileStat, FileType, fileTypeFromFsStat } from '../../src/utils/fs-utils';
 import { IRegistry } from '../../src/utils/registry-api';
+import { Readable, Writable } from 'stream';
+
+export function createConnection(serverProcess: cp.ChildProcess) {
+  serverProcess.stderr.on('data', (data) => {
+    fs.appendFileSync(`./error.${serverProcess.pid || 0}.log`, data);
+  });
+  const connection = createMessageConnection(
+    new StreamMessageReader(serverProcess.stdout as Readable),
+    new StreamMessageWriter(serverProcess.stdin as Writable),
+    <Logger>{
+      error(msg) {
+        console.log('error', msg);
+      },
+      log(msg) {
+        console.log('log', msg);
+      },
+      info(msg) {
+        console.log('info', msg);
+      },
+      warn(msg) {
+        console.log('warn', msg);
+      },
+    }
+  );
+
+  return connection;
+}
 
 export function startServer(asyncFs = false) {
   const params = JSON.parse(process.env.npm_config_argv);

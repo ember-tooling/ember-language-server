@@ -35,7 +35,7 @@ describe('generateNamespacedComponentsHashMap', function () {
       },
     };
 
-    expect(generateNamespacedComponentsHashMap(mockAddonMetaArr, (server as unknown) as Server, true)).toEqual({ Foo: ['Biz$Foo'] });
+    expect(generateNamespacedComponentsHashMap(mockAddonMetaArr, server as unknown as Server, true)).toEqual({ Foo: ['Biz$Foo'] });
   });
 
   it('[Mustache] returns the expected namespaced map', function () {
@@ -50,6 +50,6 @@ describe('generateNamespacedComponentsHashMap', function () {
       },
     };
 
-    expect(generateNamespacedComponentsHashMap(mockAddonMetaArr, (server as unknown) as Server, false)).toEqual({ foo: ['test$foo'] });
+    expect(generateNamespacedComponentsHashMap(mockAddonMetaArr, server as unknown as Server, false)).toEqual({ foo: ['test$foo'] });
   });
 });

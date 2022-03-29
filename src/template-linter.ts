@@ -6,7 +6,6 @@ import { getTemplateNodes } from '@lifeart/ember-extract-inline-templates';
 import { parseScriptFile } from 'ember-meta-explorer';
 import { URI } from 'vscode-uri';
 import { log, logError, logDebugInfo } from './utils/logger';
-import * as findUp from 'find-up';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
 
@@ -210,8 +209,10 @@ export default class TemplateLinter {
 
     return diagnostics;
   }
-  private templateLintConfig(cwd: string): string | undefined {
-    return findUp.sync('.template-lintrc.js', { cwd });
+  private async templateLintConfig(cwd: string): Promise<string | undefined> {
+    const { findUp } = await eval(`import('find-up')`);
+
+    return findUp('.template-lintrc.js', { cwd });
   }
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public async linterForProject(project: Project) {
@@ -225,7 +226,7 @@ export default class TemplateLinter {
 
     try {
       // don't resolve template-lint (due to resolution error) if no linter config found;
-      if (!this.templateLintConfig(project.root)) {
+      if (!(await this.templateLintConfig(project.root))) {
         return;
       }
 
