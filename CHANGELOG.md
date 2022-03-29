@@ -1,3 +1,10 @@
+# [2.19.0](https://github.com/lifeart/ember-language-server/compare/v2.18.0...v2.19.0) (2022-03-29)
+
+
+### Features
+
+* bump deps ([#371](https://github.com/lifeart/ember-language-server/issues/371)) ([a659edd](https://github.com/lifeart/ember-language-server/commit/a659eddf084e5501371d9747bd65a4d2666f125f))
+
 # [2.18.0](https://github.com/lifeart/ember-language-server/compare/v2.17.0...v2.18.0) (2022-03-28)
 
 
