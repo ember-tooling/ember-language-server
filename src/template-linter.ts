@@ -6,13 +6,15 @@ import { getTemplateNodes } from '@lifeart/ember-extract-inline-templates';
 import { parseScriptFile } from 'ember-meta-explorer';
 import { URI } from 'vscode-uri';
 import { log, logError, logDebugInfo } from './utils/logger';
-import * as path from 'path';
 import { pathToFileURL } from 'url';
+import type { findUp as FindUp } from 'find-up';
 
 import Server from './server';
 import { Project } from './project';
 import { getRequireSupport } from './utils/layout-helpers';
 import { getFileRanges, RangeWalker } from './utils/glimmer-script';
+
+type findUpType = typeof FindUp;
 
 type LinterVerifyArgs = { source: string; moduleId: string; filePath: string };
 class Linter {
@@ -58,6 +60,7 @@ function setCwd(cwd: string) {
 export default class TemplateLinter {
   private _linterCache = new Map<Project, typeof Linter>();
   private _isEnabled = true;
+  private _findUp: undefined | findUpType;
 
   constructor(private server: Server) {
     if (this.server.options.type === 'worker') {
@@ -209,10 +212,24 @@ export default class TemplateLinter {
 
     return diagnostics;
   }
-  private async templateLintConfig(cwd: string): Promise<string | undefined> {
-    const { findUp } = await eval(`import('find-up')`);
+  async getFindUp(): Promise<findUpType> {
+    if (!this._findUp) {
+      const { findUp } = await eval(`import('find-up')`);
 
-    return findUp('.template-lintrc.js', { cwd });
+      this._findUp = findUp;
+    }
+
+    return this._findUp as findUpType;
+  }
+  private async templateLintConfig(cwd: string): Promise<string | undefined> {
+    const findUp = await this.getFindUp();
+
+    return findUp('.template-lintrc.js', { cwd, type: 'file' });
+  }
+  private async projectNodeModules(cwd: string): Promise<string | undefined> {
+    const findUp = await this.getFindUp();
+
+    return findUp('node_modules', { cwd, type: 'directory' });
   }
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public async linterForProject(project: Project) {
@@ -234,9 +251,9 @@ export default class TemplateLinter {
         return;
       }
 
-      const nodePath = 'node_modules';
+      const nodePath = await this.projectNodeModules(project.root);
 
-      if (!(await this.server.fs.exists(path.join(project.root, nodePath)))) {
+      if (!nodePath || !(await this.server.fs.exists(nodePath))) {
         return;
       }
 
