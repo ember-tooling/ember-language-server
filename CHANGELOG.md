@@ -1,3 +1,10 @@
+# [2.20.0](https://github.com/lifeart/ember-language-server/compare/v2.19.0...v2.20.0) (2022-04-15)
+
+
+### Features
+
+* ember template lint support for monorepos ([#375](https://github.com/lifeart/ember-language-server/issues/375)) ([837a242](https://github.com/lifeart/ember-language-server/commit/837a2426d0108fa6ab641301eca95a754340842b))
+
 # [2.19.0](https://github.com/lifeart/ember-language-server/compare/v2.18.0...v2.19.0) (2022-03-29)
 
 
