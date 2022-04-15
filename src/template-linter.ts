@@ -7,15 +7,13 @@ import { parseScriptFile } from 'ember-meta-explorer';
 import { URI } from 'vscode-uri';
 import { log, logError, logDebugInfo } from './utils/logger';
 import { pathToFileURL } from 'url';
-import type { findUp as FindUp } from 'find-up';
 
 import Server from './server';
 import { Project } from './project';
 import { getRequireSupport } from './utils/layout-helpers';
 import { getFileRanges, RangeWalker } from './utils/glimmer-script';
 
-type findUpType = typeof FindUp;
-
+type FindUp = (name: string, opts: { cwd: string; type: string }) => Promise<string | undefined>;
 type LinterVerifyArgs = { source: string; moduleId: string; filePath: string };
 class Linter {
   constructor() {
@@ -60,7 +58,7 @@ function setCwd(cwd: string) {
 export default class TemplateLinter {
   private _linterCache = new Map<Project, typeof Linter>();
   private _isEnabled = true;
-  private _findUp: undefined | findUpType;
+  private _findUp: FindUp;
 
   constructor(private server: Server) {
     if (this.server.options.type === 'worker') {
@@ -212,14 +210,14 @@ export default class TemplateLinter {
 
     return diagnostics;
   }
-  async getFindUp(): Promise<findUpType> {
+  async getFindUp(): Promise<FindUp> {
     if (!this._findUp) {
       const { findUp } = await eval(`import('find-up')`);
 
       this._findUp = findUp;
     }
 
-    return this._findUp as findUpType;
+    return this._findUp;
   }
   private async templateLintConfig(cwd: string): Promise<string | undefined> {
     const findUp = await this.getFindUp();
