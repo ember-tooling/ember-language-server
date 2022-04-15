@@ -1,3 +1,10 @@
+## [2.20.1](https://github.com/lifeart/ember-language-server/compare/v2.20.0...v2.20.1) (2022-04-15)
+
+
+### Bug Fixes
+
+* find-up ([#377](https://github.com/lifeart/ember-language-server/issues/377)) ([90da82f](https://github.com/lifeart/ember-language-server/commit/90da82fa14f23704f29ddd49709d9283df087c8c))
+
 # [2.20.0](https://github.com/lifeart/ember-language-server/compare/v2.19.0...v2.20.0) (2022-04-15)
 
 
