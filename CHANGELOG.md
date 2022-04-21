@@ -1,3 +1,10 @@
+# [2.21.0](https://github.com/lifeart/ember-language-server/compare/v2.20.1...v2.21.0) (2022-04-21)
+
+
+### Features
+
+* yield context autocomplete ([#373](https://github.com/lifeart/ember-language-server/issues/373)) ([e157566](https://github.com/lifeart/ember-language-server/commit/e1575669aa5955ed45e9aaad2df5b9bc7c11a644))
+
 ## [2.20.1](https://github.com/lifeart/ember-language-server/compare/v2.20.0...v2.20.1) (2022-04-15)
 
 
