@@ -29,6 +29,7 @@ import {
   isHashPair,
   isHashPairValue,
   isScopedAngleTagName,
+  isSpecialHelperStringPositionalParam,
 } from '../../utils/ast-helpers';
 import {
   listComponents,
@@ -436,6 +437,33 @@ export default class TemplateCompletionProvider {
 
     return scopedValues;
   }
+  async getAllModifiers(root: string) {
+    if (!this.meta.modifiersRegistryInitialized) {
+      await mListModifiers(this.project);
+      this.enableRegistryCache('modifiersRegistryInitialized');
+    }
+
+    if (!this.meta.projectAddonsInfoInitialized) {
+      await mGetProjectAddonsInfo(root);
+      this.enableRegistryCache('projectAddonsInfoInitialized');
+      this.project.invalidateRegistry();
+    }
+
+    const registry = this.project.registry;
+
+    const resolvedModifiers = Object.keys(registry.modifier).map((name) => {
+      return {
+        label: name,
+        data: {
+          files: registry.modifier[name],
+        },
+        kind: CompletionItemKind.Function,
+        detail: 'modifier',
+      };
+    });
+
+    return uniqBy([...emberModifierItems, ...resolvedModifiers, ...builtinModifiers()], 'label');
+  }
   async getParentComponentYields(focusPath: any) {
     if (focusPath.type !== 'ElementNode') {
       return [];
@@ -489,7 +517,24 @@ export default class TemplateCompletionProvider {
     const originalText = params.originalText || '';
 
     try {
-      if (isNamedBlockName(focusPath)) {
+      if (isSpecialHelperStringPositionalParam('component', focusPath)) {
+        // (component "foo...")
+        const items = await this.getMustachePathCandidates(root);
+
+        completions.push(...items.filter((el) => el.detail === 'component'));
+      } else if (isSpecialHelperStringPositionalParam('helper', focusPath)) {
+        const ignoredHelpers = ['helper', 'modifier', 'component'];
+        // (component "foo...")
+        const items = await this.getMustachePathCandidates(root);
+
+        completions.push(...items.filter((el) => el.detail === 'helper' && !ignoredHelpers.includes(el.label)));
+      } else if (isSpecialHelperStringPositionalParam('modifier', focusPath)) {
+        // (component "foo...")
+        const items = await this.getAllModifiers(root);
+        const ignoredHelpers = ['helper', 'modifier', 'component'];
+
+        completions.push(...items.filter((el) => !ignoredHelpers.includes(el.label)));
+      } else if (isNamedBlockName(focusPath)) {
         logDebugInfo('isNamedBlockName');
         // <:main>
         const yields = await this.getParentComponentYields(focusPath.parent);
@@ -680,31 +725,9 @@ export default class TemplateCompletionProvider {
       } else if (isModifierPath(focusPath)) {
         logDebugInfo('isModifierPath');
 
-        if (!this.meta.modifiersRegistryInitialized) {
-          await mListModifiers(this.project);
-          this.enableRegistryCache('modifiersRegistryInitialized');
-        }
+        const modifiers = await this.getAllModifiers(root);
 
-        if (!this.meta.projectAddonsInfoInitialized) {
-          await mGetProjectAddonsInfo(root);
-          this.enableRegistryCache('projectAddonsInfoInitialized');
-          this.project.invalidateRegistry();
-        }
-
-        const registry = this.project.registry;
-
-        const resolvedModifiers = Object.keys(registry.modifier).map((name) => {
-          return {
-            label: name,
-            data: {
-              files: registry.modifier[name],
-            },
-            kind: CompletionItemKind.Function,
-            detail: 'modifier',
-          };
-        });
-
-        completions.push(...uniqBy([...emberModifierItems, ...resolvedModifiers, ...builtinModifiers()], 'label'));
+        completions.push(...modifiers);
       } else if (isHashPair(focusPath)) {
         // {{#each key=}}
         logDebugInfo('isHashPair');

@@ -3372,6 +3372,106 @@ Array [
 ]
 `;
 
+exports[`integration async fs enabled: false Special helpers autocomplete autocomplete component in subExpression 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "foo",
+    "textEdit": Object {
+      "newText": "foo",
+      "range": Object {
+        "end": Object {
+          "character": 20,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 20,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: false Special helpers autocomplete autocomplete helpers in subExpression 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/helpers/my-helper.js",
+      ],
+    },
+    "detail": "helper",
+    "kind": 3,
+    "label": "my-helper",
+    "textEdit": Object {
+      "newText": "my-helper",
+      "range": Object {
+        "end": Object {
+          "character": 17,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 17,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: false Special helpers autocomplete autocomplete modifier in subExpression 1`] = `
+Array [
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "on",
+    "textEdit": Object {
+      "newText": "on",
+      "range": Object {
+        "end": Object {
+          "character": 19,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 19,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "ModifierPath",
+    ],
+  },
+  Object {
+    "detail": "modifier",
+    "kind": 2,
+    "label": "action",
+    "textEdit": Object {
+      "newText": "action",
+      "range": Object {
+        "end": Object {
+          "character": 19,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 19,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
 exports[`integration async fs enabled: false autocomplete works for angle component slots 1`] = `
 Array [
   Object {
@@ -6822,6 +6922,106 @@ Array [
         },
       },
     ],
+  },
+]
+`;
+
+exports[`integration async fs enabled: true Special helpers autocomplete autocomplete component in subExpression 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/components/foo.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "foo",
+    "textEdit": Object {
+      "newText": "foo",
+      "range": Object {
+        "end": Object {
+          "character": 20,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 20,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: true Special helpers autocomplete autocomplete helpers in subExpression 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/helpers/my-helper.js",
+      ],
+    },
+    "detail": "helper",
+    "kind": 3,
+    "label": "my-helper",
+    "textEdit": Object {
+      "newText": "my-helper",
+      "range": Object {
+        "end": Object {
+          "character": 17,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 17,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: true Special helpers autocomplete autocomplete modifier in subExpression 1`] = `
+Array [
+  Object {
+    "detail": "Ember",
+    "kind": 3,
+    "label": "on",
+    "textEdit": Object {
+      "newText": "on",
+      "range": Object {
+        "end": Object {
+          "character": 19,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 19,
+          "line": 0,
+        },
+      },
+    },
+    "usableIn": Array [
+      "ModifierPath",
+    ],
+  },
+  Object {
+    "detail": "modifier",
+    "kind": 2,
+    "label": "action",
+    "textEdit": Object {
+      "newText": "action",
+      "range": Object {
+        "end": Object {
+          "character": 19,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 19,
+          "line": 0,
+        },
+      },
+    },
   },
 ]
 `;

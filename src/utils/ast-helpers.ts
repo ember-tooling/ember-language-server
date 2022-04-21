@@ -313,6 +313,32 @@ export function isNamedBlockName(path: ASTPath): boolean {
   return isAngleComponentPath(path) && path.parent && (path.node as ASTv1.ElementNode).tag.startsWith(':');
 }
 
+export function isSpecialHelperStringPositionalParam(helperName: 'component' | 'helper' | 'modifier', astPath: ASTPath) {
+  const node = astPath.node;
+
+  if (!isString(node)) {
+    return false;
+  }
+
+  const parentPath = astPath.parentPath;
+
+  if (!parentPath) {
+    return false;
+  }
+
+  if (!hasNodeType(parentPath.node, 'SubExpression')) {
+    return false;
+  }
+
+  const parentNode = parentPath.node as ASTv1.SubExpression;
+
+  if (parentNode.params.indexOf(node as ASTv1.StringLiteral) !== 0) {
+    return false;
+  }
+
+  return parentNode.path.type === 'PathExpression' && parentNode.path.original === helperName;
+}
+
 export function isScopedAngleTagName(path: ASTPath): boolean {
   const node = path.node as unknown as ASTv1.ElementNode;
 

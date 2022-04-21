@@ -747,6 +747,61 @@ describe('integration', function () {
         });
       });
 
+      describe('Special helpers autocomplete', () => {
+        it('autocomplete helpers in subExpression', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                'helpers/my-helper.js': '',
+                components: {
+                  'foo.hbs': '{{yield (helper "")}}',
+                },
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 0, character: 17 }
+          );
+
+          expect(result.response).toMatchSnapshot();
+        });
+        it('autocomplete modifier in subExpression', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'foo.hbs': '{{yield (modifier "")}}',
+                },
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 0, character: 19 }
+          );
+
+          expect(result.response).toMatchSnapshot();
+        });
+        it('autocomplete component in subExpression', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'foo.hbs': '{{yield (component "")}}',
+                },
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 0, character: 20 }
+          );
+
+          expect(result.response).toMatchSnapshot();
+        });
+      });
+
       describe('Able to provide autocomplete information for local scoped params', () => {
         it('support tag blocks and yiled context', async () => {
           const result = await getResult(
