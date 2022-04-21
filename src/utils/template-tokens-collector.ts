@@ -129,8 +129,7 @@ export function getTemplateBlocks(html: string): string[] {
   return Array.from(tokensSet).map((el) => normalizeToNamedBlockName(el));
 }
 
-function getTemplateTokens(html: string, nativeTokens: string[]) {
-  const ast = preprocess(html);
+function getTemplateTokens(ast: ASTv1.Template, nativeTokens: string[]) {
   const tokensSet: Set<string> = new Set();
   const scopedTokens: string[] = [];
 
@@ -168,11 +167,7 @@ function getTemplateTokens(html: string, nativeTokens: string[]) {
   return Array.from(tokensSet).map((el) => normalizeToClassicComponent(el));
 }
 
-export function extractTokensFromTemplate(template: string): string[] {
-  if (template === '') {
-    return [];
-  }
-
+export function extractTokensFromTemplate(template: ASTv1.Template): string[] {
   const ignored = [
     'if',
     'hash',

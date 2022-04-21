@@ -1,6 +1,7 @@
 import { Position, SourceLocation } from 'estree';
 import { containsPosition } from './estree-utils';
 import { ASTv1 } from '@glimmer/syntax';
+import { normalizeToClassicComponent } from './utils/normalizers';
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
@@ -107,6 +108,13 @@ class BlockParamDefinition {
   }
   get node() {
     return this.path.node;
+  }
+  get componentName() {
+    if (this.node.type === 'ElementNode') {
+      return normalizeToClassicComponent((this.node as ASTv1.ElementNode).tag);
+    }
+
+    return '(unknown)';
   }
   get index(): number {
     const node = this.path.node;

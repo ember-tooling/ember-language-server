@@ -1,7 +1,8 @@
 import { extractTokensFromTemplate, getTemplateBlocks } from '../../src/utils/template-tokens-collector';
+import { preprocess } from '@glimmer/syntax';
 
 function t(tpl: string) {
-  return extractTokensFromTemplate(tpl);
+  return extractTokensFromTemplate(preprocess(tpl));
 }
 
 function tok(tpl: string) {

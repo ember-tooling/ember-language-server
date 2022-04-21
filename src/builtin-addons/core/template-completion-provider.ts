@@ -28,6 +28,7 @@ import {
   isElementAttribute,
   isHashPair,
   isHashPairValue,
+  isScopedAngleTagName,
 } from '../../utils/ast-helpers';
 import {
   listComponents,
@@ -51,6 +52,7 @@ import { URI } from 'vscode-uri';
 import { componentsContextData } from './template-context-provider';
 import { IRegistry } from '../../utils/registry-api';
 import { argumentsForBuiltinComponent, docForAttribute, valuesForBuiltinComponentArgument } from '../doc/autocomplete';
+import { getAllTemplateTokens } from '../../utils/usages-api';
 
 const mListModifiers = memoize(listModifiers, { length: 1, maxAge: 60000 }); // 1 second
 const mListComponents = memoize(listComponents, { length: 1, maxAge: 60000 }); // 1 second
@@ -61,6 +63,11 @@ const mListPodsComponents = memoize(listPodsComponents, {
 const mListHelpers = memoize(listHelpers, { length: 1, maxAge: 60000 }); // 1 second
 
 const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
+
+type ScopedValuesMetadata = {
+  componentName: string;
+  index: number;
+};
 
 /**
  * Generates a map of completion label (file name) to array of potential namespaced
@@ -348,18 +355,83 @@ export default class TemplateCompletionProvider {
       };
     });
   }
-  getScopedValues(focusPath: ASTPath) {
-    const scopedValues = getLocalScope(focusPath).map(({ name, node, path }) => {
-      const blockSource =
-        node.type === 'ElementNode'
-          ? `<${(node as ASTv1.ElementNode).tag} as |...|>`
-          : `{{#${path.parentPath && ((path.parentPath.node as ASTv1.BlockStatement).path as ASTv1.PathExpression).original} as |...|}}`;
+  getExtendedScopedValues(focusPath: ASTPath): CompletionItem[] {
+    const scopedValues = this.getScopedValues(focusPath, true);
+    const extras: CompletionItem[] = [];
+    const allTokens = getAllTemplateTokens().component;
 
-      return {
+    scopedValues.forEach((value) => {
+      const data: ScopedValuesMetadata = value.data ?? {};
+
+      delete value.data;
+
+      const componentName = data.componentName;
+
+      if (!componentName) {
+        return;
+      }
+
+      if (!(componentName in allTokens)) {
+        return;
+      }
+
+      // get yield metadata from found component
+      const meta = allTokens[componentName];
+
+      // if we have yield scopes for meta, address it
+      if (typeof meta.yieldScopes === 'object') {
+        Object.keys(meta.yieldScopes).forEach((yieldScope) => {
+          // todo - respect yield name
+          /*
+          {
+              'default:0:Foo': ['component', 'foo-bar'],
+              'default:0:Bar': ['component', 'bar-baz'],
+              'default:0:Baz': ['component', 'baz-boo'],
+            }
+        */
+
+          const metaForScope = meta.yieldScopes?.[yieldScope] ?? null;
+
+          const [slotName, index, key] = yieldScope.split(':');
+
+          if (slotName === 'default' && `${data.index}` === index) {
+            const label = key.length ? `${value.label}.${key}` : `${value.label}`;
+            const item: CompletionItem = { ...value, label };
+
+            if (metaForScope !== null) {
+              item.documentation = `${metaForScope[0]} ${JSON.stringify(metaForScope[1])}`;
+            }
+
+            extras.push(item);
+          }
+        });
+      }
+    });
+
+    return [...scopedValues, ...extras];
+  }
+  getScopedValues(focusPath: ASTPath, withMeta = false): CompletionItem[] {
+    const scopedValues = getLocalScope(focusPath).map(({ name, node, path, componentName, index }) => {
+      const key =
+        node.type === 'ElementNode'
+          ? (node as ASTv1.ElementNode).tag
+          : (path.parentPath && ((path.parentPath.node as ASTv1.BlockStatement).path as ASTv1.PathExpression).original) ?? 'unknown';
+      const blockSource = node.type === 'ElementNode' ? `<${key} as |...|>` : `{{#${key} as |...|}}`;
+
+      const result: CompletionItem = {
         label: name,
         kind: CompletionItemKind.Variable,
-        detail: `Param from ${blockSource}`,
+        detail: `Positional param from ${blockSource}`,
       };
+
+      if (withMeta) {
+        result.data = {
+          componentName,
+          index,
+        };
+      }
+
+      return result;
     });
 
     return scopedValues;
@@ -427,10 +499,16 @@ export default class TemplateCompletionProvider {
         logDebugInfo('isAngleComponentPath');
         // <Foo>
         const candidates = await this.getAllAngleBracketComponents(root);
-        const scopedValues = this.getScopedValues(focusPath);
+        const scopedValues = this.getExtendedScopedValues(focusPath);
 
         logDebugInfo(candidates, scopedValues);
         completions.push(...uniqBy([...candidates, ...scopedValues], 'label'));
+      } else if (isScopedAngleTagName(focusPath)) {
+        // {{#let foo as |bar|}} <bar..
+        const scopedValues = this.getExtendedScopedValues(focusPath);
+
+        logDebugInfo(scopedValues);
+        completions.push(...uniqBy(scopedValues, 'label'));
       } else if (isElementAttribute(focusPath) && (focusPath.node as ASTv1.AttrNode).name.startsWith('.')) {
         logDebugInfo('isElementAttribute');
 
@@ -519,7 +597,7 @@ export default class TemplateCompletionProvider {
         const localCandidates = await this.getLocalPathExpressionCandidates(uri, originalText);
 
         if (isScopedPathExpression(focusPath)) {
-          const scopedValues = this.getScopedValues(focusPath);
+          const scopedValues = this.getExtendedScopedValues(focusPath);
 
           completions.push(...uniqBy(scopedValues, 'label'));
         }
@@ -551,7 +629,7 @@ export default class TemplateCompletionProvider {
         logDebugInfo('isPathExpression');
 
         if (isScopedPathExpression(focusPath)) {
-          const scopedValues = this.getScopedValues(focusPath);
+          const scopedValues = this.getExtendedScopedValues(focusPath);
 
           completions.push(...uniqBy(scopedValues, 'label'));
         }

@@ -748,6 +748,69 @@ describe('integration', function () {
       });
 
       describe('Able to provide autocomplete information for local scoped params', () => {
+        it('support tag blocks and yiled context', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'my-component.hbs': `{{yield (hash Foo=(component "my-component") Bar=(component "super-puper"))}}`,
+                  'foo.hbs': ['<MyComponent as |bar|>', '{{b}}', '</MyComponent>'].join('\n'),
+                },
+              },
+              $meta: {
+                waitForTemplateTokensToBeCollected: true,
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 1, character: 3 }
+          );
+
+          expect(result).toMatchSnapshot();
+        });
+        it('support tag blocks and yiled capital context path', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'my-component.hbs': `{{yield (hash Moo=(component (or @foo "bar")) Foo=(component "my-component") baz=(helper "uppercase") editor=(modifier "my-modifier"))}}`,
+                  'foo.hbs': ['<MyComponent as |Bar|>', '<Ba', '</MyComponent>'].join('\n'),
+                },
+              },
+              $meta: {
+                waitForTemplateTokensToBeCollected: true,
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 1, character: 3 }
+          );
+
+          expect(result.response.length).toBe(5);
+        });
+        it('support tag blocks and yiled lowercase context path', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'my-component.hbs': `{{yield (hash Moo=(component (or @foo "bar")) Foo=(component "my-component") baz=(helper "uppercase") editor=(modifier "my-modifier"))}}`,
+                  'foo.hbs': ['<MyComponent as |bar|>', '<ba', '</MyComponent>'].join('\n'),
+                },
+              },
+              $meta: {
+                waitForTemplateTokensToBeCollected: true,
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 1, character: 3 }
+          );
+
+          expect(result.response.length).toBe(5);
+        });
         it('support tag blocks', async () => {
           const result = await getResult(
             CompletionRequest.method,

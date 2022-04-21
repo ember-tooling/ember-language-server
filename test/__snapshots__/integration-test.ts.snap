@@ -703,7 +703,7 @@ Object {
       },
     },
     Object {
-      "detail": "Param from <MyComponent as |...|>",
+      "detail": "Positional param from <MyComponent as |...|>",
       "kind": 6,
       "label": "boo",
       "textEdit": Object {
@@ -721,11 +721,87 @@ Object {
       },
     },
     Object {
-      "detail": "Param from {{#my-component as |...|}}",
+      "detail": "Positional param from {{#my-component as |...|}}",
       "kind": 6,
       "label": "bar",
       "textEdit": Object {
         "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component [\\"bar\\"]",
+      "kind": 6,
+      "label": "boo.Moo",
+      "textEdit": Object {
+        "newText": "boo.Moo",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component \\"my-component\\"",
+      "kind": 6,
+      "label": "boo.Foo",
+      "textEdit": Object {
+        "newText": "boo.Foo",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "helper \\"uppercase\\"",
+      "kind": 6,
+      "label": "boo.baz",
+      "textEdit": Object {
+        "newText": "boo.baz",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "modifier \\"my-modifier\\"",
+      "kind": 6,
+      "label": "boo.editor",
+      "textEdit": Object {
+        "newText": "boo.editor",
         "range": Object {
           "end": Object {
             "character": 1,
@@ -754,7 +830,7 @@ Object {
   },
   "response": Array [
     Object {
-      "detail": "Param from {{#my-component as |...|}}",
+      "detail": "Positional param from {{#my-component as |...|}}",
       "kind": 6,
       "label": "bar",
       "textEdit": Object {
@@ -830,11 +906,204 @@ Object {
   },
   "response": Array [
     Object {
-      "detail": "Param from <MyComponent as |...|>",
+      "detail": "Positional param from <MyComponent as |...|>",
       "kind": 6,
       "label": "bar",
       "textEdit": Object {
         "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component [\\"bar\\"]",
+      "kind": 6,
+      "label": "bar.Moo",
+      "textEdit": Object {
+        "newText": "bar.Moo",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component \\"my-component\\"",
+      "kind": 6,
+      "label": "bar.Foo",
+      "textEdit": Object {
+        "newText": "bar.Foo",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "helper \\"uppercase\\"",
+      "kind": 6,
+      "label": "bar.baz",
+      "textEdit": Object {
+        "newText": "bar.baz",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "modifier \\"my-modifier\\"",
+      "kind": 6,
+      "label": "bar.editor",
+      "textEdit": Object {
+        "newText": "bar.editor",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "unbound",
+      "textEdit": Object {
+        "newText": "unbound",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+        "SubExpressionPath",
+      ],
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "debugger",
+      "textEdit": Object {
+        "newText": "debugger",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: false Able to provide autocomplete information for local scoped params support tag blocks and yiled context 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+      "my-component": Array [
+        "app/components/my-component.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "kind": 6,
+      "label": "bar",
+      "textEdit": Object {
+        "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component \\"my-component\\"",
+      "kind": 6,
+      "label": "bar.Foo",
+      "textEdit": Object {
+        "newText": "bar.Foo",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component \\"super-puper\\"",
+      "kind": 6,
+      "label": "bar.Bar",
+      "textEdit": Object {
+        "newText": "bar.Bar",
         "range": Object {
           "end": Object {
             "character": 3,
@@ -3888,7 +4157,7 @@ Object {
       },
     },
     Object {
-      "detail": "Param from <MyComponent as |...|>",
+      "detail": "Positional param from <MyComponent as |...|>",
       "kind": 6,
       "label": "boo",
       "textEdit": Object {
@@ -3906,11 +4175,87 @@ Object {
       },
     },
     Object {
-      "detail": "Param from {{#my-component as |...|}}",
+      "detail": "Positional param from {{#my-component as |...|}}",
       "kind": 6,
       "label": "bar",
       "textEdit": Object {
         "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component [\\"bar\\"]",
+      "kind": 6,
+      "label": "boo.Moo",
+      "textEdit": Object {
+        "newText": "boo.Moo",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component \\"my-component\\"",
+      "kind": 6,
+      "label": "boo.Foo",
+      "textEdit": Object {
+        "newText": "boo.Foo",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "helper \\"uppercase\\"",
+      "kind": 6,
+      "label": "boo.baz",
+      "textEdit": Object {
+        "newText": "boo.baz",
+        "range": Object {
+          "end": Object {
+            "character": 1,
+            "line": 2,
+          },
+          "start": Object {
+            "character": 1,
+            "line": 2,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "modifier \\"my-modifier\\"",
+      "kind": 6,
+      "label": "boo.editor",
+      "textEdit": Object {
+        "newText": "boo.editor",
         "range": Object {
           "end": Object {
             "character": 1,
@@ -3939,7 +4284,7 @@ Object {
   },
   "response": Array [
     Object {
-      "detail": "Param from {{#my-component as |...|}}",
+      "detail": "Positional param from {{#my-component as |...|}}",
       "kind": 6,
       "label": "bar",
       "textEdit": Object {
@@ -4015,11 +4360,204 @@ Object {
   },
   "response": Array [
     Object {
-      "detail": "Param from <MyComponent as |...|>",
+      "detail": "Positional param from <MyComponent as |...|>",
       "kind": 6,
       "label": "bar",
       "textEdit": Object {
         "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component [\\"bar\\"]",
+      "kind": 6,
+      "label": "bar.Moo",
+      "textEdit": Object {
+        "newText": "bar.Moo",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component \\"my-component\\"",
+      "kind": 6,
+      "label": "bar.Foo",
+      "textEdit": Object {
+        "newText": "bar.Foo",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "helper \\"uppercase\\"",
+      "kind": 6,
+      "label": "bar.baz",
+      "textEdit": Object {
+        "newText": "bar.baz",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "modifier \\"my-modifier\\"",
+      "kind": 6,
+      "label": "bar.editor",
+      "textEdit": Object {
+        "newText": "bar.editor",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "unbound",
+      "textEdit": Object {
+        "newText": "unbound",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+        "SubExpressionPath",
+      ],
+    },
+    Object {
+      "detail": "Ember",
+      "kind": 3,
+      "label": "debugger",
+      "textEdit": Object {
+        "newText": "debugger",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+      "usableIn": Array [
+        "MustachePath",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for local scoped params support tag blocks and yiled context 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "foo": Array [
+        "app/components/foo.hbs",
+      ],
+      "my-component": Array [
+        "app/components/my-component.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "kind": 6,
+      "label": "bar",
+      "textEdit": Object {
+        "newText": "bar",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component \\"my-component\\"",
+      "kind": 6,
+      "label": "bar.Foo",
+      "textEdit": Object {
+        "newText": "bar.Foo",
+        "range": Object {
+          "end": Object {
+            "character": 3,
+            "line": 1,
+          },
+          "start": Object {
+            "character": 2,
+            "line": 1,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Positional param from <MyComponent as |...|>",
+      "documentation": "component \\"super-puper\\"",
+      "kind": 6,
+      "label": "bar.Bar",
+      "textEdit": Object {
+        "newText": "bar.Bar",
         "range": Object {
           "end": Object {
             "character": 3,

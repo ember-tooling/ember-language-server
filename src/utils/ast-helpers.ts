@@ -1,6 +1,126 @@
 import ASTPath from './../glimmer-utils';
 import { ASTv1 } from '@glimmer/syntax';
 
+const HTML_TAGS = [
+  'a',
+  'abbr',
+  'address',
+  'area',
+  'article',
+  'aside',
+  'audio',
+  'b',
+  'base',
+  'bdi',
+  'bdo',
+  'blockquote',
+  'body',
+  'br',
+  'button',
+  'canvas',
+  'caption',
+  'cite',
+  'code',
+  'col',
+  'colgroup',
+  'data',
+  'datalist',
+  'dd',
+  'del',
+  'details',
+  'dfn',
+  'dialog',
+  'div',
+  'dl',
+  'dt',
+  'em',
+  'embed',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'footer',
+  'form',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'head',
+  'header',
+  'hgroup',
+  'hr',
+  'html',
+  'i',
+  'iframe',
+  'img',
+  'input',
+  'ins',
+  'kbd',
+  'label',
+  'legend',
+  'li',
+  'link',
+  'main',
+  'map',
+  'mark',
+  'math',
+  'menu',
+  'menuitem',
+  'meta',
+  'meter',
+  'nav',
+  'noscript',
+  'object',
+  'ol',
+  'optgroup',
+  'option',
+  'output',
+  'p',
+  'param',
+  'picture',
+  'pre',
+  'progress',
+  'q',
+  'rb',
+  'rp',
+  'rt',
+  'rtc',
+  'ruby',
+  's',
+  'samp',
+  'script',
+  'section',
+  'select',
+  'slot',
+  'small',
+  'source',
+  'span',
+  'strong',
+  'style',
+  'sub',
+  'summary',
+  'sup',
+  'svg',
+  'table',
+  'tbody',
+  'td',
+  'template',
+  'textarea',
+  'tfoot',
+  'th',
+  'thead',
+  'time',
+  'title',
+  'tr',
+  'track',
+  'u',
+  'ul',
+  'var',
+  'video',
+  'wbr',
+];
+
 function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   const node = astPath.node;
 
@@ -193,15 +313,36 @@ export function isNamedBlockName(path: ASTPath): boolean {
   return isAngleComponentPath(path) && path.parent && (path.node as ASTv1.ElementNode).tag.startsWith(':');
 }
 
-export function isAngleComponentPath(path: ASTPath): boolean {
+export function isScopedAngleTagName(path: ASTPath): boolean {
   const node = path.node as unknown as ASTv1.ElementNode;
 
   if (!hasNodeType(node, 'ElementNode')) {
     return false;
   }
 
-  if (node.tag.length === 0) {
-    return true;
+  if (node.tag.startsWith('@')) {
+    // have no idea how to handle it in context
+    return false;
+  }
+
+  if (node.tag.startsWith('this.')) {
+    // have no idea how to handle it in context
+    return false;
+  }
+
+  if (node.tag.startsWith(':')) {
+    // have no idea how to handle it in context
+    return false;
+  }
+
+  return !HTML_TAGS.includes(node.tag);
+}
+
+export function isAngleComponentPath(path: ASTPath): boolean {
+  const node = path.node as unknown as ASTv1.ElementNode;
+
+  if (!hasNodeType(node, 'ElementNode')) {
+    return false;
   }
 
   if (node.tag.charAt(0) === node.tag.charAt(0).toUpperCase()) {

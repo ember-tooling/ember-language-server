@@ -255,7 +255,10 @@ export default class Server {
           const meta = allTokens[key][pathName];
 
           if (isFileBelongsToRoots(project.roots, meta.source)) {
-            projectTokens[key][pathName] = meta;
+            projectTokens[key][pathName] = {
+              source: meta.source,
+              tokens: meta.tokens,
+            };
           }
         });
       });

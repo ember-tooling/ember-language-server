@@ -565,6 +565,13 @@ export async function getResult(
   projectName?: string[] | string
 ): Promise<IResponse<unknown> | IResponse<unknown>[]> {
   // @ts-expect-error overload
+
+  const meta = files.$meta || {};
+
+  if ('$meta' in files) {
+    delete files.$meta;
+  }
+
   const { normalizedPath, originalPath, destroy, result } = await createProject(files, connection, projectName);
 
   const modelPath = path.join(originalPath, fileToInspect);
@@ -576,6 +583,14 @@ export async function getResult(
   const params = textDocument(modelPath, position);
 
   openFile(connection, modelPath);
+
+  if (meta.waitForTemplateTokensToBeCollected) {
+    await connection.sendRequest(ExecuteCommandRequest.type as unknown as string, {
+      command: 'els.getLegacyTemplateTokens',
+      arguments: [normalizedPath],
+    });
+  }
+
   let response = await connection.sendRequest(reqType as never, params);
 
   if (reqType === CompletionRequest.method) {

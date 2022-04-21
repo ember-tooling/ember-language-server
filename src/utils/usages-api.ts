@@ -2,10 +2,13 @@ import { extractTokensFromTemplate } from './template-tokens-collector';
 import { MatchResultType } from './path-matcher';
 import { fsProvider } from '../fs-provider';
 import { logDebugInfo } from './logger';
+import { preprocess } from '@glimmer/syntax';
+import { extractYeildMetadata, TemplateYieldContext } from './yield-context-extractor';
 
 export interface TemplateTokenMeta {
   source: string;
   tokens: string[];
+  yieldScopes?: TemplateYieldContext;
 }
 
 export type ITemplateTokens = {
@@ -141,12 +144,32 @@ async function extractTokens() {
   try {
     const content = await fsProvider().readFile(file);
 
-    if (content !== null) {
-      const tokens = extractTokensFromTemplate(content);
+    if (content !== null && content.trim().length > 0) {
+      const ast = preprocess(content);
+
+      const tokens = extractTokensFromTemplate(ast);
+      let yieldMeta = {};
+
+      if (kind === 'component') {
+        try {
+          yieldMeta = extractYeildMetadata(ast);
+        } catch (e) {
+          yieldMeta = {
+            error: e.toString(),
+          };
+        }
+      }
 
       TEMPLATE_TOKENS[kind][normalizedName] = {
         source: file,
         tokens,
+        yieldScopes: yieldMeta,
+      };
+    } else if (typeof content === 'string') {
+      TEMPLATE_TOKENS[kind][normalizedName] = {
+        source: file,
+        tokens: [],
+        yieldScopes: {},
       };
     }
   } catch (e) {
