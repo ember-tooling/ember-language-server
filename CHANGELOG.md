@@ -1,3 +1,10 @@
+# [2.23.0](https://github.com/lifeart/ember-language-server/compare/v2.22.0...v2.23.0) (2022-04-21)
+
+
+### Features
+
+* named slots context autocomplete ([#381](https://github.com/lifeart/ember-language-server/issues/381)) ([ab8b888](https://github.com/lifeart/ember-language-server/commit/ab8b88821b28c972e1ef544bb742090c1c07fbd7))
+
 # [2.22.0](https://github.com/lifeart/ember-language-server/compare/v2.21.0...v2.22.0) (2022-04-21)
 
 
