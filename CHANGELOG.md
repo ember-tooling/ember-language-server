@@ -1,3 +1,10 @@
+# [2.22.0](https://github.com/lifeart/ember-language-server/compare/v2.21.0...v2.22.0) (2022-04-21)
+
+
+### Features
+
+* autocomplete for component, helper, modifier helpers ([#380](https://github.com/lifeart/ember-language-server/issues/380)) ([5f3e91d](https://github.com/lifeart/ember-language-server/commit/5f3e91d78d6ee17166beda3ed9396cecb73e7cd3))
+
 # [2.21.0](https://github.com/lifeart/ember-language-server/compare/v2.20.1...v2.21.0) (2022-04-21)
 
 
