@@ -111,10 +111,33 @@ class BlockParamDefinition {
   }
   get componentName() {
     if (this.node.type === 'ElementNode') {
-      return normalizeToClassicComponent((this.node as ASTv1.ElementNode).tag);
+      const tagName = (this.node as ASTv1.ElementNode).tag;
+
+      if (tagName.startsWith(':')) {
+        const parentNode = this.path.parent as ASTv1.ElementNode;
+
+        if (parentNode && parentNode.type === 'ElementNode') {
+          return normalizeToClassicComponent(parentNode.tag);
+        }
+
+        return '(unknown)';
+      }
+
+      return normalizeToClassicComponent(tagName);
     }
 
     return '(unknown)';
+  }
+  get slotName() {
+    const node = this.node as ASTv1.ElementNode;
+
+    if (node.type === 'ElementNode') {
+      if (node.tag.startsWith(':')) {
+        return node.tag.replace(':', '');
+      }
+    }
+
+    return 'default';
   }
   get index(): number {
     const node = this.path.node;

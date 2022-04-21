@@ -68,6 +68,7 @@ const mListRoutes = memoize(listRoutes, { length: 1, maxAge: 60000 });
 type ScopedValuesMetadata = {
   componentName: string;
   index: number;
+  slotName: string;
 };
 
 /**
@@ -395,7 +396,7 @@ export default class TemplateCompletionProvider {
 
           const [slotName, index, key] = yieldScope.split(':');
 
-          if (slotName === 'default' && `${data.index}` === index) {
+          if (slotName === data.slotName && `${data.index}` === index) {
             const label = key.length ? `${value.label}.${key}` : `${value.label}`;
             const item: CompletionItem = { ...value, label };
 
@@ -412,7 +413,7 @@ export default class TemplateCompletionProvider {
     return [...scopedValues, ...extras];
   }
   getScopedValues(focusPath: ASTPath, withMeta = false): CompletionItem[] {
-    const scopedValues = getLocalScope(focusPath).map(({ name, node, path, componentName, index }) => {
+    const scopedValues = getLocalScope(focusPath).map(({ name, node, path, componentName, slotName, index }) => {
       const key =
         node.type === 'ElementNode'
           ? (node as ASTv1.ElementNode).tag
@@ -428,6 +429,7 @@ export default class TemplateCompletionProvider {
       if (withMeta) {
         result.data = {
           componentName,
+          slotName,
           index,
         };
       }

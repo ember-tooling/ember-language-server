@@ -150,13 +150,11 @@ async function extractTokens() {
       const tokens = extractTokensFromTemplate(ast);
       let yieldMeta = {};
 
-      if (kind === 'component') {
+      if (kind === 'component' && content.includes('{{yield')) {
         try {
           yieldMeta = extractYeildMetadata(ast);
         } catch (e) {
-          yieldMeta = {
-            error: e.toString(),
-          };
+          yieldMeta = {};
         }
       }
 

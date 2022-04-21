@@ -803,6 +803,32 @@ describe('integration', function () {
       });
 
       describe('Able to provide autocomplete information for local scoped params', () => {
+        it('support named slots context autocomplete', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'my-component.hbs': `{{yield (hash Foo=(component "my-component") Bar=(component "super-puper")) to="body"}}`,
+                  'foo.hbs': ['<MyComponent>', '<:body as |b|>', '<b', '</:body>', '</MyComponent>'].join('\n'),
+                },
+              },
+              $meta: {
+                waitForTemplateTokensToBeCollected: true,
+              },
+            },
+            'app/components/foo.hbs',
+            { line: 2, character: 2 }
+          );
+
+          expect(
+            result.response
+              .map((e) => e.label)
+              .sort()
+              .join(',')
+          ).toBe('b,b.Bar,b.Foo');
+        });
         it('support tag blocks and yiled context', async () => {
           const result = await getResult(
             CompletionRequest.method,
