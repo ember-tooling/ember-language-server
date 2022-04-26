@@ -1,3 +1,10 @@
+# [2.24.0](https://github.com/lifeart/ember-language-server/compare/v2.23.0...v2.24.0) (2022-04-26)
+
+
+### Features
+
+* Support .yml YAML files ([#384](https://github.com/lifeart/ember-language-server/issues/384)) ([e150ba7](https://github.com/lifeart/ember-language-server/commit/e150ba7fcafee53ad618ef6dd306adef8793ef00))
+
 # [2.23.0](https://github.com/lifeart/ember-language-server/compare/v2.22.0...v2.23.0) (2022-04-21)
 
 
