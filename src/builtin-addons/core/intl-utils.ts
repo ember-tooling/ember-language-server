@@ -28,6 +28,8 @@ type TranslationFile =
     }
   | Record<string, never>;
 
+const YAML_EXTENSIONS = ['.yaml', '.yml'];
+
 export async function getTranslations(root: string, server: Server): Promise<TranslationsHashMap> {
   const hashMap = {};
   const intlEntry = path.join(root, 'translations');
@@ -72,7 +74,7 @@ async function recursiveIntlTranslationsSearch(server: Server, hashMap: Translat
 async function objFromFile(server: Server, filePath: string): Promise<TranslationFile> {
   const ext = path.extname(filePath);
 
-  if (ext === '.yaml') {
+  if (YAML_EXTENSIONS.includes(ext)) {
     const content = await server.fs.readFile(filePath);
 
     if (content === null) {
@@ -112,7 +114,7 @@ function addToHashMap(hash: TranslationsHashMap, translationFile: TranslationFil
 
     if (extension === '.json' && translationFile.type === 'json') {
       position = getPositionInJson(translationFile.jsonAst, p);
-    } else if (extension === '.yaml' && translationFile.type === 'yaml') {
+    } else if (YAML_EXTENSIONS.includes(extension) && translationFile.type === 'yaml') {
       position = getPositionInYaml(translationFile.yamlAst, p, translationFile.yamlLineCounter);
     }
 

@@ -35,6 +35,16 @@ const translationsYaml = {
   },
 };
 
+const translationsYamlYMLExtension = {
+  'en-us.yml': `rootFileTranslation: text 1`,
+  'sub-folder': {
+    'en-us.yml': `subFolderTranslation:
+        subTranslation: text 2
+        anotherTranslation: another text
+      `,
+  },
+};
+
 const translationsYamlInvalid = {
   'en-us.yaml': `rootFileTranslation text 1`,
 };
@@ -424,45 +434,47 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
       });
     });
 
-    describe('provide completion - YAML', () => {
-      it('should autocomplete root translation in handlebars', async () => {
-        expect(
-          (
-            await getResult(
-              CompletionRequest.method,
-              connection,
-              {
-                app: {
-                  components: {
-                    'test.hbs': '{{t "rootFileTransla"}}',
+    describe('YAML - .yaml file extensions', () => {
+      describe('provide completion', () => {
+        it('should autocomplete root translation in handlebars', async () => {
+          expect(
+            (
+              await getResult(
+                CompletionRequest.method,
+                connection,
+                {
+                  app: {
+                    components: {
+                      'test.hbs': '{{t "rootFileTransla"}}',
+                    },
                   },
+                  translations: translationsYaml,
                 },
-                translations: translationsYaml,
-              },
-              'app/components/test.hbs',
-              { line: 0, character: 20 }
-            )
-          ).response
-        ).toEqual([
-          {
-            documentation: 'en-us : text 1',
-            kind: 12,
-            label: 'rootFileTranslation',
-            textEdit: {
-              newText: 'rootFileTranslation',
-              range: {
-                end: {
-                  character: 5,
-                  line: 0,
-                },
-                start: {
-                  character: 5,
-                  line: 0,
+                'app/components/test.hbs',
+                { line: 0, character: 20 }
+              )
+            ).response
+          ).toEqual([
+            {
+              documentation: 'en-us : text 1',
+              kind: 12,
+              label: 'rootFileTranslation',
+              textEdit: {
+                newText: 'rootFileTranslation',
+                range: {
+                  end: {
+                    character: 5,
+                    line: 0,
+                  },
+                  start: {
+                    character: 5,
+                    line: 0,
+                  },
                 },
               },
             },
-          },
-        ]);
+          ]);
+        });
       });
 
       it('should autocomplete sub folder translation in handlebars', async () => {
@@ -521,6 +533,228 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
             },
           },
         ]);
+      });
+
+      describe('provide definition', () => {
+        it('should provide translation definition in handlebars', async () => {
+          expect(
+            (
+              (await getResult(
+                DefinitionRequest.method,
+                connection,
+                {
+                  app: {
+                    components: {
+                      'test.hbs': '{{t "subFolderTranslation.subTranslation" }}',
+                    },
+                  },
+                  translations: translationsYaml,
+                },
+                'app/components/test.hbs',
+                { line: 0, character: 32 }
+              )) as any
+            ).response
+          ).toEqual([
+            {
+              uri: '/translations/sub-folder/en-us.yaml',
+              range: {
+                start: { line: 1, character: 8 },
+                end: { line: 1, character: 30 },
+              },
+            },
+          ]);
+        });
+
+        it('should provide translation definition in js', async () => {
+          expect(
+            (
+              (await getResult(
+                DefinitionRequest.method,
+                connection,
+                {
+                  app: {
+                    components: {
+                      'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.anotherTranslation"); }',
+                    },
+                  },
+                  translations: translationsYaml,
+                },
+                'app/components/test.js',
+                { line: 0, character: 86 }
+              )) as any
+            ).response
+          ).toEqual([
+            {
+              uri: '/translations/sub-folder/en-us.yaml',
+              range: {
+                start: { line: 2, character: 8 },
+                end: { line: 2, character: 40 },
+              },
+            },
+          ]);
+        });
+      });
+    });
+
+    describe('YAML - .yml file extensions', () => {
+      describe('provide completion', () => {
+        it('should autocomplete root translation in handlebars', async () => {
+          expect(
+            (
+              await getResult(
+                CompletionRequest.method,
+                connection,
+                {
+                  app: {
+                    components: {
+                      'test.hbs': '{{t "rootFileTransla"}}',
+                    },
+                  },
+                  translations: translationsYamlYMLExtension,
+                },
+                'app/components/test.hbs',
+                { line: 0, character: 20 }
+              )
+            ).response
+          ).toEqual([
+            {
+              documentation: 'en-us : text 1',
+              kind: 12,
+              label: 'rootFileTranslation',
+              textEdit: {
+                newText: 'rootFileTranslation',
+                range: {
+                  end: {
+                    character: 5,
+                    line: 0,
+                  },
+                  start: {
+                    character: 5,
+                    line: 0,
+                  },
+                },
+              },
+            },
+          ]);
+        });
+      });
+
+      it('should autocomplete sub folder translation in handlebars', async () => {
+        expect(
+          (
+            await getResult(
+              CompletionRequest.method,
+              connection,
+              {
+                app: {
+                  components: {
+                    'test.hbs': '{{t "subFolderTranslat"}}',
+                  },
+                },
+                translations: translationsYamlYMLExtension,
+              },
+              'app/components/test.hbs',
+              { line: 0, character: 22 }
+            )
+          ).response
+        ).toEqual([
+          {
+            documentation: 'en-us : text 2',
+            kind: 12,
+            label: 'subFolderTranslation.subTranslation',
+            textEdit: {
+              newText: 'subFolderTranslation.subTranslation',
+              range: {
+                end: {
+                  character: 5,
+                  line: 0,
+                },
+                start: {
+                  character: 5,
+                  line: 0,
+                },
+              },
+            },
+          },
+          {
+            documentation: 'en-us : another text',
+            kind: 12,
+            label: 'subFolderTranslation.anotherTranslation',
+            textEdit: {
+              newText: 'subFolderTranslation.anotherTranslation',
+              range: {
+                end: {
+                  character: 5,
+                  line: 0,
+                },
+                start: {
+                  character: 5,
+                  line: 0,
+                },
+              },
+            },
+          },
+        ]);
+      });
+
+      describe('provide definition', () => {
+        it('should provide translation definition in handlebars', async () => {
+          expect(
+            (
+              (await getResult(
+                DefinitionRequest.method,
+                connection,
+                {
+                  app: {
+                    components: {
+                      'test.hbs': '{{t "subFolderTranslation.subTranslation" }}',
+                    },
+                  },
+                  translations: translationsYamlYMLExtension,
+                },
+                'app/components/test.hbs',
+                { line: 0, character: 32 }
+              )) as any
+            ).response
+          ).toEqual([
+            {
+              uri: '/translations/sub-folder/en-us.yml',
+              range: {
+                start: { line: 1, character: 8 },
+                end: { line: 1, character: 30 },
+              },
+            },
+          ]);
+        });
+
+        it('should provide translation definition in js', async () => {
+          expect(
+            (
+              (await getResult(
+                DefinitionRequest.method,
+                connection,
+                {
+                  app: {
+                    components: {
+                      'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.anotherTranslation"); }',
+                    },
+                  },
+                  translations: translationsYamlYMLExtension,
+                },
+                'app/components/test.js',
+                { line: 0, character: 86 }
+              )) as any
+            ).response
+          ).toEqual([
+            {
+              uri: '/translations/sub-folder/en-us.yml',
+              range: {
+                start: { line: 2, character: 8 },
+                end: { line: 2, character: 40 },
+              },
+            },
+          ]);
+        });
       });
     });
 
@@ -614,66 +848,6 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
             range: {
               start: { line: 1, character: 4 },
               end: { line: 1, character: 45 },
-            },
-          },
-        ]);
-      });
-    });
-
-    describe('provide definition -YAML', () => {
-      it('should provide translation definition in handlebars', async () => {
-        expect(
-          (
-            (await getResult(
-              DefinitionRequest.method,
-              connection,
-              {
-                app: {
-                  components: {
-                    'test.hbs': '{{t "subFolderTranslation.subTranslation" }}',
-                  },
-                },
-                translations: translationsYaml,
-              },
-              'app/components/test.hbs',
-              { line: 0, character: 32 }
-            )) as any
-          ).response
-        ).toEqual([
-          {
-            uri: '/translations/sub-folder/en-us.yaml',
-            range: {
-              start: { line: 1, character: 8 },
-              end: { line: 1, character: 30 },
-            },
-          },
-        ]);
-      });
-
-      it('should provide translation definition in js', async () => {
-        expect(
-          (
-            (await getResult(
-              DefinitionRequest.method,
-              connection,
-              {
-                app: {
-                  components: {
-                    'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.anotherTranslation"); }',
-                  },
-                },
-                translations: translationsYaml,
-              },
-              'app/components/test.js',
-              { line: 0, character: 86 }
-            )) as any
-          ).response
-        ).toEqual([
-          {
-            uri: '/translations/sub-folder/en-us.yaml',
-            range: {
-              start: { line: 2, character: 8 },
-              end: { line: 2, character: 40 },
             },
           },
         ]);
