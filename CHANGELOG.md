@@ -1,3 +1,10 @@
+# [2.25.0](https://github.com/lifeart/ember-language-server/compare/v2.24.0...v2.25.0) (2022-04-27)
+
+
+### Features
+
+* go to definition for yield context components ([#385](https://github.com/lifeart/ember-language-server/issues/385)) ([4618d27](https://github.com/lifeart/ember-language-server/commit/4618d2781984d279fc26119cfa4ce7fc83b4254c))
+
 # [2.24.0](https://github.com/lifeart/ember-language-server/compare/v2.23.0...v2.24.0) (2022-04-26)
 
 
