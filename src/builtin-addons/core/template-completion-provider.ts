@@ -466,17 +466,16 @@ export default class TemplateCompletionProvider {
 
     return uniqBy([...emberModifierItems, ...resolvedModifiers, ...builtinModifiers()], 'label');
   }
-  async getParentComponentYields(focusPath: any) {
-    if (focusPath.type !== 'ElementNode') {
+  async getParentComponentYields(node: ASTv1.ElementNode) {
+    if (node.type !== 'ElementNode') {
       return [];
     }
 
     const paths: string[] = [];
 
-    const rawScopedPaths = provideComponentTemplatePaths(this.registry, focusPath.tag);
-    const scopedPaths = await asyncFilter(rawScopedPaths, this.server.fs.exists);
+    const rawScopedPaths = provideComponentTemplatePaths(this.registry, node.tag);
 
-    scopedPaths.forEach((p) => {
+    rawScopedPaths.forEach((p) => {
       if (!paths.includes(p)) {
         paths.push(p);
       }
@@ -499,7 +498,7 @@ export default class TemplateCompletionProvider {
         return {
           label: `:${blockName}`,
           kind: CompletionItemKind.Variable,
-          detail: `Named block (Slot) for <${focusPath.tag}>`,
+          detail: `Named block (Slot) for <${node.tag}>`,
         };
       });
     } catch (e) {

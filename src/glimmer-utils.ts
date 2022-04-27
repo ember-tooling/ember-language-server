@@ -98,7 +98,7 @@ export function focusedBlockParamName(content: string, position: Position) {
   return '';
 }
 
-class BlockParamDefinition {
+export class BlockParamDefinition {
   public type = 'BlockParam';
   public name: string;
   public path: ASTPath;
@@ -292,7 +292,7 @@ export default class ASTPath {
     return this.path[this.index - level];
   }
 
-  metaForType(astType: 'handlebars'): HandlebarsASTPathMeta | null {
+  metaForType(astType?: 'handlebars'): HandlebarsASTPathMeta | null {
     if (astType === 'handlebars') {
       return new HandlebarsASTPathMeta(this, this.position, this.content);
     } else {

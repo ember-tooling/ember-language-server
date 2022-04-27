@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Definition, Location } from 'vscode-languageserver/node';
 import { DefinitionFunctionParams } from './../../utils/addon-api';
 import { isLinkToTarget, isLinkComponentRouteTarget, isOutlet } from './../../utils/ast-helpers';
-import ASTPath from './../../glimmer-utils';
+import ASTPath, { getLocalScope } from './../../glimmer-utils';
 import { IRegistry } from './../../utils/registry-api';
 import { normalizeToClassicComponent } from '../../utils/normalizers';
 import { isTemplatePath, isTestFile, isScriptPath, asyncFilter } from './../../utils/layout-helpers';
@@ -16,6 +16,7 @@ import { Project } from '../../project';
 import Server from '../../server';
 import { isStyleFile } from '../../utils/layout-helpers';
 import FSProvider from '../../fs-provider';
+import { getAllTemplateTokens } from '../../utils/usages-api';
 
 function getComponentAndAddonName(rawComponentName: string) {
   const componentParts = rawComponentName.split('$');
@@ -88,6 +89,29 @@ export default class TemplateDefinitionProvider {
       // <FooBar />
       definitions = await this.provideAngleBrackedComponentDefinition(focusPath);
       // {{#foo-bar}} {{/foo-bar}}
+    } else if (this.isMayBeComponentFromPath(focusPath)) {
+      const [key, ...tail] = (focusPath.node as ASTv1.ElementNode).tag.split('.');
+      const scopes = getLocalScope(focusPath);
+      const target = scopes.find((el) => el.name === key);
+
+      if (target) {
+        const keyPath = `${target.slotName}:${target.index}:${tail.join('.')}`;
+
+        const allTokens = getAllTemplateTokens().component;
+        const meta = allTokens[target.componentName];
+
+        if (meta.yieldScopes && meta.yieldScopes[keyPath]) {
+          const info = meta.yieldScopes[keyPath];
+
+          if (info) {
+            const [kind, name] = info;
+            const names = Array.isArray(name) ? name : [name];
+            const data = names.map((itemName) => getPathsFromRegistry(kind, itemName, this.registry));
+
+            definitions = pathsToLocations(...data.reduce((acc, curr) => acc.concat(curr), []));
+          }
+        }
+      }
     } else if (this.isComponentWithBlock(focusPath)) {
       definitions = await this.provideBlockComponentDefinition(focusPath);
       // {{action "fooBar"}}, (action "fooBar"), (action this.fooBar), this.someProperty
@@ -393,6 +417,16 @@ export default class TemplateDefinitionProvider {
       node.path.original.charAt(0) !== '-' &&
       !node.path.original.includes('.')
     );
+  }
+
+  isMayBeComponentFromPath(path: ASTPath) {
+    const node = path.node as ASTv1.ElementNode;
+
+    if (node.type === 'ElementNode') {
+      if (node.tag.indexOf('.') > -1) {
+        return true;
+      }
+    }
   }
 
   isAngleComponent(path: ASTPath) {

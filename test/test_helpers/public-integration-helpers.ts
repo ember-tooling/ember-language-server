@@ -1,6 +1,4 @@
-import { Readable, Writable } from 'stream';
-import { createMessageConnection, Disposable, Logger, MessageConnection } from 'vscode-jsonrpc';
-import { StreamMessageReader, StreamMessageWriter } from 'vscode-jsonrpc/node';
+import { Disposable, MessageConnection } from 'vscode-jsonrpc';
 import { asyncFSProvider, initServer, registerCommandExecutor, startServer, createConnection } from './integration-helpers';
 
 export { getResult, makeProject, createProject } from './integration-helpers';

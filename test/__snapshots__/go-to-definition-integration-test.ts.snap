@@ -135,3 +135,71 @@ Object {
   ],
 }
 `;
+
+exports[`template files yield positional path definition component definition as property path return component from property path 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "bar": Array [
+        "app/components/bar/index.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+      "my-component": Array [
+        "app/components/my-component.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/bar/index.hbs",
+    },
+  ],
+}
+`;
+
+exports[`template files yield positional path definition component definition as property path return component from property path for global scope override 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "bar": Array [
+        "app/components/bar/index.hbs",
+      ],
+      "hello": Array [
+        "app/components/hello/index.hbs",
+      ],
+      "my-component": Array [
+        "app/components/my-component.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/components/bar/index.hbs",
+    },
+  ],
+}
+`;

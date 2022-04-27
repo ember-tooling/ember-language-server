@@ -1,6 +1,6 @@
 import type { ASTv1 } from '@glimmer/syntax';
 
-export type CaseContent = null | [string, string | string[]];
+export type CaseContent = null | ['component' | 'helper' | 'modifier', string | string[]];
 export type TemplateYieldContext = Record<string, CaseContent>;
 
 export function extractYeildMetadata(template: ASTv1.Template) {

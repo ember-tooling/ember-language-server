@@ -1,6 +1,6 @@
 import { CompletionItem, TextDocumentPositionParams, Position, TextDocumentIdentifier } from 'vscode-languageserver/node';
 import Server from '../server';
-import ASTPath from '../glimmer-utils';
+import ASTPath, { BlockParamDefinition } from '../glimmer-utils';
 import { filter } from 'fuzzaldrin';
 import { queryELSAddonsAPIChain } from './../utils/addon-api';
 import { preprocess, ASTv1 } from '@glimmer/syntax';
@@ -133,7 +133,7 @@ export default class TemplateCompletionProvider {
 }
 
 function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
-  let node = astPath.node as any;
+  let node: BlockParamDefinition | ASTv1.Node = astPath.node as ASTv1.Node;
 
   if (node === undefined) {
     return normalPlaceholder;
@@ -149,7 +149,17 @@ function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
     }
   }
 
-  const target = node.original || node.tag || node.name || node.chars || '';
+  let target = '';
+
+  if ('original' in node) {
+    target = String(node.original);
+  } else if ('tag' in node) {
+    target = node.tag;
+  } else if ('name' in node) {
+    target = String(node.name);
+  } else if ('chars' in node) {
+    target = node.chars;
+  }
 
   return target.replace(normalPlaceholder, '').replace(PLACEHOLDER, '');
 }

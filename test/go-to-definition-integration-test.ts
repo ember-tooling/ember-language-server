@@ -130,3 +130,73 @@ describe('script files', function () {
     });
   });
 });
+
+describe('template files', function () {
+  let instance!: ServerBucket;
+  let connection!: MessageConnection;
+
+  describe('yield positional path definition', () => {
+    beforeAll(async () => {
+      instance = await createServer({ asyncFsEnabled: false });
+      connection = instance.connection;
+    });
+
+    afterAll(async () => {
+      await instance.destroy();
+    });
+
+    describe('component definition as property path', () => {
+      it('return component from property path', async () => {
+        const tpl = `
+          <MyComponent as |foo|>
+            <foo.ba⚡r />
+          </MyComponent>
+        `;
+        const { content, position } = createPointer(tpl);
+
+        const project = makeProject({
+          'app/components/hello/index.hbs': content,
+          'app/components/bar/index.hbs': 'Hello',
+          'app/components/my-component.hbs': `
+              {{yield (hash bar=(component "bar"))}}
+          `,
+        });
+
+        project['$meta'] = {
+          waitForTemplateTokensToBeCollected: true,
+        };
+
+        const result = await getResult(DefinitionRequest.method, connection, project, 'app/components/hello/index.hbs', position);
+
+        expect(result).toMatchSnapshot();
+      });
+
+      it('return component from property path for global scope override', async () => {
+        const tpl = `
+          {{#let (component "my-component") as |foo|}}
+            <MyComponent as |foo|>
+              <foo.ba⚡r />
+            </MyComponent>
+          {{/let}}
+        `;
+        const { content, position } = createPointer(tpl);
+
+        const project = makeProject({
+          'app/components/hello/index.hbs': content,
+          'app/components/bar/index.hbs': 'Hello',
+          'app/components/my-component.hbs': `
+              {{yield (hash bar=(component "bar"))}}
+          `,
+        });
+
+        project['$meta'] = {
+          waitForTemplateTokensToBeCollected: true,
+        };
+
+        const result = await getResult(DefinitionRequest.method, connection, project, 'app/components/hello/index.hbs', position);
+
+        expect(result).toMatchSnapshot();
+      });
+    });
+  });
+});
