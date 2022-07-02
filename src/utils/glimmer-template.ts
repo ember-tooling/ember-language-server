@@ -39,7 +39,7 @@ export function getFocusPath(
     return null;
   }
 
-  const isHBS = ext === '.hbs' || document.languageId === 'handlebars';
+  const isHBS = ext === '.hbs' || document.languageId === 'html' || document.languageId === 'handlebars' || document.languageId === 'html.handlebars';
 
   const originalText = isHBS
     ? documentContent
