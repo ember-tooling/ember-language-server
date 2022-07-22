@@ -1,3 +1,10 @@
+# [2.26.0](https://github.com/lifeart/ember-language-server/compare/v2.25.0...v2.26.0) (2022-07-22)
+
+
+### Features
+
+* 🧪 Support folder namespaces for intl ([#389](https://github.com/lifeart/ember-language-server/issues/389)) ([9099c60](https://github.com/lifeart/ember-language-server/commit/9099c60fd524e0a279abe52feffcc7ee77c231a6))
+
 # [2.25.0](https://github.com/lifeart/ember-language-server/compare/v2.24.0...v2.25.0) (2022-04-27)
 
 
