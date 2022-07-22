@@ -343,6 +343,52 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
             ]);
           });
 
+          it('should autocomplete when the translation is in the root file in handlebars', async () => {
+            expect(
+              (
+                await getResult(
+                  CompletionRequest.method,
+                  connection,
+                  {
+                    app: {
+                      components: {
+                        'test.hbs': `{{t "admin." }}`,
+                      },
+                    },
+                    config: {
+                      'ember-intl.js': `module.exports = function() { return { wrapTranslationsWithNamespace: true } }`,
+                    },
+                    translations: {
+                      'en.yml': `admin:
+  foo: Bar`,
+                    },
+                  },
+                  'app/components/test.hbs',
+                  { line: 0, character: 12 }
+                )
+              ).response
+            ).toEqual([
+              {
+                documentation: 'en : Bar',
+                kind: 12,
+                label: 'admin.foo',
+                textEdit: {
+                  newText: 'admin.foo',
+                  range: {
+                    end: {
+                      character: 7,
+                      line: 0,
+                    },
+                    start: {
+                      character: 7,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+            ]);
+          });
+
           it('should autocomplete in JS files when in the end of expression', async () => {
             expect(
               (

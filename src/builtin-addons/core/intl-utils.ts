@@ -138,10 +138,10 @@ function generateTranslationKey(key: string, filePath: string, root: string): st
 
   const dirname = path
     .dirname(filePath)
-    .replace(new RegExp(`.*\\${path.sep}translations\\${path.sep}`), '')
+    .replace(new RegExp(`.*\\${path.sep}translations(\\${path.sep})?`), '')
     .replace(new RegExp(`\\${path.sep}`, 'g'), '.');
 
-  return `${dirname}.${key}`;
+  return dirname.length ? `${dirname}.${key}` : key;
 }
 
 function addToHashMap(hash: TranslationsHashMap, translationFile: TranslationFile, locale: string, filePath: string, root: string) {
