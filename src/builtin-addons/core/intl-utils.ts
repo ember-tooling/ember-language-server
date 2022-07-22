@@ -6,6 +6,7 @@ import { Location, Range } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { Server } from '../..';
 import { logDebugInfo } from '../../utils/logger';
+import { getRequireSupport } from '../../utils/layout-helpers';
 
 type Translations = {
   locale: string;
@@ -13,6 +14,10 @@ type Translations = {
   location?: Location;
 };
 type TranslationsHashMap = Record<string, Translations[]>;
+
+type EmberIntlConfig = {
+  wrapTranslationsWithNamespace?: boolean;
+};
 
 type TranslationFile =
   | {
@@ -30,6 +35,29 @@ type TranslationFile =
 
 const YAML_EXTENSIONS = ['.yaml', '.yml'];
 
+export function getEmberIntlConfig(root: string): EmberIntlConfig | null {
+  try {
+    if (!getRequireSupport()) {
+      return null;
+    }
+
+    // @ts-expect-error @todo - fix webpack imports
+    const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const intlConfig = requireFunc(path.join(root, 'config', 'ember-intl.js'));
+
+    if (!intlConfig) {
+      return null;
+    }
+
+    return typeof intlConfig === 'function' ? intlConfig() : intlConfig;
+  } catch (e) {
+    // logDebugInfo('catch', e);
+    return null;
+  }
+}
+
 export async function getTranslations(root: string, server: Server): Promise<TranslationsHashMap> {
   const hashMap = {};
   const intlEntry = path.join(root, 'translations');
@@ -37,13 +65,13 @@ export async function getTranslations(root: string, server: Server): Promise<Tra
   const intlEntryExists = await server.fs.exists(intlEntry);
 
   if (intlEntryExists) {
-    await recursiveIntlTranslationsSearch(server, hashMap, intlEntry);
+    await recursiveIntlTranslationsSearch(server, hashMap, intlEntry, root);
   }
 
   return hashMap;
 }
 
-async function recursiveIntlTranslationsSearch(server: Server, hashMap: TranslationsHashMap, startPath: string) {
+async function recursiveIntlTranslationsSearch(server: Server, hashMap: TranslationsHashMap, startPath: string, root: string) {
   const localizations = await server.fs.readDirectory(startPath);
 
   for (const [fileName] of localizations) {
@@ -55,7 +83,7 @@ async function recursiveIntlTranslationsSearch(server: Server, hashMap: Translat
       const fileStats = await server.fs.stat(filePath);
 
       if (fileStats.isDirectory()) {
-        await recursiveIntlTranslationsSearch(server, hashMap, filePath);
+        await recursiveIntlTranslationsSearch(server, hashMap, filePath, root);
       } else {
         const translationFile = await objFromFile(server, filePath);
 
@@ -63,7 +91,7 @@ async function recursiveIntlTranslationsSearch(server: Server, hashMap: Translat
           return;
         }
 
-        addToHashMap(hashMap, translationFile, localization, filePath);
+        addToHashMap(hashMap, translationFile, localization, filePath, root);
       }
     } catch (e) {
       logDebugInfo('error', e);
@@ -100,13 +128,31 @@ async function objFromFile(server: Server, filePath: string): Promise<Translatio
   return {};
 }
 
-function addToHashMap(hash: TranslationsHashMap, translationFile: TranslationFile, locale: string, filePath: string) {
+function generateTranslationKey(key: string, filePath: string, root: string): string {
+  const config = getEmberIntlConfig(root);
+  const wrapTranslationsWithNamespace = config?.wrapTranslationsWithNamespace;
+
+  if (!wrapTranslationsWithNamespace) {
+    return key;
+  }
+
+  const dirname = path
+    .dirname(filePath)
+    .replace(new RegExp(`.*\\${path.sep}translations\\${path.sep}`), '')
+    .replace(new RegExp(`\\${path.sep}`, 'g'), '.');
+
+  return `${dirname}.${key}`;
+}
+
+function addToHashMap(hash: TranslationsHashMap, translationFile: TranslationFile, locale: string, filePath: string, root: string) {
   const items: Record<string, string> = flat(translationFile.json);
   const extension = path.extname(filePath);
 
   Object.keys(items).forEach((p) => {
-    if (!(p in hash)) {
-      hash[p] = [];
+    const key = generateTranslationKey(p, filePath, root);
+
+    if (!(key in hash)) {
+      hash[key] = [];
     }
 
     const uri = URI.file(filePath).toString();
@@ -124,7 +170,7 @@ function addToHashMap(hash: TranslationsHashMap, translationFile: TranslationFil
     const endColumn = position ? position.end.column - 1 : 0;
     const range = Range.create(startLine, startColumn, endLine, endColumn);
 
-    hash[p].push({ locale, text: items[p], location: Location.create(uri, range) });
+    hash[key].push({ locale, text: items[p], location: Location.create(uri, range) });
   });
 }
 

@@ -11,6 +11,14 @@ const translations = {
     "rootFileTranslation": "text 1 in polish"
   }`,
   'sub-folder': {
+    'sub-sub-folder': {
+      'en-us.json': `{
+        "subsubFolderTranslation": {
+          "subSubTranslation": "text 3",
+          "anotherSubSubTranslation": "text 4"
+        }
+      }`,
+    },
     'en-us.json': `{
       "subFolderTranslation": {
         "subTranslation": "text 2",
@@ -236,161 +244,522 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
         ]);
       });
 
-      it('should autocomplete sub folder translation in handlebars', async () => {
-        expect(
-          (
-            await getResult(
-              CompletionRequest.method,
-              connection,
+      describe('With ember-intl config', () => {
+        describe('#wrapTranslationsWithNamespace is true', () => {
+          it('should autocomplete sub folder translation in handlebars', async () => {
+            expect(
+              (
+                await getResult(
+                  CompletionRequest.method,
+                  connection,
+                  {
+                    app: {
+                      components: {
+                        'test.hbs': `{{t "subFolderTranslat" }}`,
+                      },
+                    },
+                    config: {
+                      'ember-intl.js': `module.exports = function() { return { wrapTranslationsWithNamespace: true } }`,
+                    },
+                    translations,
+                  },
+                  'app/components/test.hbs',
+                  { line: 0, character: 12 }
+                )
+              ).response
+            ).toEqual([
               {
-                app: {
-                  components: {
-                    'test.hbs': `{{t "subFolderTranslat" }}`,
+                documentation: 'en-us : text 2',
+                kind: 12,
+                label: 'sub-folder.subFolderTranslation.subTranslation',
+                textEdit: {
+                  newText: 'sub-folder.subFolderTranslation.subTranslation',
+                  range: {
+                    end: {
+                      character: 5,
+                      line: 0,
+                    },
+                    start: {
+                      character: 5,
+                      line: 0,
+                    },
                   },
                 },
-                translations,
               },
-              'app/components/test.hbs',
-              { line: 0, character: 12 }
-            )
-          ).response
-        ).toEqual([
-          {
-            documentation: 'en-us : text 2',
-            kind: 12,
-            label: 'subFolderTranslation.subTranslation',
-            textEdit: {
-              newText: 'subFolderTranslation.subTranslation',
-              range: {
-                end: {
-                  character: 5,
-                  line: 0,
-                },
-                start: {
-                  character: 5,
-                  line: 0,
+              {
+                documentation: 'en-us : another text',
+                kind: 12,
+                label: 'sub-folder.subFolderTranslation.anotherTranslation',
+                textEdit: {
+                  newText: 'sub-folder.subFolderTranslation.anotherTranslation',
+                  range: {
+                    end: {
+                      character: 5,
+                      line: 0,
+                    },
+                    start: {
+                      character: 5,
+                      line: 0,
+                    },
+                  },
                 },
               },
-            },
-          },
-          {
-            documentation: 'en-us : another text',
-            kind: 12,
-            label: 'subFolderTranslation.anotherTranslation',
-            textEdit: {
-              newText: 'subFolderTranslation.anotherTranslation',
-              range: {
-                end: {
-                  character: 5,
-                  line: 0,
-                },
-                start: {
-                  character: 5,
-                  line: 0,
+              {
+                documentation: 'en-us : text 3',
+                kind: 12,
+                label: 'sub-folder.sub-sub-folder.subsubFolderTranslation.subSubTranslation',
+                textEdit: {
+                  newText: 'sub-folder.sub-sub-folder.subsubFolderTranslation.subSubTranslation',
+                  range: {
+                    end: {
+                      character: 5,
+                      line: 0,
+                    },
+                    start: {
+                      character: 5,
+                      line: 0,
+                    },
+                  },
                 },
               },
-            },
-          },
-        ]);
+              {
+                documentation: 'en-us : text 4',
+                kind: 12,
+                label: 'sub-folder.sub-sub-folder.subsubFolderTranslation.anotherSubSubTranslation',
+                textEdit: {
+                  newText: 'sub-folder.sub-sub-folder.subsubFolderTranslation.anotherSubSubTranslation',
+                  range: {
+                    end: {
+                      character: 5,
+                      line: 0,
+                    },
+                    start: {
+                      character: 5,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+            ]);
+          });
+
+          it('should autocomplete in JS files when in the end of expression', async () => {
+            expect(
+              (
+                await getResult(
+                  CompletionRequest.method,
+                  connection,
+                  {
+                    app: {
+                      components: {
+                        'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.another"); }',
+                      },
+                    },
+                    config: {
+                      'ember-intl.js': `module.exports = function() { return { wrapTranslationsWithNamespace: true } }`,
+                    },
+                    translations,
+                  },
+                  'app/components/test.js',
+                  { line: 0, character: 86 }
+                )
+              ).response
+            ).toEqual([
+              {
+                documentation: 'en-us : another text',
+                kind: 12,
+                label: 'sub-folder.subFolderTranslation.anotherTranslation',
+                textEdit: {
+                  newText: 'sub-folder.subFolderTranslation.anotherTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : text 4',
+                kind: 12,
+                label: 'sub-folder.sub-sub-folder.subsubFolderTranslation.anotherSubSubTranslation',
+                textEdit: {
+                  newText: 'sub-folder.sub-sub-folder.subsubFolderTranslation.anotherSubSubTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+            ]);
+          });
+
+          it('should autocomplete sub folder translation in JS', async () => {
+            expect(
+              (
+                await getResult(
+                  CompletionRequest.method,
+                  connection,
+                  {
+                    app: {
+                      components: {
+                        'test.js': `export default class Foo extends Bar { text = this.intl.t("subFolderTranslation."); }`,
+                      },
+                    },
+                    config: {
+                      'ember-intl.js': `module.exports = function() { return { wrapTranslationsWithNamespace: true } }`,
+                    },
+                    translations,
+                  },
+                  'app/components/test.js',
+                  { line: 0, character: 64 }
+                )
+              ).response
+            ).toEqual([
+              {
+                documentation: 'en-us : text 2',
+                kind: 12,
+                label: 'sub-folder.subFolderTranslation.subTranslation',
+                textEdit: {
+                  newText: 'sub-folder.subFolderTranslation.subTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : another text',
+                kind: 12,
+                label: 'sub-folder.subFolderTranslation.anotherTranslation',
+                textEdit: {
+                  newText: 'sub-folder.subFolderTranslation.anotherTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : text 3',
+                kind: 12,
+                label: 'sub-folder.sub-sub-folder.subsubFolderTranslation.subSubTranslation',
+                textEdit: {
+                  newText: 'sub-folder.sub-sub-folder.subsubFolderTranslation.subSubTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : text 4',
+                kind: 12,
+                label: 'sub-folder.sub-sub-folder.subsubFolderTranslation.anotherSubSubTranslation',
+                textEdit: {
+                  newText: 'sub-folder.sub-sub-folder.subsubFolderTranslation.anotherSubSubTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+            ]);
+          });
+        });
+
+        describe('#wrapTranslationsWithNamespace is not set', () => {
+          it('should not autocomplete sub folder translation in handlebars', async () => {
+            expect(
+              (
+                await getResult(
+                  CompletionRequest.method,
+                  connection,
+                  {
+                    app: {
+                      components: {
+                        'test.hbs': `{{t "subFolderTranslat" }}`,
+                      },
+                    },
+                    config: {
+                      'ember-intl.js': `module.exports = function() { }`,
+                    },
+                    translations,
+                  },
+                  'app/components/test.hbs',
+                  { line: 0, character: 12 }
+                )
+              ).response
+            ).toEqual([
+              {
+                documentation: 'en-us : text 2',
+                kind: 12,
+                label: 'subFolderTranslation.subTranslation',
+                textEdit: {
+                  newText: 'subFolderTranslation.subTranslation',
+                  range: {
+                    end: {
+                      character: 5,
+                      line: 0,
+                    },
+                    start: {
+                      character: 5,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : another text',
+                kind: 12,
+                label: 'subFolderTranslation.anotherTranslation',
+                textEdit: {
+                  newText: 'subFolderTranslation.anotherTranslation',
+                  range: {
+                    end: {
+                      character: 5,
+                      line: 0,
+                    },
+                    start: {
+                      character: 5,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : text 3',
+                kind: 12,
+                label: 'subsubFolderTranslation.subSubTranslation',
+                textEdit: {
+                  newText: 'subsubFolderTranslation.subSubTranslation',
+                  range: {
+                    end: {
+                      character: 5,
+                      line: 0,
+                    },
+                    start: {
+                      character: 5,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : text 4',
+                kind: 12,
+                label: 'subsubFolderTranslation.anotherSubSubTranslation',
+                textEdit: {
+                  newText: 'subsubFolderTranslation.anotherSubSubTranslation',
+                  range: {
+                    end: {
+                      character: 5,
+                      line: 0,
+                    },
+                    start: {
+                      character: 5,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+            ]);
+          });
+
+          it('should autocomplete in JS files when in the end of expression', async () => {
+            expect(
+              (
+                await getResult(
+                  CompletionRequest.method,
+                  connection,
+                  {
+                    app: {
+                      components: {
+                        'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.another"); }',
+                      },
+                    },
+                    config: {
+                      'ember-intl.js': `module.exports = function() { return {}; }`,
+                    },
+                    translations,
+                  },
+                  'app/components/test.js',
+                  { line: 0, character: 86 }
+                )
+              ).response
+            ).toEqual([
+              {
+                documentation: 'en-us : another text',
+                kind: 12,
+                label: 'subFolderTranslation.anotherTranslation',
+                textEdit: {
+                  newText: 'subFolderTranslation.anotherTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : text 4',
+                kind: 12,
+                label: 'subsubFolderTranslation.anotherSubSubTranslation',
+                textEdit: {
+                  newText: 'subsubFolderTranslation.anotherSubSubTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+            ]);
+          });
+
+          it('should autocomplete sub folder translation in JS', async () => {
+            expect(
+              (
+                await getResult(
+                  CompletionRequest.method,
+                  connection,
+                  {
+                    app: {
+                      components: {
+                        'test.js': `export default class Foo extends Bar { text = this.intl.t("subFolderTranslation."); }`,
+                      },
+                    },
+                    config: {
+                      'ember-intl.js': `module.exports = function() { return {}; }`,
+                    },
+                    translations,
+                  },
+                  'app/components/test.js',
+                  { line: 0, character: 64 }
+                )
+              ).response
+            ).toEqual([
+              {
+                documentation: 'en-us : text 2',
+                kind: 12,
+                label: 'subFolderTranslation.subTranslation',
+                textEdit: {
+                  newText: 'subFolderTranslation.subTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : another text',
+                kind: 12,
+                label: 'subFolderTranslation.anotherTranslation',
+                textEdit: {
+                  newText: 'subFolderTranslation.anotherTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : text 3',
+                kind: 12,
+                label: 'subsubFolderTranslation.subSubTranslation',
+                textEdit: {
+                  newText: 'subsubFolderTranslation.subSubTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+              {
+                documentation: 'en-us : text 4',
+                kind: 12,
+                label: 'subsubFolderTranslation.anotherSubSubTranslation',
+                textEdit: {
+                  newText: 'subsubFolderTranslation.anotherSubSubTranslation',
+                  range: {
+                    end: {
+                      character: 59,
+                      line: 0,
+                    },
+                    start: {
+                      character: 59,
+                      line: 0,
+                    },
+                  },
+                },
+              },
+            ]);
+          });
+        });
       });
 
-      it('should autocomplete in JS files when in the end of expression', async () => {
-        expect(
-          (
-            await getResult(
-              CompletionRequest.method,
-              connection,
-              {
-                app: {
-                  components: {
-                    'test.js': 'export default class Foo extends Bar { text = this.intl.t("subFolderTranslation.another"); }',
-                  },
-                },
-                translations,
-              },
-              'app/components/test.js',
-              { line: 0, character: 86 }
-            )
-          ).response
-        ).toEqual([
-          {
-            documentation: 'en-us : another text',
-            kind: 12,
-            label: 'subFolderTranslation.anotherTranslation',
-            textEdit: {
-              newText: 'subFolderTranslation.anotherTranslation',
-              range: {
-                end: {
-                  character: 59,
-                  line: 0,
-                },
-                start: {
-                  character: 59,
-                  line: 0,
-                },
-              },
-            },
-          },
-        ]);
-      });
-
-      it('should autocomplete sub folder translation in JS', async () => {
-        expect(
-          (
-            await getResult(
-              CompletionRequest.method,
-              connection,
-              {
-                app: {
-                  components: {
-                    'test.js': `export default class Foo extends Bar { text = this.intl.t("subFolderTranslation."); }`,
-                  },
-                },
-                translations,
-              },
-              'app/components/test.js',
-              { line: 0, character: 64 }
-            )
-          ).response
-        ).toEqual([
-          {
-            documentation: 'en-us : text 2',
-            kind: 12,
-            label: 'subFolderTranslation.subTranslation',
-            textEdit: {
-              newText: 'subFolderTranslation.subTranslation',
-              range: {
-                end: {
-                  character: 59,
-                  line: 0,
-                },
-                start: {
-                  character: 59,
-                  line: 0,
-                },
-              },
-            },
-          },
-          {
-            documentation: 'en-us : another text',
-            kind: 12,
-            label: 'subFolderTranslation.anotherTranslation',
-            textEdit: {
-              newText: 'subFolderTranslation.anotherTranslation',
-              range: {
-                end: {
-                  character: 59,
-                  line: 0,
-                },
-                start: {
-                  character: 59,
-                  line: 0,
-                },
-              },
-            },
-          },
-        ]);
-      });
       it('should autocomplete translation base on translation text', async () => {
         expect(
           (
