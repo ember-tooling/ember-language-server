@@ -1,3 +1,10 @@
+## [2.26.1](https://github.com/lifeart/ember-language-server/compare/v2.26.0...v2.26.1) (2022-07-22)
+
+
+### Bug Fixes
+
+* key name when translation file is at the root ([#392](https://github.com/lifeart/ember-language-server/issues/392)) ([4294adb](https://github.com/lifeart/ember-language-server/commit/4294adbc682ed2ae03c0869722ed62efb58670e9)), closes [/github.com/lifeart/ember-language-server/pull/389#issuecomment-1192553091](https://github.com//github.com/lifeart/ember-language-server/pull/389/issues/issuecomment-1192553091)
+
 # [2.26.0](https://github.com/lifeart/ember-language-server/compare/v2.25.0...v2.26.0) (2022-07-22)
 
 
