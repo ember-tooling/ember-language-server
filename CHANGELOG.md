@@ -1,3 +1,10 @@
+# [2.27.0](https://github.com/lifeart/ember-language-server/compare/v2.26.1...v2.27.0) (2022-08-19)
+
+
+### Features
+
+* pin find-up deps ([b64455f](https://github.com/lifeart/ember-language-server/commit/b64455f48d1f6a875b840ae25bf8ad24a717253c))
+
 ## [2.26.1](https://github.com/lifeart/ember-language-server/compare/v2.26.0...v2.26.1) (2022-07-22)
 
 
