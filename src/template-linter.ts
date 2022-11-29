@@ -88,7 +88,7 @@ export default class TemplateLinter {
     return this.server.projectRoots.projectForUri(textDocument.uri);
   }
 
-  private sourcesForDocument(textDocument: TextDocument) {
+  private sourcesForDocument(textDocument: TextDocument, templateLintVersion: string): string[] {
     const ext = getExtension(textDocument);
 
     if (ext !== null && !extensionsToLint.includes(ext)) {
@@ -96,6 +96,12 @@ export default class TemplateLinter {
     }
 
     const documentContent = textDocument.getText();
+
+    // we assume that ember-template-lint v5 could handle js/ts/gts/gjs files
+
+    if (templateLintVersion === '5') {
+      return [documentContent];
+    }
 
     if (ext === '.hbs') {
       if (documentContent.trim().length === 0) {
@@ -145,10 +151,13 @@ export default class TemplateLinter {
       return;
     }
 
+    const linterMeta = project.dependenciesMeta.find((dep) => dep.name === 'ember-template-lint');
+    const linterVersion = linterMeta?.version.split('.')[0] || 'unknown';
+
     let sources = [];
 
     try {
-      sources = this.sourcesForDocument(textDocument);
+      sources = this.sourcesForDocument(textDocument, linterVersion);
     } catch (e) {
       return;
     }
