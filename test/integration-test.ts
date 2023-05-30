@@ -651,6 +651,60 @@ describe('integration', function () {
         });
       });
 
+      describe('Able to provide autocomplete information for on modifier argument', () => {
+        it('provide correct autocomplete values for div element', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'hello.hbs': '<div {{on ""}}></div>',
+                },
+              },
+            },
+            'app/components/hello.hbs',
+            { line: 0, character: 11 }
+          );
+
+          expect(result).toMatchSnapshot();
+        });
+        it('provide correct autocomplete values for RandomComponent element', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'hello.hbs': '<Rnd {{on ""}}></Rnd>',
+                },
+              },
+            },
+            'app/components/hello.hbs',
+            { line: 0, character: 11 }
+          );
+
+          expect(result).toMatchSnapshot();
+        });
+        it('provide correct autocomplete values for button element', async () => {
+          const result = await getResult(
+            CompletionRequest.method,
+            connection,
+            {
+              app: {
+                components: {
+                  'hello.hbs': '<select {{on ""}}></select>',
+                },
+              },
+            },
+            'app/components/hello.hbs',
+            { line: 0, character: 14 }
+          );
+
+          expect(result).toMatchSnapshot();
+        });
+      });
+
       describe('Able to provide autocomplete information for angle component arguments names', () => {
         it('support template-only collocated components arguments extraction', async () => {
           const result = await getResult(

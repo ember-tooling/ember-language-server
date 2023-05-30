@@ -1163,6 +1163,285 @@ Object {
 }
 `;
 
+exports[`integration async fs enabled: false Able to provide autocomplete information for on modifier argument provide correct autocomplete values for RandomComponent element 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "click",
+      "textEdit": Object {
+        "newText": "click",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "mousedown",
+      "textEdit": Object {
+        "newText": "mousedown",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "mouseup",
+      "textEdit": Object {
+        "newText": "mouseup",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "mouseenter",
+      "textEdit": Object {
+        "newText": "mouseenter",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "mouseleave",
+      "textEdit": Object {
+        "newText": "mouseleave",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: false Able to provide autocomplete information for on modifier argument provide correct autocomplete values for button element 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Event for <select>",
+      "kind": 23,
+      "label": "change",
+      "textEdit": Object {
+        "newText": "change",
+        "range": Object {
+          "end": Object {
+            "character": 14,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 14,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <select>",
+      "kind": 23,
+      "label": "focus",
+      "textEdit": Object {
+        "newText": "focus",
+        "range": Object {
+          "end": Object {
+            "character": 14,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 14,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <select>",
+      "kind": 23,
+      "label": "blur",
+      "textEdit": Object {
+        "newText": "blur",
+        "range": Object {
+          "end": Object {
+            "character": 14,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 14,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: false Able to provide autocomplete information for on modifier argument provide correct autocomplete values for div element 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "click",
+      "textEdit": Object {
+        "newText": "click",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "mousedown",
+      "textEdit": Object {
+        "newText": "mousedown",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "mouseup",
+      "textEdit": Object {
+        "newText": "mouseup",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "mouseenter",
+      "textEdit": Object {
+        "newText": "mouseenter",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "mouseleave",
+      "textEdit": Object {
+        "newText": "mouseleave",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
 exports[`integration async fs enabled: false Able to use classes for API support dummy class-based addon definition:template 1`] = `
 Object {
   "addonsMeta": Array [
@@ -4712,6 +4991,285 @@ Object {
       "usableIn": Array [
         "MustachePath",
       ],
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for on modifier argument provide correct autocomplete values for RandomComponent element 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "click",
+      "textEdit": Object {
+        "newText": "click",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "mousedown",
+      "textEdit": Object {
+        "newText": "mousedown",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "mouseup",
+      "textEdit": Object {
+        "newText": "mouseup",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "mouseenter",
+      "textEdit": Object {
+        "newText": "mouseenter",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <Rnd>",
+      "kind": 23,
+      "label": "mouseleave",
+      "textEdit": Object {
+        "newText": "mouseleave",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for on modifier argument provide correct autocomplete values for button element 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Event for <select>",
+      "kind": 23,
+      "label": "change",
+      "textEdit": Object {
+        "newText": "change",
+        "range": Object {
+          "end": Object {
+            "character": 14,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 14,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <select>",
+      "kind": 23,
+      "label": "focus",
+      "textEdit": Object {
+        "newText": "focus",
+        "range": Object {
+          "end": Object {
+            "character": 14,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 14,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <select>",
+      "kind": 23,
+      "label": "blur",
+      "textEdit": Object {
+        "newText": "blur",
+        "range": Object {
+          "end": Object {
+            "character": 14,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 14,
+            "line": 0,
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`integration async fs enabled: true Able to provide autocomplete information for on modifier argument provide correct autocomplete values for div element 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "click",
+      "textEdit": Object {
+        "newText": "click",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "mousedown",
+      "textEdit": Object {
+        "newText": "mousedown",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "mouseup",
+      "textEdit": Object {
+        "newText": "mouseup",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "mouseenter",
+      "textEdit": Object {
+        "newText": "mouseenter",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
+    },
+    Object {
+      "detail": "Event for <div>",
+      "kind": 23,
+      "label": "mouseleave",
+      "textEdit": Object {
+        "newText": "mouseleave",
+        "range": Object {
+          "end": Object {
+            "character": 11,
+            "line": 0,
+          },
+          "start": Object {
+            "character": 11,
+            "line": 0,
+          },
+        },
+      },
     },
   ],
 }

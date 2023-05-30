@@ -121,6 +121,40 @@ const HTML_TAGS = [
   'wbr',
 ];
 
+function isElementModifierStatement(node: ASTv1.Node, name: string | false = false): boolean {
+  const isModifier = node.type === 'ElementModifierStatement';
+
+  if (!isModifier) {
+    return false;
+  }
+
+  if (!name) {
+    return true;
+  }
+
+  return node.path.type === 'PathExpression' && node.path.original === name;
+}
+
+export function isFirstParamOfOnModifier(astPath: ASTPath): boolean {
+  const node = astPath.node;
+
+  if (!isString(node)) {
+    return false;
+  }
+
+  const parent = astPath.parent as ASTv1.ElementModifierStatement;
+
+  if (!isElementModifierStatement(parent, 'on')) {
+    return false;
+  }
+
+  if (parent.params[0] !== node) {
+    return false;
+  }
+
+  return true;
+}
+
 function isFirstStringParamInCallExpression(astPath: ASTPath): boolean {
   const node = astPath.node;
 

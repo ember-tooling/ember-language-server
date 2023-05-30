@@ -30,6 +30,7 @@ import {
   isHashPairValue,
   isScopedAngleTagName,
   isSpecialHelperStringPositionalParam,
+  isFirstParamOfOnModifier,
 } from '../../utils/ast-helpers';
 import {
   listComponents,
@@ -505,6 +506,25 @@ export default class TemplateCompletionProvider {
       return [];
     }
   }
+  suggestEventNames(rawTagName: string): string[] {
+    const tagName = rawTagName.toLowerCase();
+    const eventSuggestions: Record<string, string[]> = {
+      a: ['click', 'mousedown', 'mouseup', 'mouseenter', 'mouseleave'],
+      button: ['click', 'mousedown', 'mouseup', 'mouseenter', 'mouseleave'],
+      input: ['change', 'focus', 'blur', 'keydown', 'keyup'],
+      select: ['change', 'focus', 'blur'],
+      textarea: ['change', 'focus', 'blur', 'keydown', 'keyup'],
+      form: ['submit'],
+      img: ['load', 'error'],
+      video: ['play', 'pause', 'ended', 'timeupdate'],
+      audio: ['play', 'pause', 'ended', 'timeupdate'],
+      div: ['click', 'mousedown', 'mouseup', 'mouseenter', 'mouseleave'],
+      span: ['click', 'mousedown', 'mouseup', 'mouseenter', 'mouseleave'],
+      // Add more tag names and their event suggestions here
+    };
+
+    return eventSuggestions[tagName] || eventSuggestions['div'];
+  }
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     logDebugInfo('provideCompletions');
 
@@ -518,7 +538,22 @@ export default class TemplateCompletionProvider {
     const originalText = params.originalText || '';
 
     try {
-      if (isSpecialHelperStringPositionalParam('component', focusPath)) {
+      if (isFirstParamOfOnModifier(focusPath)) {
+        const tagName = focusPath.parentPath?.parent;
+
+        if (tagName?.type === 'ElementNode') {
+          const tag = (tagName as ASTv1.ElementNode).tag;
+          const names = this.suggestEventNames(tag);
+
+          names.forEach((name) => {
+            completions.push({
+              label: name,
+              kind: CompletionItemKind.Event,
+              detail: `Event for <${tag}>`,
+            });
+          });
+        }
+      } else if (isSpecialHelperStringPositionalParam('component', focusPath)) {
         // (component "foo...")
         const items = await this.getMustachePathCandidates(root);
 
