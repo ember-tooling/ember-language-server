@@ -159,6 +159,6 @@ jobs:
       - name: Release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release@20.1.1
+        run: npx semantic-release@19.0.5
 
 
