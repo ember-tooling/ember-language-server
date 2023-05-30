@@ -1,3 +1,16 @@
+# [2.29.0](https://github.com/lifeart/ember-language-server/compare/v2.28.0...v2.29.0) (2023-05-30)
+
+
+### Bug Fixes
+
+* ci with floating-deps ([#409](https://github.com/lifeart/ember-language-server/issues/409)) ([a284fb9](https://github.com/lifeart/ember-language-server/commit/a284fb930ce50a145ade9de32e1984356fadccec))
+
+
+### Features
+
+* autocomplete on modifier event names ([#408](https://github.com/lifeart/ember-language-server/issues/408)) ([4e057f1](https://github.com/lifeart/ember-language-server/commit/4e057f13ad806a5637b83bc3adafbcb23a4cd4ed))
+* bump glimmer syntax to 0.84.3 ([#407](https://github.com/lifeart/ember-language-server/issues/407)) ([0de7a2c](https://github.com/lifeart/ember-language-server/commit/0de7a2c376abbe0228ccf6977ac93d601b0f06d5))
+
 # [2.28.0](https://github.com/lifeart/ember-language-server/compare/v2.27.0...v2.28.0) (2022-11-29)
 
 
