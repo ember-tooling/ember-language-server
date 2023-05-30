@@ -10,9 +10,13 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { Position as EsTreePosition } from 'estree';
 import { createFocusPath, extensionsToProvideTemplateCompletions, getFocusPath, getTextForGuessing, PLACEHOLDER } from '../utils/glimmer-template';
 import { Project } from '../project';
+import HandlebarsFixer from '../ai/handlebars-fixer';
 
 export default class TemplateCompletionProvider {
-  constructor(private server: Server) {}
+  fixer: HandlebarsFixer;
+  constructor(private server: Server) {
+    this.fixer = new HandlebarsFixer();
+  }
   getTextForGuessing(originalText: string, offset: number, PLACEHOLDER: string) {
     // logDebugInfo('getTextForGuessing', originalText, offset, PLACEHOLDER);
     return getTextForGuessing(originalText, offset, PLACEHOLDER);
@@ -32,8 +36,8 @@ export default class TemplateCompletionProvider {
   createFocusPath(ast: any, position: EsTreePosition, validText: string) {
     return createFocusPath(ast, position, validText);
   }
-  getFocusPath(document: TextDocument, position: Position, placeholder = PLACEHOLDER) {
-    return getFocusPath(document, position, placeholder);
+  async getFocusPath(document: TextDocument, position: Position, placeholder = PLACEHOLDER) {
+    return await getFocusPath(document, position, placeholder, this.fixer);
   }
   async provideCompletionsForFocusPath(
     results: { focusPath: any; originalText: string; normalPlaceholder: string },
@@ -122,7 +126,9 @@ export default class TemplateCompletionProvider {
       return [];
     }
 
-    const results = this.getFocusPath(document, position, PLACEHOLDER);
+    logInfo(`getFocusPath`);
+
+    const results = await this.getFocusPath(document, position, PLACEHOLDER);
 
     if (!results) {
       return [];

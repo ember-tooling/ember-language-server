@@ -10,6 +10,7 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import * as camelCase from 'lodash/camelCase';
 import * as path from 'path';
 import { MatchResult } from '../utils/path-matcher';
+import HandlebarsFixer from '../ai/handlebars-fixer';
 export default class GlimmerScriptCompletionProvider {
   constructor(private server: Server) {}
   async provideCompletions(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
@@ -62,7 +63,7 @@ export default class GlimmerScriptCompletionProvider {
       });
 
       const synthDoc = TextDocument.create(document.uri, 'handlebars', document.version, templateForPosition.absoluteContent);
-      const info = getFocusPath(synthDoc, params.position);
+      const info = await getFocusPath(synthDoc, params.position, undefined, new HandlebarsFixer());
 
       if (!info) {
         return results;

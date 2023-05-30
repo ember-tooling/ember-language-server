@@ -2,12 +2,13 @@ import { Position } from 'vscode-languageserver/node';
 import ASTPath from '../glimmer-utils';
 import { toPosition } from '../estree-utils';
 import { getExtension } from '../utils/file-extension';
-import { logDebugInfo } from '../utils/logger';
+import { logDebugInfo, logInfo } from '../utils/logger';
 import { searchAndExtractHbs } from '@lifeart/ember-extract-inline-templates';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { parseScriptFile } from 'ember-meta-explorer';
 import { preprocess, ASTv1 } from '@glimmer/syntax';
 import { Position as EsTreePosition } from 'estree';
+import HandlebarsFixer from '../ai/handlebars-fixer';
 
 export const PLACEHOLDER = 'ELSCompletionDummy';
 export const extensionsToProvideTemplateCompletions = ['.hbs', '.js', '.ts', '.gjs', '.gts'];
@@ -22,18 +23,22 @@ export function createFocusPath(ast: ASTv1.Template, position: EsTreePosition, v
   return ASTPath.toPosition(ast, position, validText);
 }
 
-export function getFocusPath(
+export async function getFocusPath(
   document: TextDocument,
   position: Position,
-  placeholder = PLACEHOLDER
-): null | {
+  placeholder = PLACEHOLDER,
+  fixer: HandlebarsFixer
+): Promise<null | {
   focusPath: ASTPath;
   originalText: string;
   normalPlaceholder: string;
   ast: ASTv1.Template;
-} {
+}> {
   const documentContent = document.getText();
   const ext = getExtension(document);
+
+  logInfo('ext:' + ext);
+  logDebugInfo('placeholder' + placeholder);
 
   if (!extensionsToProvideTemplateCompletions.includes(ext as string)) {
     return null;
@@ -58,41 +63,26 @@ export function getFocusPath(
   }
 
   const offset = document.offsetAt(position);
-  let normalPlaceholder: string = placeholder;
   let ast: ASTv1.Template | null = null;
-
-  const cases = [
-    PLACEHOLDER + ' />',
-    PLACEHOLDER,
-    PLACEHOLDER + '"',
-    PLACEHOLDER + "'",
-    // block params autocomplete
-    PLACEHOLDER + '| />',
-    PLACEHOLDER + '}} />',
-    PLACEHOLDER + '"}}',
-    PLACEHOLDER + '}}',
-    PLACEHOLDER + '}}{{/' + PLACEHOLDER + '}}',
-    // {{#}} -> {{# + P}}{{/P + }}
-    PLACEHOLDER + '}}{{/' + PLACEHOLDER,
-    PLACEHOLDER + ')}}',
-    PLACEHOLDER + '))}}',
-    PLACEHOLDER + ')))}}',
-  ];
 
   let validText = '';
 
-  while (cases.length) {
-    normalPlaceholder = cases.shift() as string;
+  try {
+    logInfo('fixer.fix');
+    validText = await fixer.fix(getTextForGuessing(originalText, offset, '$$'));
 
     try {
-      validText = getTextForGuessing(originalText, offset, normalPlaceholder);
-      ast = preprocess(validText);
-      logDebugInfo('validText', validText);
-      break;
+      ast = preprocess(validText.replace('$$', PLACEHOLDER));
     } catch (e) {
-      // logDebugInfo('parsing-error', this.getTextForGuessing(originalText, offset, normalPlaceholder));
+      logInfo(e.toString());
+      logDebugInfo('fixer error2', e);
       ast = null;
     }
+  } catch (e) {
+    logInfo(e.toString());
+
+    logDebugInfo('fixer error', e);
+    ast = null;
   }
 
   if (ast === null) {
@@ -109,6 +99,6 @@ export function getFocusPath(
     ast,
     focusPath,
     originalText,
-    normalPlaceholder,
+    normalPlaceholder: PLACEHOLDER,
   };
 }

@@ -3,7 +3,7 @@ import { Connection, createConnection, BrowserMessageReader, BrowserMessageWrite
 
 // Create a connection for the server. The connection defaults to Node's IPC as a transport, but
 // also supports stdio via command line flag
-const connection: Connection = createConnection(new BrowserMessageReader(self), new BrowserMessageWriter(self));
+const connection: Connection = createConnection(new BrowserMessageReader(self as any), new BrowserMessageWriter(self as any));
 
 const server = new Server(connection, {
   type: 'worker',

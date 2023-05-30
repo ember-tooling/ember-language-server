@@ -6,6 +6,7 @@ import { extractComponentInformationFromMeta, IComponentMetaInformation, IJsMeta
 import * as uniqBy from 'lodash/uniqBy';
 import FSProvider from '../../fs-provider';
 import { asyncFilter } from '../../utils/layout-helpers';
+import HandlebarsFixer from '../../ai/handlebars-fixer';
 
 function localizeName(name: string) {
   if (name.startsWith('this.')) {
@@ -44,7 +45,21 @@ export async function componentsContextData(fs: FSProvider, maybeScripts: string
     templateInfo = processTemplate(templateContent);
     infoItems.push(templateInfo as IJsMeta);
   } catch (e) {
-    logError(e);
+    try {
+      let templateInfo: unknown = null;
+      const fixer = new HandlebarsFixer();
+
+      logError(new Error('fixing template') as any);
+
+      const fixedContent = await fixer.fix(templateContent);
+
+      logError(new Error('fixed template') as any);
+
+      templateInfo = processTemplate(fixedContent);
+      infoItems.push(templateInfo as IJsMeta);
+    } catch (e) {
+      logError(e);
+    }
   }
 
   logDebugInfo('infoItems', infoItems);
