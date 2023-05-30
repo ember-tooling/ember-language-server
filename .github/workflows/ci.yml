@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Node 12.x - ubuntu
+    name: Node 14.x - ubuntu
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -72,12 +72,12 @@ jobs:
       matrix:
         os: [ubuntu]
         # os: [ubuntu, windows] @to-to finally fix CI for windows
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [14.x, 16.x, 18.x, 20.x]
 
         # excluded because it is the `test` job above
         exclude:
           - os: ubuntu
-            node-version: 12.x
+            node-version: 14.x
 
     steps:
       - uses: actions/checkout@v2
@@ -109,10 +109,10 @@ jobs:
           fetch-depth: 0
       - uses: volta-cli/action@v1
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: install dependencies
-        run: yarn install --no-lockfile
+        run: yarn install --no-lockfile --ignore-engines
 
       - name: compile
         run: yarn compile
