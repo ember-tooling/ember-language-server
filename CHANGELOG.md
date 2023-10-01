@@ -1,3 +1,10 @@
+# [2.30.0](https://github.com/lifeart/ember-language-server/compare/v2.29.0...v2.30.0) (2023-10-01)
+
+
+### Features
+
+* add quotes as triggerCharacter ([#415](https://github.com/lifeart/ember-language-server/issues/415)) ([ece2345](https://github.com/lifeart/ember-language-server/commit/ece23454cba90086528cc6e51a6dd7963042f160))
+
 # [2.29.0](https://github.com/lifeart/ember-language-server/compare/v2.28.0...v2.29.0) (2023-05-30)
 
 
