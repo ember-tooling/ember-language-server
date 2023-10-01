@@ -1,8 +1,8 @@
-import { extractYeildMetadata } from '../../src/utils/yield-context-extractor';
+import { extractYieldMetadata } from '../../src/utils/yield-context-extractor';
 import { preprocess } from '@glimmer/syntax';
 
 function extract(tpl: string) {
-  return extractYeildMetadata(preprocess(tpl));
+  return extractYieldMetadata(preprocess(tpl));
 }
 
 describe('Yeld Metadata API', () => {
@@ -65,10 +65,10 @@ describe('Yeld Metadata API', () => {
   it('should handle default yield with hash, having few concat keys', () => {
     expect(
       extract(`
-        {{yield (hash 
+        {{yield (hash
             Foo=(component "foo-bar")
             Bar=(component "bar-baz")
-            Baz=(component "baz-boo")    
+            Baz=(component "baz-boo")
         )}}
       `)
     ).toEqual({

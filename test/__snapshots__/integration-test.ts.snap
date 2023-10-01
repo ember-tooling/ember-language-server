@@ -1046,7 +1046,7 @@ Object {
 }
 `;
 
-exports[`integration async fs enabled: false Able to provide autocomplete information for local scoped params support tag blocks and yiled context 1`] = `
+exports[`integration async fs enabled: false Able to provide autocomplete information for local scoped params support tag blocks and yielded context 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -3349,6 +3349,39 @@ Object {
 }
 `;
 
+exports[`integration async fs enabled: false Go to definition works for all supported cases go to route definition from LinkTo component 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "routePath": Object {
+      "foo.bar.baz": Array [
+        "app/templates/foo/bar/baz.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo/bar/baz.hbs",
+    },
+  ],
+}
+`;
+
 exports[`integration async fs enabled: false Go to definition works for all supported cases to children route from application outlet 1`] = `
 Object {
   "addonsMeta": Array [],
@@ -3425,39 +3458,6 @@ Object {
         },
       },
       "uri": "/app/templates/foo/baz.hbs",
-    },
-  ],
-}
-`;
-
-exports[`integration async fs enabled: false Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
-Object {
-  "addonsMeta": Array [],
-  "registry": Object {
-    "component": Object {
-      "hello": Array [
-        "app/components/hello.hbs",
-      ],
-    },
-    "routePath": Object {
-      "foo.bar.baz": Array [
-        "app/templates/foo/bar/baz.hbs",
-      ],
-    },
-  },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/templates/foo/bar/baz.hbs",
     },
   ],
 }
@@ -4881,7 +4881,7 @@ Object {
 }
 `;
 
-exports[`integration async fs enabled: true Able to provide autocomplete information for local scoped params support tag blocks and yiled context 1`] = `
+exports[`integration async fs enabled: true Able to provide autocomplete information for local scoped params support tag blocks and yielded context 1`] = `
 Object {
   "addonsMeta": Array [],
   "registry": Object {
@@ -7184,6 +7184,39 @@ Object {
 }
 `;
 
+exports[`integration async fs enabled: true Go to definition works for all supported cases go to route definition from LinkTo component 1`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "component": Object {
+      "hello": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "routePath": Object {
+      "foo.bar.baz": Array [
+        "app/templates/foo/bar/baz.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo/bar/baz.hbs",
+    },
+  ],
+}
+`;
+
 exports[`integration async fs enabled: true Go to definition works for all supported cases to children route from application outlet 1`] = `
 Object {
   "addonsMeta": Array [],
@@ -7260,39 +7293,6 @@ Object {
         },
       },
       "uri": "/app/templates/foo/baz.hbs",
-    },
-  ],
-}
-`;
-
-exports[`integration async fs enabled: true Go to definition works for all supported cases to to route defintion from LinkTo component 1`] = `
-Object {
-  "addonsMeta": Array [],
-  "registry": Object {
-    "component": Object {
-      "hello": Array [
-        "app/components/hello.hbs",
-      ],
-    },
-    "routePath": Object {
-      "foo.bar.baz": Array [
-        "app/templates/foo/bar/baz.hbs",
-      ],
-    },
-  },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/templates/foo/bar/baz.hbs",
     },
   ],
 }

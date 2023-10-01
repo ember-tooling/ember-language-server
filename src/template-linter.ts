@@ -265,7 +265,7 @@ export default class TemplateLinter {
       }
 
       const linterPath = await (Files.resolveModulePath(project.root, 'ember-template-lint', nodePath, () => {
-        /* intentially empty default callback */
+        /* intentionally empty default callback */
       }) as Promise<string>);
 
       if (!linterPath) {

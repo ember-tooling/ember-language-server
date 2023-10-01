@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver';
 import { CompletionFunctionParams, Server } from '../..';
-import { isLocalizationHelperTranslataionName } from '../../utils/ast-helpers';
+import { isLocalizationHelperTranslationName } from '../../utils/ast-helpers';
 import { getTranslations } from './intl-utils';
 
 export default class IntlCompletionProvider {
@@ -13,7 +13,7 @@ export default class IntlCompletionProvider {
   async onComplete(root: string, params: CompletionFunctionParams): Promise<CompletionItem[]> {
     const { focusPath, position, results, type } = params;
 
-    if (isLocalizationHelperTranslataionName(focusPath, type)) {
+    if (isLocalizationHelperTranslationName(focusPath, type)) {
       const items = await getTranslations(root, this.server);
       const PLACEHOLDER = 'ELSCompletionDummy';
       const node = focusPath.node as any;

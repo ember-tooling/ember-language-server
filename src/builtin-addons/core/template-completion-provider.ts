@@ -77,7 +77,7 @@ type ScopedValuesMetadata = {
  * paths.
  * @param addonsMeta addons meta array
  * @param server Server
- * @param focusPath currentfocus path
+ * @param focusPath current focus path
  * @returns { [key: string]: string[] }
  */
 export function generateNamespacedComponentsHashMap(addonsMeta: Array<AddonMeta>, server: Server, isAngleComponent: boolean) {

@@ -577,7 +577,7 @@ export async function getResult(
   const modelPath = path.join(originalPath, fileToInspect);
 
   if (!fs.existsSync(modelPath)) {
-    throw new Error(`Unabe to find file path to inspect in file system. - ${fileToInspect}`);
+    throw new Error(`Unable to find file path to inspect in file system. - ${fileToInspect}`);
   }
 
   const params = textDocument(modelPath, position);

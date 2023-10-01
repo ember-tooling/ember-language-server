@@ -3,7 +3,7 @@ import { Hover } from 'vscode-languageserver';
 import { Server } from '../..';
 import { nodeLoc } from '../../glimmer-utils';
 import { HoverFunctionParams } from '../../utils/addon-api';
-import { isLocalizationHelperTranslataionName } from '../../utils/ast-helpers';
+import { isLocalizationHelperTranslationName } from '../../utils/ast-helpers';
 import { getTranslations } from './intl-utils';
 
 export default class IntlHoverProvider {
@@ -15,7 +15,7 @@ export default class IntlHoverProvider {
   async onHover(root: string, params: HoverFunctionParams): Promise<Hover[]> {
     const { results, focusPath, type } = params;
 
-    if (isLocalizationHelperTranslataionName(focusPath, type)) {
+    if (isLocalizationHelperTranslationName(focusPath, type)) {
       const node = focusPath.node as ASTv1.StringLiteral;
       const key = node.value;
       const translations = await getTranslations(root, this.server);

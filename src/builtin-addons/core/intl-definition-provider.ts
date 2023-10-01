@@ -1,6 +1,6 @@
 import { Definition } from 'vscode-languageserver';
 import { DefinitionFunctionParams, Server } from '../..';
-import { isLocalizationHelperTranslataionName } from '../../utils/ast-helpers';
+import { isLocalizationHelperTranslationName } from '../../utils/ast-helpers';
 import { getTranslations } from './intl-utils';
 
 export default class IntlDefinitionProvider {
@@ -13,7 +13,7 @@ export default class IntlDefinitionProvider {
   async onDefinition(root: string, params: DefinitionFunctionParams): Promise<Definition[]> {
     const { focusPath, type, results } = params;
 
-    if (isLocalizationHelperTranslataionName(focusPath, type)) {
+    if (isLocalizationHelperTranslationName(focusPath, type)) {
       const items = await getTranslations(root, this.server);
       const node = focusPath.node as any;
       const key = node.value;

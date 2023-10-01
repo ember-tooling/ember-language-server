@@ -21,7 +21,7 @@ import { getAllTemplateTokens } from '../../utils/usages-api';
 function getComponentAndAddonName(rawComponentName: string) {
   const componentParts = rawComponentName.split('$');
   const addonName = componentParts.length > 1 ? componentParts[0] : '';
-  // If the component name doesnt have a batman syntax then just return the name of the component
+  // If the component name doesn't have a batman syntax then just return the name of the component
   // Else returns the name of the component.
   const componentName = componentParts.pop() as string;
 
@@ -87,7 +87,7 @@ export default class TemplateDefinitionProvider {
       definitions = await this.provideComponentDefinition(componentName, addonName);
     } else if (this.isAngleComponent(focusPath)) {
       // <FooBar />
-      definitions = await this.provideAngleBrackedComponentDefinition(focusPath);
+      definitions = await this.provideAngleBracketedComponentDefinition(focusPath);
       // {{#foo-bar}} {{/foo-bar}}
     } else if (this.isMayBeComponentFromPath(focusPath)) {
       const [key, ...tail] = (focusPath.node as ASTv1.ElementNode).tag.split('.');
@@ -201,7 +201,7 @@ export default class TemplateDefinitionProvider {
 
     return pathsToLocations(...existingPaths);
   }
-  provideAngleBrackedComponentDefinition(focusPath: ASTPath) {
+  provideAngleBracketedComponentDefinition(focusPath: ASTPath) {
     return this.provideLikelyComponentTemplatePath((focusPath.node as ASTv1.ElementNode).tag);
   }
   async provideBlockComponentDefinition(focusPath: ASTPath): Promise<Location[]> {

@@ -83,7 +83,7 @@ describe('integration', function () {
       });
 
       describe('Go to definition works for all supported cases', () => {
-        it('to to route defintion from LinkTo component', async () => {
+        it('go to route definition from LinkTo component', async () => {
           const result = await getResult(
             DefinitionRequest.method,
             connection,
@@ -883,7 +883,7 @@ describe('integration', function () {
               .join(',')
           ).toBe('b,b.Bar,b.Foo');
         });
-        it('support tag blocks and yiled context', async () => {
+        it('support tag blocks and yielded context', async () => {
           const result = await getResult(
             CompletionRequest.method,
             connection,
@@ -904,7 +904,7 @@ describe('integration', function () {
 
           expect(result).toMatchSnapshot();
         });
-        it('support tag blocks and yiled capital context path', async () => {
+        it('support tag blocks and yielded capital context path', async () => {
           const result = await getResult(
             CompletionRequest.method,
             connection,
@@ -925,7 +925,7 @@ describe('integration', function () {
 
           expect(result.response.length).toBe(5);
         });
-        it('support tag blocks and yiled lowercase context path', async () => {
+        it('support tag blocks and yielded lowercase context path', async () => {
           const result = await getResult(
             CompletionRequest.method,
             connection,

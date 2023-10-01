@@ -12,7 +12,7 @@
 
  There are two ways by which we can spawn the server: ipc and stdio. WE are
  using stdio for spawning the server right now because of a (probable) timing
- sissue setting up the ipc channel across the process lineage `test -> spawned nyc processs ->
+ issue setting up the ipc channel across the process lineage `test -> spawned nyc process ->
  ELS server`. This had manifest in two ways as below:
 
 

@@ -27,7 +27,6 @@ export default class GlimmerScriptDefinitionProvider {
     let rangeWalker = new RangeWalker(ranges);
 
     // strip not needed scopes example
-    // strip not needed scopes example
     rangeWalker = rangeWalker.subtract(rangeWalker.hbsInlineComments(true));
     rangeWalker = rangeWalker.subtract(rangeWalker.hbsComments(true));
     rangeWalker = rangeWalker.subtract(rangeWalker.htmlComments(true));

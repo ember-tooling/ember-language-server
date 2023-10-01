@@ -498,8 +498,8 @@ export default class Server {
     }
   }
 
-  // After the server has started the client sends an initilize request. The server receives
-  // in the passed params the rootPath of the workspace plus the client capabilites.
+  // After the server has started the client sends an initialize request. The server receives
+  // in the passed params the rootPath of the workspace plus the client capabilities.
   private async onInitialize({ rootUri, rootPath, workspaceFolders, initializationOptions, capabilities }: InitializeParams): Promise<InitializeResult> {
     rootPath = rootUri ? URI.parse(rootUri).fsPath : rootPath;
     this.clientCapabilities = capabilities || {};

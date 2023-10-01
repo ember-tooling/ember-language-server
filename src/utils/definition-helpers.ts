@@ -22,7 +22,7 @@ export function pathsToLocations(...paths: string[]): Location[] {
   });
 }
 
-export function getFirstTextPostion(text: string, content: string) {
+export function getFirstTextPosition(text: string, content: string) {
   const arrayOfLines = text.match(/(.*?(?:\r\n?|\n|$))/gm) || [];
   let startLine = 0;
   let startCharacter = 0;
@@ -82,7 +82,7 @@ export async function pathsToLocationsWithPosition(paths: string[], findMe: stri
       return null;
     }
 
-    const [startLine, startCharacter] = getFirstTextPostion(text, findMe);
+    const [startLine, startCharacter] = getFirstTextPosition(text, findMe);
 
     return Location.create(URI.file(fileName).toString(), Range.create(startLine, startCharacter, startLine, startCharacter + findMe.length));
   });

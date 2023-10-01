@@ -5,7 +5,7 @@ describe('diagnostic-utils', function () {
   describe('toDiagnostic()', function () {
     it('converts handlebars parser errors', function () {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { source, error } = require('./../fixtures/dignostic/handlbars-parser-error.json');
+      const { source, error } = require('./../fixtures/diagnostic/handlebars-parser-error.json');
 
       const diagnostic = toDiagnostic(source, error);
 
@@ -20,7 +20,7 @@ describe('diagnostic-utils', function () {
 
     it('converts glimmer compiler errors', function () {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { source, error } = require('./../fixtures/dignostic/glimmer-compiler-error.json');
+      const { source, error } = require('./../fixtures/diagnostic/glimmer-compiler-error.json');
 
       const diagnostic = toDiagnostic(source, error);
 
@@ -35,7 +35,7 @@ describe('diagnostic-utils', function () {
 
     it('converts unclosed element errors', function () {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { source, error } = require('./../fixtures/dignostic/non-translated-error.json');
+      const { source, error } = require('./../fixtures/diagnostic/non-translated-error.json');
 
       const diagnostic = toDiagnostic(source, error);
 

@@ -19,10 +19,10 @@ import { BaseProject } from '../../src/base-project';
 
 describe('definition-helpers', function () {
   describe('getPodModulePrefix()', function () {
-    it('return pod relative pod prefix for projects with podModulePrefix in evironment.js', function () {
+    it('return pod relative pod prefix for projects with podModulePrefix in environment.js', function () {
       expect(getPodModulePrefix(path.join(__dirname, './../fixtures/pod-project'))).toEqual('pods');
     });
-    it('return null for projects without podModulePrefix in evironment.js', function () {
+    it('return null for projects without podModulePrefix in environment.js', function () {
       expect(getPodModulePrefix(path.join(__dirname, './../fixtures/full-project'))).toEqual(null);
     });
   });

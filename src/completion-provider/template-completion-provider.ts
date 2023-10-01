@@ -142,10 +142,10 @@ function getTextPrefix(astPath: ASTPath, normalPlaceholder: string): string {
   // handle block params autocomplete case
   if (node.type === 'ElementNode' || node.type === 'BlockStatement') {
     const meta = astPath.metaForType('handlebars');
-    const maybeBlockDefenition = meta && meta.maybeBlockParamDefinition;
+    const maybeBlockDefinition = meta && meta.maybeBlockParamDefinition;
 
-    if (maybeBlockDefenition) {
-      node = maybeBlockDefenition;
+    if (maybeBlockDefinition) {
+      node = maybeBlockDefinition;
     }
   }
 

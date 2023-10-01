@@ -285,7 +285,7 @@ export class RangeWalker {
         };
 
         if (part.loc.start.line !== lineNumber && part.loc.end.line !== lineNumber) {
-          // replace in-range characters with blank lines (dont have better idea for now)
+          // replace in-range characters with blank lines (don't have better idea for now)
           rangeLine.characters = rangeLine.characters.map(() => charPlaceholder);
         } else if (part.loc.start.line === lineNumber && part.loc.end.line === lineNumber) {
           rangeLine.characters = rangeLine.characters.map((char, index) => {

@@ -231,15 +231,15 @@ describe('ClassicPathMatcher', () => {
       scope: 'application',
       kind: 'template',
     });
-    expect(m('foo/bar/tests/integration/components/cart-widgget/item-test.js')).toEqual({
+    expect(m('foo/bar/tests/integration/components/cart-widget/item-test.js')).toEqual({
       type: 'component',
-      name: 'cart-widgget/item',
+      name: 'cart-widget/item',
       scope: 'application',
       kind: 'test',
     });
-    expect(m('foo/bar/tests/integration/components/cart-widgget/index-test.js')).toEqual({
+    expect(m('foo/bar/tests/integration/components/cart-widget/index-test.js')).toEqual({
       type: 'component',
-      name: 'cart-widgget',
+      name: 'cart-widget',
       scope: 'application',
       kind: 'test',
     });
@@ -291,9 +291,9 @@ describe('ClassicPathMatcher', () => {
   it('routes', () => {
     expect(m('foo/bar/app/routes/foo/index.ts')).toEqual({ type: 'route', name: 'foo/index', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/routes/foo.ts')).toEqual({ type: 'route', name: 'foo', scope: 'application', kind: 'script' });
-    expect(m('foo/bar/tests/unit/routes/cart-widgget/index-test.js')).toEqual({
+    expect(m('foo/bar/tests/unit/routes/cart-widget/index-test.js')).toEqual({
       type: 'route',
-      name: 'cart-widgget/index',
+      name: 'cart-widget/index',
       scope: 'application',
       kind: 'test',
     });
@@ -301,9 +301,9 @@ describe('ClassicPathMatcher', () => {
   it('controllers', () => {
     expect(m('foo/bar/app/controllers/foo/index.ts')).toEqual({ type: 'controller', name: 'foo/index', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/controllers/foo.ts')).toEqual({ type: 'controller', name: 'foo', scope: 'application', kind: 'script' });
-    expect(m('foo/bar/tests/unit/controllers/cart-widgget/index-test.js')).toEqual({
+    expect(m('foo/bar/tests/unit/controllers/cart-widget/index-test.js')).toEqual({
       type: 'controller',
-      name: 'cart-widgget/index',
+      name: 'cart-widget/index',
       scope: 'application',
       kind: 'test',
     });

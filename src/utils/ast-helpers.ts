@@ -628,7 +628,7 @@ export function isModelReference(astPath: ASTPath): boolean {
   return expressionHasIdentifierName(parent, ['belongsTo', 'hasMany']);
 }
 
-export function isLocalizationHelperTranslataionName(focusPath: ASTPath, type: 'script' | 'template'): boolean {
+export function isLocalizationHelperTranslationName(focusPath: ASTPath, type: 'script' | 'template'): boolean {
   const parent = focusPath.parent;
 
   if (!parent) {

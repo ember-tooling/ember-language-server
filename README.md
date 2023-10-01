@@ -55,7 +55,7 @@ All features currently only work in Ember CLI application that use the default c
 - all addons could be added as dev-dependency for a project
 - dev-dependency installation allow us to have independent versions of addons for different projects
 - for global addon installation check LS settings in your editor (you have to specify path to addon root in LS config)
-- you could [build](https://github.com/lifeart/ember-language-server/wiki/Addon-API) your project-sepecific addon
+- you could [build](https://github.com/lifeart/ember-language-server/wiki/Addon-API) your project-specific addon
 
 ---
 
@@ -73,11 +73,11 @@ new Server({fs, type})
 ```
 
 
-`fs` - available options: 
+`fs` - available options:
   * `sync` - LS should use nodejs.fs logic
   * `async` - LS should use client's fs provider
 
-`type` - available options: 
+`type` - available options:
   * `node` - supported addons & require logic
   * `worker` - addons and require logic not supported
 
@@ -90,6 +90,6 @@ new Server({fs, type})
 
 ---
 
-## Licence
+## License
 
 [MIT](LICENSE.md)

@@ -3,7 +3,7 @@ import { MatchResultType } from './path-matcher';
 import { fsProvider } from '../fs-provider';
 import { logDebugInfo } from './logger';
 import { preprocess } from '@glimmer/syntax';
-import { extractYeildMetadata, TemplateYieldContext } from './yield-context-extractor';
+import { extractYieldMetadata, TemplateYieldContext } from './yield-context-extractor';
 
 export interface TemplateTokenMeta {
   source: string;
@@ -152,7 +152,7 @@ async function extractTokens() {
 
       if (kind === 'component' && content.includes('{{yield')) {
         try {
-          yieldMeta = extractYeildMetadata(ast);
+          yieldMeta = extractYieldMetadata(ast);
         } catch (e) {
           yieldMeta = {};
         }
