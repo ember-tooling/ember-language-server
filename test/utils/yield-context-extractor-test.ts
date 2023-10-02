@@ -5,7 +5,7 @@ function extract(tpl: string) {
   return extractYieldMetadata(preprocess(tpl));
 }
 
-describe('Yeld Metadata API', () => {
+describe('Yield Metadata API', () => {
   it('should handle default yield with hash', () => {
     expect(
       extract(`
@@ -91,7 +91,27 @@ describe('Yeld Metadata API', () => {
       `)
     ).toEqual({ 'default:0:': ['component', 'foo-bar'], 'default:1:': ['component', 'foo-baz'] });
   });
-  it('should handle default yeld with single positional hash argument with component property', () => {
+  it('should handle default yield with single positional hash argument with component property', () => {
     expect(extract(`{{yield (hash Foo=(component "my-component"))}}`)).toEqual({ 'default:0:Foo': ['component', 'my-component'] });
+  });
+  it('should extract only yield content when nested in a div with other content', () => {
+    expect(
+      extract(`
+      <div class="example">
+        <p>Some Content</p>
+        {{yield (hash Foo=(component "my-component"))}}
+      </div>
+      `)
+    ).toEqual({ 'default:0:Foo': ['component', 'my-component'] });
+  });
+
+  it('should extract only yield content when nested in an "if" statement', () => {
+    expect(
+      extract(`
+      {{#if this.isTrue}}
+        {{yield (hash Foo=(component "my-component"))}}
+      {{/if}}
+      `)
+    ).toEqual({ 'default:0:Foo': ['component', 'my-component'] });
   });
 });

@@ -70,7 +70,7 @@ export function extractYieldMetadata(template: ASTv1.Template) {
       const acc: Record<string, unknown> = {};
 
       return {
-        $elemant: node.tag,
+        $element: node.tag,
         $attributes: this.map(node.attributes).reduce((acc, [key, val]) => {
           Object.defineProperty(acc, key, {
             value: val,
@@ -79,12 +79,12 @@ export function extractYieldMetadata(template: ASTv1.Template) {
           return acc;
         }, acc),
         $modifiers: this.map(node.modifiers),
-        $programms: this.map(node.children).filter((e) => typeof e !== 'string'),
+        $programs: this.map(node.children).filter((e) => typeof e !== 'string'),
       };
     }
     Template(node: ASTv1.Template | ASTv1.Program) {
       return {
-        $programms: this.map(node.body).filter((e) => typeof e !== 'string'),
+        $programs: this.map(node.body).filter((e) => typeof e !== 'string'),
       };
     }
     ConcatStatement(node: ASTv1.ConcatStatement) {
@@ -137,14 +137,14 @@ export function extractYieldMetadata(template: ASTv1.Template) {
     BlockStatement(node: ASTv1.BlockStatement) {
       const result = this.SubExpression(node);
 
-      const $programms = [this.Block(node.program)];
+      const $programs = [this.Block(node.program)];
 
       if (node.inverse) {
-        $programms.push(this.Block(node.inverse));
+        $programs.push(this.Block(node.inverse));
       }
 
-      Object.defineProperty(result, '$programms', {
-        value: $programms,
+      Object.defineProperty(result, '$programs', {
+        value: $programs,
       });
 
       return result;
