@@ -3471,18 +3471,17 @@ Object {
       "resolveProvider": true,
       "triggerCharacters": Array [
         ".",
-        "::",
+        ":",
         "$",
         "=",
         "/",
-        "{{",
+        "{",
         "(",
         "<",
         "@",
-        "this.",
-        "<:",
         "\\"",
         "'",
+        "#",
       ],
     },
     "definitionProvider": true,
@@ -3753,7 +3752,99 @@ Array [
 ]
 `;
 
-exports[`integration async fs enabled: false autocomplete works for angle component slots 1`] = `
+exports[`integration async fs enabled: false autocomplete includes yielded blocks in angle component completions 1`] = `
+Array [
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":main",
+    "textEdit": Object {
+      "newText": ":main",
+      "range": Object {
+        "end": Object {
+          "character": 10,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "Hello",
+    "textEdit": Object {
+      "newText": "Hello",
+      "range": Object {
+        "end": Object {
+          "character": 10,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/components/darling.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "Darling",
+    "textEdit": Object {
+      "newText": "Darling",
+      "range": Object {
+        "end": Object {
+          "character": 10,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/components/world.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "World",
+    "textEdit": Object {
+      "newText": "World",
+      "range": Object {
+        "end": Object {
+          "character": 10,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: false autocomplete works for angle component yielded blocks 1`] = `
 Array [
   Object {
     "detail": "Named block (Slot) for <Darling>",
@@ -3776,7 +3867,7 @@ Array [
 ]
 `;
 
-exports[`integration async fs enabled: false autocomplete works for multiple angle component slots 1`] = `
+exports[`integration async fs enabled: false autocomplete works for multiple angle component yielded blocks 1`] = `
 Array [
   Object {
     "detail": "Named block (Slot) for <Darling>",
@@ -7306,18 +7397,17 @@ Object {
       "resolveProvider": true,
       "triggerCharacters": Array [
         ".",
-        "::",
+        ":",
         "$",
         "=",
         "/",
-        "{{",
+        "{",
         "(",
         "<",
         "@",
-        "this.",
-        "<:",
         "\\"",
         "'",
+        "#",
       ],
     },
     "definitionProvider": true,
@@ -7588,7 +7678,99 @@ Array [
 ]
 `;
 
-exports[`integration async fs enabled: true autocomplete works for angle component slots 1`] = `
+exports[`integration async fs enabled: true autocomplete includes yielded blocks in angle component completions 1`] = `
+Array [
+  Object {
+    "detail": "Named block (Slot) for <Darling>",
+    "kind": 6,
+    "label": ":main",
+    "textEdit": Object {
+      "newText": ":main",
+      "range": Object {
+        "end": Object {
+          "character": 10,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/components/hello.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "Hello",
+    "textEdit": Object {
+      "newText": "Hello",
+      "range": Object {
+        "end": Object {
+          "character": 10,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/components/darling.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "Darling",
+    "textEdit": Object {
+      "newText": "Darling",
+      "range": Object {
+        "end": Object {
+          "character": 10,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "data": Object {
+      "files": Array [
+        "app/components/world.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "World",
+    "textEdit": Object {
+      "newText": "World",
+      "range": Object {
+        "end": Object {
+          "character": 10,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 10,
+          "line": 0,
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`integration async fs enabled: true autocomplete works for angle component yielded blocks 1`] = `
 Array [
   Object {
     "detail": "Named block (Slot) for <Darling>",
@@ -7611,7 +7793,7 @@ Array [
 ]
 `;
 
-exports[`integration async fs enabled: true autocomplete works for multiple angle component slots 1`] = `
+exports[`integration async fs enabled: true autocomplete works for multiple angle component yielded blocks 1`] = `
 Array [
   Object {
     "detail": "Named block (Slot) for <Darling>",

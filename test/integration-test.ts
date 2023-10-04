@@ -1811,7 +1811,7 @@ describe('integration', function () {
         });
       });
 
-      it('autocomplete works for angle component slots', async () => {
+      it('autocomplete works for angle component yielded blocks', async () => {
         const result = await getResult(
           CompletionRequest.method,
           connection,
@@ -1830,7 +1830,7 @@ describe('integration', function () {
         expect(result.response).toMatchSnapshot();
       });
 
-      it('autocomplete works for multiple angle component slots', async () => {
+      it('autocomplete works for multiple angle component yielded blocks', async () => {
         const result = await getResult(
           CompletionRequest.method,
           connection,
@@ -1844,6 +1844,26 @@ describe('integration', function () {
           },
           'app/components/hello.hbs',
           { line: 0, character: 11 }
+        );
+
+        expect(result.response).toMatchSnapshot();
+      });
+
+      it('autocomplete includes yielded blocks in angle component completions', async () => {
+        const result = await getResult(
+          CompletionRequest.method,
+          connection,
+          {
+            app: {
+              components: {
+                'hello.hbs': '<Darling><</Darling>',
+                'world.hbs': 'Hello World',
+                'darling.hbs': '{{yield to="main"}}',
+              },
+            },
+          },
+          'app/components/hello.hbs',
+          { line: 0, character: 10 }
         );
 
         expect(result.response).toMatchSnapshot();

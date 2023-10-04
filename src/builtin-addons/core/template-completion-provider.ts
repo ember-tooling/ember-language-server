@@ -576,14 +576,15 @@ export default class TemplateCompletionProvider {
         const yields = await this.getParentComponentYields(focusPath.parent);
 
         completions.push(...yields);
-      } else if (isAngleComponentPath(focusPath) && !isNamedBlockName(focusPath)) {
+      } else if (isAngleComponentPath(focusPath)) {
         logDebugInfo('isAngleComponentPath');
         // <Foo>
         const candidates = await this.getAllAngleBracketComponents(root);
         const scopedValues = this.getExtendedScopedValues(focusPath);
+        const yields = await this.getParentComponentYields(focusPath.parent);
 
         logDebugInfo(candidates, scopedValues);
-        completions.push(...uniqBy([...candidates, ...scopedValues], 'label'));
+        completions.push(...uniqBy([...yields, ...candidates, ...scopedValues], 'label'));
       } else if (isScopedAngleTagName(focusPath)) {
         // {{#let foo as |bar|}} <bar..
         const scopedValues = this.getExtendedScopedValues(focusPath);
