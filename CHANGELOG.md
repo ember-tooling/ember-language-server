@@ -1,3 +1,10 @@
+## [2.30.1](https://github.com/lifeart/ember-language-server/compare/v2.30.0...v2.30.1) (2023-10-04)
+
+
+### Bug Fixes
+
+* punch CI ([366a43f](https://github.com/lifeart/ember-language-server/commit/366a43f5299dd5e2d90c1445670062521e15286f))
+
 # [2.30.0](https://github.com/lifeart/ember-language-server/compare/v2.29.0...v2.30.0) (2023-10-01)
 
 
