@@ -109,6 +109,6 @@ We then adapted the integration code to the following:
 
 After evaluating that snippet (`C-x C-e` whilst at the end of the expression), we opened an EmbeJS project.  Being in web-mode this requested us to launch ELS.  The ELS launch hangs at this point, because the `--inspect-brk` option does not continue evaluating until we press play in the inspector (see next).
 
-As ELS had launched, we visited chrome://inspect from within Brave, and launched the debugger.  We enabled "Pause on Exceptions" as that was the specific case we were interested in.  Then we pressed "Resume script execution" (which you'd likely identify as the play/pause button).
+As ELS had launched, we visited `chrome://inspect` from within Brave, and launched the debugger.  We enabled "Pause on Exceptions" as that was the specific case we were interested in.  Then we pressed "Resume script execution" (which you'd likely identify as the play/pause button).
 
 After our debugging session was over, we evaluated the first `lsp-register-client` once again, so future sessions would not have debugging enabled and start without having the debugger attached.
