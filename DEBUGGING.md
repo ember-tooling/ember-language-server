@@ -22,9 +22,9 @@ In order to debug the sources, we need to get hold of them and their dependencie
 
 ### Getting the sources
 
-Sources for uELS can be fetched from https://github.com/lifeart/ember-language-server
+Sources for ELS can be fetched from https://github.com/ember-tooling/ember-language-server
 
-    git clone https://github.com/lifeart/ember-language-server.git
+    git clone https://github.com/ember-tooling/ember-language-server.git
 
 In later steps we will use the variable `$PATH_TO_ELS` which you likely want to replace manually.  It's definition would be found by executing the following in the previous directory:
 
