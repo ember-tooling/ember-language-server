@@ -383,7 +383,7 @@ export default class Server {
     }
 
     if (globalThis.process) {
-      globalThis.process.title = 'unstable_ember_language_server';
+      globalThis.process.title = 'ember_language_server';
     }
 
     this.options = { ...defaultServerOptions, ...options };

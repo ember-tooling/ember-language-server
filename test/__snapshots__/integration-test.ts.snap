@@ -3510,7 +3510,7 @@ Object {
     },
   },
   "serverInfo": Object {
-    "name": "@lifeart/ember-language-server",
+    "name": "@ember-tooling/ember-language-server",
   },
 }
 `;
@@ -7436,7 +7436,7 @@ Object {
     },
   },
   "serverInfo": Object {
-    "name": "@lifeart/ember-language-server",
+    "name": "@ember-tooling/ember-language-server",
   },
 }
 `;

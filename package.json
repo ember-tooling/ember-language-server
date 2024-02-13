@@ -1,5 +1,5 @@
 {
-  "name": "@lifeart/ember-language-server",
+  "name": "@ember-tooling/ember-language-server",
   "description": "A language server implementation for Ember.js projects.",
   "version": "2.30.1",
   "contributors": [
@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/lifeart/ember-language-server.git"
+    "url": "https://github.com/ember-tooling/ember-language-server.git"
   },
   "engines": {
     "node": ">= 14.21.1"
