@@ -1,10 +1,11 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - component-context-info-origin
-  pull_request: {}
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - component-context-info-origin
+  # pull_request: {}
 
 jobs:
   test:
@@ -128,7 +129,7 @@ jobs:
     timeout-minutes: 10
     needs: [floating-dependencies]
     env:
-      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
 
       - name: checkout repo
