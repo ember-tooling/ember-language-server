@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   # push:
   #   branches:
-  #     - component-context-info-origin
+  #     - master
   # pull_request: {}
 
 jobs:
@@ -125,7 +125,7 @@ jobs:
   cd:
     runs-on: ubuntu-latest
     name: cd
-    if: github.ref == 'refs/heads/component-context-info-origin'
+    if: github.ref == 'refs/heads/master'
     timeout-minutes: 10
     needs: [floating-dependencies]
     env:
