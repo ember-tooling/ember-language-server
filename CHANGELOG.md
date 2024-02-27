@@ -1,3 +1,10 @@
+## [2.30.2](https://github.com/ember-tooling/ember-language-server/compare/v2.30.1...v2.30.2) (2024-02-27)
+
+
+### Bug Fixes
+
+* release under ember-tooling ([e32c88b](https://github.com/ember-tooling/ember-language-server/commit/e32c88bde127baaac238b8cf6d79bae46b54b562))
+
 ## [2.30.1](https://github.com/lifeart/ember-language-server/compare/v2.30.0...v2.30.1) (2023-10-04)
 
 
