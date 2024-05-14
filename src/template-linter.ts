@@ -221,7 +221,9 @@ export default class TemplateLinter {
   }
   async getFindUp(): Promise<FindUp> {
     if (!this._findUp) {
-      const { findUp } = await import('find-up');
+      // NOTE: webpack is incorrectly compiling away await import()
+      //       (the target is CJS, but await import is valid in CJS)
+      const { findUp } = await eval(`import('find-up')`);
 
       this._findUp = findUp as FindUp;
     }
