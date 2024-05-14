@@ -221,9 +221,11 @@ export default class TemplateLinter {
   }
   async getFindUp(): Promise<FindUp> {
     if (!this._findUp) {
+      // NOTE: webpack is incorrectly compiling away await import()
+      //       (the target is CJS, but await import is valid in CJS)
       const { findUp } = await eval(`import('find-up')`);
 
-      this._findUp = findUp;
+      this._findUp = findUp as FindUp;
     }
 
     return this._findUp;
@@ -231,7 +233,17 @@ export default class TemplateLinter {
   private async templateLintConfig(cwd: string): Promise<string | undefined> {
     const findUp = await this.getFindUp();
 
-    return findUp('.template-lintrc.js', { cwd, type: 'file' });
+    const candidates = ['.template-lintrc.js', '.template-lintrc.cjs', '.template-lintrc.mjs'];
+
+    const results = await Promise.all(
+      // Check all candidates in "parallel"
+      // gotta go fast
+      candidates.map((candidate) => findUp(candidate, { cwd, type: 'file' }))
+    );
+
+    const result = results.filter(Boolean);
+
+    return result[0];
   }
   private async projectNodeModules(cwd: string): Promise<string | undefined> {
     const findUp = await this.getFindUp();
