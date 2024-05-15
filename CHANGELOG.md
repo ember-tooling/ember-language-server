@@ -1,3 +1,10 @@
+## [2.30.3](https://github.com/ember-tooling/ember-language-server/compare/v2.30.2...v2.30.3) (2024-05-15)
+
+
+### Bug Fixes
+
+* Support all template-lint extensions ([74cd998](https://github.com/ember-tooling/ember-language-server/commit/74cd99876909b1f9d8827d85d00452670ff52f86))
+
 ## [2.30.2](https://github.com/ember-tooling/ember-language-server/compare/v2.30.1...v2.30.2) (2024-02-27)
 
 
