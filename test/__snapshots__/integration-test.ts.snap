@@ -7339,6 +7339,37 @@ Object {
 }
 `;
 
+exports[`integration async fs enabled: true Go to definition works for all supported cases to children route from application outlet 2`] = `
+Object {
+  "addonsMeta": Array [],
+  "registry": Object {
+    "routePath": Object {
+      "application": Array [
+        "app/templates/application.hbs",
+      ],
+      "foo": Array [
+        "app/templates/foo.hbs",
+      ],
+    },
+  },
+  "response": Array [
+    Object {
+      "range": Object {
+        "end": Object {
+          "character": 0,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 0,
+          "line": 0,
+        },
+      },
+      "uri": "/app/templates/foo.hbs",
+    },
+  ],
+}
+`;
+
 exports[`integration async fs enabled: true Go to definition works for all supported cases to children route from meaningful outlet 1`] = `
 Object {
   "addonsMeta": Array [],

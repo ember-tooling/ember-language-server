@@ -87,6 +87,10 @@ export default class ProjectRoots {
       ignore: ['**/.git/**', '**/bower_components/**', '**/dist/**', '**/node_modules/**', '**/tmp/**'],
     });
 
+    logInfo(`ELS: Found ${roots.length} roots for ${workspaceRoot}`);
+
+    const start = Date.now();
+
     for (const rootPath of roots) {
       const filePath = path.join(workspaceRoot, rootPath);
       const fullPath = path.dirname(filePath);
@@ -103,6 +107,8 @@ export default class ProjectRoots {
         await this.onProjectAdd(fullPath);
       }
     }
+
+    logInfo(`ELS: iterating roots took ${Date.now() - start}ms`);
   }
 
   async initialize(workspaceRoot: string) {
@@ -121,6 +127,8 @@ export default class ProjectRoots {
 
     if (this.projects.has(projectPath)) {
       const project = this.projects.get(projectPath) as Project;
+
+      logInfo(`Project already existed at ${projectPath}`);
 
       return {
         initIssues: project.initIssues,
@@ -154,12 +162,16 @@ export default class ProjectRoots {
         };
       }
 
+      logInfo(`Initializing new project at ${projectPath} with ${this.localAddons.length} ELS addons.`);
+
       const project = new Project(projectPath, this.localAddons, info);
+
+      const start = Date.now();
 
       await project.initialize(this.server);
 
       this.projects.set(projectPath, project);
-      logInfo(`Ember CLI project added at ${projectPath}`);
+      logInfo(`Ember CLI project added at ${projectPath}. (took ${Date.now() - start}ms)`);
       await project.init(this.server);
 
       return {
