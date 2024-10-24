@@ -168,12 +168,14 @@ export default class Server {
   hoverProvider!: HoverProvider;
   codeActionProvider!: CodeActionProvider;
   async executeInitializers() {
-    logInfo('UELS: executeInitializers');
+    logInfo('ELS: executeInitializers');
+    logInfo(`ELS: ${this.initializers.length} initializers`);
 
     for (const initializer of this.initializers) {
       await initializer();
     }
 
+    logInfo(`ELS: clearing initializers because they've been initialized`);
     this.initializers = [];
   }
   private onInitialized() {
@@ -190,6 +192,10 @@ export default class Server {
 
       if (this.lazyInit) {
         try {
+          /**
+           * Don't await this so that "format on save" is not blocked.
+           * We still need to run the initializers so that we have hinting in component files though.
+           */
           await this.executeInitializers();
         } catch (e) {
           logError(e);
@@ -523,6 +529,8 @@ export default class Server {
 
     this.initializers.push(async () => {
       await this.projectRoots.initialize(rootPath as string);
+
+      logInfo(`Found ${workspaceFolders?.length ?? 0} workspace folders for ${rootPath}`);
 
       if (workspaceFolders && Array.isArray(workspaceFolders)) {
         for (const folder of workspaceFolders) {
