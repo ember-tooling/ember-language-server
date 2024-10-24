@@ -6,8 +6,13 @@ import { clean, coerce, valid } from 'semver';
 import { BaseProject } from '../base-project';
 import { fsProvider } from '../fs-provider';
 import walkAsync from './walk-async';
+import { instrumentTime } from './logger';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
+
+// Don't traverse dependencies we've already seen.
+// correct package graph can sort of throw us in to cycles if we don't keep track of this.
+const SEEN = new Set<string>();
 
 export const ADDON_CONFIG_KEY = 'ember-language-server';
 
@@ -196,6 +201,16 @@ export function cached(_proto: unknown, prop: string, desc: PropertyDescriptor) 
 
 async function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
   const packageData = await asyncGetPackageJSON(root);
+
+  // names are required for packages
+  if (!packageData.name) return [];
+
+  if (SEEN.has(packageData.name)) {
+    return [];
+  }
+
+  SEEN.add(packageData.name);
+
   const emberAddonPaths: string[] = (packageData['ember-addon'] && packageData['ember-addon'].paths) || [];
 
   if (roots.length) {
@@ -212,6 +227,15 @@ async function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
 
   for (const validRoot of validPaths) {
     const packInfo = await asyncGetPackageJSON(validRoot);
+
+    // names are required for packages
+    if (!packInfo.name) continue;
+
+    if (SEEN.has(packInfo.name)) {
+      continue;
+    }
+
+    SEEN.add(packInfo.name);
 
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
@@ -234,7 +258,11 @@ async function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
 }
 
 export async function getProjectInRepoAddonsRoots(root: string): Promise<string[]> {
+  const time = instrumentTime(`getProjectInRepoAddonsRoots(${root})`);
+
   const roots: string[] = await getRecursiveInRepoAddonRoots(root, []);
+
+  time.log(`finished getRecursiveInRepoAddonRoots`);
 
   return Array.from(new Set(roots));
 }
@@ -274,7 +302,15 @@ export async function isGlimmerXProject(root: string) {
 }
 
 export async function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
+  const time = instrumentTime(`getProjectInRepoAddonsRoots(${root})`);
+
   const pack = await asyncGetPackageJSON(root);
+
+  if (!pack.name) return [];
+
+  if (SEEN.has(pack.name)) return [];
+
+  SEEN.add(pack.name);
 
   if (resolvedItems.length) {
     if (!isEmberAddon(pack)) {
@@ -304,6 +340,12 @@ export async function getProjectAddonsRoots(root: string, resolvedItems: string[
   for (const rootItem of roots) {
     const packInfo = packages[roots.indexOf(rootItem)];
 
+    if (!packInfo.name) continue;
+
+    if (SEEN.has(packInfo.name)) continue;
+
+    SEEN.add(packInfo.name);
+
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
       continue;
@@ -320,6 +362,8 @@ export async function getProjectAddonsRoots(root: string, resolvedItems: string[
       });
     }
   }
+
+  time.log(`Finished looping over ${roots.length} roots`);
 
   return recursiveRoots;
 }
