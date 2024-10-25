@@ -41,7 +41,7 @@ export class ClassicPathMatcher {
     serializer: ['/serializers/'],
     util: ['/utils/'],
   };
-  ignores = ['/tmp/', '/dist/', '/.git/'];
+  ignores = ['/tmp/', '/dist/', '/.git/', '/.embroider/'];
   setIgnores(ignores: string[]) {
     this.ignores = ignores;
   }
