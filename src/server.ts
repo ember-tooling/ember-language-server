@@ -192,10 +192,6 @@ export default class Server {
 
       if (this.lazyInit) {
         try {
-          /**
-           * Don't await this so that "format on save" is not blocked.
-           * We still need to run the initializers so that we have hinting in component files though.
-           */
           await this.executeInitializers();
         } catch (e) {
           logError(e);
