@@ -72,11 +72,107 @@ Array [
       },
     },
   },
+  Object {
+    "data": Object {
+      "files": Array [
+        "lib/boo/addon/templates/components/bar.hbs",
+        "lib/foo/addon/components/bar.js",
+        "lib/foo/addon/templates/components/bar.hbs",
+      ],
+    },
+    "detail": "component",
+    "kind": 7,
+    "label": "Boo$Bar",
+    "textEdit": Object {
+      "newText": "Boo$Bar",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Foo$Bar",
+    "textEdit": Object {
+      "newText": "Foo$Bar",
+      "range": Object {
+        "end": Object {
+          "character": 1,
+          "line": 0,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 0,
+        },
+      },
+    },
+  },
 ]
 `;
 
-exports[`With \`batman project\` initialized on server Completion request returns all angle-bracket in a element expression for in repo addons with batman syntax 1`] = `Array []`;
+exports[`With \`batman project\` initialized on server Completion request returns all angle-bracket in a element expression for in repo addons with batman syntax 1`] = `
+Array [
+  Object {
+    "detail": "component",
+    "kind": 7,
+    "label": "Foo$Bar",
+    "textEdit": Object {
+      "newText": "Foo$Bar",
+      "range": Object {
+        "end": Object {
+          "character": 2,
+          "line": 1,
+        },
+        "start": Object {
+          "character": 1,
+          "line": 1,
+        },
+      },
+    },
+  },
+]
+`;
 
-exports[`With \`batman project\` initialized on server Definition request return proper component location from batman syntax component name 1`] = `Array []`;
+exports[`With \`batman project\` initialized on server Definition request return proper component location from batman syntax component name 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/lib/boo/addon/templates/components/bar.hbs",
+  },
+]
+`;
 
-exports[`With \`batman project\` initialized on server return proper import location from in-repo addon 1`] = `Array []`;
+exports[`With \`batman project\` initialized on server return proper import location from in-repo addon 1`] = `
+Array [
+  Object {
+    "range": Object {
+      "end": Object {
+        "character": 0,
+        "line": 0,
+      },
+      "start": Object {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "uri": "/lib/foo/addon/components/bar.js",
+  },
+]
+`;
