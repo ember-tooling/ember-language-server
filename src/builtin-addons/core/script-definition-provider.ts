@@ -29,6 +29,7 @@ type ItemType = 'Model' | 'Transform' | 'Service';
 // eslint-disable-line
 type LayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => string[];
 type AsyncLayoutCollectorFn = (root: string, itemName: string, podModulePrefix?: string) => Promise<string[]>;
+type ProjectAwareCollectionFn = (project: Project, itemName: string, podModulePrefix?: string) => Promise<string[]>;
 
 function joinPaths(...args: string[]) {
   return ['.ts', '.js'].map((extName: string) => {
@@ -40,7 +41,8 @@ function joinPaths(...args: string[]) {
 }
 
 class PathResolvers {
-  [key: string]: LayoutCollectorFn | AsyncLayoutCollectorFn;
+  [key: string]: LayoutCollectorFn | AsyncLayoutCollectorFn | ProjectAwareCollectionFn;
+
   muModelPaths(root: string, modelName: string) {
     return joinPaths(root, 'src', 'data', 'models', modelName, 'model');
   }
@@ -68,11 +70,11 @@ class PathResolvers {
   podServicePaths(root: string, modelName: string, podPrefix: string) {
     return joinPaths(root, 'app', podPrefix, modelName, 'service');
   }
-  async addonServicePaths(root: string, serviceName: string): Promise<string[]> {
-    return await getAddonPathsForType(root, 'services', serviceName);
+  async addonServicePaths(project: Project, serviceName: string): Promise<string[]> {
+    return await getAddonPathsForType(project, 'services', serviceName);
   }
-  async addonImportPaths(root: string, pathName: string) {
-    return await getAddonImport(root, pathName);
+  async addonImportPaths(project: Project, pathName: string) {
+    return await getAddonImport(project, pathName);
   }
   classicImportPaths(root: string, pathName: string) {
     const pathParts = pathName.split('/');
@@ -123,7 +125,7 @@ export default class CoreScriptDefinitionProvider {
       guessedPaths.push(pathLocation);
     });
 
-    const addonImports = await this.resolvers.addonImportPaths(root, importPath);
+    const addonImports = await this.resolvers.addonImportPaths(this.project, importPath);
 
     addonImports.forEach((pathLocation: string) => {
       guessedPaths.push(pathLocation);
@@ -148,7 +150,7 @@ export default class CoreScriptDefinitionProvider {
     }
 
     if (fnName === 'Service') {
-      const paths = await this.resolvers.addonServicePaths(root, typeName);
+      const paths = await this.resolvers.addonServicePaths(this.project, typeName);
 
       paths.forEach((item: string) => {
         guessedPaths.push(item);

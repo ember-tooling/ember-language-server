@@ -218,7 +218,7 @@ export default class Server {
         };
       }
 
-      await mGetProjectAddonsInfo(project.root);
+      await mGetProjectAddonsInfo(project.root, project.seenDependencies);
       project.invalidateRegistry();
 
       return {

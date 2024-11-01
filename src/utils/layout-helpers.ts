@@ -10,10 +10,6 @@ import { instrumentTime } from './logger';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 
-// Don't traverse dependencies we've already seen.
-// correct package graph can sort of throw us in to cycles if we don't keep track of this.
-const SEEN = new Set<string>();
-
 export const ADDON_CONFIG_KEY = 'ember-language-server';
 
 export async function asyncFilter<T>(arr: T[], predicate: (value: unknown) => Promise<boolean | undefined>): Promise<T[]> {
@@ -199,17 +195,17 @@ export function cached(_proto: unknown, prop: string, desc: PropertyDescriptor) 
   };
 }
 
-async function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
+async function getRecursiveInRepoAddonRoots(root: string, seenDependencies: Set<string>, roots: string[]) {
   const packageData = await asyncGetPackageJSON(root);
 
   // names are required for packages
   if (!packageData.name) return [];
 
-  if (SEEN.has(packageData.name)) {
+  if (seenDependencies.has(packageData.name)) {
     return [];
   }
 
-  SEEN.add(packageData.name);
+  seenDependencies.add(packageData.name);
 
   const emberAddonPaths: string[] = (packageData['ember-addon'] && packageData['ember-addon'].paths) || [];
 
@@ -231,11 +227,11 @@ async function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
     // names are required for packages
     if (!packInfo.name) continue;
 
-    if (SEEN.has(packInfo.name)) {
+    if (seenDependencies.has(packInfo.name)) {
       continue;
     }
 
-    SEEN.add(packInfo.name);
+    seenDependencies.add(packInfo.name);
 
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
@@ -244,7 +240,7 @@ async function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
 
     if (!recursiveRoots.includes(validRoot)) {
       recursiveRoots.push(validRoot);
-      const items = await getRecursiveInRepoAddonRoots(validRoot, recursiveRoots);
+      const items = await getRecursiveInRepoAddonRoots(validRoot, seenDependencies, recursiveRoots);
 
       items.forEach((relatedRoot: string) => {
         if (!recursiveRoots.includes(relatedRoot)) {
@@ -257,10 +253,10 @@ async function getRecursiveInRepoAddonRoots(root: string, roots: string[]) {
   return recursiveRoots.sort();
 }
 
-export async function getProjectInRepoAddonsRoots(root: string): Promise<string[]> {
+export async function getProjectInRepoAddonsRoots(root: string, seenDependencies: Set<string>): Promise<string[]> {
   const time = instrumentTime(`getProjectInRepoAddonsRoots(${root})`);
 
-  const roots: string[] = await getRecursiveInRepoAddonRoots(root, []);
+  const roots: string[] = await getRecursiveInRepoAddonRoots(root, seenDependencies, []);
 
   time.log(`finished getRecursiveInRepoAddonRoots`);
 
@@ -301,16 +297,16 @@ export async function isGlimmerXProject(root: string) {
   return hasDep(pack, '@glimmerx/core') || hasDep(pack, 'glimmer-lite-core');
 }
 
-export async function getProjectAddonsRoots(root: string, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
+export async function getProjectAddonsRoots(root: string, seenDependencies: Set<string>, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
   const time = instrumentTime(`getProjectInRepoAddonsRoots(${root})`);
 
   const pack = await asyncGetPackageJSON(root);
 
   if (!pack.name) return [];
 
-  if (SEEN.has(pack.name)) return [];
+  if (seenDependencies.has(pack.name)) return [];
 
-  SEEN.add(pack.name);
+  seenDependencies.add(pack.name);
 
   if (resolvedItems.length) {
     if (!isEmberAddon(pack)) {
@@ -342,9 +338,9 @@ export async function getProjectAddonsRoots(root: string, resolvedItems: string[
 
     if (!packInfo.name) continue;
 
-    if (SEEN.has(packInfo.name)) continue;
+    if (seenDependencies.has(packInfo.name)) continue;
 
-    SEEN.add(packInfo.name);
+    seenDependencies.add(packInfo.name);
 
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
@@ -353,7 +349,7 @@ export async function getProjectAddonsRoots(root: string, resolvedItems: string[
 
     if (!recursiveRoots.includes(rootItem)) {
       recursiveRoots.push(rootItem);
-      const addonRoots = await getProjectAddonsRoots(rootItem, recursiveRoots, packageFolderName);
+      const addonRoots = await getProjectAddonsRoots(rootItem, seenDependencies, recursiveRoots, packageFolderName);
 
       addonRoots.forEach((item: string) => {
         if (!recursiveRoots.includes(item)) {
@@ -440,8 +436,11 @@ export function hasAddonFolderInPath(name: string) {
   return name.includes(path.sep + 'addon' + path.sep) || name.includes(path.sep + 'addon-test-support' + path.sep);
 }
 
-export async function getProjectAddonsInfo(root: string): Promise<void> {
-  const [projectAddonsRoots, projectInRepoAddonsRoots] = await Promise.all([getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root)]);
+export async function getProjectAddonsInfo(root: string, seenDependencies: Set<string>): Promise<void> {
+  const [projectAddonsRoots, projectInRepoAddonsRoots] = await Promise.all([
+    getProjectAddonsRoots(root, seenDependencies),
+    getProjectInRepoAddonsRoots(root, seenDependencies),
+  ]);
   const roots = ([] as string[]).concat(projectAddonsRoots, projectInRepoAddonsRoots).filter((pathItem: unknown) => typeof pathItem === 'string');
 
   for (const packagePath of roots) {
