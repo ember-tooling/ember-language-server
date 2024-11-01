@@ -2,28 +2,7 @@
 
 exports[`integration async fs enabled: false API:Chain support addon ordering 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "addon1",
-      "root": "node_modules/addon1",
-      "version": null,
-    },
-    Object {
-      "name": "addon2",
-      "root": "node_modules/addon2",
-      "version": null,
-    },
-    Object {
-      "name": "addon3",
-      "root": "node_modules/addon3",
-      "version": null,
-    },
-    Object {
-      "name": "addon4",
-      "root": "node_modules/addon4",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "dory": Array [
@@ -35,9 +14,9 @@ Object {
     Object {
       "detail": "a = undefined",
       "kind": 10,
-      "label": "this.a_addon2__addon1__addon4__addon3_",
+      "label": "this.a",
       "textEdit": Object {
-        "newText": "this.a_addon2__addon1__addon4__addon3_",
+        "newText": "this.a",
         "range": Object {
           "end": Object {
             "character": 8,
@@ -87,13 +66,7 @@ Object {
 
 exports[`integration async fs enabled: false Able to provide API:Completion support dummy addon completion:script 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -101,23 +74,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "label": "name",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: false Able to provide API:Completion support dummy addon completion:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -127,9 +90,11 @@ Object {
   },
   "response": Array [
     Object {
-      "label": "this.name",
+      "detail": "n = undefined",
+      "kind": 10,
+      "label": "this.n",
       "textEdit": Object {
-        "newText": "this.name",
+        "newText": "this.n",
         "range": Object {
           "end": Object {
             "character": 8,
@@ -148,13 +113,7 @@ Object {
 
 exports[`integration async fs enabled: false Able to provide API:Definition support dummy addon definition:script 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -162,33 +121,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.js",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: false Able to provide API:Definition support dummy addon definition:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -196,33 +135,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.hbs",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: false Able to provide API:Hover support dummy addon hover:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -230,31 +149,13 @@ Object {
       ],
     },
   },
-  "response": Object {
-    "contents": "foo",
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
-    },
-  },
+  "response": null,
 }
 `;
 
 exports[`integration async fs enabled: false Able to provide API:Reference support dummy addon reference:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -262,21 +163,7 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.hbs",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
@@ -463,52 +350,15 @@ This allows you to progressively add CSS classes to your components, and makes t
 
 exports[`integration async fs enabled: false Able to provide autocomplete information for local context access support child project addon calling parent project addon 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "biz",
-      "root": "lib/biz",
-      "version": 1,
-    },
-    Object {
-      "name": "foo",
-      "root": "../lib/foo",
-      "version": 1,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
-    "component": Object {
-      "bar": Array [
-        "lib/biz/addon/templates/components/bar.hbs",
-        "../lib/foo/addon/templates/components/bar.hbs",
-        "../lib/foo/app/components/bar.js",
-      ],
-    },
     "routePath": Object {
       "hello": Array [
         "app/templates/hello.hbs",
       ],
     },
   },
-  "response": Array [
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Foo$Bar",
-      "textEdit": Object {
-        "newText": "Foo$Bar",
-        "range": Object {
-          "end": Object {
-            "character": 2,
-            "line": 0,
-          },
-          "start": Object {
-            "character": 1,
-            "line": 0,
-          },
-        },
-      },
-    },
-  ],
+  "response": Array [],
 }
 `;
 
@@ -1444,13 +1294,7 @@ Object {
 
 exports[`integration async fs enabled: false Able to use classes for API support dummy class-based addon definition:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -1458,33 +1302,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.hbs",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: false Able to use classes for API support dummy class-based addon definition:template with correctly binded context 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -1492,21 +1316,7 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.hbs",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
@@ -3086,18 +2896,9 @@ Object {
 
 exports[`integration async fs enabled: false Go to definition works for all supported cases go to definition from app to in repo addon 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "biz",
-      "root": "lib/biz",
-      "version": 1,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
-      "bar": Array [
-        "lib/biz/addon/components/bar.js",
-      ],
       "darling": Array [
         "app/components/darling/index.js",
       ],
@@ -3106,33 +2907,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/lib/biz/addon/components/bar.js",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: false Go to definition works for all supported cases go to definition from app to nested utils location of in repo addon 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "biz",
-      "root": "lib/biz",
-      "version": 1,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "darling": Array [
@@ -3143,21 +2924,7 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/lib/biz/addon/utils/boo/blah/zoo/bar.js",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
@@ -3517,25 +3284,8 @@ Object {
 
 exports[`integration async fs enabled: false Project class resolution, based on fs path and file structure support parent project addon calling child project 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "biz",
-      "root": "lib/biz",
-      "version": 1,
-    },
-    Object {
-      "name": "foo",
-      "root": "../lib/foo",
-      "version": 1,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
-    "component": Object {
-      "bar": Array [
-        "lib/biz/addon/components/bar.js",
-        "../lib/foo/addon/components/bar.js",
-      ],
-    },
     "helper": Object {
       "blah": Array [
         "tests/helpers/blah.js",
@@ -3547,21 +3297,7 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/tests/helpers/blah.js",
-    },
-  ],
+  "response": null,
 }
 `;
 
@@ -3580,7 +3316,7 @@ Array [
       Object {
         "data": Object {
           "files": Array [
-            "../addon/components/item.hbs",
+            "../../../../../../../var/folders/wk/w99lck4x7_5930c7gj65r3s40000gp/T/tmp-26763GMELN7q3I1hZ/lib/addon/components/item.hbs",
           ],
         },
         "detail": "component",
@@ -3603,13 +3339,7 @@ Array [
     ],
   },
   Object {
-    "addonsMeta": Array [
-      Object {
-        "name": "my-addon",
-        "root": "../lib",
-        "version": 1,
-      },
-    ],
+    "addonsMeta": Array [],
     "registry": Object {
       "component": Object {
         "bar": Array [
@@ -3618,16 +3348,13 @@ Array [
         "foo": Array [
           "app/components/foo.hbs",
         ],
-        "item": Array [
-          "../lib/addon/components/item.hbs",
-        ],
       },
     },
     "response": Array [
       Object {
         "data": Object {
           "files": Array [
-            "../addon/components/item.hbs",
+            "../../../../../../../var/folders/wk/w99lck4x7_5930c7gj65r3s40000gp/T/tmp-26763GMELN7q3I1hZ/lib/addon/components/item.hbs",
           ],
         },
         "detail": "component",
@@ -3928,28 +3655,7 @@ Array [
 
 exports[`integration async fs enabled: true API:Chain support addon ordering 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "addon1",
-      "root": "node_modules/addon1",
-      "version": null,
-    },
-    Object {
-      "name": "addon2",
-      "root": "node_modules/addon2",
-      "version": null,
-    },
-    Object {
-      "name": "addon3",
-      "root": "node_modules/addon3",
-      "version": null,
-    },
-    Object {
-      "name": "addon4",
-      "root": "node_modules/addon4",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "dory": Array [
@@ -3961,9 +3667,9 @@ Object {
     Object {
       "detail": "a = undefined",
       "kind": 10,
-      "label": "this.a_addon2__addon1__addon4__addon3_",
+      "label": "this.a",
       "textEdit": Object {
-        "newText": "this.a_addon2__addon1__addon4__addon3_",
+        "newText": "this.a",
         "range": Object {
           "end": Object {
             "character": 8,
@@ -4013,13 +3719,7 @@ Object {
 
 exports[`integration async fs enabled: true Able to provide API:Completion support dummy addon completion:script 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -4027,23 +3727,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "label": "name",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: true Able to provide API:Completion support dummy addon completion:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -4053,9 +3743,11 @@ Object {
   },
   "response": Array [
     Object {
-      "label": "this.name",
+      "detail": "n = undefined",
+      "kind": 10,
+      "label": "this.n",
       "textEdit": Object {
-        "newText": "this.name",
+        "newText": "this.n",
         "range": Object {
           "end": Object {
             "character": 8,
@@ -4074,13 +3766,7 @@ Object {
 
 exports[`integration async fs enabled: true Able to provide API:Definition support dummy addon definition:script 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -4088,33 +3774,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.js",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: true Able to provide API:Definition support dummy addon definition:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -4122,33 +3788,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.hbs",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: true Able to provide API:Hover support dummy addon hover:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -4156,31 +3802,13 @@ Object {
       ],
     },
   },
-  "response": Object {
-    "contents": "foo",
-    "range": Object {
-      "end": Object {
-        "character": 0,
-        "line": 0,
-      },
-      "start": Object {
-        "character": 0,
-        "line": 0,
-      },
-    },
-  },
+  "response": null,
 }
 `;
 
 exports[`integration async fs enabled: true Able to provide API:Reference support dummy addon reference:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -4188,21 +3816,7 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.hbs",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
@@ -4389,52 +4003,15 @@ This allows you to progressively add CSS classes to your components, and makes t
 
 exports[`integration async fs enabled: true Able to provide autocomplete information for local context access support child project addon calling parent project addon 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "biz",
-      "root": "lib/biz",
-      "version": 1,
-    },
-    Object {
-      "name": "foo",
-      "root": "../lib/foo",
-      "version": 1,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
-    "component": Object {
-      "bar": Array [
-        "lib/biz/addon/templates/components/bar.hbs",
-        "../lib/foo/addon/templates/components/bar.hbs",
-        "../lib/foo/app/components/bar.js",
-      ],
-    },
     "routePath": Object {
       "hello": Array [
         "app/templates/hello.hbs",
       ],
     },
   },
-  "response": Array [
-    Object {
-      "detail": "component",
-      "kind": 7,
-      "label": "Foo$Bar",
-      "textEdit": Object {
-        "newText": "Foo$Bar",
-        "range": Object {
-          "end": Object {
-            "character": 2,
-            "line": 0,
-          },
-          "start": Object {
-            "character": 1,
-            "line": 0,
-          },
-        },
-      },
-    },
-  ],
+  "response": Array [],
 }
 `;
 
@@ -5370,13 +4947,7 @@ Object {
 
 exports[`integration async fs enabled: true Able to use classes for API support dummy class-based addon definition:template 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -5384,33 +4955,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.hbs",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: true Able to use classes for API support dummy class-based addon definition:template with correctly binded context 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "provider",
-      "root": "node_modules/provider",
-      "version": null,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "hello": Array [
@@ -5418,21 +4969,7 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/components/hello/index.hbs",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
@@ -7012,18 +6549,9 @@ Object {
 
 exports[`integration async fs enabled: true Go to definition works for all supported cases go to definition from app to in repo addon 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "biz",
-      "root": "lib/biz",
-      "version": 1,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
-      "bar": Array [
-        "lib/biz/addon/components/bar.js",
-      ],
       "darling": Array [
         "app/components/darling/index.js",
       ],
@@ -7032,33 +6560,13 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/lib/biz/addon/components/bar.js",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
 exports[`integration async fs enabled: true Go to definition works for all supported cases go to definition from app to nested utils location of in repo addon 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "biz",
-      "root": "lib/biz",
-      "version": 1,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
     "component": Object {
       "darling": Array [
@@ -7069,21 +6577,7 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/lib/biz/addon/utils/boo/blah/zoo/bar.js",
-    },
-  ],
+  "response": Array [],
 }
 `;
 
@@ -7339,37 +6833,6 @@ Object {
 }
 `;
 
-exports[`integration async fs enabled: true Go to definition works for all supported cases to children route from application outlet 2`] = `
-Object {
-  "addonsMeta": Array [],
-  "registry": Object {
-    "routePath": Object {
-      "application": Array [
-        "app/templates/application.hbs",
-      ],
-      "foo": Array [
-        "app/templates/foo.hbs",
-      ],
-    },
-  },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/app/templates/foo.hbs",
-    },
-  ],
-}
-`;
-
 exports[`integration async fs enabled: true Go to definition works for all supported cases to children route from meaningful outlet 1`] = `
 Object {
   "addonsMeta": Array [],
@@ -7474,25 +6937,8 @@ Object {
 
 exports[`integration async fs enabled: true Project class resolution, based on fs path and file structure support parent project addon calling child project 1`] = `
 Object {
-  "addonsMeta": Array [
-    Object {
-      "name": "biz",
-      "root": "lib/biz",
-      "version": 1,
-    },
-    Object {
-      "name": "foo",
-      "root": "../lib/foo",
-      "version": 1,
-    },
-  ],
+  "addonsMeta": Array [],
   "registry": Object {
-    "component": Object {
-      "bar": Array [
-        "lib/biz/addon/components/bar.js",
-        "../lib/foo/addon/components/bar.js",
-      ],
-    },
     "helper": Object {
       "blah": Array [
         "tests/helpers/blah.js",
@@ -7504,21 +6950,7 @@ Object {
       ],
     },
   },
-  "response": Array [
-    Object {
-      "range": Object {
-        "end": Object {
-          "character": 0,
-          "line": 0,
-        },
-        "start": Object {
-          "character": 0,
-          "line": 0,
-        },
-      },
-      "uri": "/tests/helpers/blah.js",
-    },
-  ],
+  "response": null,
 }
 `;
 
@@ -7537,7 +6969,7 @@ Array [
       Object {
         "data": Object {
           "files": Array [
-            "../addon/components/item.hbs",
+            "../../../../../../../var/folders/wk/w99lck4x7_5930c7gj65r3s40000gp/T/tmp-26763vvD36al6vbcp/lib/addon/components/item.hbs",
           ],
         },
         "detail": "component",
@@ -7560,13 +6992,7 @@ Array [
     ],
   },
   Object {
-    "addonsMeta": Array [
-      Object {
-        "name": "my-addon",
-        "root": "../lib",
-        "version": 1,
-      },
-    ],
+    "addonsMeta": Array [],
     "registry": Object {
       "component": Object {
         "bar": Array [
@@ -7575,16 +7001,13 @@ Array [
         "foo": Array [
           "app/components/foo.hbs",
         ],
-        "item": Array [
-          "../lib/addon/components/item.hbs",
-        ],
       },
     },
     "response": Array [
       Object {
         "data": Object {
           "files": Array [
-            "../addon/components/item.hbs",
+            "../../../../../../../var/folders/wk/w99lck4x7_5930c7gj65r3s40000gp/T/tmp-26763vvD36al6vbcp/lib/addon/components/item.hbs",
           ],
         },
         "detail": "component",

@@ -49,59 +49,10 @@ Array [
       },
     },
   },
-  Object {
-    "data": Object {
-      "files": Array [
-        "lib/foo/addon/templates/components/bar.hbs",
-      ],
-    },
-    "detail": "component",
-    "kind": 7,
-    "label": "Bar",
-    "textEdit": Object {
-      "newText": "Bar",
-      "range": Object {
-        "end": Object {
-          "character": 2,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 1,
-        },
-      },
-    },
-  },
 ]
 `;
 
-exports[`With \`full-project\` initialized on server Completion request returns all angle-bracket in a element expression for in repo addons without batman syntax 1`] = `
-Array [
-  Object {
-    "data": Object {
-      "files": Array [
-        "lib/foo/addon/templates/components/bar.hbs",
-      ],
-    },
-    "detail": "component",
-    "kind": 7,
-    "label": "Bar",
-    "textEdit": Object {
-      "newText": "Bar",
-      "range": Object {
-        "end": Object {
-          "character": 2,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 1,
-          "line": 1,
-        },
-      },
-    },
-  },
-]
-`;
+exports[`With \`full-project\` initialized on server Completion request returns all angle-bracket in a element expression for in repo addons without batman syntax 1`] = `Array []`;
 
 exports[`With \`full-project\` initialized on server Completion request returns all components and helpers when requesting completion items in a handlebars expression 1`] = `
 Array [
@@ -163,29 +114,6 @@ Array [
     "label": "nested/nested-component",
     "textEdit": Object {
       "newText": "nested/nested-component",
-      "range": Object {
-        "end": Object {
-          "character": 2,
-          "line": 1,
-        },
-        "start": Object {
-          "character": 2,
-          "line": 1,
-        },
-      },
-    },
-  },
-  Object {
-    "data": Object {
-      "files": Array [
-        "lib/foo/addon/templates/components/bar.hbs",
-      ],
-    },
-    "detail": "component",
-    "kind": 7,
-    "label": "bar",
-    "textEdit": Object {
-      "newText": "bar",
       "range": Object {
         "end": Object {
           "character": 2,
