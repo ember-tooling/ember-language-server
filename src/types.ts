@@ -6,4 +6,5 @@ export interface Config {
   useBuiltinLinting?: boolean;
   useBuiltinFoldingRangeProvider?: boolean;
   collectTemplateTokens?: boolean;
+  disableAddonDiscovery?: boolean;
 }

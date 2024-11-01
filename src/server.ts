@@ -119,7 +119,10 @@ export default class Server {
     }
   }
 
+  config: Config;
   async setConfiguration(config: Config) {
+    this.config = config;
+
     // in worker mode we don't have fs access, so, we don't trying to include it
     if (this.options.type !== 'worker') {
       if (config.addons) {
@@ -168,6 +171,10 @@ export default class Server {
   hoverProvider!: HoverProvider;
   codeActionProvider!: CodeActionProvider;
   async executeInitializers() {
+    if (this.config && this.config.disableAddonDiscovery) {
+      return;
+    }
+
     logInfo('UELS: executeInitializers');
 
     for (const initializer of this.initializers) {
