@@ -187,18 +187,13 @@ function requireUncached(module: string) {
   return result;
 }
 
-export async function collectProjectProviders(
-  root: string,
-  addons: string[],
-  seenInRepoDependencies: Set<string>,
-  seenProjectDependencies: Set<string>
-): Promise<ProjectProviders> {
+export async function collectProjectProviders(root: string, addons: string[], dependencyMap: Project['dependencyMap']): Promise<ProjectProviders> {
   const time = instrumentTime(`collectProjectProviders(${root})`);
 
   time.log(`Starting`);
   const [projectAddonsRoots, projectInRepoAddonsRoots] = await Promise.all([
-    getProjectAddonsRoots(root, seenProjectDependencies),
-    getProjectInRepoAddonsRoots(root, seenInRepoDependencies),
+    getProjectAddonsRoots(root, dependencyMap),
+    getProjectInRepoAddonsRoots(root, dependencyMap),
   ]);
 
   time.log(`found roots`);

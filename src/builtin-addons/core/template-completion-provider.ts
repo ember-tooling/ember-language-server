@@ -178,7 +178,7 @@ export default class TemplateCompletionProvider {
         await mListComponents(project);
         this.enableRegistryCache('componentsRegistryInitialized');
 
-        await mGetProjectAddonsInfo(project.root, project.seenProjectDependencies);
+        await mGetProjectAddonsInfo(project.root, project.dependencyMap);
         this.enableRegistryCache('projectAddonsInfoInitialized');
 
         this.project.invalidateRegistry();
@@ -195,7 +195,7 @@ export default class TemplateCompletionProvider {
     const items: CompletionItem[] = [];
 
     if (!this.meta.projectAddonsInfoInitialized) {
-      await mGetProjectAddonsInfo(root, this.project.seenProjectDependencies);
+      await mGetProjectAddonsInfo(root, this.project.dependencyMap);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }
@@ -256,7 +256,7 @@ export default class TemplateCompletionProvider {
   }
   async getMustachePathCandidates(root: string) {
     if (!this.meta.projectAddonsInfoInitialized) {
-      await mGetProjectAddonsInfo(root, this.project.seenProjectDependencies);
+      await mGetProjectAddonsInfo(root, this.project.dependencyMap);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }
@@ -305,7 +305,7 @@ export default class TemplateCompletionProvider {
   }
   async getBlockPathCandidates(root: string): Promise<CompletionItem[]> {
     if (!this.meta.projectAddonsInfoInitialized) {
-      await mGetProjectAddonsInfo(root, this.project.seenProjectDependencies);
+      await mGetProjectAddonsInfo(root, this.project.dependencyMap);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }
@@ -340,7 +340,7 @@ export default class TemplateCompletionProvider {
     }
 
     if (!this.meta.projectAddonsInfoInitialized) {
-      await mGetProjectAddonsInfo(this.project.root, this.project.seenProjectDependencies);
+      await mGetProjectAddonsInfo(this.project.root, this.project.dependencyMap);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }
@@ -447,7 +447,7 @@ export default class TemplateCompletionProvider {
     }
 
     if (!this.meta.projectAddonsInfoInitialized) {
-      await mGetProjectAddonsInfo(root, this.project.seenProjectDependencies);
+      await mGetProjectAddonsInfo(root, this.project.dependencyMap);
       this.enableRegistryCache('projectAddonsInfoInitialized');
       this.project.invalidateRegistry();
     }

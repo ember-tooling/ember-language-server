@@ -7,6 +7,7 @@ import { BaseProject } from '../base-project';
 import { fsProvider } from '../fs-provider';
 import walkAsync from './walk-async';
 import { instrumentTime, logDebugInfo } from './logger';
+import { Project } from '../project';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 
@@ -195,17 +196,20 @@ export function cached(_proto: unknown, prop: string, desc: PropertyDescriptor) 
   };
 }
 
-async function getRecursiveInRepoAddonRoots(root: string, seenDependencies: Set<string>, roots: string[]) {
-  const packageData = await asyncGetPackageJSON(root);
+async function getRecursiveInRepoAddonRoots(root: string, dependencyMap: Project['dependencyMap'], roots: string[]) {
+  let fastPackage: PackageInfo | null = null;
+
+  for (const dependencyMapItem of dependencyMap) {
+    if (dependencyMapItem[1].root === root) {
+      fastPackage = dependencyMapItem[1].package;
+      break;
+    }
+  }
+
+  const packageData = fastPackage || (await asyncGetPackageJSON(root));
 
   // names are required for packages
   if (!packageData.name) return [];
-
-  if (seenDependencies.has(packageData.name)) {
-    return [];
-  }
-
-  seenDependencies.add(packageData.name);
 
   const emberAddonPaths: string[] = (packageData['ember-addon'] && packageData['ember-addon'].paths) || [];
 
@@ -222,16 +226,23 @@ async function getRecursiveInRepoAddonRoots(root: string, seenDependencies: Set<
   const validPaths = await asyncFilter(normalizedPaths, isProjectAddonRoot);
 
   for (const validRoot of validPaths) {
-    const packInfo = await asyncGetPackageJSON(validRoot);
+    let fastPackage: PackageInfo | null = null;
+
+    for (const dependencyMapItem of dependencyMap) {
+      if (dependencyMapItem[1].root === validRoot) {
+        fastPackage = dependencyMapItem[1].package;
+        break;
+      }
+    }
+
+    const packInfo = fastPackage || (await asyncGetPackageJSON(validRoot));
 
     // names are required for packages
     if (!packInfo.name) continue;
 
-    if (seenDependencies.has(packInfo.name)) {
-      continue;
+    if (!fastPackage) {
+      dependencyMap.set(packInfo.name, { root: validRoot, package: packInfo });
     }
-
-    seenDependencies.add(packInfo.name);
 
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
@@ -240,7 +251,7 @@ async function getRecursiveInRepoAddonRoots(root: string, seenDependencies: Set<
 
     if (!recursiveRoots.includes(validRoot)) {
       recursiveRoots.push(validRoot);
-      const items = await getRecursiveInRepoAddonRoots(validRoot, seenDependencies, recursiveRoots);
+      const items = await getRecursiveInRepoAddonRoots(validRoot, dependencyMap, recursiveRoots);
 
       items.forEach((relatedRoot: string) => {
         if (!recursiveRoots.includes(relatedRoot)) {
@@ -253,10 +264,10 @@ async function getRecursiveInRepoAddonRoots(root: string, seenDependencies: Set<
   return recursiveRoots.sort();
 }
 
-export async function getProjectInRepoAddonsRoots(root: string, seenDependencies: Set<string> = new Set()): Promise<string[]> {
+export async function getProjectInRepoAddonsRoots(root: string, dependencyMap: Project['dependencyMap']): Promise<string[]> {
   const time = instrumentTime(`getProjectInRepoAddonsRoots(${root})`);
 
-  const roots: string[] = await getRecursiveInRepoAddonRoots(root, seenDependencies, []);
+  const roots: string[] = await getRecursiveInRepoAddonRoots(root, dependencyMap, []);
 
   time.log(`finished getRecursiveInRepoAddonRoots`);
 
@@ -297,20 +308,30 @@ export async function isGlimmerXProject(root: string) {
   return hasDep(pack, '@glimmerx/core') || hasDep(pack, 'glimmer-lite-core');
 }
 
-export async function getProjectAddonsRoots(root: string, seenDependencies: Set<string>, resolvedItems: string[] = [], packageFolderName = 'node_modules') {
+export async function getProjectAddonsRoots(
+  root: string,
+  dependencyMap: Project['dependencyMap'],
+  resolvedItems: string[] = [],
+  packageFolderName = 'node_modules'
+) {
   const time = instrumentTime(`getProjectInRepoAddonsRoots(${root})`);
 
-  const pack = await asyncGetPackageJSON(root);
+  let fastPackage: PackageInfo | null = null;
+
+  for (const dependencyMapItem of dependencyMap) {
+    if (dependencyMapItem[1].root === root) {
+      fastPackage = dependencyMapItem[1].package;
+      break;
+    }
+  }
+
+  const pack = fastPackage || (await asyncGetPackageJSON(root));
 
   if (!pack.name) {
-    logDebugInfo('no name', root, JSON.stringify(pack), Array.from(seenDependencies), resolvedItems);
+    logDebugInfo('no name', root, JSON.stringify(pack), Array.from(dependencyMap), resolvedItems);
 
     return [];
   }
-
-  if (seenDependencies.has(pack.name)) return [];
-
-  seenDependencies.add(pack.name);
 
   if (resolvedItems.length) {
     if (!isEmberAddon(pack)) {
@@ -323,28 +344,44 @@ export async function getProjectAddonsRoots(root: string, seenDependencies: Set<
     : [...Object.keys(pack.dependencies || {}), ...Object.keys(pack.peerDependencies || {}), ...Object.keys(pack.devDependencies || {})];
   // logDebugInfo('items', items);
 
-  const rawRoots = await Promise.all(
+  const rawRoots: [string, string | false][] = await Promise.all(
     items.map(async (item: string) => {
-      return await resolvePackageRoot(root, item, packageFolderName);
+      if (dependencyMap.has(item)) {
+        return [item, dependencyMap.get(item)!.root ?? false];
+      }
+
+      const packageRoot = await resolvePackageRoot(root, item, packageFolderName);
+
+      return [item, packageRoot];
     })
   );
 
-  const roots = rawRoots.filter((p: string | boolean) => {
+  const _roots = rawRoots.filter(([, p]: [string, string | boolean]) => {
     return p !== false;
-  }) as string[];
+  }) as Array<[string, string]>;
 
   const recursiveRoots: string[] = resolvedItems.slice(0);
 
-  const packages = await Promise.all(roots.map((root) => asyncGetPackageJSON(root)));
+  const packages = await Promise.all(
+    _roots.map(async ([packageName, packageRoot]) => {
+      const mappedValue = dependencyMap.get(packageName);
+
+      if (mappedValue) {
+        return mappedValue.package;
+      }
+
+      const packInfo = await asyncGetPackageJSON(packageRoot);
+
+      dependencyMap.set(packageName, { root: packageRoot, package: packInfo });
+
+      return packInfo;
+    })
+  );
+
+  const roots = _roots.map(([, p]: [string, string]) => p);
 
   for (const rootItem of roots) {
     const packInfo = packages[roots.indexOf(rootItem)];
-
-    if (!packInfo.name) continue;
-
-    if (seenDependencies.has(packInfo.name)) continue;
-
-    seenDependencies.add(packInfo.name);
 
     // we don't need to go deeper if package itself not an ember-addon or els-extension
     if (!isEmberAddon(packInfo) && !hasEmberLanguageServerExtension(packInfo)) {
@@ -353,7 +390,7 @@ export async function getProjectAddonsRoots(root: string, seenDependencies: Set<
 
     if (!recursiveRoots.includes(rootItem)) {
       recursiveRoots.push(rootItem);
-      const addonRoots = await getProjectAddonsRoots(rootItem, seenDependencies, recursiveRoots, packageFolderName);
+      const addonRoots = await getProjectAddonsRoots(rootItem, dependencyMap, recursiveRoots, packageFolderName);
 
       addonRoots.forEach((item: string) => {
         if (!recursiveRoots.includes(item)) {
@@ -440,10 +477,10 @@ export function hasAddonFolderInPath(name: string) {
   return name.includes(path.sep + 'addon' + path.sep) || name.includes(path.sep + 'addon-test-support' + path.sep);
 }
 
-export async function getProjectAddonsInfo(root: string, seenDependencies: Set<string>): Promise<void> {
+export async function getProjectAddonsInfo(root: string, dependencyMap: Project['dependencyMap']): Promise<void> {
   const [projectAddonsRoots, projectInRepoAddonsRoots] = await Promise.all([
-    getProjectAddonsRoots(root, seenDependencies),
-    getProjectInRepoAddonsRoots(root, seenDependencies),
+    getProjectAddonsRoots(root, dependencyMap),
+    getProjectInRepoAddonsRoots(root, dependencyMap),
   ]);
   const roots = ([] as string[]).concat(projectAddonsRoots, projectInRepoAddonsRoots).filter((pathItem: unknown) => typeof pathItem === 'string');
 
