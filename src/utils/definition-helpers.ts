@@ -168,7 +168,7 @@ export function getPathsForComponentTemplates(root: string, maybeComponentName: 
 }
 
 export async function getAddonImport(project: Project, importPath: string) {
-  const { root, seenDependencies } = project;
+  const { root, seenProjectDependencies, seenInRepoDependencies } = project;
   const importParts = importPath.split('/');
   let addonName = importParts.shift();
 
@@ -181,7 +181,10 @@ export async function getAddonImport(project: Project, importPath: string) {
   }
 
   const items: string[] = [];
-  const [addonRoots, inRepoRoots] = await Promise.all([mProjectAddonsRoots(root, seenDependencies), mProjectInRepoAddonsRoots(root, seenDependencies)]);
+  const [addonRoots, inRepoRoots] = await Promise.all([
+    mProjectAddonsRoots(root, seenProjectDependencies),
+    mProjectInRepoAddonsRoots(root, seenInRepoDependencies),
+  ]);
 
   const roots = items.concat(addonRoots, inRepoRoots);
   let existingPaths: string[] = [];
@@ -231,9 +234,12 @@ export async function getAddonImport(project: Project, importPath: string) {
 }
 
 export async function getAddonPathsForType(project: Project, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
-  const { root, seenDependencies } = project;
+  const { root, seenInRepoDependencies, seenProjectDependencies } = project;
   const items: string[] = [];
-  const [addonRoots, inRepoRoots] = await Promise.all([mProjectAddonsRoots(root, seenDependencies), mProjectInRepoAddonsRoots(root, seenDependencies)]);
+  const [addonRoots, inRepoRoots] = await Promise.all([
+    mProjectAddonsRoots(root, seenProjectDependencies),
+    mProjectInRepoAddonsRoots(root, seenInRepoDependencies),
+  ]);
   const roots = items.concat(addonRoots, inRepoRoots);
   let existingPaths: string[] = [];
   let hasValidPath = false;

@@ -37,7 +37,8 @@ export interface Executors {
 export class Project extends BaseProject {
   // Don't traverse dependencies we've already seen.
   // correct package graph can sort of throw us in to cycles if we don't keep track of this.
-  seenDependencies = new Set<string>();
+  seenInRepoDependencies: Set<string> = new Set();
+  seenProjectDependencies: Set<string> = new Set();
 
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
@@ -152,7 +153,7 @@ export class Project extends BaseProject {
       this.providers = emptyProjectProviders();
       this.flags.enableEagerRegistryInitialization = false;
     } else if (server.options.type === 'node') {
-      this.providers = await collectProjectProviders(this.root, this.addons, this.seenDependencies);
+      this.providers = await collectProjectProviders(this.root, this.addons, this.seenInRepoDependencies, this.seenProjectDependencies);
     } else {
       throw new Error(`Unknown server type: "${server.options.type}"`);
     }

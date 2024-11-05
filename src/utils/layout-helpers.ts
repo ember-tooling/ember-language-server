@@ -6,7 +6,7 @@ import { clean, coerce, valid } from 'semver';
 import { BaseProject } from '../base-project';
 import { fsProvider } from '../fs-provider';
 import walkAsync from './walk-async';
-import { instrumentTime } from './logger';
+import { instrumentTime, logDebugInfo } from './logger';
 
 // const GLOBAL_REGISTRY = ['primitive-name'][['relatedFiles']];
 
@@ -253,7 +253,7 @@ async function getRecursiveInRepoAddonRoots(root: string, seenDependencies: Set<
   return recursiveRoots.sort();
 }
 
-export async function getProjectInRepoAddonsRoots(root: string, seenDependencies: Set<string>): Promise<string[]> {
+export async function getProjectInRepoAddonsRoots(root: string, seenDependencies: Set<string> = new Set()): Promise<string[]> {
   const time = instrumentTime(`getProjectInRepoAddonsRoots(${root})`);
 
   const roots: string[] = await getRecursiveInRepoAddonRoots(root, seenDependencies, []);
@@ -302,7 +302,11 @@ export async function getProjectAddonsRoots(root: string, seenDependencies: Set<
 
   const pack = await asyncGetPackageJSON(root);
 
-  if (!pack.name) return [];
+  if (!pack.name) {
+    logDebugInfo('no name', root, JSON.stringify(pack), Array.from(seenDependencies), resolvedItems);
+
+    return [];
+  }
 
   if (seenDependencies.has(pack.name)) return [];
 

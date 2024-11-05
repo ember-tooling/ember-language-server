@@ -208,6 +208,7 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'some-project',
                 'ember-addon': {
                   paths: ['lib/biz'],
                 },
@@ -263,6 +264,7 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'some-different-project',
                 'ember-addon': {
                   paths: ['lib/biz'],
                 },
@@ -1006,6 +1008,7 @@ describe('integration', function () {
             connection,
             {
               'package.json': JSON.stringify({
+                name: 'default-name',
                 'ember-language-server': {
                   entry: './lib/langserver',
                   capabilities: {
@@ -1056,6 +1059,7 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 't1',
                 dependencies: {
                   provider: '*',
                 },
@@ -1097,7 +1101,9 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'fake',
                 dependencies: {
+                  name: 'lake',
                   provider: '*',
                 },
               }),
@@ -1322,7 +1328,9 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'pork',
                 dependencies: {
+                  name: 'park',
                   provider: '*',
                 },
               }),
@@ -1396,7 +1404,9 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'white',
                 dependencies: {
+                  name: 'dark',
                   provider: '*',
                 },
               }),
@@ -1456,6 +1466,7 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'shark',
                 dependencies: {
                   provider: '*',
                 },
@@ -1514,6 +1525,7 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'pork',
                 dependencies: {
                   provider: '*',
                 },
@@ -1562,6 +1574,7 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'dog',
                 dependencies: {
                   provider: '*',
                 },
@@ -1609,6 +1622,7 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'cat',
                 dependencies: {
                   provider: '*',
                 },
@@ -1692,6 +1706,7 @@ describe('integration', function () {
                   },
                 },
                 'package.json': JSON.stringify({
+                  name: 'zoo',
                   dependencies: { 'ember-holy-futuristic-template-namespacing-batman': '^1.0.2' },
                   'ember-addon': {
                     paths: ['lib/biz'],
@@ -1730,6 +1745,7 @@ describe('integration', function () {
                 },
               },
               'package.json': JSON.stringify({
+                name: 'boss',
                 dependencies: { 'ember-holy-futuristic-template-namespacing-batman': '^1.0.2' },
               }),
             },

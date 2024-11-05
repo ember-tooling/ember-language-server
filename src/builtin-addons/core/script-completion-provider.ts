@@ -84,7 +84,7 @@ export default class ScriptCompletionProvider {
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          await mGetProjectAddonsInfo(root, this.project.seenDependencies);
+          await mGetProjectAddonsInfo(root, this.project.seenProjectDependencies);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }
@@ -107,7 +107,7 @@ export default class ScriptCompletionProvider {
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          await mGetProjectAddonsInfo(root, this.project.seenDependencies);
+          await mGetProjectAddonsInfo(root, this.project.seenProjectDependencies);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }
@@ -130,7 +130,7 @@ export default class ScriptCompletionProvider {
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          await mGetProjectAddonsInfo(root, this.project.seenDependencies);
+          await mGetProjectAddonsInfo(root, this.project.seenProjectDependencies);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }
@@ -185,7 +185,7 @@ export default class ScriptCompletionProvider {
         }
 
         if (!this.meta.projectAddonsInfoInitialized) {
-          await mGetProjectAddonsInfo(root, this.project.seenDependencies);
+          await mGetProjectAddonsInfo(root, this.project.seenProjectDependencies);
           this.enableRegistryCache('projectAddonsInfoInitialized');
           this.project.invalidateRegistry();
         }
