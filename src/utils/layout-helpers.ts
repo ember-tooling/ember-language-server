@@ -1,5 +1,6 @@
 import * as memoize from 'memoizee';
 import * as path from 'path';
+import * as childProcess from 'child_process';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { addToRegistry, normalizeMatchNaming } from './registry-api';
 import { clean, coerce, valid } from 'semver';
@@ -119,10 +120,26 @@ export function getPodModulePrefix(root: string): string | null {
   return podModulePrefix.trim().length > 0 ? podModulePrefix : null;
 }
 
+function getRoot(fromDir: string) {
+  try {
+    const topLevel = childProcess.execSync('git rev-parse --show-toplevel', { encoding: 'utf8', cwd: fromDir });
+
+    return topLevel.trim();
+  } catch {
+    // we ignore the error, because we might not be in a git repo
+    return '/';
+  }
+}
+
 export async function resolvePackageRoot(root: string, addonName: string, packagesFolder = 'node_modules'): Promise<string | false> {
   const roots = root.split(path.sep);
+  const stopAt = getRoot(root);
 
   while (roots.length) {
+    if (roots.join(path.sep) === stopAt) {
+      return false;
+    }
+
     const prefix = roots.join(path.sep);
     const maybePath = path.join(prefix, packagesFolder, addonName);
     const linkedPath = path.join(prefix, addonName);
