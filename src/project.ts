@@ -35,6 +35,17 @@ export interface Executors {
 }
 
 export class Project extends BaseProject {
+  // Don't traverse dependencies we've already seen.
+  // correct package graph can sort of throw us in to cycles if we don't keep track of this.
+
+  dependencyMap: Map<
+    string,
+    {
+      package: PackageInfo;
+      root: string;
+    }
+  > = new Map();
+
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
   addonsMeta: AddonMeta[] = [];
@@ -148,7 +159,7 @@ export class Project extends BaseProject {
       this.providers = emptyProjectProviders();
       this.flags.enableEagerRegistryInitialization = false;
     } else if (server.options.type === 'node') {
-      this.providers = await collectProjectProviders(this.root, this.addons);
+      this.providers = await collectProjectProviders(this.root, this.addons, this.dependencyMap);
     } else {
       throw new Error(`Unknown server type: "${server.options.type}"`);
     }

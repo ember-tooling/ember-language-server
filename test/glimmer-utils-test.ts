@@ -1,5 +1,6 @@
 import { Position } from 'vscode-languageserver';
 import { ASTv1, preprocess } from '@glimmer/syntax';
+import * as assert from 'node:assert';
 
 import ASTPath, { getLocalScope, maybeComponentNameForPath, sourceForNode, focusedBlockParamName, maybeBlockParamDefinition } from '../src/glimmer-utils';
 import { toPosition } from '../src/estree-utils';
@@ -16,7 +17,7 @@ describe('glimmer-utils', function () {
         `;
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 5)));
 
-      expect(astPath.node).toMatchSnapshot();
+      expect(astPath?.node).toMatchSnapshot();
     });
   });
   describe('getLocalScope', function () {
@@ -29,6 +30,8 @@ describe('glimmer-utils', function () {
 </Component>
         `;
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 5)));
+
+      assert(astPath, `ASTPath not found in test`);
 
       expect(getLocalScope(astPath).map(({ name, index }) => [name, index])).toEqual([
         ['item', 0],
@@ -48,6 +51,8 @@ describe('glimmer-utils', function () {
         `;
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 5)));
 
+      assert(astPath, `ASTPath not found in test`);
+
       expect(maybeComponentNameForPath(astPath)).toEqual('Component');
     });
   });
@@ -62,12 +67,16 @@ describe('glimmer-utils', function () {
               `;
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(2, 2)));
 
+      assert(astPath, `ASTPath not found in test`);
+
       expect((astPath.node as ASTv1.ElementNode).tag).toEqual('Component');
       expect(sourceForNode(astPath.node, input)).toEqual(input.trim());
     });
     it('works as expected for MustachePaths', function () {
       const input = ['<Component as |items|>', '{{#let items as |item bar|}}', '{{items}}', '{{/let}}', '</Component>'].join('\n');
       const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(2, 3)));
+
+      assert(astPath, `ASTPath not found in test`);
 
       expect((astPath.node as ASTv1.PathExpression).original).toEqual('items');
       expect(sourceForNode(astPath.node, input)).toEqual('items');
@@ -79,6 +88,8 @@ describe('glimmer-utils', function () {
       const pos = toPosition(Position.create(1, 3));
       const astPath = ASTPath.toPosition(preprocess(input), pos);
 
+      assert(astPath, `ASTPath not found in test`);
+
       expect(maybeBlockParamDefinition(astPath, input, pos)).toEqual(undefined);
     });
     it('able to handle single param', function () {
@@ -86,12 +97,16 @@ describe('glimmer-utils', function () {
       const pos = toPosition(Position.create(0, 16));
       const astPath = ASTPath.toPosition(preprocess(input), pos);
 
+      assert(astPath, `ASTPath not found in test`);
+
       expect(maybeBlockParamDefinition(astPath, input, pos)).toMatchSnapshot();
     });
     it('able to handle single fiew params', function () {
       const input = ['<Component as |items boo zoo|>', '{{foo}}', '</Component>'].join('\n');
       const pos = toPosition(Position.create(0, 22));
       const astPath = ASTPath.toPosition(preprocess(input), pos);
+
+      assert(astPath, `ASTPath not found in test`);
 
       expect(maybeBlockParamDefinition(astPath, input, pos)).toMatchSnapshot();
     });

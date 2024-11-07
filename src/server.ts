@@ -168,12 +168,14 @@ export default class Server {
   hoverProvider!: HoverProvider;
   codeActionProvider!: CodeActionProvider;
   async executeInitializers() {
-    logInfo('UELS: executeInitializers');
+    logInfo('ELS: executeInitializers');
+    logInfo(`ELS: ${this.initializers.length} initializers`);
 
     for (const initializer of this.initializers) {
       await initializer();
     }
 
+    logInfo(`ELS: clearing initializers because they've been initialized`);
     this.initializers = [];
   }
   private onInitialized() {
@@ -216,7 +218,7 @@ export default class Server {
         };
       }
 
-      await mGetProjectAddonsInfo(project.root);
+      await mGetProjectAddonsInfo(project.root, project.dependencyMap);
       project.invalidateRegistry();
 
       return {
@@ -523,6 +525,8 @@ export default class Server {
 
     this.initializers.push(async () => {
       await this.projectRoots.initialize(rootPath as string);
+
+      logInfo(`Found ${workspaceFolders?.length ?? 0} workspace folders for ${rootPath}`);
 
       if (workspaceFolders && Array.isArray(workspaceFolders)) {
         for (const folder of workspaceFolders) {

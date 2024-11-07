@@ -6,6 +6,7 @@ import { URI } from 'vscode-uri';
 
 import { podModulePrefixForRoot, hasAddonFolderInPath, getProjectAddonsRoots, getProjectInRepoAddonsRoots, asyncFilter } from './layout-helpers';
 import { fsProvider } from '../fs-provider';
+import { Project } from '..';
 
 const mProjectAddonsRoots = memoize(getProjectAddonsRoots, {
   length: 3,
@@ -166,7 +167,8 @@ export function getPathsForComponentTemplates(root: string, maybeComponentName: 
   return paths;
 }
 
-export async function getAddonImport(root: string, importPath: string) {
+export async function getAddonImport(project: Project, importPath: string) {
+  const { root, dependencyMap } = project;
   const importParts = importPath.split('/');
   let addonName = importParts.shift();
 
@@ -179,7 +181,7 @@ export async function getAddonImport(root: string, importPath: string) {
   }
 
   const items: string[] = [];
-  const [addonRoots, inRepoRoots] = await Promise.all([mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root)]);
+  const [addonRoots, inRepoRoots] = await Promise.all([mProjectAddonsRoots(root, dependencyMap), mProjectInRepoAddonsRoots(root, dependencyMap)]);
 
   const roots = items.concat(addonRoots, inRepoRoots);
   let existingPaths: string[] = [];
@@ -228,9 +230,10 @@ export async function getAddonImport(root: string, importPath: string) {
   return existingPaths;
 }
 
-export async function getAddonPathsForType(root: string, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
+export async function getAddonPathsForType(project: Project, collection: 'services' | 'models' | 'modifiers' | 'helpers' | 'routes', name: string) {
+  const { root, dependencyMap } = project;
   const items: string[] = [];
-  const [addonRoots, inRepoRoots] = await Promise.all([mProjectAddonsRoots(root), mProjectInRepoAddonsRoots(root)]);
+  const [addonRoots, inRepoRoots] = await Promise.all([mProjectAddonsRoots(root, dependencyMap), mProjectInRepoAddonsRoots(root, dependencyMap)]);
   const roots = items.concat(addonRoots, inRepoRoots);
   let existingPaths: string[] = [];
   let hasValidPath = false;

@@ -107,7 +107,7 @@ export function findRelatedFiles(token: string, tokenType: MatchResultType = 'co
 
 const tokenQueue: [UsageType, string, string][] = [];
 
-let extractionTimeout: NodeJS.Timeout;
+let extractionTimeout: NodeJS.Timeout | number;
 
 function scheduleTokensExtraction(kind: UsageType, normalizedName: string, file: string) {
   tokenQueue.push([kind, normalizedName, file]);

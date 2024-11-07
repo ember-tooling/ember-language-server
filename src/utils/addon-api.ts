@@ -11,7 +11,7 @@ import {
 } from './layout-helpers';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import * as path from 'path';
-import { log, logInfo, logError, safeStringify } from './logger';
+import { log, logInfo, logError, safeStringify, instrumentTime } from './logger';
 import Server from '../server';
 import ASTPath from './../glimmer-utils';
 import DAGMap from 'dag-map';
@@ -187,8 +187,17 @@ function requireUncached(module: string) {
   return result;
 }
 
-export async function collectProjectProviders(root: string, addons: string[]): Promise<ProjectProviders> {
-  const [projectAddonsRoots, projectInRepoAddonsRoots] = await Promise.all([getProjectAddonsRoots(root), getProjectInRepoAddonsRoots(root)]);
+export async function collectProjectProviders(root: string, addons: string[], dependencyMap: Project['dependencyMap']): Promise<ProjectProviders> {
+  const time = instrumentTime(`collectProjectProviders(${root})`);
+
+  time.log(`Starting`);
+  const [projectAddonsRoots, projectInRepoAddonsRoots] = await Promise.all([
+    getProjectAddonsRoots(root, dependencyMap),
+    getProjectInRepoAddonsRoots(root, dependencyMap),
+  ]);
+
+  time.log(`found roots`);
+
   const roots = addons
     .concat([root])
     .concat(projectAddonsRoots, projectInRepoAddonsRoots)
@@ -225,6 +234,8 @@ export async function collectProjectProviders(root: string, addons: string[]): P
       dagMap.add(info.name || packagePath, addon, addonInfo.before, addonInfo.after);
     }
   }
+
+  time.log(`found ELS addons`);
 
   const result: {
     definitionProviders: DefinitionResolveFunction[];
@@ -331,6 +342,8 @@ export async function collectProjectProviders(root: string, addons: string[]): P
       }
     }
   });
+
+  time.log(`finished crawling dagMap`);
 
   return result;
 }

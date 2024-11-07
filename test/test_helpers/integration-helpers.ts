@@ -708,6 +708,7 @@ export function makeProject(appFiles = {}, addons = {}) {
   const fileStructure = Object.assign({}, appFiles, {
     node_modules,
     'package.json': JSON.stringify({
+      name: 'mock-project',
       dependencies,
     }),
   });

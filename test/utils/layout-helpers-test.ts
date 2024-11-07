@@ -130,7 +130,7 @@ describe('definition-helpers', function () {
   describe('getProjectInRepoAddonsRoots()', function () {
     it('must discover in-repo addons for classic structure', async function () {
       const root = path.join(__dirname, './../fixtures/project-with-in-repo-addons');
-      const items = await getProjectInRepoAddonsRoots(root);
+      const items = await getProjectInRepoAddonsRoots(root, new Map());
 
       expect(items.length).toEqual(2);
     });
@@ -139,7 +139,7 @@ describe('definition-helpers', function () {
   describe('getProjectAddonsRoots()', function () {
     it('must resolve all related to project addons', async function () {
       const root = path.join(__dirname, './../fixtures/full-project');
-      const items = await getProjectAddonsRoots(root, [], 'hope_modules');
+      const items = await getProjectAddonsRoots(root, new Map(), [], 'hope_modules');
 
       expect(items.length).toEqual(2);
     });
@@ -174,7 +174,7 @@ describe('definition-helpers', function () {
         },
       });
 
-      const items = await getProjectAddonsRoots(path.join(info.path, 'packages', 'touchstone'));
+      const items = await getProjectAddonsRoots(path.join(info.path, 'packages', 'touchstone'), new Map());
 
       expect(items.length).toEqual(1);
       expect(items[0].split(path.sep).join('/').split('node_modules/')[1]).toEqual('@skylight/anvil');

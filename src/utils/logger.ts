@@ -35,6 +35,24 @@ export function logInfo(str: string) {
   }
 }
 
+export function instrumentTime(label: string) {
+  let last = Date.now();
+
+  return {
+    reset: () => {
+      last = Date.now();
+    },
+    log: (msg: string) => {
+      const now = Date.now();
+      const diff = now - last;
+
+      last = now;
+
+      logInfo(`[${label}] +${diff}ms :: ${msg}`);
+    },
+  };
+}
+
 export function setConsole(item: RemoteConsole | null) {
   remoteConsole = item;
 }
