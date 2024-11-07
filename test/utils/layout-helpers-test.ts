@@ -37,13 +37,11 @@ describe('definition-helpers', function () {
     it('return package root folder', async function () {
       const resultOne = await resolvePackageRoot(__dirname, 'lodash');
 
-      // no lodash here.
-      expect(resultOne).toBe(false);
+      expect(resultOne).toContain(path.sep + 'lodash');
 
       const resultTwo = await resolvePackageRoot(__dirname, 'memoizee');
 
-      // memoizee also does not exist
-      expect(resultTwo).toBe(false);
+      expect(resultTwo).toContain(path.sep + 'memoizee');
     });
   });
 

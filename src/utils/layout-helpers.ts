@@ -120,7 +120,7 @@ export function getPodModulePrefix(root: string): string | null {
   return podModulePrefix.trim().length > 0 ? podModulePrefix : null;
 }
 
-export function getRoot(fromDir: string) {
+function getRoot(fromDir: string) {
   try {
     const topLevel = childProcess.execSync('git rev-parse --show-toplevel', { encoding: 'utf8', cwd: fromDir });
 
