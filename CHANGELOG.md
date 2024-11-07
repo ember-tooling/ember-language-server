@@ -1,3 +1,16 @@
+## [2.30.4](https://github.com/ember-tooling/ember-language-server/compare/v2.30.3...v2.30.4) (2024-11-07)
+
+
+### Bug Fixes
+
+* performance regression for projects using correct module graphs ([10c6b28](https://github.com/ember-tooling/ember-language-server/commit/10c6b28d0b3e0dc1e087c97fb7f7f9aa9350b8bc))
+
+
+### Reverts
+
+* Revert "Fix #414" ([bca0a71](https://github.com/ember-tooling/ember-language-server/commit/bca0a7108f3f125061b3968ab58a1d99895d13f4)), closes [#414](https://github.com/ember-tooling/ember-language-server/issues/414)
+* Revert "Does CI match my local env?" (it does) ([10685e0](https://github.com/ember-tooling/ember-language-server/commit/10685e09bf3999e4990a7b79a9ee18d821cb40a0))
+
 ## [2.30.3](https://github.com/ember-tooling/ember-language-server/compare/v2.30.2...v2.30.3) (2024-05-15)
 
 
