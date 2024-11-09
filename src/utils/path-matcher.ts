@@ -74,14 +74,26 @@ export class ClassicPathMatcher {
   rightPartFromFirstMatch(type: string, fileName: string, extName: string, str: string, strToMatch: string) {
     let fullName = str.slice(str.indexOf(strToMatch) + strToMatch.length, str.length).slice(0, -extName.length);
 
+    if (fullName.includes('/-layouts')) {
+      fullName = fullName.split('/-layouts')[0];
+    }
+
     if (type === 'component') {
-      if (['component', 'template', 'index', 'index-test', 'component-test', 'style', 'styles', 'module'].includes(fileName)) {
+      if (['component', 'template', 'index', 'index-test', 'component-test', 'style', 'styles', 'styles.module', 'module'].includes(fileName)) {
         fullName = fullName.replace(`/${fileName}`, '');
       }
 
       if (fileName.endsWith('.module')) {
         fullName = fullName.replace(`.module`, '');
       }
+    }
+
+    if (type === 'route') {
+      if (fullName.endsWith('/route')) {
+        fullName = fullName.replace('/route', '');
+      }
+
+      fullName = fullName.replace('/template', '');
     }
 
     if (str.includes('/tests/') && fullName.endsWith('-test')) {
@@ -176,6 +188,10 @@ export class PodMatcher extends ClassicPathMatcher {
 
     if (fullName.startsWith('./')) {
       fullName = fullName.replace('./', '');
+    }
+
+    if (fullName.startsWith('routes/')) {
+      fullName = fullName.replace('routes/', '');
     }
 
     return fullName;
