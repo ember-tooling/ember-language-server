@@ -99,7 +99,7 @@ export default class TemplateLinter {
 
     // we assume that ember-template-lint v5 could handle js/ts/gts/gjs files
 
-    if (templateLintVersion === '5') {
+    if (templateLintVersion >= '5') {
       return [documentContent];
     }
 
