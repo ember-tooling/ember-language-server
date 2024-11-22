@@ -160,6 +160,12 @@ export default class TemplateLinter {
     let sources = [];
 
     try {
+      /**
+       * Semver parsing can throw errors, if the version is invalid,
+       * we want behave as if there was no version specified.
+       *
+       * (same as when errors are thrown from sourcesForDocument)
+       */
       const linterVersion = linterMeta?.version ? semver.parse(linterMeta.version) : null;
 
       sources = this.sourcesForDocument(textDocument, linterVersion);
