@@ -297,9 +297,7 @@ export function getDepIfExists(pack: PackageInfo, depName: string): string | nul
 
   const version: string = pack?.dependencies?.[depName] ?? pack?.devDependencies?.[depName] ?? pack?.peerDependencies?.[depName] ?? '';
 
-  const cleanVersion = clean(version);
-
-  return valid(coerce(cleanVersion));
+  return version;
 }
 
 export async function isGlimmerXProject(root: string) {
