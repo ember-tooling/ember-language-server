@@ -12,6 +12,7 @@ import Server from './server';
 import { Project } from './project';
 import { getRequireSupport } from './utils/layout-helpers';
 import { getFileRanges, RangeWalker } from './utils/glimmer-script';
+import semver, { SemVer } from 'semver';
 
 type FindUp = (name: string, opts: { cwd: string; type: string }) => Promise<string | undefined>;
 type LinterVerifyArgs = { source: string; moduleId: string; filePath: string };
@@ -88,7 +89,7 @@ export default class TemplateLinter {
     return this.server.projectRoots.projectForUri(textDocument.uri);
   }
 
-  private sourcesForDocument(textDocument: TextDocument, templateLintVersion: string): string[] {
+  private sourcesForDocument(textDocument: TextDocument, templateLintVersion: SemVer | null): string[] {
     const ext = getExtension(textDocument);
 
     if (ext !== null && !extensionsToLint.includes(ext)) {
@@ -98,8 +99,11 @@ export default class TemplateLinter {
     const documentContent = textDocument.getText();
 
     // we assume that ember-template-lint v5 could handle js/ts/gts/gjs files
+    if (!templateLintVersion) {
+      return [documentContent];
+    }
 
-    if (templateLintVersion >= '5') {
+    if (semver.gte(templateLintVersion, '5.0.0')) {
       return [documentContent];
     }
 
@@ -152,11 +156,12 @@ export default class TemplateLinter {
     }
 
     const linterMeta = project.dependenciesMeta.find((dep) => dep.name === 'ember-template-lint');
-    const linterVersion = linterMeta?.version.split('.')[0] || 'unknown';
 
     let sources = [];
 
     try {
+      const linterVersion = linterMeta?.version ? semver.parse(linterMeta.version) : null;
+
       sources = this.sourcesForDocument(textDocument, linterVersion);
     } catch (e) {
       return;
