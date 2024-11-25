@@ -12,7 +12,8 @@ import Server from './server';
 import { Project } from './project';
 import { getRequireSupport } from './utils/layout-helpers';
 import { getFileRanges, RangeWalker } from './utils/glimmer-script';
-import semver, { type SemVer } from 'semver';
+import * as semver from 'semver';
+import { type SemVer } from 'semver';
 
 type FindUp = (name: string, opts: { cwd: string; type: string }) => Promise<string | undefined>;
 type LinterVerifyArgs = { source: string; moduleId: string; filePath: string };
