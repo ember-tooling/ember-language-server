@@ -156,7 +156,7 @@ export default class TemplateLinter {
       return;
     }
 
-    const linterMeta = project.dependenciesMeta.find((dep) => dep.name === 'ember-template-lint');
+    const linterMeta = project.dependencyMap.get('ember-template-lint');
 
     let sources = [];
 
@@ -167,7 +167,8 @@ export default class TemplateLinter {
        *
        * (same as when errors are thrown from sourcesForDocument)
        */
-      const linterVersion = linterMeta?.version ? semver.parse(linterMeta.version) : null;
+      const version = linterMeta?.package.version;
+      const linterVersion = version ? semver.parse(version) : null;
 
       sources = this.sourcesForDocument(textDocument, linterVersion);
     } catch (e) {

@@ -41,6 +41,7 @@ type StringConfig = Record<string, string>;
 export interface PackageInfo {
   keywords?: string[];
   name?: string;
+  version?: string;
   'ember-language-server'?: UnknownConfig;
   peerDependencies?: StringConfig;
   devDependencies?: StringConfig;
