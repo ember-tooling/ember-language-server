@@ -158,6 +158,10 @@ export default class TemplateLinter {
 
     const linterMeta = project.dependencyMap.get('ember-template-lint');
 
+    if (!linterMeta) {
+      return;
+    }
+
     let sources = [];
 
     try {
