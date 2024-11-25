@@ -2,7 +2,6 @@ import * as memoize from 'memoizee';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { addToRegistry, normalizeMatchNaming } from './registry-api';
-import { clean, coerce, valid } from 'semver';
 import { BaseProject } from '../base-project';
 import { fsProvider } from '../fs-provider';
 import walkAsync from './walk-async';
