@@ -349,7 +349,6 @@ export async function collectProjectProviders(root: string, addons: string[], de
 }
 
 export type AddonMeta = { root: string; name: string; version: null | 1 | 2 };
-export type DependencyMeta = { name: string; version: string };
 
 export function emptyProjectProviders(providers?: Partial<ProjectProviders>): ProjectProviders {
   return {

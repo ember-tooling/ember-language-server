@@ -7,16 +7,8 @@ import {
   getRegistryForRoots,
   existsInRegistry,
 } from './utils/registry-api';
-import { ProjectProviders, collectProjectProviders, AddonMeta, DependencyMeta, emptyProjectProviders } from './utils/addon-api';
-import {
-  findTestsForProject,
-  findAddonItemsForProject,
-  findAppItemsForProject,
-  isRootStartingWithFilePath,
-  getDepIfExists,
-  cached,
-  PackageInfo,
-} from './utils/layout-helpers';
+import { ProjectProviders, collectProjectProviders, AddonMeta, emptyProjectProviders } from './utils/addon-api';
+import { findTestsForProject, findAddonItemsForProject, findAppItemsForProject, isRootStartingWithFilePath, cached, PackageInfo } from './utils/layout-helpers';
 import { BaseProject } from './base-project';
 import Server from './server';
 import { Diagnostic, FileChangeType } from 'vscode-languageserver/node';
@@ -49,7 +41,6 @@ export class Project extends BaseProject {
   providers!: ProjectProviders;
   builtinProviders!: ProjectProviders;
   addonsMeta: AddonMeta[] = [];
-  dependenciesMeta: DependencyMeta[] = [];
   executors: Executors = {};
   watchers: Watcher[] = [];
   destructors: Destructor[] = [];
@@ -175,19 +166,6 @@ export class Project extends BaseProject {
     this.addons = addons;
     this.addonsMeta = [];
     this._packageJSON = pkg;
-    // for now, let's collect only interesting deps
-    const interestingDeps = ['ember-cli', 'ember-source', 'ember-template-lint', 'typescript', '@embroider/core'];
-
-    interestingDeps.forEach((dep) => {
-      const version = getDepIfExists(pkg, dep);
-
-      if (version !== null) {
-        this.dependenciesMeta.push({
-          name: dep,
-          version,
-        });
-      }
-    });
   }
   async unload() {
     this.initIssues = [];
