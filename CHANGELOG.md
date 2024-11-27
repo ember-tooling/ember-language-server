@@ -1,3 +1,10 @@
+## [2.30.5](https://github.com/ember-tooling/ember-language-server/compare/v2.30.4...v2.30.5) (2024-11-27)
+
+
+### Bug Fixes
+
+* Use broader template-lint range ([71eb563](https://github.com/ember-tooling/ember-language-server/commit/71eb56346954b53cbebfab8ecd06703a4894e414))
+
 ## [2.30.4](https://github.com/ember-tooling/ember-language-server/compare/v2.30.3...v2.30.4) (2024-11-07)
 
 
