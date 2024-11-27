@@ -144,22 +144,11 @@ export default class TemplateLinter {
       });
     }
   }
-  async lint(textDocument: TextDocument): Promise<Diagnostic[] | undefined> {
-    if (this._isEnabled === false) {
-      return;
-    }
-
-    const cwd = process.cwd();
-    const project = this.getProjectForDocument(textDocument);
-
-    if (!project) {
-      return;
-    }
-
+  getSourcesForDocument(textDocument: TextDocument, project: Project): string[] {
     const linterMeta = project.dependencyMap.get('ember-template-lint');
 
     if (!linterMeta) {
-      return;
+      return [];
     }
 
     let sources = [];
@@ -176,8 +165,25 @@ export default class TemplateLinter {
 
       sources = this.sourcesForDocument(textDocument, linterVersion);
     } catch (e) {
+      return [];
+    }
+
+    return sources;
+  }
+  async lint(textDocument: TextDocument): Promise<Diagnostic[] | undefined> {
+    if (this._isEnabled === false) {
+      return [];
+    }
+
+    const cwd = process.cwd();
+
+    const project = this.getProjectForDocument(textDocument);
+
+    if (!project) {
       return;
     }
+
+    const sources = this.getSourcesForDocument(textDocument, project);
 
     if (!sources.length) {
       return;
