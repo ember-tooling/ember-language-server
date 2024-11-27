@@ -2,7 +2,6 @@ import * as memoize from 'memoizee';
 import * as path from 'path';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { addToRegistry, normalizeMatchNaming } from './registry-api';
-import { clean, coerce, valid } from 'semver';
 import { BaseProject } from '../base-project';
 import { fsProvider } from '../fs-provider';
 import walkAsync from './walk-async';
@@ -42,6 +41,7 @@ type StringConfig = Record<string, string>;
 export interface PackageInfo {
   keywords?: string[];
   name?: string;
+  version?: string;
   'ember-language-server'?: UnknownConfig;
   peerDependencies?: StringConfig;
   devDependencies?: StringConfig;
@@ -297,9 +297,7 @@ export function getDepIfExists(pack: PackageInfo, depName: string): string | nul
 
   const version: string = pack?.dependencies?.[depName] ?? pack?.devDependencies?.[depName] ?? pack?.peerDependencies?.[depName] ?? '';
 
-  const cleanVersion = clean(version);
-
-  return valid(coerce(cleanVersion));
+  return version;
 }
 
 export async function isGlimmerXProject(root: string) {

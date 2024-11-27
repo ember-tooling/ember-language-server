@@ -12,6 +12,8 @@ import Server from './server';
 import { Project } from './project';
 import { getRequireSupport } from './utils/layout-helpers';
 import { getFileRanges, RangeWalker } from './utils/glimmer-script';
+import * as semver from 'semver';
+import { type SemVer } from 'semver';
 
 type FindUp = (name: string, opts: { cwd: string; type: string }) => Promise<string | undefined>;
 type LinterVerifyArgs = { source: string; moduleId: string; filePath: string };
@@ -88,7 +90,7 @@ export default class TemplateLinter {
     return this.server.projectRoots.projectForUri(textDocument.uri);
   }
 
-  private sourcesForDocument(textDocument: TextDocument, templateLintVersion: string): string[] {
+  private sourcesForDocument(textDocument: TextDocument, templateLintVersion: SemVer | null): string[] {
     const ext = getExtension(textDocument);
 
     if (ext !== null && !extensionsToLint.includes(ext)) {
@@ -98,8 +100,11 @@ export default class TemplateLinter {
     const documentContent = textDocument.getText();
 
     // we assume that ember-template-lint v5 could handle js/ts/gts/gjs files
+    if (!templateLintVersion) {
+      return [documentContent];
+    }
 
-    if (templateLintVersion === '5') {
+    if (semver.gte(templateLintVersion, '5.0.0')) {
       return [documentContent];
     }
 
@@ -139,28 +144,46 @@ export default class TemplateLinter {
       });
     }
   }
+  getSourcesForDocument(textDocument: TextDocument, project: Project): string[] {
+    const linterMeta = project.dependencyMap.get('ember-template-lint');
+
+    if (!linterMeta) {
+      return [];
+    }
+
+    let sources = [];
+
+    try {
+      /**
+       * Semver parsing can throw errors, if the version is invalid,
+       * we want behave as if there was no version specified.
+       *
+       * (same as when errors are thrown from sourcesForDocument)
+       */
+      const version = linterMeta?.package.version;
+      const linterVersion = version ? semver.parse(version) : null;
+
+      sources = this.sourcesForDocument(textDocument, linterVersion);
+    } catch (e) {
+      return [];
+    }
+
+    return sources;
+  }
   async lint(textDocument: TextDocument): Promise<Diagnostic[] | undefined> {
     if (this._isEnabled === false) {
-      return;
+      return [];
     }
 
     const cwd = process.cwd();
+
     const project = this.getProjectForDocument(textDocument);
 
     if (!project) {
       return;
     }
 
-    const linterMeta = project.dependenciesMeta.find((dep) => dep.name === 'ember-template-lint');
-    const linterVersion = linterMeta?.version.split('.')[0] || 'unknown';
-
-    let sources = [];
-
-    try {
-      sources = this.sourcesForDocument(textDocument, linterVersion);
-    } catch (e) {
-      return;
-    }
+    const sources = this.getSourcesForDocument(textDocument, project);
 
     if (!sources.length) {
       return;
