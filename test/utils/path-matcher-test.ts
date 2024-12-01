@@ -143,6 +143,25 @@ describe('PodMatcher :customPrefix', () => {
     expect(m('foo/bar/app/helpers/foo.js')).toEqual(null);
   });
 });
+
+describe('PodMatcher :appPrefix', () => {
+  const matcher = new PodMatcher('my-app', 'app');
+
+  function m(str: string) {
+    return matcher.metaFromPath(str);
+  }
+
+  it('controller', () => {
+    expect(m('my-app/app/routes/data/index/controller.ts')).toEqual({ type: 'controller', name: 'data/index', scope: 'application', kind: 'script' });
+  });
+
+  it('route', () => {
+    expect(m('my-app/app/routes/data/view/template.hbs')).toEqual({ type: 'template', name: 'data/view', scope: 'application', kind: 'template' });
+    expect(m('my-app/app/routes/data/navigate/route.ts')).toEqual({ type: 'route', name: 'data/navigate', scope: 'application', kind: 'script' });
+    expect(m('my-app/app/routes/data/route.ts')).toEqual({ type: 'route', name: 'data', scope: 'application', kind: 'script' });
+  });
+});
+
 describe('ClassicPathMatcher', () => {
   const matcher = new ClassicPathMatcher();
 
@@ -220,10 +239,18 @@ describe('ClassicPathMatcher', () => {
     expect(m('frontend/app/components/audio-player/styles.css')).toEqual({ type: 'component', name: 'audio-player', scope: 'application', kind: 'style' });
     expect(m('frontend/app/components/audio-player/styles.scss')).toEqual({ type: 'component', name: 'audio-player', scope: 'application', kind: 'style' });
     expect(m('frontend/app/components/audio-player/module.less')).toEqual({ type: 'component', name: 'audio-player', scope: 'application', kind: 'style' });
+    expect(m('my/app/components/table/styles.module.scss')).toEqual({ type: 'component', name: 'table', scope: 'application', kind: 'style' });
 
     expect(m('foo/bar/app/components/foo.js')).toEqual({ type: 'component', name: 'foo', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/components/foo.hbs')).toEqual({ type: 'component', name: 'foo', scope: 'application', kind: 'template' });
     expect(m('foo/bar/app/components/foo.module.less')).toEqual({ type: 'component', name: 'foo', scope: 'application', kind: 'style' });
+
+    expect(m('my/app/components/semantic/chip/-layouts/desktop.hbs')).toEqual({
+      type: 'component',
+      name: 'semantic/chip',
+      scope: 'application',
+      kind: 'template',
+    });
 
     expect(m('foo/bar/app/templates/components/foo.hbs')).toEqual({
       type: 'component',
@@ -289,6 +316,15 @@ describe('ClassicPathMatcher', () => {
     });
   });
   it('routes', () => {
+    expect(m('my-app/app/routes/data/navigate-loading/-layouts/desktop.hbs')).toEqual({
+      type: 'route',
+      name: 'data/navigate-loading',
+      scope: 'application',
+      kind: 'template',
+    });
+    expect(m('my-app/app/routes/data/view/template.hbs')).toEqual({ type: 'route', name: 'data/view', scope: 'application', kind: 'template' });
+    expect(m('my-app/app/routes/data/navigate/route.ts')).toEqual({ type: 'route', name: 'data/navigate', scope: 'application', kind: 'script' });
+    expect(m('foo/bar/app/routes/data/route.ts')).toEqual({ type: 'route', name: 'data', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/routes/foo/index.ts')).toEqual({ type: 'route', name: 'foo/index', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/routes/foo.ts')).toEqual({ type: 'route', name: 'foo', scope: 'application', kind: 'script' });
     expect(m('foo/bar/tests/unit/routes/cart-widget/index-test.js')).toEqual({
@@ -307,8 +343,15 @@ describe('ClassicPathMatcher', () => {
       scope: 'application',
       kind: 'test',
     });
+    expect(m('my-app/tests/unit/controllers/bookmarks/index-test.ts')).toEqual({
+      type: 'controller',
+      name: 'bookmarks/index',
+      scope: 'application',
+      kind: 'test',
+    });
   });
   it('templates', () => {
+    expect(m('my/app/routes/data/template.hbs')).toEqual({ type: 'route', name: 'data', scope: 'application', kind: 'template' });
     expect(m('foo/bar/app/templates/foo/index.hbs')).toEqual({ type: 'template', name: 'foo/index', scope: 'application', kind: 'template' });
     expect(m('foo/bar/app/templates/foo.hbs')).toEqual({ type: 'template', name: 'foo', scope: 'application', kind: 'template' });
     expect(m('foo/bar/app/templates/components/foo.hbs')).toEqual({ type: 'component', name: 'foo', scope: 'application', kind: 'template' });
@@ -345,7 +388,6 @@ describe('ClassicPathMatcher', () => {
     expect(m('foo/bar/app/services/foo-bar/baz.js')).toEqual({ type: 'service', name: 'foo-bar/baz', scope: 'application', kind: 'script' });
     expect(m('foo/bar/tests/unit/services/foo-bar-test.js')).toEqual({ type: 'service', name: 'foo-bar', scope: 'application', kind: 'test' });
   });
-
   it('utils', () => {
     expect(m('foo/bar/app/utils/baz-util.js')).toEqual({ type: 'util', name: 'baz-util', scope: 'application', kind: 'script' });
     expect(m('foo/bar/app/utils/fizz/baz-util.js')).toEqual({ type: 'util', name: 'fizz/baz-util', scope: 'application', kind: 'script' });
