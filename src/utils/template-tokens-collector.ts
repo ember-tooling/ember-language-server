@@ -1,5 +1,5 @@
 import { preprocess, traverse, ASTv1 } from '@glimmer/syntax';
-import { normalizeToClassicComponent, normalizeToNamedBlockName } from './normalizers';
+import { normalizeToClassicComponent } from './normalizers';
 
 function tokensFromType(node: ASTv1.BaseNode, scopedTokens: string[]) {
   const tokensMap = {
@@ -126,7 +126,7 @@ export function getTemplateBlocks(html: string): string[] {
     },
   });
 
-  return Array.from(tokensSet).map((el) => normalizeToNamedBlockName(el));
+  return Array.from(tokensSet);
 }
 
 function getTemplateTokens(ast: ASTv1.Template, nativeTokens: string[]) {
