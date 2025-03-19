@@ -1,3 +1,11 @@
+## [2.30.6](https://github.com/ember-tooling/ember-language-server/compare/v2.30.5...v2.30.6) (2025-03-19)
+
+
+### Bug Fixes
+
+* normalizeToNamedBlockName util ([154c996](https://github.com/ember-tooling/ember-language-server/commit/154c996a1084933fa8b872c2093147a3711fddb6))
+* normalizeToNamedBlockName util ([7ab29d9](https://github.com/ember-tooling/ember-language-server/commit/7ab29d94a1ef4b0c1e1329c15684f9a01a6d8c76))
+
 ## [2.30.5](https://github.com/ember-tooling/ember-language-server/compare/v2.30.4...v2.30.5) (2024-11-27)
 
 
