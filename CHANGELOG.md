@@ -1,3 +1,11 @@
+## [2.30.7](https://github.com/ember-tooling/ember-language-server/compare/v2.30.6...v2.30.7) (2025-05-02)
+
+
+### Bug Fixes
+
+* improve app detection ([bc8728f](https://github.com/ember-tooling/ember-language-server/commit/bc8728f32792fca370addc49f8af90c5969a2c74))
+* improve app detection ([3ad629a](https://github.com/ember-tooling/ember-language-server/commit/3ad629ac3d45d63a7bf0f1928f41991ae543c7a0))
+
 ## [2.30.6](https://github.com/ember-tooling/ember-language-server/compare/v2.30.5...v2.30.6) (2025-03-19)
 
 
