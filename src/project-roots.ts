@@ -3,7 +3,7 @@
 import * as path from 'path';
 import { logError, logInfo } from './utils/logger';
 import { URI } from 'vscode-uri';
-import { isGlimmerXProject, isELSAddonRoot, isRootStartingWithFilePath, safeWalkAsync, asyncGetPackageJSON } from './utils/layout-helpers';
+import { isEmberLikeProject, isELSAddonRoot, isRootStartingWithFilePath, safeWalkAsync, asyncGetPackageJSON } from './utils/layout-helpers';
 
 import Server from './server';
 
@@ -83,7 +83,7 @@ export default class ProjectRoots {
   async findProjectsInsideRoot(workspaceRoot: string) {
     const roots = await safeWalkAsync(workspaceRoot, {
       directories: false,
-      globs: ['**/ember-cli-build.js', '**/package.json'],
+      globs: ['**/ember-cli-build.js', '**/ember-cli-build.cjs', '**/package.json'],
       ignore: ['**/.git/**', '**/bower_components/**', '**/dist/**', '**/node_modules/**', '**/tmp/**'],
     });
 
@@ -97,7 +97,7 @@ export default class ProjectRoots {
 
       if (filePath.endsWith('package.json')) {
         try {
-          if (await isGlimmerXProject(fullPath)) {
+          if (await isEmberLikeProject(fullPath)) {
             await this.onProjectAdd(fullPath);
           }
         } catch (e) {
