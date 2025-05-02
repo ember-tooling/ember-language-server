@@ -300,10 +300,14 @@ export function getDepIfExists(pack: PackageInfo, depName: string): string | nul
   return version;
 }
 
-export async function isGlimmerXProject(root: string) {
+export async function isEmberLikeProject(root: string) {
   const pack = await asyncGetPackageJSON(root);
 
-  return hasDep(pack, '@glimmerx/core') || hasDep(pack, 'glimmer-lite-core');
+  const isGlimmerXProject = hasDep(pack, '@glimmerx/core') || hasDep(pack, 'glimmer-lite-core');
+  const isEmberAddon = 'ember-addon' in pack;
+  const isEmberApp = 'ember' in pack;
+
+  return isGlimmerXProject || isEmberAddon || isEmberApp;
 }
 
 export async function getProjectAddonsRoots(
