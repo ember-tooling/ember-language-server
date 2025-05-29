@@ -189,7 +189,7 @@ export default class TemplateLinter {
       return;
     }
 
-    const TemplateLinterKlass = await this.getLinter(project);
+    const TemplateLinterKlass = await this.linterForProject(project);
 
     if (!TemplateLinterKlass) {
       return;
@@ -275,10 +275,18 @@ export default class TemplateLinter {
   }
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public async linterForProject(project: Project) {
-    return await this.getLinter(project);
+    const maybeLinter = await this.getLinter(project);
+
+    if (!maybeLinter) {
+      return;
+    } else if ('default' in maybeLinter) {
+      return maybeLinter.default;
+    } else {
+      return maybeLinter;
+    }
   }
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  private async getLinter(project: Project): Promise<typeof Linter | undefined> {
+  private async getLinter(project: Project): Promise<typeof Linter | { default: typeof Linter } | undefined> {
     if (this._linterCache.has(project)) {
       return this._linterCache.get(project);
     }
