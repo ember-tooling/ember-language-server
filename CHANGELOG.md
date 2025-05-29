@@ -1,3 +1,10 @@
+## [2.30.8](https://github.com/ember-tooling/ember-language-server/compare/v2.30.7...v2.30.8) (2025-05-29)
+
+
+### Bug Fixes
+
+* improve path detection inside blocks ([385e1c5](https://github.com/ember-tooling/ember-language-server/commit/385e1c52f9095cbba656a7fc0e45a49f4218b460))
+
 ## [2.30.7](https://github.com/ember-tooling/ember-language-server/compare/v2.30.6...v2.30.7) (2025-05-02)
 
 
