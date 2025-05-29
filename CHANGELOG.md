@@ -1,3 +1,10 @@
+## [2.30.9](https://github.com/ember-tooling/ember-language-server/compare/v2.30.8...v2.30.9) (2025-05-29)
+
+
+### Bug Fixes
+
+* possible default export for template-lint ([046702e](https://github.com/ember-tooling/ember-language-server/commit/046702eb2f74ca0d898b89994be86a44f4d240bf))
+
 ## [2.30.8](https://github.com/ember-tooling/ember-language-server/compare/v2.30.7...v2.30.8) (2025-05-29)
 
 
