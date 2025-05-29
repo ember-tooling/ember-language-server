@@ -327,7 +327,11 @@ function _findFocusPath(node: ASTv1.BaseNode, position: Position, seen = new Set
     if (containsPosition(range, position)) {
       path.push(node);
     } else {
-      return [];
+      // Special handling for Block nodes whose loc might not encompass all children
+      if (node.type !== 'Block') {
+        return [];
+      }
+      // For Block nodes, continue searching children even if loc doesn't contain position
     }
   }
 

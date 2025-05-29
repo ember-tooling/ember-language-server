@@ -19,6 +19,20 @@ describe('glimmer-utils', function () {
 
       expect(astPath?.node).toMatchSnapshot();
     });
+    it('support nested ifs', function () {
+      const input = `
+{{#if @hasError}}
+  <Error />
+{{else if this.hasFiles}}
+  <File />
+{{else}}
+  <Empty />
+{{/if}}
+        `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(6, 4)));
+
+      expect(astPath?.node.type).toBe('ElementNode');
+    });
   });
   describe('getLocalScope', function () {
     it('works as expected', function () {
