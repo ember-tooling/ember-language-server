@@ -33,6 +33,104 @@ describe('glimmer-utils', function () {
 
       expect(astPath?.node.type).toBe('ElementNode');
     });
+    it('does not fall to loop in nested Block -> BlockStatement [1]', function () {
+      const input = `
+{{#if foo}}
+we
+{{else if bar}}
+ee
+{{/if}}
+      `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 11)));
+
+      expect(astPath?.node['original']).toBe('bar');
+    });
+    it('does not fall to loop in nested Block -> BlockStatement [2]', function () {
+      const input = `
+{{#if foo}}
+we
+{{else if bar}}
+ee
+{{/if}}
+      `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 8)));
+
+      expect(astPath?.node['original']).toBe('if');
+    });
+    it('does not fall to loop in nested Block -> BlockStatement [3]', function () {
+      const input = `
+{{#if foo}}
+we
+{{else if bar}}
+ee
+{{/if}}
+      `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 4)));
+
+      expect(astPath?.node['type']).toBe('BlockStatement');
+    });
+    it('does not fall to loop in nested Block -> BlockStatement [4]', function () {
+      const input = `
+{{#if foo}}
+we
+{{else if bar}}
+ee
+{{/if}}
+      `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(5, 4)));
+
+      expect(astPath?.node['type']).toBe('BlockStatement');
+    });
+    it('does not fall to loop in nested Block -> BlockStatement [5]', function () {
+      const input = `
+{{#if foo}}
+we
+{{else if (can bar)}}
+ee
+{{/if}}
+      `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 12)));
+
+      expect(astPath?.node['original']).toBe('can');
+    });
+    it('does not fall to loop in nested Block -> BlockStatement [6]', function () {
+      const input = `
+{{#if foo}}
+we
+{{else if (can bar)}}
+ee
+{{/if}}
+      `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 15)));
+
+      expect(astPath?.node['original']).toBe('bar');
+    });
+    it('does not fall to loop in nested Block -> BlockStatement [7]', function () {
+      const input = `
+{{#if foo}}
+we
+{{else if (can bar)}}
+ee
+{{/if}}
+      `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(3, 10)));
+
+      expect(astPath?.node['type']).toBe('SubExpression');
+    });
+    it('does not fall to loop in nested Block -> BlockStatement [8]', function () {
+      const input = `
+{{#if foo}}
+{{else if (can bar)}}
+  {{#if foo}}
+  {{else if (can bar)}}
+  ee
+  {{/if}}
+{{/if}}
+      `;
+      const astPath = ASTPath.toPosition(preprocess(input), toPosition(Position.create(5, 3)));
+
+      expect(astPath?.node['type']).toBe('TextNode');
+    });
   });
   describe('getLocalScope', function () {
     it('works as expected', function () {
