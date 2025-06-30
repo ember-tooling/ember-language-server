@@ -38,6 +38,7 @@ All features currently only work in Ember CLI application that use the default c
 * VSCode: [Unstable Ember Language Server](https://github.com/lifeart/vscode-ember)
 * Neo (Vim): [coc-ember](https://github.com/NullVoxPopuli/coc-ember), [native LSP integration](https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#ember)
 * Emacs using [lsp-mode](https://github.com/emacs-lsp/lsp-mode)
+* Helix: `npm install -g @ember-tooling/ember-language-server`
 * GitPod, Onivim, Coder, VSCodium, and Theia using [Open VSX](https://open-vsx.org/extension/lifeart/vscode-ember-unstable)
 
 ## Addons available for install
