@@ -18,6 +18,7 @@ import {
   asyncFSProvider,
   registerCommandExecutor,
   createConnection,
+  killServerProcess,
 } from './test_helpers/integration-helpers';
 import { MessageConnection } from 'vscode-jsonrpc/node';
 
@@ -67,8 +68,8 @@ describe('integration', function () {
           asyncFSProviderInstance = null;
         }
 
-        await connection.dispose();
-        await serverProcess.kill();
+        connection.dispose();
+        await killServerProcess(serverProcess);
       });
 
       describe('Initialize request', () => {

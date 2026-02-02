@@ -1,5 +1,5 @@
 import { Disposable, MessageConnection } from 'vscode-jsonrpc';
-import { asyncFSProvider, initServer, registerCommandExecutor, startServer, createConnection } from './integration-helpers';
+import { asyncFSProvider, initServer, registerCommandExecutor, startServer, createConnection, killServerProcess } from './integration-helpers';
 
 export { getResult, makeProject, createProject } from './integration-helpers';
 
@@ -53,8 +53,8 @@ export async function createServer({ asyncFsEnabled } = { asyncFsEnabled: false 
         asyncFSProviderInstance = null;
       }
 
-      await connection.dispose();
-      await serverProcess.kill();
+      connection.dispose();
+      await killServerProcess(serverProcess);
     },
   };
 }
