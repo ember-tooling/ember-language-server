@@ -40,7 +40,7 @@ describe('integration', function () {
     describe(`async fs enabled: ${asyncFsEnabled.toString()}`, function () {
       let connection: MessageConnection;
       let serverProcess: cp.ChildProcess;
-      let asyncFSProviderInstance!: any;
+      let asyncFSProviderInstance: Record<string, unknown> | null = null;
       const disposables: Disposable[] = [];
 
       beforeAll(async () => {

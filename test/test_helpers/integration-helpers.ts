@@ -17,6 +17,7 @@ import {
   FoldingRangeRequest,
   Hover,
   HoverRequest,
+  Location,
   ReferencesRequest,
 } from 'vscode-languageserver-protocol/node';
 
@@ -258,7 +259,7 @@ export async function initFileStructure(files: Tree) {
   };
 }
 
-type RecursiveRecord<T> = Record<string, string | T>;
+export type RecursiveRecord<T> = Record<string, string | T>;
 
 export function flattenFsProject(obj: Record<string, unknown | string> | string) {
   if (typeof obj === 'string') {
@@ -497,8 +498,23 @@ export async function getResult(
   files,
   fileToInspect: string,
   position: { line: number; character: number },
-  projectName?: string[]
-): Promise<IResponse<Hover[]>[]>;
+  projectName: string[]
+): Promise<IResponse<Hover>[]>;
+export async function getResult(
+  reqType: typeof HoverRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect: string,
+  position: { line: number; character: number },
+  projectName: string
+): Promise<IResponse<Hover>>;
+export async function getResult(
+  reqType: typeof HoverRequest.method,
+  connection: MessageConnection,
+  files,
+  fileToInspect: string,
+  position: { line: number; character: number }
+): Promise<IResponse<Hover>>;
 export async function getResult(
   reqType: typeof CompletionRequest.method,
   connection: MessageConnection,
@@ -537,8 +553,8 @@ export async function getResult(
   files,
   fileToInspect: string,
   position: { line: number; character: number },
-  projectName?: string
-): Promise<IResponse<Definition>>;
+  projectName: string
+): Promise<IResponse<Definition[]>>;
 export async function getResult(
   reqType: typeof DefinitionRequest.method,
   connection: MessageConnection,
