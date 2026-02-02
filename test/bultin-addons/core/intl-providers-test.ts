@@ -954,7 +954,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
         it('should provide translation definition in handlebars', async () => {
           expect(
             (
-              (await getResult(
+              await getResult(
                 DefinitionRequest.method,
                 connection,
                 {
@@ -967,7 +967,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
                 },
                 'app/components/test.hbs',
                 { line: 0, character: 32 }
-              )) as any
+              )
             ).response
           ).toEqual([
             {
@@ -983,7 +983,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
         it('should provide translation definition in js', async () => {
           expect(
             (
-              (await getResult(
+              await getResult(
                 DefinitionRequest.method,
                 connection,
                 {
@@ -996,7 +996,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
                 },
                 'app/components/test.js',
                 { line: 0, character: 86 }
-              )) as any
+              )
             ).response
           ).toEqual([
             {
@@ -1116,7 +1116,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
         it('should provide translation definition in handlebars', async () => {
           expect(
             (
-              (await getResult(
+              await getResult(
                 DefinitionRequest.method,
                 connection,
                 {
@@ -1129,7 +1129,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
                 },
                 'app/components/test.hbs',
                 { line: 0, character: 32 }
-              )) as any
+              )
             ).response
           ).toEqual([
             {
@@ -1145,7 +1145,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
         it('should provide translation definition in js', async () => {
           expect(
             (
-              (await getResult(
+              await getResult(
                 DefinitionRequest.method,
                 connection,
                 {
@@ -1158,7 +1158,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
                 },
                 'app/components/test.js',
                 { line: 0, character: 86 }
-              )) as any
+              )
             ).response
           ).toEqual([
             {
@@ -1177,7 +1177,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
       it('should provide translation definition in handlebars', async () => {
         expect(
           (
-            (await getResult(
+            await getResult(
               DefinitionRequest.method,
               connection,
               {
@@ -1190,7 +1190,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
               },
               'app/components/test.hbs',
               { line: 0, character: 32 }
-            )) as any
+            )
           ).response
         ).toEqual([
           {
@@ -1206,7 +1206,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
       it('should provide translation definition in js', async () => {
         expect(
           (
-            (await getResult(
+            await getResult(
               DefinitionRequest.method,
               connection,
               {
@@ -1219,7 +1219,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
               },
               'app/components/test.js',
               { line: 0, character: 86 }
-            )) as any
+            )
           ).response
         ).toEqual([
           {
@@ -1235,7 +1235,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
       it('should provide translation definitions from multiple files', async () => {
         expect(
           (
-            (await getResult(
+            await getResult(
               DefinitionRequest.method,
               connection,
               {
@@ -1248,7 +1248,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
               },
               'app/components/test.js',
               { line: 0, character: 70 }
-            )) as any
+            )
           ).response
         ).toEqual([
           {
@@ -1273,7 +1273,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
       it('should provide translation hover in handlebars', async () => {
         expect(
           (
-            (await getResult(
+            await getResult(
               HoverRequest.method,
               connection,
               {
@@ -1286,7 +1286,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
               },
               'app/components/test.hbs',
               { line: 0, character: 20 }
-            )) as any
+            )
           ).response
         ).toEqual({
           contents: {
@@ -1304,7 +1304,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
       it('should provide translation hover in js', async () => {
         expect(
           (
-            (await getResult(
+            await getResult(
               HoverRequest.method,
               connection,
               {
@@ -1317,7 +1317,7 @@ for (const asyncFsEnabled of testCaseAsyncFsOptions) {
               },
               'app/components/test.js',
               { line: 0, character: 70 }
-            )) as any
+            )
           ).response
         ).toEqual({
           contents: {

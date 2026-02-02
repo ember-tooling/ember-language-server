@@ -35,7 +35,7 @@ class MatcherCollection {
   }
 }
 
-export default async function walkAsync(baseDir: string, inputOptions?: Options | string[]) {
+export default async function walkAsync(baseDir: string, inputOptions: Options) {
   const options = handleOptions(inputOptions);
 
   let mapFunct: (arg: Entry) => string;
@@ -60,7 +60,7 @@ export default async function walkAsync(baseDir: string, inputOptions?: Options 
   }
 }
 
-export function entries(baseDir: string, inputOptions?: Options | string[]) {
+export function entries(baseDir: string, inputOptions: Options) {
   const options = handleOptions(inputOptions);
 
   return _walkAsync(ensurePosix(baseDir), options, null, new Set());
@@ -98,16 +98,7 @@ function isDefined<T>(val: T | undefined): val is T {
   return typeof val !== 'undefined';
 }
 
-function handleOptions(_options?: Options | string[]): Options {
-  // @ts-expect-error empty options
-  let options: Options = {};
-
-  if (Array.isArray(_options)) {
-    options.globs = _options;
-  } else if (_options) {
-    options = _options;
-  }
-
+function handleOptions(options: Options): Options {
   return options;
 }
 

@@ -383,17 +383,13 @@ export default class TemplateDefinitionProvider {
       return false;
     }
 
-    if (
-      path.parent.type !== 'MustacheStatement' &&
-      path.parent.type !== 'PathExpression' &&
-      path.parent.type !== 'SubExpression' &&
-      path.parent.type !== 'ElementModifierStatement'
-    ) {
+    if (path.parent.type !== 'MustacheStatement' && path.parent.type !== 'SubExpression' && path.parent.type !== 'ElementModifierStatement') {
       return false;
     }
 
-    // @ts-expect-error @todo - fix typings
-    if (!path.parent || path.parent.path.original !== 'action' || !path.parent.params[0] === node) {
+    const parent = path.parent as ASTv1.MustacheStatement | ASTv1.SubExpression | ASTv1.ElementModifierStatement;
+
+    if (parent.path.type !== 'PathExpression' || parent.path.original !== 'action' || parent.params[0] !== node) {
       return false;
     }
 

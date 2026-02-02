@@ -25,7 +25,7 @@ export interface ServerBucket {
 
 export async function createServer({ asyncFsEnabled } = { asyncFsEnabled: false }): Promise<ServerBucket> {
   const serverProcess = startServer(asyncFsEnabled);
-  let asyncFSProviderInstance!: any;
+  let asyncFSProviderInstance: Record<string, unknown> | null = null;
   const disposables: Disposable[] = [];
   const connection = createConnection(serverProcess);
 

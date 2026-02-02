@@ -1,4 +1,4 @@
-import { normalizeToFs, flattenFsProject } from './integration-helpers';
+import { normalizeToFs, flattenFsProject, RecursiveRecord } from './integration-helpers';
 
 describe('normalizeToFs', () => {
   it('support existing cases', () => {
@@ -10,8 +10,7 @@ describe('normalizeToFs', () => {
       },
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(normalizeToFs(files as any)).toStrictEqual(JSON.parse(JSON.stringify(files)));
+    expect(normalizeToFs(files as RecursiveRecord<RecursiveRecord<string>>)).toStrictEqual(JSON.parse(JSON.stringify(files)));
   });
   it('support new case', () => {
     const expectedObj = {
