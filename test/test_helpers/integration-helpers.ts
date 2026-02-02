@@ -32,6 +32,20 @@ import { FileStat, FileType, fileTypeFromFsStat } from '../../src/utils/fs-utils
 import { IRegistry } from '../../src/utils/registry-api';
 import { Readable, Writable } from 'stream';
 
+export async function killServerProcess(serverProcess: cp.ChildProcess): Promise<void> {
+  if (!serverProcess.killed) {
+    await new Promise<void>((resolve) => {
+      const timeout = setTimeout(() => resolve(), 2000);
+
+      serverProcess.once('exit', () => {
+        clearTimeout(timeout);
+        resolve();
+      });
+      serverProcess.kill();
+    });
+  }
+}
+
 export function createConnection(serverProcess: cp.ChildProcess) {
   serverProcess.stderr.on('data', (data) => {
     fs.appendFileSync(`./error.${serverProcess.pid || 0}.log`, data);
@@ -59,23 +73,22 @@ export function createConnection(serverProcess: cp.ChildProcess) {
 }
 
 export function startServer(asyncFs = false) {
-  const params = JSON.parse(process.env.npm_config_argv);
-
-  // {
-  //   remain: [],
-  //   cooked: [ 'run', 'test' ],
-  //   original: [ 'test', 'template-imports-integration' ]
-  // }
-  const command = params.original[0];
+  // Use ELS_COVERAGE environment variable to determine if we're running in coverage mode
+  // This is more reliable than parsing npm_config_argv which is deprecated in newer yarn versions
+  const isCoverageMode = process.env.ELS_COVERAGE === 'true';
 
   let serverPath = '';
 
-  if (command === 'test') {
-    serverPath = './lib/start-server.js';
-  } else {
+  if (isCoverageMode) {
+    // Use instrumented code for coverage collection
     serverPath = './inst/start-server.js';
+  } else {
+    // Use regular compiled code for normal test runs
+    serverPath = './lib/start-server.js';
   }
 
+  // Always use nyc to spawn the server for consistent stdio handling
+  // The --reporter none option prevents nyc from outputting reports inline
   const options: Array<string | undefined> = ['--reporter', 'none', 'node', serverPath, '--stdio', asyncFs ? '--async-fs' : undefined, '--no-clean'];
 
   return spawn(

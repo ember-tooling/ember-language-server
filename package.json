@@ -77,6 +77,7 @@
     "@typescript-eslint/eslint-plugin": "5.17.0",
     "@typescript-eslint/parser": "5.17.0",
     "broccoli-test-helper": "^2.0.0",
+    "cross-env": "^7.0.3",
     "cross-spawn": "7.0.3",
     "eslint": "8.12.0",
     "eslint-config-prettier": "8.5.0",
@@ -118,7 +119,7 @@
     "lint": "eslint \"./{src,test}/**/*.ts\"",
     "prepublish": "yarn clean && yarn compile",
     "test": "jest",
-    "test:coverage": "rimraf inst/ && nyc instrument lib inst && nyc --no-clean --reporter=clover --reporter=json --reporter=lcov yarn run jest --no-coverage",
+    "test:coverage": "rimraf inst/ && nyc instrument lib inst && cross-env ELS_COVERAGE=true nyc --no-clean --reporter=clover --reporter=json --reporter=lcov yarn run jest --no-coverage",
     "watch": "tsc --watch -p .",
     "prepare": "husky install",
     "test:worker-bundle": "npx http-server ."

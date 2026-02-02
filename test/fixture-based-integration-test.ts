@@ -9,6 +9,7 @@ import {
   normalizeUri,
   normalizeCompletionRequest,
   createConnection,
+  killServerProcess,
 } from './test_helpers/integration-helpers';
 import { MessageConnection } from 'vscode-jsonrpc/node';
 
@@ -26,9 +27,9 @@ describe('With `full-project` initialized on server', () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     connection.dispose();
-    serverProcess.kill();
+    await killServerProcess(serverProcess);
   });
 
   beforeEach(async () => {

@@ -10,6 +10,7 @@ import {
   fsProjectToJSON,
   normalizeCompletionRequest,
   createConnection,
+  killServerProcess,
 } from './test_helpers/integration-helpers';
 import { MessageConnection } from 'vscode-jsonrpc/node';
 
@@ -32,8 +33,8 @@ describe('With `batman project` initialized on server', () => {
   });
 
   afterAll(async () => {
-    await connection.dispose();
-    await serverProcess.kill();
+    connection.dispose();
+    await killServerProcess(serverProcess);
   });
 
   beforeEach(async () => {
