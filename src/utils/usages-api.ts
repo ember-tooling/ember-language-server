@@ -105,9 +105,33 @@ export function findRelatedFiles(token: string, tokenType: MatchResultType = 'co
   return results;
 }
 
+const MAX_TEMPLATE_TOKENS_SIZE = 5000;
+const TOKEN_CACHE_KEYS_BY_ACCESS: { kind: UsageType; name: string }[] = [];
+
+function updateTokenCacheAccess(kind: UsageType, name: string) {
+  const idx = TOKEN_CACHE_KEYS_BY_ACCESS.findIndex((e) => e.kind === kind && e.name === name);
+
+  if (idx !== -1) {
+    TOKEN_CACHE_KEYS_BY_ACCESS.splice(idx, 1);
+  }
+
+  TOKEN_CACHE_KEYS_BY_ACCESS.push({ kind, name });
+}
+
+function evictOldestTokensIfNeeded() {
+  while (TOKEN_CACHE_KEYS_BY_ACCESS.length > MAX_TEMPLATE_TOKENS_SIZE) {
+    const oldest = TOKEN_CACHE_KEYS_BY_ACCESS.shift();
+
+    if (oldest) {
+      delete TEMPLATE_TOKENS[oldest.kind][oldest.name];
+    }
+  }
+}
+
 const tokenQueue: [UsageType, string, string][] = [];
 
-let extractionTimeout: NodeJS.Timeout | number;
+let extractionTimeout: NodeJS.Timeout | number = 0;
+let isExtracting = false;
 
 function scheduleTokensExtraction(kind: UsageType, normalizedName: string, file: string) {
   tokenQueue.push([kind, normalizedName, file]);
@@ -117,9 +141,17 @@ function scheduleTokensExtraction(kind: UsageType, normalizedName: string, file:
 }
 
 export async function waitForTokensToBeCollected() {
-  while (tokenQueue.length) {
-    await new Promise((resolve) => setTimeout(resolve, 200));
+  // Wait for the debounce timeout to fire (100ms debounce + buffer)
+  // This ensures that if files were just added to the queue, the extraction will start
+  await new Promise((resolve) => setTimeout(resolve, 200));
+
+  // Then wait for the queue to drain and extraction to complete
+  while (tokenQueue.length > 0 || isExtracting) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
   }
+
+  // One more small wait to ensure any async file reads have completed
+  await new Promise((resolve) => setTimeout(resolve, 50));
 }
 
 export function getAllTemplateTokens(): ITemplateTokens {
@@ -127,55 +159,85 @@ export function getAllTemplateTokens(): ITemplateTokens {
 }
 
 async function extractTokens() {
+  // Guard against concurrent execution.
+  // When scheduleTokensExtraction resets the debounce timer while extractTokens is
+  // already running (during an async await point), the new timer fires and calls
+  // extractTokens again. Without this guard, two concurrent calls would both read
+  // tokenQueue[0], then both call tokenQueue.shift(), causing the second shift to
+  // remove an unprocessed item from the queue.
+  if (isExtracting) {
+    return;
+  }
+
   if (!tokenQueue.length) {
     return;
   }
 
-  const item = tokenQueue[0];
+  isExtracting = true;
 
-  if (item === undefined) {
-    logDebugInfo('extractTokens:item:undefined', tokenQueue);
+  // Use a do-while to catch items added during the final yield
+  do {
+    while (tokenQueue.length > 0) {
+      const item = tokenQueue[0];
 
-    return;
-  }
-
-  const [kind, normalizedName, file]: [UsageType, string, string] = item;
-
-  try {
-    const content = await fsProvider().readFile(file);
-
-    if (content !== null && content.trim().length > 0) {
-      const ast = preprocess(content);
-
-      const tokens = extractTokensFromTemplate(ast);
-      let yieldMeta = {};
-
-      if (kind === 'component' && content.includes('{{yield')) {
-        try {
-          yieldMeta = extractYieldMetadata(ast);
-        } catch (e) {
-          yieldMeta = {};
-        }
+      if (item === undefined) {
+        logDebugInfo('extractTokens:item:undefined', tokenQueue);
+        tokenQueue.shift();
+        continue;
       }
 
-      TEMPLATE_TOKENS[kind][normalizedName] = {
-        source: file,
-        tokens,
-        yieldScopes: yieldMeta,
-      };
-    } else if (typeof content === 'string') {
-      TEMPLATE_TOKENS[kind][normalizedName] = {
-        source: file,
-        tokens: [],
-        yieldScopes: {},
-      };
+      const [kind, normalizedName, file]: [UsageType, string, string] = item;
+
+      try {
+        const content = await fsProvider().readFile(file);
+
+        if (content !== null && content.trim().length > 0) {
+          const ast = preprocess(content);
+
+          const tokens = extractTokensFromTemplate(ast);
+          let yieldMeta = {};
+
+          if (kind === 'component' && content.includes('{{yield')) {
+            try {
+              yieldMeta = extractYieldMetadata(ast);
+            } catch (e) {
+              yieldMeta = {};
+            }
+          }
+
+          TEMPLATE_TOKENS[kind][normalizedName] = {
+            source: file,
+            tokens,
+            yieldScopes: yieldMeta,
+          };
+          updateTokenCacheAccess(kind, normalizedName);
+          evictOldestTokensIfNeeded();
+        } else if (typeof content === 'string') {
+          TEMPLATE_TOKENS[kind][normalizedName] = {
+            source: file,
+            tokens: [],
+            yieldScopes: {},
+          };
+          updateTokenCacheAccess(kind, normalizedName);
+          evictOldestTokensIfNeeded();
+        }
+      } catch (e) {
+        //
+      }
+
+      tokenQueue.shift();
+
+      // Small delay between items to avoid blocking the event loop
+      if (tokenQueue.length > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 16));
+      }
     }
-  } catch (e) {
-    //
-  } finally {
-    tokenQueue.shift();
-    setTimeout(extractTokens, 16);
-  }
+
+    // Yield once more to catch any items pushed during the last iteration
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  } while (tokenQueue.length > 0);
+
+  isExtracting = false;
 }
 
 export function updateTemplateTokens(kind: UsageType, normalizedName: string, file: string | null) {
